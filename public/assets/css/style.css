@@ -1,0 +1,749 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.app-wrapper {
+    padding: 10px;
+    text-align: center;
+    align-items: center;
+    width: 100%;
+}
+
+.card {
+    flex-grow: 1; /* Memastikan kartu menggunakan ruang yang tersedia */
+    min-width: 280px; /* Lebar minimal agar responsif */
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+}
+
+.cards {
+    flex-grow: 1; /* Memastikan kartu menggunakan ruang yang tersedia */
+    max-width: 400px; /* Batas maksimal lebar */
+    min-width: 280px; /* Lebar minimal agar responsif */
+    border: none;
+    border-radius: 10px;
+    background-color: #fff;
+    margin: 0px;
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+.card ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.card ul li {
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: #555;
+}
+
+.card img {
+    border: 2px solid #00456d;
+}
+
+.d-flex {
+    display: flex;
+    flex-wrap: wrap; /* Membungkus jika ruang tidak cukup */
+    justify-content: space-evenly; /* Sebarkan kartu secara merata */
+    gap: 20px; /* Jarak antar elemen */
+    width: 100%; /* Lebar penuh */
+}
+
+.border-bottom-line {
+    border-bottom: 2px solid rgba(0, 0, 0, 0.2); /* Garis bawah */
+}
+
+.flex-column {
+    flex-direction: column;
+}
+
+.gap-4 {
+    gap: 20px;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.align-items-center {
+    align-items: center;
+}
+
+.justify-content-center {
+    justify-content: center;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.sidebar {
+    width: 300px;
+    min-height: 100vh;
+    max-height: 100vh;
+    background: radial-gradient(
+        circle at top right,
+        #00456d 0%,
+        #858585 65%,
+        #ffffff 100%
+    );
+    color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0; /* Jangan biarkan sidebar menyusut */
+    position: fixed; /* Sidebar tetap di posisi kiri */
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.profile-section {
+    margin-bottom: 20px;
+}
+
+.nav-link {
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+
+.nav-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.profile-section {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.profile-picture {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+.profile-info h4 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.profile-info p {
+    margin: 0;
+    font-size: 14px;
+    color: #ddd;
+}
+
+.menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu-item {
+    position: relative; /* Relatif untuk submenu */
+    margin-bottom: 10px;
+    margin: 5px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.menu-item a {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.menu-item:hover {
+    background: #e2e6ea; /* Warna saat hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Bayangan lebih tegas saat hover */
+}
+
+.menu-item i {
+    font-size: 18px; /* Ukuran ikon */
+    color: rgb(63, 63, 63); /* Warna ikon menjadi hitam */
+    margin-right: 10px; /* Jarak antara ikon dan teks */
+}
+
+.menu-item.has-submenu .submenu-toggle.open {
+    transform: rotate(180deg);
+}
+
+.menu-item:hover > a {
+    background-color: #eaeaea;
+    color: #000;
+    font-weight: bold;
+}
+
+.submenu {
+    position: relative;
+    background-color: transparent;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    display: none;
+}
+
+.submenu-item {
+    padding: 8px 15px;
+}
+
+.submenu-item a {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    font-weight: 500;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.submenu-item a:hover {
+    background-color: #eaeaea; /* Warna saat di-hover */
+    color: #000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Bayangan lebih jelas */
+}
+
+.submenu-item i {
+    margin-right: 10px;
+    font-size: 16px; /* Ukuran ikon */
+}
+.submenu-toggle {
+    margin-left: auto;
+    transition: transform 0.3s;
+}
+
+.sidebar,
+main {
+    min-height: 100vh; /* Setinggi layar */
+}
+
+main {
+    margin-left: 300px;
+    flex-grow: 1;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+body {
+    display: flex;
+    flex-direction: row;
+    /* Menambahkan font Poppins untuk seluruh body */
+    font-family: "Poppins", sans-serif;
+}
+
+.profile-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px; /* Jarak antara profil dan menu */
+}
+
+.profile-card {
+    background: white; /* Latar belakang putih */
+    border-radius: 10px; /* Sudut melengkung */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Bayangan */
+    text-align: center; /* Pusatkan konten */
+    padding: 20px; /* Jarak dalam */
+    width: 200px; /* Lebar kotak */
+}
+
+.profile-card a {
+    text-decoration: none; /* Hilangkan underline */
+    color: inherit; /* Gunakan warna yang diwariskan dari parent */
+    display: flex; /* Layout untuk menata konten secara fleksibel */
+    flex-direction: column; /* Konten vertikal */
+    align-items: center; /* Pusatkan konten secara horizontal */
+    cursor: pointer; /* Tetap bisa ditekan */
+}
+
+.profile-card a:hover {
+    color: inherit;
+    text-decoration: none; /* Pastikan underline tetap hilang */
+}
+
+.profile-card a:focus {
+    outline: none; /* Hilangkan outline default */
+    box-shadow: none; /* Tidak ada shadow tambahan */
+}
+
+.profile-card a:visited {
+    color: inherit; /* Warna tetap seperti teks biasa */
+    text-decoration: none; /* Tidak ada underline */
+}
+
+.profile-picture {
+    width: 80px; /* Ukuran gambar profil */
+    height: 80px;
+    border-radius: 50%; /* Bentuk lingkaran */
+    object-fit: cover; /* Gambar tidak terdistorsi */
+    margin-bottom: 10px; /* Jarak bawah gambar */
+    border: 2px solid #00456d; /* Border di sekitar gambar */
+}
+
+.profile-name {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0;
+    text-align: center;
+    color: #333; /* Warna teks */
+}
+
+.profile-id {
+    font-size: 14px;
+    color: #666; /* Warna teks */
+    margin: 0;
+}
+/* Sidebar Header */
+.sidebar-header {
+    display: flex; /* Flexbox untuk layout horizontal */
+    align-items: center; /* Vertikal rata tengah */
+    padding: 10px 20px; /* Memberikan ruang di dalam header */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* Garis bawah */
+    margin-bottom: 20px; /* Jarak bawah */
+}
+
+.header-logo {
+    width: 50px; /* Ukuran logo */
+    height: 50px;
+    object-fit: contain; /* Agar gambar tidak terdistorsi */
+    margin-right: 10px; /* Jarak antara logo dan teks */
+}
+
+.header-text {
+    display: flex;
+    flex-direction: column; /* Menumpuk teks "SIS" dan "Student Information System" */
+    color: white; /* Warna teks */
+}
+
+.header-text h4 {
+    font-size: 18px; /* Ukuran teks utama */
+    margin: 0;
+    font-weight: bold;
+}
+
+.header-text p {
+    font-size: 12px; /* Ukuran teks deskripsi */
+    margin: 0;
+    color: rgba(255, 255, 255, 0.8); /* Warna teks deskripsi */
+}
+.custom-btn {
+    background-color: #457ec0;
+    border-color: #457ec0; /* Mengubah border juga jika diperlukan */
+}
+.va-text {
+    color: rgb(48, 181, 234); /* Warna biru */
+}
+
+#kemajuanStudiChart {
+    width: 100%;
+    max-width: 600px; /* Atur sesuai kebutuhan */
+    height: 300px; /* Tinggi elemen */
+    display: block; /* Mencegah masalah floating */
+}
+.text-purple {
+    color: #6f42c1; /* Ungu */
+}
+.text-primary {
+    color: #007bff; /* Biru */
+}
+.text-danger {
+    color: #dc3545; /* Merah */
+}
+.text-info {
+    color: #17a2b8; /* Biru muda */
+}
+.text-success {
+    color: #28a745; /* Hijau */
+}
+
+.pengumuman {
+    margin-bottom: 10px;
+}
+.matkul {
+    background-color: #337ab7 !important;
+    color: white !important;
+    border-radius: 10px;
+    margin: 0 auto; /* Tempatkan tabel di tengah container */
+}
+
+.table td,
+.table th {
+    padding: 10px;
+    width: 10%; /* Menambah jarak dalam sel */
+    max-width: 10%;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Modal Header */
+.modal-header {
+    background: linear-gradient(135deg, #4a90e2, #50c2e3);
+    color: white;
+    font-family: "Poppins", sans-serif;
+}
+
+/* Form Controls */
+.form-control {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
+    font-family: "Poppins", sans-serif;
+}
+
+/* Tombol Footer */
+.modal-footer .btn {
+    border-radius: 20px;
+    padding: 10px 20px;
+    font-family: "Poppins", sans-serif;
+}
+
+/* Mengatur font untuk seluruh container */
+h4,
+ul,
+ul li,
+.btn {
+    font-family: "Poppins", sans-serif;
+}
+
+/* Styling tambahan untuk judul h4 */
+h4 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Styling untuk daftar ul */
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+/* Styling untuk setiap item li */
+ul li {
+    margin-bottom: 8px;
+    font-size: 1rem;
+    font-weight: 400;
+    color: #555;
+}
+
+/* Styling untuk span dengan class text-primary dan text-danger */
+.text-primary {
+    color: #007bff; /* Warna biru */
+    font-weight: 600;
+}
+
+.text-danger {
+    color: #dc3545; /* Warna merah */
+    font-weight: 600;
+}
+
+/* Styling tombol */
+.btn {
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-transform: capitalize;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+/* Mengatur font untuk label */
+.form-label {
+    font-family: "Poppins", sans-serif;
+    font-size: 1rem; /* Ukuran font */
+    font-weight: 500; /* Ketebalan font */
+    color: #333; /* Warna teks */
+    display: block; /* Agar label selalu tampil di atas elemen input */
+    margin-bottom: 8px; /* Spasi antara label dan elemen input */
+}
+
+.pengumuman li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: nowrap; /* Mencegah konten membungkus */
+}
+
+.pengumuman li span {
+    flex: 1; /* Membuat teks pengumuman menggunakan sisa ruang yang tersedia */
+    word-wrap: break-word; /* Memastikan teks panjang tidak meluap */
+}
+
+.pengumuman li .btn {
+    white-space: nowrap; /* Mencegah tombol membungkus */
+}
+
+.custom-title {
+    color: white;
+}
+
+.breadcrumb {
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+}
+
+.breadcrumb a {
+    color: #000;
+}
+
+.breadcrumb a:hover {
+    color: #555;
+    text-decoration: none;
+}
+
+.border-bottom {
+    border-bottom: 2px solid #000;
+}
+
+.table th,
+.table td {
+    vertical-align: middle;
+    text-align: center;
+}
+
+.table a {
+    font-weight: bold;
+}
+
+.table {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.table-bordered th,
+.table-bordered td {
+    border: 1px solid #dee2e6;
+}
+
+/* Mengatur posisi judul 'Absensi Mahasiswa' ke kiri */
+h3 {
+    text-align: left; /* Mengatur teks agar rata kiri */
+    margin-top: 20px;
+}
+
+/* Mengatur warna tautan menjadi hitam dan menghapus garis bawah */
+h3.me-auto a {
+    color: #000; /* Warna hitam */
+    text-decoration: none; /* Menghapus garis bawah */
+}
+
+/* Efek hover opsional untuk tautan */
+h3.me-auto a:hover {
+    color: #555; /* Warna abu-abu gelap saat di-hover */
+    text-decoration: none; /* Tetap tanpa garis bawah saat hover */
+}
+
+.text-left-custom {
+    text-align: left !important;
+    margin-bottom: 1.5rem;
+}
+
+.container {
+    text-align: left;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* Program Studi Section */
+.h4-Prodi {
+    position: relative;
+    display: inline-block;
+    padding-bottom: 5px;
+    font-size: 1.75rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.h4-Prodi::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1.5px; /* Ketebalan garis */
+    background-color: #555; /* Warna garis, bisa disesuaikan */
+}
+
+p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #555;
+}
+
+/* Menambahkan underline pada judul Visi dan Misi */
+.underline {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 10px;
+    font-size: 1.25rem; /* Menyesuaikan ukuran font */
+    font-weight: bold;
+    border-bottom: 2px solid #555; /* Garis bawah */
+}
+
+.text-muted {
+    color: #6c757d;
+}
+
+.ms-auto i {
+    color: #007bff;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.ms-auto i:hover {
+    color: #0056b3;
+}
+
+.underline-bold {
+    font-weight: bold;
+    display: inline-block;
+    text-decoration: underline;
+}
+.table-container {
+    max-width: 700px; /* Batasi lebar tabel */
+    margin: 0 auto;
+    margin-left: 0px; /* Pusatkan tabel */
+}
+/* Rata kiri untuk teks dalam tab */
+.nav-link {
+    text-align: left;
+}
+
+/* Rata kiri untuk isi tabel */
+.table th,
+.table td {
+    text-align: left;
+}
+
+/* Tabel nilai */
+.table-nilai {
+    width: 100%;
+    max-width: 800px;
+    margin: 0; /* Hilangkan auto margin */
+    text-align: left; /* Teks rata kiri */
+}
+
+/* Tabs nilai */
+.nav-tabs-nilai {
+    justify-content: flex-start; /* Rata kiri tab */
+    margin-bottom: 1rem;
+}
+
+.nav-tabs-nilai .nav-item .nav-link {
+    font-size: 14px;
+    padding: 10px 20px;
+    border-radius: 0;
+}
+
+.nav-tabs-nilai .nav-item {
+    margin: 0 5px;
+}
+
+/* Konten tab */
+.tab-content-nilai {
+    width: 100%;
+    max-width: 800px;
+    margin: 0; /* Hilangkan auto margin */
+    text-align: left; /* Konten rata kiri */
+}
+
+/* Card styling */
+.card-nilai {
+    max-width: 800px;
+    margin: 0; /* Hilangkan auto margin */
+    text-align: left; /* Teks rata kiri */
+}
+
+/* Atur kontainer utama */
+.nav-tabs-nilai {
+    background-color: #007bff; /* Warna biru */
+    border-bottom: none; /* Hilangkan border bawah default */
+    display: flex;
+    justify-content: flex-start; /* Rata kiri */
+    width: 100%; /* Penuh lebar */
+    max-width: 800px; /* Batas lebar */
+}
+
+/* Tab default */
+.nav-tabs-nilai .nav-link {
+    color: white; /* Teks putih */
+    background-color: transparent; /* Transparan agar menyatu */
+    border: none; /* Hilangkan border default */
+    margin-right: 0; /* Hilangkan jarak antar-tab */
+    text-align: center; /* Teks di tengah dalam tab */
+    padding: 10px 15px; /* Sesuaikan padding */
+    flex: 0; /* Lebar tab menyesuaikan konten */
+}
+
+/* Tab aktif */
+.nav-tabs-nilai .nav-link.active {
+    color: #007bff; /* Teks biru */
+    background-color: white; /* Latar putih */
+    border: 1px solid #007bff; /* Border biru */
+    border-bottom-color: white; /* Hilangkan border bawah tab aktif */
+    z-index: 1; /* Letakkan di atas garis biru */
+}
+
+/* Hover */
+.nav-tabs-nilai .nav-link:hover {
+    color: white; /* Teks tetap putih */
+    background-color: #0056b3; /* Biru gelap */
+}
+
+/* Konten tab */
+.tab-content-nilai {
+    max-width: 800px; /* Batasi lebar konten tab */
+    margin-left: 0; /* Rata kiri */
+    margin-right: auto;
+}
+
+.mark-yellow {
+    background-color: #ffffcc; /* Kuning muda */
+    padding: 5px; /* Tambahkan spasi di sekitar teks */
+    border-radius: 4px; /* Opsional: Tambahkan sudut tumpul */
+}
+
+#pengumumanModal .modal-content {
+    width: 50%;
+    margin: 30px auto;
+}

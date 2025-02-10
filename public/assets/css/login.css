@@ -1,0 +1,203 @@
+/* Global Styles */
+body {
+    margin: 0;
+    font-family: "Times New Roman", Times, serif;
+    background: linear-gradient(to right, #014871, #d7ede2);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #333;
+}
+
+/* Container */
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 90%;
+    max-width: 1200px;
+    gap: 40px; /* Spacing between sections */
+}
+
+/* Welcome Section */
+.welcome-section {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+}
+
+.welcome-section img {
+    max-width: 140px; /* Logo size */
+}
+
+.welcome-content {
+    margin-left: 20px;
+    align-items: center;
+}
+
+.welcome-content .font-sis {
+    font-size: 100px;
+    margin-top: 0;
+    margin-bottom: 0;
+    color: white;
+}
+
+.welcome-content p {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+/* Login Section */
+.login-section {
+    flex: 1;
+    background: linear-gradient(to bottom, #0b689d, #d7ede2);
+    padding: 10px 80px 40px 80px;
+    border-radius: 20px;
+    box-shadow: 6px 8px 0 rgba(0, 0, 0, 0.3); /* Solid shadow */
+    max-width: 300px;
+}
+
+.login-section h2 {
+    text-align: center;
+    color: #1e5396;
+    margin-bottom: 10px;
+    font-size: 1.8rem;
+}
+
+.sub-heading {
+    text-align: center;
+    color: #555;
+    font-size: 1rem;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-left: -12px;
+    margin-bottom: 5px;
+    font-size: 25px;
+    color: #ffffff;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 30px;
+    font-size: 1rem;
+    margin-left: -12px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Inner shadow */
+}
+
+/* Input Icons */
+.form-group i {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(20%);
+    color: #999;
+    font-size: 1.2rem;
+}
+
+/* Button Styles */
+.btn {
+    width: 50%;
+    background: white;
+    color: #1e5396;
+    font-size: 16px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+    box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.2),
+        /* Bottom-right shadow */ -3px 0px 6px rgba(0, 0, 0, 0.2); /* Left shadow */
+}
+
+.btn:hover {
+    background: #163e73;
+    color: white;
+}
+
+/* Login Section Header */
+.login-heading {
+    font-size: 100px;
+    margin-top: -1rem;
+    margin-bottom: 0;
+    text-align: center;
+    color: #005bd3;
+    -webkit-text-stroke: 0.5px white; /* White border around text */
+    text-stroke: 0.5px white; /* Non-prefixed version for wider compatibility */
+}
+
+/* Additional Text Styles */
+.container-sis {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: -1rem;
+    margin-bottom: -1rem;
+}
+
+.welcome-text {
+    font-size: 40px;
+    color: white;
+}
+
+.student-text {
+    font-size: 25px;
+    color: #add8e6; /* Light blue color */
+}
+
+.email-section {
+    flex: 1;
+    background: linear-gradient(to bottom, #0b689d, #d7ede2);
+    padding: 10px 80px 40px 80px;
+    border-radius: 20px;
+    box-shadow: 6px 8px 0 rgba(0, 0, 0, 0.3); /* Solid shadow */
+    max-width: 600px;
+}
+
+/* Center Container */
+.email-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%; /* Full height for centering */
+    padding: 20px;
+}
+
+/* Notification Card */
+.email-notification-card {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); /* Enhanced shadow */
+    padding: 30px 50px; /* Wider padding for readability */
+    max-width: 800px; /* Adjust width for larger screens */
+    width: 70%;
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+/* Heading Styling */
+.email-heading {
+    font-size: 28px;
+    margin-bottom: 15px;
+}
+
+/* Text Content Styling */
+.email-content {
+    font-size: 16px;
+    line-height: 1.6; /* Improved readability */
+    margin-bottom: 20px;
+    color: #333;
+}
