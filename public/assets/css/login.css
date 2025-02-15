@@ -2,22 +2,41 @@
 body {
     margin: 0;
     font-family: "Times New Roman", Times, serif;
-    background: linear-gradient(to right, #014871, #d7ede2);
-    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 90%;
+    padding: 40px; /* Whitespace around the container */
     color: #333;
 }
 
 /* Container */
 .container {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    width: 90%;
+    width: 100%;
     max-width: 1200px;
     gap: 40px; /* Spacing between sections */
+    padding: 40px; /* Whitespace around the container */
+    border-radius: 20px; /* Rounded corners */
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+    position: relative; /* Required for pseudo-element */
+    overflow: hidden; /* Ensure the pseudo-element doesn't overflow */
+}
+
+/* Pseudo-element untuk background dengan opacity */
+.container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url("../img/del.png") no-repeat center center; /* Background image */
+    background-size: cover; /* Fit the container */
+    opacity: 0.25; /* 25% opacity */
+    z-index: -1; /* Letakkan di belakang konten */
 }
 
 /* Welcome Section */
@@ -40,7 +59,7 @@ body {
     font-size: 100px;
     margin-top: 0;
     margin-bottom: 0;
-    color: white;
+    color: #1e5396; /* Dark blue color */
 }
 
 .welcome-content p {
@@ -51,11 +70,15 @@ body {
 /* Login Section */
 .login-section {
     flex: 1;
-    background: linear-gradient(to bottom, #0b689d, #d7ede2);
-    padding: 10px 80px 40px 80px;
+    background: linear-gradient(
+        to bottom,
+        rgba(109, 157, 193, 1),
+        rgba(231, 235, 237, 1)
+    );
+    padding: 20px 40px; /* Adjusted padding */
     border-radius: 20px;
     box-shadow: 6px 8px 0 rgba(0, 0, 0, 0.3); /* Solid shadow */
-    max-width: 300px;
+    max-width: 800px;
 }
 
 .login-section h2 {
@@ -73,7 +96,7 @@ body {
 }
 
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 0px;
     position: relative;
 }
 
@@ -130,13 +153,11 @@ body {
 
 /* Login Section Header */
 .login-heading {
-    font-size: 100px;
+    font-size: 50px;
     margin-top: -1rem;
-    margin-bottom: 0;
+    margin-bottom: 2px;
     text-align: center;
-    color: #005bd3;
-    -webkit-text-stroke: 0.5px white; /* White border around text */
-    text-stroke: 0.5px white; /* Non-prefixed version for wider compatibility */
+    color: white;
 }
 
 /* Additional Text Styles */
@@ -149,8 +170,9 @@ body {
 }
 
 .welcome-text {
-    font-size: 40px;
-    color: white;
+    font-size: 25px;
+    color: black;
+    font-weight: bold;
 }
 
 .student-text {
@@ -160,11 +182,16 @@ body {
 
 .email-section {
     flex: 1;
-    background: linear-gradient(to bottom, #0b689d, #d7ede2);
+    background: linear-gradient(
+        to bottom,
+        rgba(109, 157, 193, 1),
+        rgba(231, 235, 237, 1)
+    );
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+    overflow: hidden; /* Ensure the pseudo-element doesn't overflow */
     padding: 10px 80px 40px 80px;
     border-radius: 20px;
-    box-shadow: 6px 8px 0 rgba(0, 0, 0, 0.3); /* Solid shadow */
-    max-width: 600px;
+    max-width: 700px;
 }
 
 /* Center Container */
@@ -200,4 +227,66 @@ body {
     line-height: 1.6; /* Improved readability */
     margin-bottom: 20px;
     color: #333;
+}
+
+/* Form Styles */
+form {
+    width: 100%;
+}
+
+.form-box {
+    position: absolute;
+    right: 0;
+    width: 50%;
+    height: 100%;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    color: #333;
+    text-align: center;
+    padding: 40px;
+    z-index: 1;
+    transition: 0.6s ease-in-out 1.2s, visibility 0s 1s;
+}
+
+.container.active .form-box {
+    right: 50%;
+}
+
+.form-box.register {
+    visibility: hidden;
+}
+
+.container.active .form-box.register {
+    visibility: visible;
+}
+
+.input-box {
+    position: relative;
+    margin: 30px 0;
+}
+
+.input-box input {
+    width: 100%;
+    padding: 13px 50px 13px 20px;
+    background: #eee;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #333;
+    font-weight: 500;
+}
+
+.input-box input::placeholder {
+    color: #888;
+    font-weight: 400;
+}
+
+.input-box i {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
 }
