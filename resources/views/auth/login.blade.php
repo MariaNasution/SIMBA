@@ -6,74 +6,76 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login - Student Information System</title>
   <link rel="stylesheet" href="{{ asset('assets/css/login.css') }}">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 </head>
 
 <body>
   <div class="container">
-    <!-- Welcome Section -->
-    <div class="welcome-section">
-      <img src="{{ asset('assets/img/Logo Institut Teknologi Del.png') }}" alt="Del Logo">
-      <div class="welcome-content">
-        <p class="welcome-text">Sistem Informasi</p>
-        <p class="welcome-text">Manajemen Bimbingan</p>
-        <p class="welcome-text">Mahasiswa dan Perwalian</p>
+    <div class="form-box login">
+      <div class="logo-container">
+        <img src="{{ asset('assets/img/Logo Institut Teknologi Del.png') }}" alt="Logo IT Del" class="logo">
+        <div class="logo-text">
+          <h2>Sistem Informasi <br>Manajemen Bimbingan<br>Mahasiswa dan Perwalian<br><span>(SIMBA)</span></h2>
+        </div>
+      </div>
+      <button class="btn register-btn">Login</button>
+    </div>
 
-        <p class="welcome-text"> (SIMBA)</p>
+
+    <div class="form-box register">
+      <div class="logo-container">
+        <img src="{{ asset('assets/img/Logo Institut Teknologi Del.png') }}" alt="Logo IT Del" class="logo">
+        <div class="logo-text">
+          <h2>Sistem Informasi <br>Manajemen Bimbingan<br>Mahasiswa dan Perwalian<br><span>(SIMBA)</span></h2>
+        </div>
+      </div>
+      <button class="btn login-btn">Register</button>
+    </div>
+
+    <div class="toggle-box">
+      <div class="toggle-panel toggle-right">
+        <form action="#">
+          <h1>Login</h1>
+          <div class="input-box">
+            <input type="text" placeholder="Username" required>
+            <i class="bx bxs-user"></i>
+          </div>
+          <div class="input-box">
+            <input type="password" placeholder="Password" required>
+            <i class="bx bxs-lock-alt"></i>
+          </div>
+
+          <button type="submit" class="btn">Login</button>
+          <p>or login with social platforms</p>
+
+        </form>
+
+      </div>
+      <div class="toggle-panel toggle-left">
+        <form action="#">
+          <h1>Registration</h1>
+          <div class="input-box">
+            <input type="text" placeholder="Username" required>
+            <i class="bx bxs-user"></i>
+          </div>
+          <div class="input-box">
+            <input type="password" placeholder="Password" required>
+            <i class="bx bxs-lock-alt"></i>
+          </div>
+          <div class="input-box">
+            <input type="email" placeholder="Email" required>
+            <i class="bx bxs-envelope"></i>
+          </div>
+          <button type="submit" class="btn">Register</button>
+          <p>or register with social platforms</p>
+        </form>
+
       </div>
     </div>
-
-    <!-- Login Section -->
-    <div class="login-section">
-      <p class="login-heading">DAFTAR</p>
-      <form action="{{ route('login.submit') }}" method="POST">
-        @csrf
-        <!-- Input NIM -->
-        <div class="form-group">
-          <label for="nim">NIM</label>
-          <div class="input-wrapper">
-            <input type="text" id="nim" name="nim" placeholder="Student NIM" required>
-            <i class="fas fa-user"></i>
-          </div>
-        </div>
-
-        <!-- Input Password -->
-        <div class="form-group">
-          <label for="password">Password</label>
-          <div class="input-wrapper">
-            <input type="password" id="password" name="password" placeholder="*******" required>
-            <i class="fas fa-lock"></i>
-          </div>
-
-          <!-- Pesan Kesalahan -->
-          @if ($errors->has('login'))
-          <p style="color: red; font-size: 14px; margin-top: 8px;">
-            {{ $errors->first('login') }}
-          </p>
-          @endif
-        </div>
-
-        <div class="forgot-password">
-          <a href="{{ route('password.forgot') }}"
-            style="color: #ffffff; font-size: 14px; text-align: right; display: block; margin-top: 10px;">
-            Lupa Password?
-          </a>
-        </div>
-
-        <div>
-          <a href="{{ route('register.form') }}"
-            style="color: #ffffff; font-size: 14px; text-align: right; display: block; margin-top: 10px;">
-            Belum Punya Akun?
-          </a>
-        </div>
-
-        <!-- Tombol Login -->
-        <center>
-          <button type="submit" class="btn">Login</button>
-        </center>
-      </form>
-    </div>
   </div>
+
+  <script src="{{ asset('js/app.js') }}"></script>
+
 </body>
 
 </html>

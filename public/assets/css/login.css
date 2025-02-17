@@ -1,252 +1,117 @@
-/* Global Styles */
+@import url("https://fonts.googleapis.com/css2?family-Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap");
+
+* {
+    margin: 0%;
+    padding: 0%;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+    text-decoration: none;
+    list-style: none;
+}
+
 body {
-    margin: 0;
-    font-family: "Times New Roman", Times, serif;
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 90%;
-    padding: 40px; /* Whitespace around the container */
-    color: #333;
+    min-height: 100vh;
+    background: linear-gradient(90deg, #e2e2e2, #c9d6ff);
 }
 
-/* Container */
 .container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    max-width: 1200px;
-    gap: 40px; /* Spacing between sections */
-    padding: 40px; /* Whitespace around the container */
-    border-radius: 20px; /* Rounded corners */
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1); /* Shadow for depth */
-    position: relative; /* Required for pseudo-element */
-    overflow: hidden; /* Ensure the pseudo-element doesn't overflow */
+    position: relative;
+    width: 900px;
+    height: 500px;
+    background: url("../img/del.png") no-repeat center/cover; /* Tambahkan ini */
+    margin: 20px;
+    border-radius: 30px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0, 0.2);
+    overflow: hidden;
 }
-
-/* Pseudo-element untuk background dengan opacity */
+/* Tambahkan ini untuk overlay */
 .container::before {
     content: "";
     position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
     height: 100%;
-    background: url("../img/del.png") no-repeat center center; /* Background image */
+    background: rgba(255, 255, 255, 0.9);
     background-size: cover; /* Fit the container */
-    opacity: 0.25; /* 25% opacity */
-    z-index: -1; /* Letakkan di belakang konten */
+    opacity: 0.7; /* 25% opacity */
+    z-index: 1;
+}
+.container h1 {
+    font-size: 24px;
+    margin: -10px 0;
 }
 
-/* Welcome Section */
-.welcome-section {
-    flex: 1;
+.container p {
+    font-size: 14.5px;
+    margin: 15px 0;
+}
+
+/* Tambahkan CSS ini */
+.logo-container {
     display: flex;
-    align-items: flex-start;
-}
-
-.welcome-section img {
-    max-width: 140px; /* Logo size */
-}
-
-.welcome-content {
-    margin-left: 20px;
     align-items: center;
-}
-
-.welcome-content .font-sis {
-    font-size: 100px;
-    margin-top: 0;
-    margin-bottom: 0;
-    color: #1e5396; /* Dark blue color */
-}
-
-.welcome-content p {
-    margin-top: 0;
-    margin-bottom: 0;
-}
-
-/* Login Section */
-.login-section {
-    flex: 1;
-    background: linear-gradient(
-        to bottom,
-        rgba(109, 157, 193, 1),
-        rgba(231, 235, 237, 1)
-    );
-    padding: 20px 40px; /* Adjusted padding */
-    border-radius: 20px;
-    box-shadow: 6px 8px 0 rgba(0, 0, 0, 0.3); /* Solid shadow */
-    max-width: 800px;
-}
-
-.login-section h2 {
-    text-align: center;
-    color: #1e5396;
-    margin-bottom: 10px;
-    font-size: 1.8rem;
-}
-
-.sub-heading {
-    text-align: center;
-    color: #555;
-    font-size: 1rem;
-    margin-bottom: 30px;
-}
-
-.form-group {
-    margin-bottom: 0px;
-    position: relative;
-}
-
-.form-group label {
-    display: block;
-    font-weight: bold;
-    margin-left: -12px;
-    margin-bottom: 5px;
-    font-size: 25px;
-    color: #ffffff;
-}
-
-.form-group input {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ccc;
-    border-radius: 30px;
-    font-size: 1rem;
-    margin-left: -12px;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Inner shadow */
-}
-
-/* Input Icons */
-.form-group i {
+    margin-top: 35%;
+    margin-left: 10%;
     position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(20%);
-    color: #999;
-    font-size: 1.2rem;
+    width: 100%;
 }
 
-/* Button Styles */
-.btn {
-    width: 50%;
-    background: white;
-    color: #1e5396;
-    font-size: 16px;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-    margin-top: 3rem;
-    margin-bottom: 1rem;
-    box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.2),
-        /* Bottom-right shadow */ -3px 0px 6px rgba(0, 0, 0, 0.2); /* Left shadow */
+.logo {
+    width: 100px;
+    height: px;
+    margin-right: 10px;
 }
 
-.btn:hover {
-    background: #163e73;
-    color: white;
+/* Penyesuaian tombol */
+.form-box .btn {
+    width: 80%;
+    margin-top: auto;
+}
+.logo-text h2 {
+    font-size: 18px;
+    color: #2c3e50;
+    line-height: 1.3;
+    margin-bottom: 5px;
+    font-weight: 800;
+    text-align: justify;
 }
 
-/* Login Section Header */
-.login-heading {
-    font-size: 50px;
-    margin-top: -1rem;
-    margin-bottom: 2px;
-    text-align: center;
-    color: white;
+/* Modifikasi form-box */
+.form-box.login {
+    right: 0;
+    left: auto;
 }
 
-/* Additional Text Styles */
-.container-sis {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: -1rem;
-    margin-bottom: -1rem;
+.container.active .form-box.login {
+    transform: translateX(100%);
+    opacity: 0;
+    visibility: hidden;
 }
 
-.welcome-text {
-    font-size: 25px;
-    color: black;
-    font-weight: bold;
+/* Untuk positioning button */
+.form-box.login .btn {
+    margin-top: auto;
+    width: 80%;
 }
 
-.student-text {
-    font-size: 25px;
-    color: #add8e6; /* Light blue color */
-}
-
-.email-section {
-    flex: 1;
-    background: linear-gradient(
-        to bottom,
-        rgba(109, 157, 193, 1),
-        rgba(231, 235, 237, 1)
-    );
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1); /* Shadow for depth */
-    overflow: hidden; /* Ensure the pseudo-element doesn't overflow */
-    padding: 10px 80px 40px 80px;
-    border-radius: 20px;
-    max-width: 700px;
-}
-
-/* Center Container */
-.email-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%; /* Full height for centering */
-    padding: 20px;
-}
-
-/* Notification Card */
-.email-notification-card {
-    background-color: white;
-    border-radius: 15px;
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); /* Enhanced shadow */
-    padding: 30px 50px; /* Wider padding for readability */
-    max-width: 800px; /* Adjust width for larger screens */
-    width: 70%;
-    text-align: center;
-    font-family: Arial, sans-serif;
-}
-
-/* Heading Styling */
-.email-heading {
-    font-size: 28px;
-    margin-bottom: 15px;
-}
-
-/* Text Content Styling */
-.email-content {
-    font-size: 16px;
-    line-height: 1.6; /* Improved readability */
-    margin-bottom: 20px;
-    color: #333;
-}
-
-/* Form Styles */
 form {
     width: 100%;
 }
 
 .form-box {
     position: absolute;
-    right: 0;
     width: 50%;
     height: 100%;
-    background: #fff;
+    background: transparent !important;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    color: #333;
-    text-align: center;
-    padding: 40px;
-    z-index: 1;
-    transition: 0.6s ease-in-out 1.2s, visibility 0s 1s;
+    justify-content: space-between;
+    padding: 40px 60px;
+    transition: all 0.6s ease-in-out;
+    z-index: 2;
 }
 
 .container.active .form-box {
@@ -254,32 +119,42 @@ form {
 }
 
 .form-box.register {
+    transform: translateX(-100%);
+    opacity: 0;
     visibility: hidden;
 }
 
 .container.active .form-box.register {
+    transform: translateX(0);
+    opacity: 1;
     visibility: visible;
 }
 
 .input-box {
     position: relative;
     margin: 30px 0;
+    width: 100%;
+    width: 100%;
+    padding: 13px 20px;
+    background: transparent;
+    border: 1px solid rgba(0, 0, 0, 1); /* Border hitam solid */
+    outline: none;
+    height: 32px;
+    border-radius: 2px;
+    font-size: 16px;
+    font-weight: 500;
+    color: black; /* Warna teks tetap hitam */
 }
 
 .input-box input {
-    width: 100%;
-    padding: 13px 50px 13px 20px;
-    background: #eee;
-    border-radius: 8px;
-    border: none;
+    background: none;
     outline: none;
-    font-size: 16px;
-    color: #333;
-    font-weight: 500;
+    border: none;
+    color: none; /* Warna teks tetap hitam */
 }
 
 .input-box input::placeholder {
-    color: #888;
+    color: rgba(0, 0, 0, 0.5); /* Placeholder lebih samar */
     font-weight: 400;
 }
 
@@ -288,5 +163,186 @@ form {
     right: 20px;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 20px;
+    font-size: 18px;
+    color: rgba(0, 0, 0, 0.7); /* Sesuaikan warna ikon */
+}
+
+.btn {
+    width: 100%;
+    height: 48px;
+    background: #7494ec;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 16px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    font-weight: 600;
+}
+
+.social-icons {
+    display: flex;
+    justify-content: center;
+}
+
+.social-icons a {
+    display: inline-flex;
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    font-size: 24px;
+    color: #333;
+    margin: 0 8px;
+}
+
+.toggle-box {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.toggle-box::before {
+    position: absolute;
+    content: "";
+    left: -250%;
+    width: 298%;
+    height: 100%;
+    background: linear-gradient(
+        to bottom,
+        rgba(109, 157, 193, 1),
+        rgba(231, 235, 237, 1)
+    );
+    border-radius: 150px;
+    z-index: 2;
+    transition: 1.8s ease-in-out;
+}
+
+.container.active .toggle-box::before {
+    left: 50%;
+}
+
+.toggle-panel {
+    position: absolute;
+    width: 35%;
+    height: 100%;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+    transition: 0.6s ease-in-out;
+    background: transparent !important; /* Hilangkan background jika ada */
+}
+
+.toggle-panel.toggle-left {
+    left: 4%;
+    width: 35%;
+    transition-delay: 1.2s;
+}
+
+.container.active .toggle-panel.toggle-left {
+    left: 120%;
+    transition-delay: 0.6s;
+}
+
+.toggle-panel.toggle-right {
+    right: 100%;
+    width: 35%;
+    transition-delay: 0.6s;
+}
+
+.container.active .toggle-panel.toggle-right {
+    right: 6%;
+    transition-delay: 1.2s;
+}
+
+.toggle-panel p {
+    margin-bottom: 20px;
+}
+
+.toggle-panel .btn {
+    width: 160px;
+    height: 46px;
+    background: transparent;
+    border: 2px solid #fff;
+    box-shadow: none;
+}
+
+@media screen and (max-width: 650px) {
+    .container {
+        height: calc(100vh - 40px);
+    }
+    .form-box {
+        width: 100%;
+        height: 70%;
+        bottom: 0;
+    }
+
+    .logo-container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .logo {
+        margin-right: 0;
+        margin-bottom: 20px;
+    }
+
+    .logo-text h2 {
+        font-size: 18px;
+    }
+
+    .logo-text h2 span {
+        font-size: 16px;
+    }
+
+    .container.active .form-box {
+        right: 0%;
+        bottom: 20%;
+    }
+    .toggle-box::before {
+        left: 0;
+        top: -270%;
+        width: 100%;
+        height: 300%;
+        border-radius: 20vw;
+    }
+
+    .container.active .toggle-box::before {
+        top: 70%;
+        left: 0;
+    }
+
+    .container.active .toggle-panel.toggle-left {
+        left: 0;
+        top: -30%;
+    }
+
+    .toggle-panel {
+        width: 100%;
+        height: 30%;
+    }
+
+    .toggle-panel.toggle-left {
+        top: 0;
+    }
+
+    .toggle-panel.toggle-right {
+        right: 0;
+        bottom: -30%;
+    }
+    .container.active .toggle-panel.toggle-right {
+        bottom: 0;
+    }
+}
+
+@media screen and (max-width: 450px) {
+    .form-box {
+        padding: 20px;
+    }
+    .toggle-panel h1 {
+        font-size: 30px;
+    }
 }
