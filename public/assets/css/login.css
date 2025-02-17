@@ -130,27 +130,55 @@ form {
     visibility: visible;
 }
 
+/* Hapus background autofill */
+.input-box input:-webkit-autofill,
+.input-box input:-webkit-autofill:hover,
+.input-box input:-webkit-autofill:focus,
+.input-box input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+    -webkit-text-fill-color: #000 !important; /* Warna teks */
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Untuk Firefox */
+@-moz-document url-prefix() {
+    .input-box input {
+        background: transparent !important;
+    }
+}
+
 .input-box {
     position: relative;
-    margin: 30px 0;
+    margin: 20px 0;
     width: 100%;
+}
+
+.input-box label {
+    font-size: 14px;
+    font-weight: 500;
+    color: black;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.input-box input,
+.input-box select {
     width: 100%;
     padding: 13px 20px;
     background: transparent;
-    border: 1px solid rgba(0, 0, 0, 1); /* Border hitam solid */
+    border: 1px solid rgba(0, 0, 0, 0.5); /* Border hitam solid */
     outline: none;
     height: 32px;
     border-radius: 2px;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 500;
-    color: black; /* Warna teks tetap hitam */
+    color: black;
 }
 
-.input-box input {
-    background: none;
-    outline: none;
-    border: none;
-    color: none; /* Warna teks tetap hitam */
+
+.input-box input:focus,
+.input-box select:focus {
+    border-color: #4caf50; /* Ubah warna border saat fokus */
 }
 
 .input-box input::placeholder {
@@ -161,25 +189,204 @@ form {
 .input-box i {
     position: absolute;
     right: 20px;
-    top: 50%;
+    top: 70%;
     transform: translateY(-50%);
+    cursor: pointer;
     font-size: 18px;
     color: rgba(0, 0, 0, 0.7); /* Sesuaikan warna ikon */
 }
 
-.btn {
+.input-box select {
+    background: none;
+    -webkit-appearance: none; /* Menghilangkan tampilan default select */
+    -moz-appearance: none;
+    appearance: none;
+    width: 100%;
+    padding: 13px 40px 13px 20px; /* Perbesar padding kanan */
+    background: transparent;
+    border: 1px solid rgba(0, 0, 0, 0.5);
+    outline: none;
+    height: 40px; /* Tambahkan tinggi jika perlu */
+    border-radius: 2px;
+    font-size: 14px;
+    font-weight: 500;
+    color: black;
+    text-overflow: ellipsis; /* Tambahkan jika teks terlalu panjang */
+}
+
+.input-box select:focus {
+    border-color: #4caf50; /* Ubah warna border saat fokus */
+}
+
+/* Container untuk select dan ikon */
+.select-container {
+    position: relative;
+    width: 100%;
+}
+
+.select-container i {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    color: rgba(0, 0, 0, 0.7); /* Sesuaikan warna ikon */
+}
+
+/* Mengatur warna link pada .register-link dan .login-link */
+.register-link, .login-link {
+    color: rgba(28, 75, 177, 1);
+    text-decoration: none; /* Menghilangkan garis bawah */
+}
+
+/* Jika ingin efek hover, bisa ditambahkan seperti berikut */
+.register-link:hover, .login-link:hover {
+    text-decoration: underline; /* Menambahkan garis bawah saat hover */
+}
+
+
+
+/* Dropdown yang dibuka */
+.select-container.open i {
+    transform: translateY(-50%) rotate(180deg); /* Ubah arah ikon saat dropdown terbuka */
+}
+
+/* .btn {
     width: 100%;
     height: 48px;
     background: #7494ec;
     color: #fff;
     border: none;
     padding: 10px;
-    cursor: pointer;
-    border-radius: 8px;
+    /* cursor: pointer; */
+    /* border-radius: 8px;
     font-size: 16px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     font-weight: 600;
+} */ 
+
+.btn-container {
+    display: flex;
+    /* margin-left: 40%; */
 }
+
+.toggle-panel.toggle-right .btn-container .register-btn {
+    flex: 1;
+    background-color: #ffff !important; /* Background putih */
+    color: #000; /* Teks hitam */
+    border: none !important;
+    border-radius: 10px;
+    margin: 0;
+    padding: 8px 0;
+    height: 33px !important;
+    font-weight: bold;
+    text-align: center;
+    position: relative; /* Menambahkan posisi relative untuk memudahkan kontrol */
+    z-index: 1; /* Mengatur urutan lapisan tombol */
+    width: 195px  !important;
+    margin-left: 43%;
+    cursor: pointer;
+}
+
+.toggle-panel.toggle-right .btn-container .login-btn {
+    flex: 1 ;
+    background-color:  rgba(53, 64, 236, 1)  !important; /* Background biru */
+    color: #fff; /* Teks putih */
+    border: none !important;
+    border-radius: 10px;
+    margin: 0;
+    padding: 8px 0;
+    height: 33px !important;
+    font-weight: bold;
+    text-align: center;
+    /* cursor: pointer; */
+    position: absolute; /* Posisi absolute agar bisa menimpa */
+    left: 0; /* Posisi kiri tombol register */
+    z-index: 0; /* Tombol login berada di bawah register */
+    /* width: 30%; */
+    margin-left: 20%;
+    /* cursor: pointer; */
+}
+
+
+.toggle-panel.toggle-left .btn-container .register-btn {
+    flex: 1;
+    background-color: rgba(53, 64, 236, 1)  !important; /* Background putih */
+    color: #ffffff; /* Teks hitam */
+    border: none !important;
+    border-radius: 10px;
+    margin: 0;
+    padding: 8px 0;
+    height: 33px !important;
+    font-weight: bold;
+    text-align: center;
+    position: relative; /* Menambahkan posisi relative untuk memudahkan kontrol */
+    z-index: 0; /* Mengatur urutan lapisan tombol */
+    width: 195px  !important;
+    margin-left: 43%;
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2); /* Efek bayangan */
+    /* cursor: pointer; */
+}
+
+.toggle-panel.toggle-left .btn-container .login-btn {
+    flex: 1 ;
+    background-color: #ffffff !important; /* Background biru */
+    color: #000; /* Teks putih */
+    border: none !important;
+    border-radius: 10px;
+    margin: 0;
+    padding: 8px 0;
+    height: 33px !important;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    position: absolute; /* Posisi absolute agar bisa menimpa */
+    left: 0; /* Posisi kiri tombol register */
+    z-index: 1; /* Tombol login berada di bawah register */
+    /* width: 30%; */
+    margin-left: 20%;
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2); /* Efek bayangan */
+}
+
+.toggle-panel.toggle-left {
+    background-color: #f5f5f5; /* Warna abu-abu muda */
+    padding: 20px;
+}
+
+.toggle-panel.toggle-right {
+    background-color: #e0e0e0; /* Warna abu-abu lebih gelap */
+    padding: 20px;
+}
+
+
+.toggle-panel.toggle-right p {
+    text-align: center; /* Menempatkan teks di tengah */
+    margin-top: 55px; /* Menggeser tulisan lebih dekat ke button */
+
+}
+
+.toggle-panel.toggle-left p {
+    text-align: center; /* Menempatkan teks di tengah */
+    margin-top: 55px; /* Menggeser tulisan lebih dekat ke button */
+    
+}
+
+.toggle-panel.toggle-right .btn, 
+.toggle-panel.toggle-left .btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-top: 30px; /* Geser lebih ke bawah */
+    border-radius: 20px;
+    background-color: #ffffff !important; /* Background putih */
+    margin-left: 75px;
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2); /* Efek bayangan */
+    cursor: pointer;
+    
+}
+
+
 
 .social-icons {
     display: flex;
@@ -263,7 +470,7 @@ form {
 }
 
 .toggle-panel .btn {
-    width: 160px;
+    width: 100px;
     height: 46px;
     background: transparent;
     border: 2px solid #fff;

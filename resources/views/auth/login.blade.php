@@ -18,7 +18,7 @@
           <h2>Sistem Informasi <br>Manajemen Bimbingan<br>Mahasiswa dan Perwalian<br><span>(SIMBA)</span></h2>
         </div>
       </div>
-      <button class="btn register-btn">Login</button>
+      <!-- <button class="btn register-btn">Login</button> -->
     </div>
 
 
@@ -29,49 +29,73 @@
           <h2>Sistem Informasi <br>Manajemen Bimbingan<br>Mahasiswa dan Perwalian<br><span>(SIMBA)</span></h2>
         </div>
       </div>
-      <button class="btn login-btn">Register</button>
+      <!-- <button class="btn login-btn">Register</button> -->
     </div>
 
     <div class="toggle-box">
       <div class="toggle-panel toggle-right">
+        <div class="btn-container">
+          <button class="btn register-btn">Daftar</button>
+          <button class="btn login-btn">Masuk</button>
+        </div>
+
         <form action="#">
-          <h1>Login</h1>
           <div class="input-box">
-            <input type="text" placeholder="Username" required>
+            <label for="username">Nama Pengguna</label>
+            <input type="text" id="username" required>
             <i class="bx bxs-user"></i>
           </div>
           <div class="input-box">
-            <input type="password" placeholder="Password" required>
+            <label for="password">Kata Sandi</label>
+            <input type="password" id="password" required>
             <i class="bx bxs-lock-alt"></i>
           </div>
 
-          <button type="submit" class="btn">Login</button>
-          <p>or login with social platforms</p>
+          <p>Belum Punya Akun? <a href="#" class="register-link">Daftar Disini</a></p>
+          <button type="submit" class="btn">Masuk</button>
 
         </form>
-
       </div>
+
       <div class="toggle-panel toggle-left">
+        <div class="btn-container">
+          <button class="btn register-btn">Daftar</button>
+          <button class="btn login-btn">Masuk</button>
+        </div>
         <form action="#">
-          <h1>Registration</h1>
+          <!-- <button class="btn register-btn">Login</button> -->
+          <!-- <h1>Registration</h1> -->
           <div class="input-box">
-            <input type="text" placeholder="Username" required>
+            <label for="username">Nama Pengguna</label>
+            <input type="text" id="username" required>
             <i class="bx bxs-user"></i>
           </div>
           <div class="input-box">
-            <input type="password" placeholder="Password" required>
+            <label for="password">Kata Sandi</label>
+            <input type="password" id="password" required>
             <i class="bx bxs-lock-alt"></i>
           </div>
-          <div class="input-box">
-            <input type="email" placeholder="Email" required>
-            <i class="bx bxs-envelope"></i>
-          </div>
-          <button type="submit" class="btn">Register</button>
-          <p>or register with social platforms</p>
-        </form>
 
+          <div class="input-box">
+            <label for="role">Jabatan</label>
+            <select id="role" required>
+              <option value="" disabled selected>Pilih Jabatan</option>
+              <option value="admin">Admin (Kemahasiswaan dan DIRDIK Konselor)</option>
+              <option value="keasramaan">Keasramaan</option>
+              <option value="dosen">Dosen Wali</option>
+              <option value="mahasiswa">Mahasiswa</option>
+              <option value="orangtua">Orangtua</option>
+            </select>
+            <i class="bx bx-chevron-down"></i> <!-- Ikon dropdown -->
+          </div>
+          <p>Sudah Daftar? <a href="#" class="login-link">Masuk Disini</a></p>
+
+          <button type="submit" class="btn">Buat Akun</button>
+
+        </form>
       </div>
     </div>
+
   </div>
 
   <script src="{{ asset('js/app.js') }}"></script>
