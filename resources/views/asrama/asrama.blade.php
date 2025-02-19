@@ -12,7 +12,7 @@
             <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
         </a>
     </div>
-
+ <!-- Konten Utama -->
     <!-- Konten Utama -->
     <div class="container mt-4">
         <h3 class="text-center mb-4">Informasi Asrama</h3>
