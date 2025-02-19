@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('nim')->unique();
             $table->date('tanggal_pengajuan');
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
-
+            $table->string('deskripsi_pengajuan');
         });
     }
 
