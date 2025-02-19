@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family-Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap");
+
 
 * {
     margin: 0%;
@@ -136,16 +136,6 @@ form {
     transform: translateX(0);
     opacity: 1;
     visibility: visible;
-}
-
-.form-box.register {
-    transform: translateX(-100%);
-    opacity: 0;
-    visibility: hidden;
-}
-
-.no-transition * {
-    transition: none !important;
 }
 
 /* Hapus background autofill */
@@ -553,6 +543,7 @@ form {
         right: 0%;
         bottom: 20%;
     }
+
     .toggle-box::before {
         left: 0;
         top: -270%;

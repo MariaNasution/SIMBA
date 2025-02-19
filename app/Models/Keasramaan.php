@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Keasramaan extends Model
 {
+    protected $table = 'keasramaan'; // Specify the correct table name
     protected $primaryKey = 'username'; // Set primary key
     public $incrementing = false; // Disable auto-increment
 

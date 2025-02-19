@@ -27,8 +27,14 @@
     <div class="app-wrapper">
         @if (session('user.role') === 'admin')
             @include('components.sidebarAdmin')
-        @elseif(session('user.role') === 'student')
-            @include('components.sidebar')
+        @elseif(session('user.role') === 'mahasiswa')
+            @include('components.sidebarMahasiswa')
+        @elseif(session('user.role') === 'dosen')
+            @include('components.sidebarDosen')
+        @elseif(session('user.role') === 'keasramaan')
+            @include('components.sidebarKeasramaan')
+        @elseif(session('user.role') === 'orang_tua')
+            @include('components.sidebarOrangTua')
         @else
             {{-- Optional: Fallback jika role tidak sesuai --}}
             <p class="text-center text-danger">Role tidak dikenali.</p>

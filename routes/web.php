@@ -8,7 +8,10 @@ use App\Http\Controllers\IBController;
 use App\Http\Controllers\IKController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\adminController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\DosenController;
+use App\Http\Controllers\KeasramaanController;
+use App\Http\Controllers\OrangTuaController;
 use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\AsramaController;
 use App\Http\Controllers\BursarController;
@@ -43,7 +46,7 @@ Route::get('/waiting-email', function () {
 
 
 // Middleware untuk akses yang memerlukan autentikasi
-Route::middleware(['auth.session', 'ensure.student.data', 'role:student'])->group(function () {
+Route::middleware(['auth.session', 'ensure.student.data', 'role:mahasiswa'])->group(function () {
     Route::get('/beranda', [HomeController::class, 'index'])->name('beranda');
     Route::get('/pengumuman/{id}', [HomeController::class, 'show'])->name('pengumuman.detail');
 
@@ -76,10 +79,26 @@ Route::middleware(['auth.session', 'ensure.student.data', 'role:student'])->grou
 });
 
 Route::middleware(['auth.session', 'role:admin'])->group(function () {
-    Route::get('/beranda/admin', [adminController::class, 'index'])->name('admin');
-    Route::post('/beranda/admin/store', [adminController::class, 'store'])->name('pengumuman.store');
-    Route::delete('/beranda/admin/{id}', [adminController::class, 'destroy'])->name('pengumuman.destroy');
-    Route::get('/pengumuman/admin/{id}', [adminController::class, 'show'])->name('pengumumanadmin.detail');
+    Route::get('/beranda/admin', [AdminController::class, 'index'])->name('admin');
+    Route::post('/beranda/admin/store', [AdminController::class, 'store'])->name('pengumuman.store');
+    Route::delete('/beranda/admin/{id}', [AdminController::class, 'destroy'])->name('pengumuman.destroy');
+    Route::get('/pengumuman/admin/{id}', [AdminController::class, 'show'])->name('pengumumanadmin.detail');
 
     Route::post('/calendar/upload', [CalendarController::class, 'upload'])->name('calendar.upload');
+});
+
+// Middleware untuk dosen
+Route::middleware(['auth.session', 'role:dosen'])->group(function () {
+    Route::get('/dosen/beranda', [DosenController::class, 'index'])->name('dosen');
+    Route::get('/dosen/presensi', [DosenController::class, 'presensi'])->name('dosen.presensi');
+});
+
+// Middleware untuk keasramaan
+Route::middleware(['auth.session', 'role:keasramaan'])->group(function () {
+    Route::get('/keasramaan/beranda', [KeasramaanController::class, 'index'])->name('keasramaan');
+});
+
+// Middleware untuk orang tua
+Route::middleware(['auth.session', 'role:orang_tua'])->group(function () {
+    Route::get('/orangtua/beranda', [OrangTuaController::class, 'index'])->name('orang_tua');
 });
