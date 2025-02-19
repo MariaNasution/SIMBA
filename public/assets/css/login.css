@@ -84,7 +84,6 @@ body {
     left: auto;
 }
 
-
 /* Untuk positioning button */
 .form-box.login .btn {
     margin-top: auto;
@@ -113,13 +112,6 @@ form {
     right: 50%;
 }
 
-.form-box.register {
-    transform: translateX(-100%);
-    opacity: 0;
-    visibility: hidden;
-}
-
-
 /* Default state: Show the login section */
 .container .form-box.login {
     transform: translateX(0);
@@ -146,10 +138,13 @@ form {
     visibility: visible;
 }
 
-/* Disable transitions when the no-transition class is applied */
-.container.no-transition .form-box,
-.container.no-transition .toggle-panel,
-.container.no-transition .toggle-box::before {
+.form-box.register {
+    transform: translateX(-100%);
+    opacity: 0;
+    visibility: hidden;
+}
+
+.no-transition * {
     transition: none !important;
 }
 
@@ -343,7 +338,6 @@ form {
     height: 33px !important;
     font-weight: bold;
     text-align: center;
-    cursor: default;
     position: absolute; /* Posisi absolute agar bisa menimpa */
     left: 0; /* Posisi kiri tombol register */
     z-index: 0; /* Tombol login berada di bawah register */
@@ -389,6 +383,15 @@ form {
     /* width: 30%; */
     margin-left: 20%;
     box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2); /* Efek bayangan */
+}
+
+/* Default state: Show the login section */
+.toggle-panel {
+    display: none; /* Hide both panels by default */
+}
+
+.toggle-left {
+    display: block; /* Show the login section by default */
 }
 
 .toggle-panel.toggle-left {

@@ -38,8 +38,8 @@
                 @csrf
                 <div class="input-box">
                     <i class="bx bxs-user log"></i>
-                    <label for="nim">Nama Pengguna</label>
-                    <input class="log" type="text" id="nim" name="nim" required>
+                    <label for="username">Nama Pengguna</label>
+                    <input class="log" type="text" id="username" name="username" required>
                 </div>
                 <div class="input-box">
                     <i class="bx bxs-lock-alt log"></i>
@@ -59,8 +59,8 @@
             <form action="{{ route('login.submit') }}" method="POST">
                 @csrf
                 <div class="input-box">
-                    <label for="nim">Nama Pengguna</label>
-                    <input class="reg" type="text" id="nim" name="nim" required>
+                    <label for="username">Nama Pengguna</label>
+                    <input class="reg" type="text" id="username" name="username" required>
                     <i class="bx bxs-user reg"></i>
                 </div>
                 <div class="input-box reg">
@@ -69,7 +69,7 @@
                     <i class="bx bxs-lock-alt reg"></i>
                 </div>
                 <div class="input-box">
-                    <label for="role">Jabatan</label>
+                    <label for="role">Jabatan</label>   
                     <select id="role" required>
                         <option value="" disabled selected><span class="option-text">Pilih Jabatan</span></option>
                         <option value="admin"><span class="option-text">Admin (Kemahasiswaan dan DIRDIK Konselor)</span></option>
@@ -89,46 +89,40 @@
 
   </div>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
+  <script>document.addEventListener("DOMContentLoaded", function () {
     // Retrieve the saved state from localStorage
     const currentState = sessionStorage.getItem("activeSection");
+    const isActive = currentState === "register"; // True if register is active
 
     // Select necessary elements
     const container = document.querySelector(".container");
     const toggleRight = document.querySelector(".toggle-panel.toggle-right");
     const toggleLeft = document.querySelector(".toggle-panel.toggle-left");
 
-    // Function to switch to the login section
-    function showLoginSection() {
-        container.classList.remove("active");
-        sessionStorage.setItem("activeSection", "login");
+    // Function to update the UI based on the active state
+    function updateUI(isActive) {
+        if (isActive) {
+            container.classList.remove("active");
+            sessionStorage.setItem("activeSection", "register");
+        } else {
+            container.classList.add("active");
+            sessionStorage.setItem("activeSection", "login");
+        }
     }
 
-    // Function to switch to the register section
-    function showRegisterSection() {
-        container.classList.add("active");
-        sessionStorage.setItem("activeSection", "register");
-    } 
-
-    // Check the saved state and apply it
-    if (currentState === "register") {
-        showRegisterSection();
-    } else if (currentState === "login"){
-        showLoginSection();
-    }
+    // Initialize the UI based on the saved state
+    updateUI(isActive);
 
     // Add event listeners for the toggle buttons
     document.querySelectorAll(".register-btn").forEach(button => {
-        button.addEventListener("click", showRegisterSection);
+        button.addEventListener("click", () => updateUI(true));
     });
 
     document.querySelectorAll(".login-btn").forEach(button => {
-        button.addEventListener("click", showLoginSection);
+        button.addEventListener("click", () => updateUI(false));
     });
-});
-  </script>
-  
+});</script>
+
 </body>
 
 </html>

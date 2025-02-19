@@ -19,11 +19,11 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'nim' => 'required|string',
+            'username' => 'required|string',
             'password' => 'required|string',
         ]);
 
-        $user = User::where('nim', $request->nim)->first();
+        $user = User::where('username', $request->username)->first();
 
         if (!$user) {
             return back()->withErrors(['login' => 'NIM tidak ditemukan.']);
