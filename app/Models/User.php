@@ -2,14 +2,12 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
@@ -17,7 +15,7 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-    protected $fillable = ['username', 'password', 'nim'];
+    protected $fillable = ['username', 'password'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -40,5 +38,45 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Define a one-to-one relationship with the Mahasiswa model.
+     */
+    public function mahasiswa()
+    {
+        return $this->hasOne(Mahasiswa::class, 'username', 'username');
+    }
+
+    /**
+     * Define a one-to-one relationship with the Admin model.
+     */
+    public function admin()
+    {
+        return $this->hasOne(Admin::class, 'username', 'username');
+    }
+
+    /**
+     * Define a one-to-one relationship with the Keasramaan model.
+     */
+    public function keasramaan()
+    {
+        return $this->hasOne(Keasramaan::class, 'username', 'username');
+    }
+
+    /**
+     * Define a one-to-one relationship with the Dosen model.
+     */
+    public function dosen()
+    {
+        return $this->hasOne(Dosen::class, 'username', 'username');
+    }
+
+    /**
+     * Define a one-to-one relationship with the OrangTua model.
+     */
+    public function orangTua()
+    {
+        return $this->hasOne(OrangTua::class, 'username', 'username');
     }
 }

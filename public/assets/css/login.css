@@ -84,12 +84,6 @@ body {
     left: auto;
 }
 
-.container.active .form-box.login {
-    transform: translateX(100%);
-    opacity: 0;
-    visibility: hidden;
-}
-
 /* Untuk positioning button */
 .form-box.login .btn {
     margin-top: auto;
@@ -118,8 +112,22 @@ form {
     right: 50%;
 }
 
-.form-box.register {
+/* Default state: Show the login section */
+.container .form-box.login {
+    transform: translateX(0);
+    opacity: 1;
+    visibility: visible;
+}
+
+.container .form-box.register {
     transform: translateX(-100%);
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* Active state: Show the register section */
+.container.active .form-box.login {
+    transform: translateX(100%);
     opacity: 0;
     visibility: hidden;
 }
@@ -128,6 +136,16 @@ form {
     transform: translateX(0);
     opacity: 1;
     visibility: visible;
+}
+
+.form-box.register {
+    transform: translateX(-100%);
+    opacity: 0;
+    visibility: hidden;
+}
+
+.no-transition * {
+    transition: none !important;
 }
 
 /* Hapus background autofill */
@@ -161,8 +179,7 @@ form {
     display: block;
 }
 
-.input-box input,
-.input-box select {
+.input-box input {
     width: 100%;
     padding: 13px 20px;
     background: transparent;
@@ -175,6 +192,13 @@ form {
     color: black;
 }
 
+.input-box input.reg{
+    padding-left: 28px; /* Add padding-left to create space for the icon */
+}
+
+.input-box input.log{
+    padding-right: 28px; /* Add padding-left to create space for the icon */
+}
 
 .input-box input:focus,
 .input-box select:focus {
@@ -187,31 +211,47 @@ form {
 }
 
 .input-box i {
-    position: absolute;
-    right: 20px;
+    position:absolute;
     top: 70%;
     transform: translateY(-50%);
-    cursor: pointer;
     font-size: 18px;
     color: rgba(0, 0, 0, 0.7); /* Sesuaikan warna ikon */
+}
+
+.input-box i.reg{
+    left:10px;
+}
+
+.input-box i.log{
+    right:10px;
+}
+
+.input-box i.jabatan{
+    cursor: pointer;
+    right: 20px;
 }
 
 .input-box select {
     background: none;
     -webkit-appearance: none; /* Menghilangkan tampilan default select */
     -moz-appearance: none;
-    appearance: none;
+    appearance : none;
     width: 100%;
-    padding: 13px 40px 13px 20px; /* Perbesar padding kanan */
+    padding: 13px 28px 13px 20px; /* Perbesar padding kanan */
     background: transparent;
     border: 1px solid rgba(0, 0, 0, 0.5);
     outline: none;
-    height: 40px; /* Tambahkan tinggi jika perlu */
-    border-radius: 2px;
+    border-radius: 5px;
     font-size: 14px;
     font-weight: 500;
     color: black;
-    text-overflow: ellipsis; /* Tambahkan jika teks terlalu panjang */
+    text-overflow:ellipsis; /* Tambahkan jika teks terlalu panjang */
+}
+
+/* Style for the option text */
+.option-text {
+    display: inline-block;
+    padding-right: 20px; /* Add right padding to the option text */
 }
 
 .input-box select:focus {
@@ -270,10 +310,10 @@ form {
     /* margin-left: 40%; */
 }
 
-.toggle-panel.toggle-right .btn-container .register-btn {
+.toggle-panel.toggle-right .btn-container .login-btn {
     flex: 1;
-    background-color: #ffff !important; /* Background putih */
-    color: #000; /* Teks hitam */
+    background-color: rgba(53, 64, 236, 1) !important; /* Background putih */
+    color: #fff; /* Teks hitam */
     border: none !important;
     border-radius: 10px;
     margin: 0;
@@ -285,13 +325,12 @@ form {
     z-index: 1; /* Mengatur urutan lapisan tombol */
     width: 195px  !important;
     margin-left: 43%;
-    cursor: pointer;
 }
 
-.toggle-panel.toggle-right .btn-container .login-btn {
+.toggle-panel.toggle-right .btn-container .register-btn {
     flex: 1 ;
-    background-color:  rgba(53, 64, 236, 1)  !important; /* Background biru */
-    color: #fff; /* Teks putih */
+    background-color:  #fff  !important; /* Background biru */
+    color: #000; /* Teks putih */
     border: none !important;
     border-radius: 10px;
     margin: 0;
@@ -299,20 +338,18 @@ form {
     height: 33px !important;
     font-weight: bold;
     text-align: center;
-    /* cursor: pointer; */
     position: absolute; /* Posisi absolute agar bisa menimpa */
     left: 0; /* Posisi kiri tombol register */
     z-index: 0; /* Tombol login berada di bawah register */
     /* width: 30%; */
     margin-left: 20%;
-    /* cursor: pointer; */
 }
 
 
-.toggle-panel.toggle-left .btn-container .register-btn {
+.toggle-panel.toggle-left .btn-container .login-btn {
     flex: 1;
-    background-color: rgba(53, 64, 236, 1)  !important; /* Background putih */
-    color: #ffffff; /* Teks hitam */
+    background-color: #fff  !important; /* Background putih */
+    color: #000; /* Teks hitam */
     border: none !important;
     border-radius: 10px;
     margin: 0;
@@ -325,13 +362,13 @@ form {
     width: 195px  !important;
     margin-left: 43%;
     box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2); /* Efek bayangan */
-    /* cursor: pointer; */
+    cursor: default;
 }
 
-.toggle-panel.toggle-left .btn-container .login-btn {
+.toggle-panel.toggle-left .btn-container .register-btn {
     flex: 1 ;
-    background-color: #ffffff !important; /* Background biru */
-    color: #000; /* Teks putih */
+    background-color: rgba(53, 64, 236, 1) !important; /* Background biru */
+    color: #fff; /* Teks putih */
     border: none !important;
     border-radius: 10px;
     margin: 0;
@@ -346,6 +383,15 @@ form {
     /* width: 30%; */
     margin-left: 20%;
     box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2); /* Efek bayangan */
+}
+
+/* Default state: Show the login section */
+.toggle-panel {
+    display: none; /* Hide both panels by default */
+}
+
+.toggle-left {
+    display: block; /* Show the login section by default */
 }
 
 .toggle-panel.toggle-left {
@@ -385,8 +431,6 @@ form {
     cursor: pointer;
     
 }
-
-
 
 .social-icons {
     display: flex;
@@ -531,6 +575,15 @@ form {
         width: 100%;
         height: 30%;
     }
+
+    /* Default state: Show the login section */
+.toggle-panel {
+    display: none; /* Hide both panels by default */
+  }
+  
+  .toggle-right {
+    display: block; /* Show the login section by default */
+  }
 
     .toggle-panel.toggle-left {
         top: 0;
