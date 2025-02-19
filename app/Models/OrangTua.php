@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class OrangTua extends Model
 {
+    protected $table = 'orang_tua'; // Specify the correct table name
     protected $primaryKey = 'username'; // Set primary key
     public $incrementing = false; // Disable auto-increment
 

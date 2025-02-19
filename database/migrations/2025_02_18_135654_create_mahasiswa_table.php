@@ -9,7 +9,7 @@ class CreateMahasiswaTable extends Migration
     {
         Schema::create('mahasiswa', function (Blueprint $table) {
             $table->string('username')->primary(); // Foreign key to users table
-            $table->string('nim')->unique(); // Student ID
+            $table->string('nim')->unique() -> nullable(); // Student ID
             $table->timestamps();
 
             // Define the foreign key constraint
