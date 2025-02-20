@@ -14,15 +14,18 @@ class HomeController extends Controller
     {
         $user = session('user');
         $nim = $user['nim'];
+        
         $apiToken = session('api_token');
 
         try {
-
+            
             $studentResponse = Http::withToken($apiToken)
                 ->withOptions(['verify' => false])
                 ->get('https://cis-dev.del.ac.id/api/library-api/get-student-by-nim', [
-                    'nim' => $nim,
+                    'nim' => '11S20010',
                 ]);
+            
+            
 
             if ($studentResponse->successful()) {
                 $studentData = $studentResponse->json()['data'] ?? [];
@@ -33,15 +36,20 @@ class HomeController extends Controller
                     'ta' => $studentData['ta'] ?? null,
                 ]);
             }
+
+            
             $response = Http::withToken($apiToken)
                 ->withOptions(['verify' => false]) // Abaikan verifikasi SSL
                 ->get('https://cis-dev.del.ac.id/api/library-api/get-penilaian', [
-                    'nim' => $nim,
+                    
                 ]);
 
+            
             Log::info('Respons API mentah:', ['body' => $response->body()]);
+            dd($response);
 
             if ($response->successful()) {
+                dd($response);
                 $data = $response->json();
                 $ipSemester = $data['IP Semester'] ?? [];
 
@@ -55,7 +63,7 @@ class HomeController extends Controller
 
                 $labels = [];
                 $values = [];
-
+                
                 foreach ($ipSemester as $semester => $details) {
                     // Tambahkan label dan nilai dengan placeholder jika ip_semester tidak valid
                     $labels[] = "TA {$details['ta']} - Semester {$details['sem']}";
@@ -69,7 +77,7 @@ class HomeController extends Controller
                 $akademik = Calendar::where('type', 'akademik')->latest()->first();
                 $bem = Calendar::where('type', 'bem')->latest()->first();
 
-
+                dd("text4");
                 return view('beranda.home', compact('labels', 'values', 'pengumuman', 'akademik', 'bem'));
             }
 
@@ -79,6 +87,7 @@ class HomeController extends Controller
             Log::error('Kesalahan API:', ['message' => $e->getMessage()]);
             return redirect()->route('beranda')->withErrors(['error' => 'Terjadi kesalahan saat memuat data.']);
         }
+
     }
 
     public function show($id)
