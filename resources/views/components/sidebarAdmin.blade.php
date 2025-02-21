@@ -38,17 +38,13 @@
             </li>
             <li class="submenu-item">
                 <a href="{{ route('konseling_lanjutan') }}">
-                    <i class="fas fa-comments"></i> Konseling Lanjutan
+                    <i class="fas fa-forward"></i> Konseling Lanjutan
                 </a>
             </li>
             <li class="submenu-item">
                 <a href="{{ route('ajukan_konseling') }}">
-                    <i class="fas fa-user-plus"></i> Ajukan Konseling
-                </a>
-            </li>
-            <li class="submenu-item">
-                <a href="{{ route('konseling_lanjutan') }}">
-                    <i class="fas fa-walking"></i> Konseling Lanjutan
+                <i class="fas fa-user-friends"></i> Ajukan Konseling
+
                 </a>
             </li>
             <li class="submenu-item">
@@ -57,8 +53,8 @@
                 </a>
             </li>
             <li class="submenu-item">
-                <a href="{{ route('hasil_konseling') }}">
-                    <i class="fas fa-clipboard-list"></i> Hasil Konseling
+                <a href="{{ route('daftar_poin') }}">
+                    <i class="fas fa-clipboard-list"></i> Daftar Poin
                 </a>
             </li>
         </ul>

@@ -83,4 +83,9 @@ class adminController extends Controller
         return view('konseling.daftar_request');
     }
 
+    public function daftarPoin()
+    {
+        return view('konseling.daftar_poin');
+    }
+
 }

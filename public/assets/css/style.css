@@ -426,7 +426,6 @@ body {
 }
 
 /* Mengatur font untuk seluruh container */
-h4,
 ul,
 ul li,
 .btn {
@@ -435,9 +434,10 @@ ul li,
 
 /* Styling tambahan untuk judul h4 */
 h4 {
+    font-family: "Roboto Serif";
     font-size: 1.5rem;
     font-weight: 600;
-    color: #333;
+    color: #ffffff;
 }
 
 /* Styling untuk daftar ul */
