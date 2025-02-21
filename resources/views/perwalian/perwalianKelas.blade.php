@@ -174,6 +174,8 @@
         </tbody>
     </table>
 
+    <h1>Text Radnrom trait_exists</h1>
+
     <script>
         function updateStatus(event, element, emoji, text) {
             event.stopPropagation(); // Prevents event bubbling
