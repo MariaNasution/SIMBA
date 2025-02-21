@@ -82,4 +82,30 @@ Route::middleware(['auth.session', 'role:admin'])->group(function () {
     Route::get('/pengumuman/admin/{id}', [adminController::class, 'show'])->name('pengumumanadmin.detail');
 
     Route::post('/calendar/upload', [CalendarController::class, 'upload'])->name('calendar.upload');
+
+    // Konseling
+    Route::prefix('konseling')->group(function () {
+        Route::get('/daftar_pelanggaran', [AdminController::class, 'daftarPelanggaran'])->name('daftar_pelanggaran');
+        Route::get('/hasil_konseling', [AdminController::class, 'hasilKonseling'])->name('hasil_konseling');
+        Route::get('/riwayat_konseling', [AdminController::class, 'riwayatKonseling'])->name('riwayat_konseling');
+        Route::get('/konseling_lanjutan', [AdminController::class, 'konselingLanjutan'])->name('konseling_lanjutan');
+        Route::get('/ajukan_konseling', [AdminController::class, 'ajukanKonseling'])->name('ajukan_konseling');
+        Route::get('/daftar_request', [AdminController::class, 'daftarRequest'])->name('daftar_request');
+    });
+});
+
+// Middleware untuk dosen
+Route::middleware(['auth.session', 'role:dosen'])->group(function () {
+    Route::get('/dosen/beranda', [DosenController::class, 'index'])->name('dosen');
+    Route::get('/dosen/presensi', [DosenController::class, 'presensi'])->name('dosen.presensi');
+});
+
+// Middleware untuk keasramaan
+Route::middleware(['auth.session', 'role:keasramaan'])->group(function () {
+    Route::get('/keasramaan/beranda', [KeasramaanController::class, 'index'])->name('keasramaan');
+});
+
+// Middleware untuk orang tua
+Route::middleware(['auth.session', 'role:orang_tua'])->group(function () {
+    Route::get('/orangtua/beranda', [OrangTuaController::class, 'index'])->name('orang_tua');
 });

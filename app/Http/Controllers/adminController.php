@@ -52,4 +52,35 @@ class adminController extends Controller
         // Kembalikan ke view dengan pengumuman yang ditemukan
         return view('beranda.detailpengumuman', compact('pengumuman'));
     }
+
+    public function daftarPelanggaran()
+    {
+        return view('konseling.daftar_pelanggaran');
+    }
+
+    public function hasilKonseling()
+    {
+        return view('konseling.hasil_konseling');
+    }
+
+    public function riwayatKonseling()
+    {
+        return view('konseling.riwayat_konseling');
+    }
+
+    public function konselingLanjutan()
+    {
+        return view('konseling.konseling_lanjutan');
+    }
+
+    public function ajukanKonseling()
+    {
+        return view('konseling.ajukan_konseling');
+    }
+
+    public function daftarRequest()
+    {
+        return view('konseling.daftar_request');
+    }
+
 }
