@@ -30,12 +30,13 @@ Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
-//Register
+// Register
 Route::get('/register', [RegisterController::class, 'showRegisterForm'])->name('register.form');
 Route::post('/register', [RegisterController::class, 'submitRegistration'])->name('register.submit');
 Route::get('/activate', [RegisterController::class, 'showActivationForm'])->name('activation.prompt');
 Route::post('/activate', [RegisterController::class, 'activateAccount'])->name('activation.submit');
 
+// Password Reset
 Route::get('/forgot-password', [PasswordResetController::class, 'showForgotPasswordForm'])->name('password.forgot');
 Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])->name('password.send-link');
 Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetPasswordForm'])->name('password.reset.form');
@@ -44,52 +45,38 @@ Route::get('/waiting-email', function () {
     return view('auth.waiting-email');
 })->name('password.waiting-email');
 
-
-// Middleware untuk akses yang memerlukan autentikasi
+// Middleware untuk mahasiswa
 Route::middleware(['auth.session', 'ensure.student.data', 'role:mahasiswa'])->group(function () {
     Route::get('/beranda', [HomeController::class, 'index'])->name('beranda');
     Route::get('/pengumuman/{id}', [HomeController::class, 'show'])->name('pengumuman.detail');
-
-    // Profil
     Route::get('/profil', [ProfilController::class, 'index'])->name('profil');
-    //ib
     Route::get('/perizinan/izin_bermalam', [IBController::class, 'index'])->name('izin_bermalam');
-    //ik
     Route::get('/perizinan/izin_keluar', [IKController::class, 'index'])->name('izin_keluar');
-    //bursar
     Route::get('bursar/bursar', [BursarController::class, 'index'])->name('bursar');
     Route::get('/bursar/{id}', [BursarController::class, 'showDetail'])->name('bursar.detail');
-
-    //asrama
     Route::get('asrama/asrama', [AsramaController::class, 'index'])->name('asrama');
-
-    //prodi
     Route::get('perkuliahan/prodi', [ProdiController::class, 'index'])->name('prodi');
-    //jadwal
     Route::get('perkuliahan/jadwal', [JadwalController::class, 'index'])->name('jadwal');
-    //presensi
     Route::get('perkuliahan/absensi', [PresensiController::class, 'index'])->name('absensi');
     Route::get('perkuliahan/{kodeMk}/detail', [PresensiController::class, 'showDetail'])->name('absensi.detail');
-    //kemajuan studi
     Route::get('perkuliahan/kemajuan_studi', [KemajuanStudiController::class, 'index'])->name('kemajuan_studi');
     Route::get('/detailnilai/{kode_mk}', [DetailNilaiController::class, 'show'])->name('detailnilai');
-
-    //catatan perilaku 
     Route::get('/catatan_perilaku', [CatatanPerilakuController::class, 'index'])->name('catatan_perilaku');
 });
 
+// Middleware untuk admin
 Route::middleware(['auth.session', 'role:admin'])->group(function () {
     Route::get('/beranda/admin', [AdminController::class, 'index'])->name('admin');
     Route::post('/beranda/admin/store', [AdminController::class, 'store'])->name('pengumuman.store');
     Route::delete('/beranda/admin/{id}', [AdminController::class, 'destroy'])->name('pengumuman.destroy');
     Route::get('/pengumuman/admin/{id}', [AdminController::class, 'show'])->name('pengumumanadmin.detail');
-
     Route::post('/calendar/upload', [CalendarController::class, 'upload'])->name('calendar.upload');
 });
 
 // Middleware untuk dosen
 Route::middleware(['auth.session', 'role:dosen'])->group(function () {
-    Route::get('/dosen/beranda', [DosenController::class, 'index'])->name('dosen');
+    Route::get('/dosen/beranda', [DosenController::class, 'beranda'])->name('dosen');
+    Route::get('/dosen/perwalian', [DosenController::class, 'index'])->name('dosen.perwalian');
     Route::get('/dosen/presensi', [DosenController::class, 'presensi'])->name('dosen.presensi');
 });
 
