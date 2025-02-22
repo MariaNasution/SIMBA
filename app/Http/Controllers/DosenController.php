@@ -7,17 +7,12 @@ use Illuminate\Support\Facades\DB;
 
 class DosenController extends Controller
 {
-    /**
-     * Display the dosen home page (beranda).
-     *
-     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
-     */
     public function beranda()
     {
         if (!session('user') || session('user')['role'] !== 'dosen') {
             return redirect()->route('login')->with('error', 'Unauthorized access.');
         }
-        return view('beranda.homeDosen');
+    return view('beranda.homeDosen');
     }
 
     /**
@@ -25,6 +20,7 @@ class DosenController extends Controller
      *
      * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
+    
     public function index()
     {
         if (!session('user') || session('user')['role'] !== 'dosen') {
@@ -48,8 +44,9 @@ class DosenController extends Controller
      *
      * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
-    public function presensi()
-    {
+public function presensi()
+{
+        return view('dosen.presensi');
         if (!session('user') || session('user')['role'] !== 'dosen') {
             return redirect()->route('login')->with('error', 'Unauthorized access.');
         }
@@ -62,5 +59,5 @@ class DosenController extends Controller
             ->get();
 
         return view('dosen.presensi', compact('anakWali'));
-    }
+}
 }

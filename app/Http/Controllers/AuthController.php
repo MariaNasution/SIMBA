@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use GuzzleHttp\Client;
 use App\Models\User;
-use App\Models\Mahasiswa;
 
 class AuthController extends Controller
 {
@@ -43,11 +42,11 @@ class AuthController extends Controller
             try {
                 // Call external API for authentication
                 Log::info('Mengirim permintaan API eksternal...');
-                $client = new Client(['verify' => false]);
+                $client = new \GuzzleHttp\Client(['verify' => false]);
                 $response = $client->post('https://cis-dev.del.ac.id/api/jwt-api/do-auth', [
                     'form_params' => [
-                        'username' => 'johannes', // Should this be $user->username instead?
-                        'password' => 'Del@2022', // Should this be $request->password?
+                        'username' => 'johannes', // Use the logged-in user's username
+                        'password' => 'Del@2022', // Use the provided password
                     ],
                     'headers' => [
                         'Accept' => 'application/json',
@@ -62,14 +61,8 @@ class AuthController extends Controller
                 $data = json_decode($body, true);
                 Log::info('Respons API setelah diuraikan:', ['parsed_response' => $data]);
 
+                // Check if the API response is valid
                 if ($data && isset($data['result']) && $data['result'] === true) {
-                    // Fetch nim from mahasiswa table if role is mahasiswa
-                    $nim = null;
-                    if ($user->role === 'mahasiswa') {
-                        $mahasiswa = Mahasiswa::where('username', $user->username)->first();
-                        $nim = $mahasiswa ? $mahasiswa->nim : null;
-                    }
-
                     // Store API token and user data in the session
                     session([
                         'api_token' => $data['token'],
@@ -77,7 +70,7 @@ class AuthController extends Controller
                         'user' => [
                             'username' => $user->username,
                             'role' => $user->role,
-                            'nim' => $nim, // Store NIM from mahasiswa table
+                            'nim' => $data['user']['nim'] ?? null, // Store NIM only for students
                         ],
                     ]);
 
@@ -88,24 +81,30 @@ class AuthController extends Controller
                         case 'mahasiswa':
                             Log::info('Redirecting to mahasiswa route...');
                             return redirect()->route('beranda')->with('success', 'Login sebagai mahasiswa berhasil!');
+
                         case 'dosen':
                             Log::info('Redirecting to dosen beranda...');
                             return redirect()->route('dosen')->with('success', 'Login sebagai dosen berhasil!');
+
                         case 'keasramaan':
                             Log::info('Redirecting to keasramaan route...');
                             return redirect()->route('keasramaan')->with('success', 'Login sebagai keasramaan berhasil!');
+                            
                         case 'orang_tua':
                             Log::info('Redirecting to orang_tua route...');
                             return redirect()->route('orang_tua')->with('success', 'Login sebagai orang tua berhasil!');
+
                         case 'admin':
                             Log::info('Redirecting to admin route...');
                             return redirect()->route('admin')->with('success', 'Login sebagai admin berhasil!');
+
                         default:
                             Log::warning('Unknown role detected:', ['role' => $user->role]);
                             return back()->withErrors(['login' => 'Role tidak dikenali.']);
                     }
                 }
 
+                // Handle invalid API response
                 Log::error('API login gagal', ['response_parsed' => $data]);
                 return back()->withErrors(['login' => 'Gagal mendapatkan token API.']);
             } catch (\Exception $e) {
@@ -114,13 +113,14 @@ class AuthController extends Controller
             }
         }
 
+        // If authentication fails
         return back()->withErrors(['login' => 'Username atau Password salah.']);
     }
 
     public function logout()
     {
-        session()->flush();
-        session()->regenerate();
+        session()->flush(); // Clear all session data
+        session()->regenerate(); // Regenerate session ID for security
         return redirect()->route('login');
     }
 }

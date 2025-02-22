@@ -36,8 +36,6 @@
             </a>
         </li>
         <li class="menu-item">
-            <a href="{{ route('absensi') }}">
-                <i class="fas fa-wallet"></i> Absensi mahasiswa
             <a href="{{ route('bursar') }}">
                 <i class="fas fa-wallet"></i> Berita Acara
             </a>
