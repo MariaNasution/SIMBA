@@ -51,46 +51,55 @@ class UserSeeder extends Seeder
                 'username' => 'ifs19001', // Added second student
                 'password' => Hash::make('mahasiswa'),
                 'role' => 'mahasiswa',
+                'anak_wali' => 'dosen', 
             ],
             [
                 'username' => 'ifs19002', // Added second student
                 'password' => Hash::make('mahasiswa'),
                 'role' => 'mahasiswa',
+                'anak_wali' => 'dosen', 
             ],
             [
                 'username' => 'ifs19003', // Added second student
                 'password' => Hash::make('mahasiswa'),
                 'role' => 'mahasiswa',
+                'anak_wali' => 'dosen', 
             ],
             [
                 'username' => 'ifs19004', // Added second student
                 'password' => Hash::make('mahasiswa'),
                 'role' => 'mahasiswa',
+                'anak_wali' => 'dosen', 
             ],
             [
                 'username' => 'ifs19005', // Added second student
                 'password' => Hash::make('mahasiswa'),
                 'role' => 'mahasiswa',
+                'anak_wali' => 'dosen', 
             ],
             [
                 'username' => 'ifs19031', // Added second student
                 'password' => Hash::make('mahasiswa'),
                 'role' => 'mahasiswa',
+                'anak_wali' => 'dosen', 
             ],
             [
                 'username' => 'ifs19032', // Added second student
                 'password' => Hash::make('mahasiswa'),
                 'role' => 'mahasiswa',
+                'anak_wali' => 'dosen', 
             ],
             [
                 'username' => 'ifs19033', // Added second student
                 'password' => Hash::make('mahasiswa'),
                 'role' => 'mahasiswa',
+                'anak_wali' => 'dosen', 
             ],
             [
                 'username' => 'ifs19034', // Added second student
                 'password' => Hash::make('mahasiswa'),
                 'role' => 'mahasiswa',
+                'anak_wali' => 'dosen', 
             ],
             [
                 'username' => 'ifs19035', // Added second student
