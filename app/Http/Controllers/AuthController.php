@@ -89,7 +89,7 @@ class AuthController extends Controller
                             Log::info('Redirecting to mahasiswa route...');
                             return redirect()->route('beranda')->with('success', 'Login sebagai mahasiswa berhasil!');
                         case 'dosen':
-                            Log::info('Redirecting to dosen route...');
+                            Log::info('Redirecting to dosen beranda...');
                             return redirect()->route('dosen')->with('success', 'Login sebagai dosen berhasil!');
                         case 'keasramaan':
                             Log::info('Redirecting to keasramaan route...');

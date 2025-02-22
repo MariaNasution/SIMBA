@@ -44,6 +44,7 @@ class UserSeeder extends Seeder
                 'username' => 'admin',
                 'password' => Hash::make('admin'),
                 'role' => 'admin',
+                'anak_wali' => null, // No anak wali for admin
             ],
             
             [
@@ -95,21 +96,25 @@ class UserSeeder extends Seeder
                 'username' => 'ifs19035', // Added second student
                 'password' => Hash::make('mahasiswa'),
                 'role' => 'mahasiswa',
+                'anak_wali' => 'dosen', // Mahasiswa is under dosen wali 1
             ],
             [
                 'username' => 'dosen',
                 'password' => Hash::make('dosen'),
                 'role' => 'dosen',
+                'anak_wali' => null, // Dosen as wali, no anak wali
             ],
             [
                 'username' => 'keasramaan',
                 'password' => Hash::make('keasramaan'),
                 'role' => 'keasramaan',
+                'anak_wali' => null, // No anak wali for keasramaan
             ],
             [
                 'username' => 'orangtua',
                 'password' => Hash::make('orangtua'),
                 'role' => 'orang_tua',
+                'anak_wali' => null, // No anak wali for orang tua
             ],
         ];
 
@@ -129,6 +134,7 @@ class UserSeeder extends Seeder
                 'username' => $user['username'],
                 'password' => $user['password'],
                 'role' => $user['role'],
+                'anak_wali' => $user['anak_wali'], // Add anak_wali column
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

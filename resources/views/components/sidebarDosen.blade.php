@@ -1,6 +1,6 @@
 <div class="sidebar">
     <div class="sidebar-header">
-        <img src="{{ asset('assets\img\Logo Institut Teknologi Del.png') }}" alt="Logo" class="header-logo">
+        <img src="{{ asset('assets/img/Logo Institut Teknologi Del.png') }}" alt="Logo" class="header-logo">
         <div class="header-text">
             <h4>SIMBA</h4>
             <p>Dosen</p>
@@ -11,34 +11,35 @@
             <a href="{{ route('profil') }}">
                 <img src="{{ asset('assets/img/profil.jpg') }}" alt="Profile Picture" class="profile-picture">
                 <h4 class="profile-name">
-                    {{ session('student_data.nama') ?? 'Nama Tidak Ditemukan' }}
+                    {{ session('user')['username'] ?? 'Nama Tidak Ditemukan' }}
                 </h4>
                 <p class="profile-id">
-                    {{ session('student_data.nim') ?? 'NIM Tidak Ditemukan' }}
+                    Dosen Wali
                 </p>
             </a>
-
         </div>
     </div>
     <ul class="menu">
         <li class="menu-item">
-            <a href="{{ route('beranda') }}">
+            <a href="{{ route('dosen') }}">
                 <i class="fas fa-home"></i> Beranda
             </a>
         </li>
         <li class="menu-item">
-            <a href="{{ route('bursar') }}">
-                <i class="fas fa-wallet"></i> Set Perwalian 
+            <a href="{{ route('dosen.perwalian') }}">
+                <i class="fas fa-users"></i> Set Perwalian
             </a>
         </li>
         <li class="menu-item">
-            <a href="{{ route('bursar') }}">
-                <i class="fas fa-wallet"></i> Berita Acara 
+            <a href="{{ route('dosen.presensi') }}">
+                <i class="fas fa-check-square"></i> Presensi
             </a>
         </li>
         <li class="menu-item">
             <a href="{{ route('absensi') }}">
                 <i class="fas fa-wallet"></i> Absensi mahasiswa
+            <a href="{{ route('bursar') }}">
+                <i class="fas fa-wallet"></i> Berita Acara
             </a>
         </li>
         <li class="menu-item">
