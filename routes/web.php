@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AbsensiController;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -78,6 +79,8 @@ Route::middleware(['auth.session', 'role:dosen'])->group(function () {
     Route::get('/dosen/beranda', [DosenController::class, 'beranda'])->name('dosen');
     Route::get('/dosen/perwalian', [DosenController::class, 'index'])->name('dosen.perwalian');
     Route::get('/dosen/presensi', [DosenController::class, 'presensi'])->name('dosen.presensi');
+    Route::get('/dosen/absensi-mahasiswa', [AbsensiController::class, 'index'])->name('absensi');
+    Route::get('/absensi-mahasiswa/{date}/{class}', [AbsensiController::class, 'show'])->name('absensi.show');
 });
 
 // Middleware untuk keasramaan

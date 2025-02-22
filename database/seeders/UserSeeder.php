@@ -38,7 +38,7 @@ class UserSeeder extends Seeder
      */
     private function seedUsersAndRoles()
     {
-        // Define users with roles
+        // Define users with roles and unique NIMs for mahasiswa
         $users = [
             [
                 'username' => 'admin',
@@ -46,8 +46,54 @@ class UserSeeder extends Seeder
                 'role' => 'admin',
                 'anak_wali' => null, // No anak wali for admin
             ],
+            
             [
-                'username' => 'mahasiswa',
+                'username' => 'ifs19001', // Added second student
+                'password' => Hash::make('mahasiswa'),
+                'role' => 'mahasiswa',
+            ],
+            [
+                'username' => 'ifs19002', // Added second student
+                'password' => Hash::make('mahasiswa'),
+                'role' => 'mahasiswa',
+            ],
+            [
+                'username' => 'ifs19003', // Added second student
+                'password' => Hash::make('mahasiswa'),
+                'role' => 'mahasiswa',
+            ],
+            [
+                'username' => 'ifs19004', // Added second student
+                'password' => Hash::make('mahasiswa'),
+                'role' => 'mahasiswa',
+            ],
+            [
+                'username' => 'ifs19005', // Added second student
+                'password' => Hash::make('mahasiswa'),
+                'role' => 'mahasiswa',
+            ],
+            [
+                'username' => 'ifs19031', // Added second student
+                'password' => Hash::make('mahasiswa'),
+                'role' => 'mahasiswa',
+            ],
+            [
+                'username' => 'ifs19032', // Added second student
+                'password' => Hash::make('mahasiswa'),
+                'role' => 'mahasiswa',
+            ],
+            [
+                'username' => 'ifs19033', // Added second student
+                'password' => Hash::make('mahasiswa'),
+                'role' => 'mahasiswa',
+            ],
+            [
+                'username' => 'ifs19034', // Added second student
+                'password' => Hash::make('mahasiswa'),
+                'role' => 'mahasiswa',
+            ],
+            [
+                'username' => 'ifs19035', // Added second student
                 'password' => Hash::make('mahasiswa'),
                 'role' => 'mahasiswa',
                 'anak_wali' => 'dosen', // Mahasiswa is under dosen wali 1
@@ -71,6 +117,15 @@ class UserSeeder extends Seeder
                 'anak_wali' => null, // No anak wali for orang tua
             ],
         ];
+
+        // Array of unique NIMs for mahasiswa (must match the number of mahasiswa users)
+        $nims = ['11S19001', '11S19002', '11S19003','11S19004',
+                 '11S19005', '11S19031', '11S19032', '11S19033',
+                 '11S19034', '11S19035'
+        ];
+
+        // Counter for assigning NIMs
+        $nimIndex = 0;
 
         // Insert users and populate role-specific tables
         foreach ($users as $user) {
@@ -97,9 +152,11 @@ class UserSeeder extends Seeder
                 case 'mahasiswa':
                     DB::table('mahasiswa')->insert([
                         'username' => $user['username'],
+                        'nim' => $nims[$nimIndex], // Assign unique NIM
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
+                    $nimIndex++; // Increment to get the next NIM
                     break;
 
                 case 'dosen':
