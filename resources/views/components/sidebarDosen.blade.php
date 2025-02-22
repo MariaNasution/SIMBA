@@ -37,7 +37,7 @@
             </a>
         </li>
         <li class="menu-item">
-            <a href="{{ route('bursar') }}">
+            <a href="{{ route('absensi') }}">
                 <i class="fas fa-wallet"></i> Absensi mahasiswa
             </a>
         </li>
