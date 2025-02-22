@@ -4,28 +4,43 @@ namespace App\Http\Controllers;
 
 use App\Models\Calendar;
 use App\Models\Pengumuman;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use App\Models\Mahasiswa;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        $user = session('user');
-        $nim = $user['nim'];
-        
+        // Get the authenticated user from session (as per your AuthController)
+        $user = session('user'); // Changed from Auth::user() to match your session-based auth
+
+        // Check if the user exists and has a mahasiswa record
+        if (!$user || !isset($user['role']) || $user['role'] !== 'mahasiswa') {
+            Log::error('User not authenticated or not a mahasiswa', ['user' => $user]);
+            return redirect()->route('login')->withErrors(['error' => 'Please log in as a mahasiswa.']);
+        }
+
+        // Get the NIM from the mahasiswa table using the username from session
+        $mahasiswa = Mahasiswa::where('username', $user['username'])->first();
+        if (!$mahasiswa) {
+            Log::error('No mahasiswa record found for user', ['username' => $user['username']]);
+            return redirect()->route('login')->withErrors(['error' => 'Mahasiswa data not found.']);
+        }
+        $nim = $mahasiswa->nim;
+
         $apiToken = session('api_token');
 
         try {
-            
             $studentResponse = Http::withToken($apiToken)
                 ->withOptions(['verify' => false])
+                ->asForm()
                 ->get('https://cis-dev.del.ac.id/api/library-api/get-student-by-nim', [
-                    'nim' => '11S20010',
+                    'nim' => $nim,
                 ]);
-            
-            
 
             if ($studentResponse->successful()) {
                 $studentData = $studentResponse->json()['data'] ?? [];
@@ -37,19 +52,16 @@ class HomeController extends Controller
                 ]);
             }
 
-            
             $response = Http::withToken($apiToken)
-                ->withOptions(['verify' => false]) // Abaikan verifikasi SSL
+                ->withOptions(['verify' => false])
+                ->asForm()
                 ->get('https://cis-dev.del.ac.id/api/library-api/get-penilaian', [
                     
+                    'nim' => $nim,
                 ]);
-
-            
             Log::info('Respons API mentah:', ['body' => $response->body()]);
-            dd($response);
 
             if ($response->successful()) {
-                dd($response);
                 $data = $response->json();
                 $ipSemester = $data['IP Semester'] ?? [];
 
@@ -77,7 +89,6 @@ class HomeController extends Controller
                 $akademik = Calendar::where('type', 'akademik')->latest()->first();
                 $bem = Calendar::where('type', 'bem')->latest()->first();
 
-                dd("text4");
                 return view('beranda.home', compact('labels', 'values', 'pengumuman', 'akademik', 'bem'));
             }
 
@@ -87,7 +98,6 @@ class HomeController extends Controller
             Log::error('Kesalahan API:', ['message' => $e->getMessage()]);
             return redirect()->route('beranda')->withErrors(['error' => 'Terjadi kesalahan saat memuat data.']);
         }
-
     }
 
     public function show($id)
