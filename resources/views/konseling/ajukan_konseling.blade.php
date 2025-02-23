@@ -4,7 +4,7 @@
     <div class="d-flex align-items-center mb-2 border-bottom-line">
         <h3 class="me-auto">
             <a href="{{ route('admin') }}"> <i class="fas fa-user-friends me-3"></i>Home</a> /
-            <a href="{{ route('daftar_pelanggaran') }}">Ajukan Konseling</a>
+            <a href="{{ route('ajukan_konseling') }}">Ajukan Konseling</a>
         </h3>
         <a href="#" onclick="confirmLogout()">
             <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
