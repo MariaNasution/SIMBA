@@ -94,9 +94,8 @@
     max-height: 100vh;
     background: radial-gradient(
         circle at top right,
-        #00456d 0%,
-        #858585 65%,
-        #ffffff 100%
+        #4975A7 0%,
+        #E4EBF0 100%
     );
     color: white;
     padding: 20px;
@@ -427,7 +426,6 @@ body {
 }
 
 /* Mengatur font untuk seluruh container */
-h4,
 ul,
 ul li,
 .btn {
@@ -436,9 +434,10 @@ ul li,
 
 /* Styling tambahan untuk judul h4 */
 h4 {
+    font-family: "Roboto Serif";
     font-size: 1.5rem;
     font-weight: 600;
-    color: #333;
+    color: #ffffff;
 }
 
 /* Styling untuk daftar ul */

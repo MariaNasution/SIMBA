@@ -24,6 +24,9 @@ use App\Http\Controllers\DetailNilaiController;
 use App\Http\Controllers\KemajuanStudiController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\CatatanPerilakuController;
+use App\Http\Controllers\MahasiswaKonselingController;
+use App\Http\Controllers\MahasiswaPerwalianController;
+use App\Http\Controllers\MahasiswaRequestKonselingController;
 
 // Login dan Logout
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
@@ -62,6 +65,9 @@ Route::middleware(['auth.session', 'ensure.student.data', 'role:mahasiswa'])->gr
     Route::get('perkuliahan/kemajuan_studi', [KemajuanStudiController::class, 'index'])->name('kemajuan_studi');
     Route::get('/detailnilai/{kode_mk}', [DetailNilaiController::class, 'show'])->name('detailnilai');
     Route::get('/catatan_perilaku', [CatatanPerilakuController::class, 'index'])->name('catatan_perilaku');
+    Route::get('/mahasiswa_konseling', [MahasiswaKonselingController::class, 'index'])->name('mahasiswa_konseling');
+    Route::get('/mahasiswa_perwalian', [MahasiswaPerwalianController::class, 'index'])->name('mahasiswa_perwalian');
+    Route::get('/mahasiswa/konseling/request', [MahasiswaRequestKonselingController::class, 'create'])->name('mhs_konseling_request');
 });
 
 // Middleware untuk admin
