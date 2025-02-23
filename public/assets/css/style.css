@@ -759,4 +759,14 @@ p {
     border: 1px solid #dee2e6; 
 }
 
-
+.date-input {
+    max-width: 300px;
+}
+.btn-custom-blue {
+    background-color: #528BB8;
+    border-color: #528BB8;
+    color: #fff;
+}
+.text-blue {
+    color: #528BB8;
+}

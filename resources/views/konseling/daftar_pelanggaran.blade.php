@@ -3,7 +3,7 @@
 @section('content')
     <div class="d-flex align-items-center mb-4 border-bottom-line">
         <h3 class="me-auto">
-            <a href="{{ route('admin') }}">Home</a> /
+            <a href="{{ route('admin') }}"> <i class="fas fa-list me-3"></i>Home</a> /
             <a href="{{ route('daftar_pelanggaran') }}">Daftar Pelanggaran</a>
         </h3>
         <a href="#" onclick="confirmLogout()">
@@ -31,7 +31,7 @@
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td><a href="{{ route('konseling_lanjutan') }}" class="btn btn-primary">Ajukan Konseling</a></td>
+                        <td><a href="{{ route('konseling_lanjutan') }}" class="btn btn-custom-blue">Ajukan Konseling</a></td>
                     </tr>
                     <tr>
                         <td class="no-column">2</td>
@@ -39,7 +39,7 @@
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td><a href="{{ route('konseling_lanjutan') }}" class="btn btn-primary">Ajukan Konseling</a></td>
+                        <td><a href="{{ route('konseling_lanjutan') }}" class="btn btn-custom-blue">Ajukan Konseling</a></td>
                     </tr>
                     <tr>
                         <td class="no-column">3</td>
@@ -47,7 +47,7 @@
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td><a href="{{ route('konseling_lanjutan') }}" class="btn btn-primary">Ajukan Konseling</a></td>
+                        <td><a href="{{ route('konseling_lanjutan') }}" class="btn btn-custom-blue">Ajukan Konseling</a></td>
                     </tr>
                     <tr>
                         <td class="no-column">4</td>
@@ -55,7 +55,7 @@
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td><a href="{{ route('konseling_lanjutan') }}" class="btn btn-primary">Ajukan Konseling</a></td>
+                        <td><a href="{{ route('konseling_lanjutan') }}" class="btn btn-custom-blue">Ajukan Konseling</a></td>
                     </tr>
                     <tr>
                         <td class="no-column">5</td>
@@ -63,7 +63,7 @@
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td><a href="{{ route('konseling_lanjutan') }}" class="btn btn-primary">Ajukan Konseling</a></td>
+                        <td><a href="{{ route('konseling_lanjutan') }}" class="btn btn-custom-blue">Ajukan Konseling</a></td>
                     </tr>
                 </tbody>
             </table>
