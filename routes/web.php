@@ -21,6 +21,8 @@ use App\Http\Controllers\DetailNilaiController;
 use App\Http\Controllers\KemajuanStudiController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\CatatanPerilakuController;
+use App\Http\Controllers\DaftarPelanggaranController;
+use App\Http\Controllers\AjukanKonselingController;
 
 // Login dan Logout
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
