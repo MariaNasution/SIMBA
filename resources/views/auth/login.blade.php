@@ -34,7 +34,7 @@
                 <button class="btn register-btn">Daftar</button>
                 <button class="btn login-btn">Masuk</button>
             </div>
-            <form action="{{ route('login.submit') }}" method="POST">
+            <form action="{{ route('register.submit') }}" method="POST">
                 @csrf
                 <div class="input-box">
                     <i class="bx bxs-user log"></i>
@@ -46,7 +46,7 @@
                     <label for="password">Kata Sandi</label>
                     <input class="log" type="password" id="password" name="password" required>
                 </div>
-                <p>Belum Punya Akun? <a href="#" class="register-link">Daftar Disini</a></p>
+                <p>Belum Punya Akun? <a href="#" class="register-link" onclick="document.querySelector('.register-btn').click(); return false;">Daftar Disini</a></p>
                 <button type="submit" class="btn">Masuk</button>
             </form>
         </div>
@@ -69,18 +69,18 @@
                     <i class="bx bxs-lock-alt reg"></i>
                 </div>
                 <div class="input-box">
-                    <label for="role">Jabatan</label>   
+                    <label for="role">Jabatan</label>
                     <select id="role" required>
-                        <option value="" disabled selected><span class="option-text">Pilih Jabatan</span></option>
-                        <option value="admin"><span class="option-text">Admin (Kemahasiswaan dan DIRDIK Konselor)</span></option>
-                        <option value="keasramaan"><span class="option-text">Keasramaan</span></option>
-                        <option value="dosen"><span class="option-text">Dosen Wali</span></option>
-                        <option value="mahasiswa"><span class="option-text">Mahasiswa</span></option>
-                        <option value="orangtua"><span class="option-text">Orangtua</span></option>
+                      <option value="" disabled selected>Pilih Jabatan</option>
+                      <option value="admin">Admin (Kemahasiswaan dan DIRDIK Konselor)</option>
+                      <option value="keasramaan">Keasramaan</option>
+                      <option value="dosen">Dosen Wali</option>
+                      <option value="mahasiswa">Mahasiswa</option>
+                      <option value="orangtua">Orangtua</option>
                     </select>
                     <i class="bx bx-chevron-down jabatan"></i>
                 </div>
-                <p>Sudah Daftar? <a href="#" class="login-link">Masuk Disini</a></p>
+                <p>Sudah Daftar? <a href="#" class="login-link" onclick="document.querySelector('.login-btn').click(); return false;">Masuk Disini</a></p>
                 <button type="submit" class="btn">Buat Akun</button>
             </form>
         </div>
@@ -89,39 +89,45 @@
 
   </div>
 
-  <script>document.addEventListener("DOMContentLoaded", function () {
-    // Retrieve the saved state from localStorage
-    const currentState = sessionStorage.getItem("activeSection");
-    const isActive = currentState === "register"; // True if register is active
-
-    // Select necessary elements
+  <script>
+document.addEventListener("DOMContentLoaded", function () {
     const container = document.querySelector(".container");
-    const toggleRight = document.querySelector(".toggle-panel.toggle-right");
-    const toggleLeft = document.querySelector(".toggle-panel.toggle-left");
 
-    // Function to update the UI based on the active state
-    function updateUI(isActive) {
-        if (isActive) {
-            container.classList.remove("active");
-            sessionStorage.setItem("activeSection", "register");
-        } else {
-            container.classList.add("active");
-            sessionStorage.setItem("activeSection", "login");
-        }
+    // Tambahkan class no-transition untuk mencegah semua transisi saat halaman pertama kali dimuat
+    container.classList.add("no-transition");
+
+    // Ambil state aktif dari sessionStorage
+    const currentState = sessionStorage.getItem("activeSection");
+    const isActive = currentState === "register"; // True jika di state "register"
+
+    // Langsung perbarui tampilan sesuai state tanpa transisi
+    if (isActive) {
+        container.classList.remove("active");
+    } else {
+        container.classList.add("active");
     }
 
-    // Initialize the UI based on the saved state
-    updateUI(isActive);
-
-    // Add event listeners for the toggle buttons
+    // Tunggu sebentar sebelum menghapus no-transition untuk memastikan tidak ada transisi awal
+    setTimeout(() => container.classList.remove("no-transition"), 100);
+    
+    // Tambahkan event listener untuk tombol toggle
     document.querySelectorAll(".register-btn").forEach(button => {
-        button.addEventListener("click", () => updateUI(true));
+        button.addEventListener("click", () => {
+            container.classList.remove("active");
+            sessionStorage.setItem("activeSection", "register");
+        });
     });
 
     document.querySelectorAll(".login-btn").forEach(button => {
-        button.addEventListener("click", () => updateUI(false));
+        button.addEventListener("click", () => {
+            container.classList.add("active");
+            sessionStorage.setItem("activeSection", "login");
+        });
     });
-});</script>
+});
+</script>
+
+
 
 </body>
 

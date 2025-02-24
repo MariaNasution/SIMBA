@@ -64,6 +64,8 @@ body {
     margin-right: 10px;
 }
 
+
+
 /* Penyesuaian tombol */
 .form-box .btn {
     width: 80%;
@@ -146,7 +148,8 @@ form {
 
 .no-transition * {
     transition: none !important;
-}
+    animation: none !important;
+  }
 
 /* Hapus background autofill */
 .input-box input:-webkit-autofill,
@@ -310,80 +313,84 @@ form {
     /* margin-left: 40%; */
 }
 
+/* Tombol Login saat toggle-right */
 .toggle-panel.toggle-right .btn-container .login-btn {
-    flex: 1;
-    background-color: rgba(53, 64, 236, 1) !important; /* Background putih */
-    color: #fff; /* Teks hitam */
-    border: none !important;
-    border-radius: 10px;
-    margin: 0;
-    padding: 8px 0;
-    height: 33px !important;
-    font-weight: bold;
-    text-align: center;
-    position: relative; /* Menambahkan posisi relative untuk memudahkan kontrol */
-    z-index: 1; /* Mengatur urutan lapisan tombol */
-    width: 195px  !important;
-    margin-left: 43%;
+  flex: 1;
+  background-color: rgba(53, 64, 236, 1) !important; /* Background biru */
+  color: #fff; /* Teks putih */
+  border: none !important;
+  border-radius: 10px;
+  margin: 0;
+  padding: 8px 0;
+  height: 33px !important;
+  font-weight: bold;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  width: 195px !important;
+  margin-left: 43%;
+  cursor: default; /* Kursor pointer saat toggle-right */
 }
 
+/* Tombol Register saat toggle-right */
 .toggle-panel.toggle-right .btn-container .register-btn {
-    flex: 1 ;
-    background-color:  #fff  !important; /* Background biru */
-    color: #000; /* Teks putih */
-    border: none !important;
-    border-radius: 10px;
-    margin: 0;
-    padding: 8px 0;
-    height: 33px !important;
-    font-weight: bold;
-    text-align: center;
-    position: absolute; /* Posisi absolute agar bisa menimpa */
-    left: 0; /* Posisi kiri tombol register */
-    z-index: 0; /* Tombol login berada di bawah register */
-    /* width: 30%; */
-    margin-left: 20%;
+  flex: 1;
+  background-color: #fff !important; /* Background putih */
+  color: #000; /* Teks hitam */
+  border: none !important;
+  border-radius: 10px;
+  margin: 0;
+  padding: 8px 0;
+  height: 33px !important;
+  font-weight: bold;
+  text-align: center;
+  position: absolute;
+  left: 0;
+  z-index: 0;
+  margin-left: 20%;
+  cursor: pointer; /* Kursor default saat toggle-right */
 }
 
-
+/* Tombol Login saat toggle-left */
 .toggle-panel.toggle-left .btn-container .login-btn {
-    flex: 1;
-    background-color: #fff  !important; /* Background putih */
-    color: #000; /* Teks hitam */
-    border: none !important;
-    border-radius: 10px;
-    margin: 0;
-    padding: 8px 0;
-    height: 33px !important;
-    font-weight: bold;
-    text-align: center;
-    position: relative; /* Menambahkan posisi relative untuk memudahkan kontrol */
-    z-index: 0; /* Mengatur urutan lapisan tombol */
-    width: 195px  !important;
-    margin-left: 43%;
-    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2); /* Efek bayangan */
-    cursor: default;
+  flex: 1;
+  background-color: #fff !important; /* Background putih */
+  color: #000; /* Teks hitam */
+  border: none !important;
+  border-radius: 10px;
+  margin: 0;
+  padding: 8px 0;
+  height: 33px !important;
+  font-weight: bold;
+  text-align: center;
+  position: relative;
+  z-index: 0;
+  width: 195px !important;
+  margin-left: 43%;
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2); /* Efek bayangan */
+  cursor: pointer; /* Kursor default saat toggle-left */
 }
 
+/* Tombol Register saat toggle-left */
 .toggle-panel.toggle-left .btn-container .register-btn {
-    flex: 1 ;
-    background-color: rgba(53, 64, 236, 1) !important; /* Background biru */
-    color: #fff; /* Teks putih */
-    border: none !important;
-    border-radius: 10px;
-    margin: 0;
-    padding: 8px 0;
-    height: 33px !important;
-    font-weight: bold;
-    text-align: center;
-    cursor: pointer;
-    position: absolute; /* Posisi absolute agar bisa menimpa */
-    left: 0; /* Posisi kiri tombol register */
-    z-index: 1; /* Tombol login berada di bawah register */
-    /* width: 30%; */
-    margin-left: 20%;
-    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2); /* Efek bayangan */
+  flex: 1;
+  background-color: rgba(53, 64, 236, 1) !important; /* Background biru */
+  color: #fff; /* Teks putih */
+  border: none !important;
+  border-radius: 10px;
+  margin: 0;
+  padding: 8px 0;
+  height: 33px !important;
+  font-weight: bold;
+  text-align: center;
+  position: absolute;
+  left: 0;
+  z-index: 1;
+  margin-left: 20%;
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2); /* Efek bayangan */
+  cursor: default; /* Kursor pointer saat toggle-left */
 }
+
 
 /* Default state: Show the login section */
 .toggle-panel {
@@ -417,6 +424,12 @@ form {
     
 }
 
+/* Menonaktifkan semua transisi untuk elemen dan pseudo-element */
+.no-transition .toggle-box::before {
+    transition: none !important;
+  }
+  
+
 .toggle-panel.toggle-right .btn, 
 .toggle-panel.toggle-left .btn {
     display: flex;
@@ -431,6 +444,14 @@ form {
     cursor: pointer;
     
 }
+
+.btn-container .login-btn:hover, 
+.btn-container .register-btn:hover {
+    background-color: rgba(53, 64, 236, 0.8);
+    box-shadow: 0px 0px 15px rgba(53, 64, 236, 0.5);
+    transition: 0.3s ease;
+}
+
 
 .social-icons {
     display: flex;
@@ -598,11 +619,15 @@ form {
     }
 }
 
-@media screen and (max-width: 450px) {
-    .form-box {
-        padding: 20px;
-    }
-    .toggle-panel h1 {
-        font-size: 30px;
-    }
+
+.btn-container .login-btn:hover, 
+.btn-container .register-btn:hover {
+    background-color: rgba(53, 64, 236, 0.8);
+    box-shadow: 0px 0px 15px rgba(53, 64, 236, 0.5);
+    transition: 0.3s ease;
 }
+
+
+
+
+
