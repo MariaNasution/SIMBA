@@ -13,7 +13,7 @@ class EnsureStudentData
     {
         // Check if the user's role is 'mahasiswa'
         $userRole = $request->session()->get('user.role');
-        if ($userRole === 'mahasiswa') {
+        if ($userRole === 'mahasiswa' || $userRole === 'orang_tua') {
             // Only fetch student data for students
             if (!$request->session()->has('student_data')) {
                 $apiToken = $request->session()->get('api_token');

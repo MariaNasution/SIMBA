@@ -95,5 +95,7 @@ Route::middleware(['auth.session', 'role:keasramaan'])->group(function () {
 
 // Middleware untuk orang tua
 Route::middleware(['auth.session', 'role:orang_tua'])->group(function () {
-    Route::get('/orangtua/beranda', [OrangTuaController::class, 'index'])->name('orang_tua');
+    Route::get('/orang_tua/beranda', [OrangTuaController::class, 'index'])->name('orang_tua');
+    Route::get('/orang_tua/catatan_perilaku', [OrangTuaController::class, 'catatan_perilaku'])->name('catatan_perilaku_orang_tua');
+    
 });
