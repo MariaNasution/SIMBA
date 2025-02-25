@@ -93,7 +93,6 @@ Route::middleware(['auth.session', 'role:admin'])->group(function () {
         Route::get('/konseling_lanjutan', [AdminController::class, 'konselingLanjutan'])->name('konseling_lanjutan');
         Route::get('/ajukan_konseling', [AdminController::class, 'ajukanKonseling'])->name('ajukan_konseling');
         Route::get('/daftar_request', [AdminController::class, 'daftarRequest'])->name('daftar_request');
-        Route::get('/daftar_poin', [AdminController::class, 'daftarPoin'])->name('daftar_poin');
     });
 });
 

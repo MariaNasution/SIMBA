@@ -52,11 +52,6 @@
                     <i class="fas fa-book-open"></i> Daftar Request
                 </a>
             </li>
-            <li class="submenu-item">
-                <a href="{{ route('daftar_poin') }}">
-                    <i class="fas fa-clipboard-list"></i> Daftar Poin
-                </a>
-            </li>
         </ul>
     </ul>
 </div>
