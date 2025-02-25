@@ -9,6 +9,7 @@ class CreateOrangTuaTable extends Migration
     {
         Schema::create('orang_tua', function (Blueprint $table) {
             $table->string('username')->primary(); // Foreign key to users table
+            $table->string('nim')->unique() -> nullable(); // Orang tua's Student ID
             $table->timestamps();
 
             // Define the foreign key constraint

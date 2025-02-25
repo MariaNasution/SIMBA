@@ -1,8 +1,5 @@
 <?php
 
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\IBController;
 use App\Http\Controllers\IKController;
@@ -97,5 +94,7 @@ Route::middleware(['auth.session', 'role:keasramaan'])->group(function () {
 Route::middleware(['auth.session', 'role:orang_tua'])->group(function () {
     Route::get('/orang_tua/beranda', [OrangTuaController::class, 'index'])->name('orang_tua');
     Route::get('/orang_tua/catatan_perilaku', [OrangTuaController::class, 'catatan_perilaku'])->name('catatan_perilaku_orang_tua');
-    
+    Route::get('/orang_tua/catatan_perilaku', [OrangTuaController::class, 'catatan_perilaku'])
+        ->name('catatan_perilaku_orang_tua')
+        ->middleware('ensure.student.data'); // Tambahkan middleware khusus jika diperlukan 
 });

@@ -10,39 +10,40 @@ use Illuminate\Support\Facades\Log;
 class EnsureStudentData
 {
     public function handle(Request $request, Closure $next)
-    {
-        // Check if the user's role is 'mahasiswa'
-        $userRole = $request->session()->get('user.role');
-        if ($userRole === 'mahasiswa' || $userRole === 'orang_tua') {
-            // Only fetch student data for students
-            if (!$request->session()->has('student_data')) {
-                $apiToken = $request->session()->get('api_token');
-                $user = $request->session()->get('user');
+{
+    $userRole = $request->session()->get('user.role');
+    
+    if (in_array($userRole, ['mahasiswa', 'orang_tua'])) {
+        if (!$request->session()->has('student_data')) {
+            $apiToken = $request->session()->get('api_token');
+            $user = $request->session()->get('user');
 
-                if ($apiToken && $user && isset($user['nim'])) {
-                    try {
-                        $response = Http::withToken($apiToken)
-                            ->withOptions(['verify' => false])
-                            ->get('https://cis-dev.del.ac.id/api/library-api/get-student-by-nim', [
-                                'nim' => $user['nim'],
-                            ]);
+            if ($apiToken && $user && isset($user['nim'])) {
+                try {
+                    $response = Http::withToken($apiToken)
+                        ->withOptions(['verify' => false])
+                        ->get('https://cis-dev.del.ac.id/api/library-api/get-student-by-nim', [
+                            'nim' => $user['nim'],
+                        ]);
 
-                        if ($response->successful()) {
-                            $data = $response->json();
-                            $request->session()->put('student_data', $data['data']);
-                        } else {
-                            Log::error('API request failed:', ['status' => $response->status(), 'body' => $response->body()]);
-                        }
-                    } catch (\Exception $e) {
-                        Log::error('Failed to fetch student data:', ['message' => $e->getMessage()]);
+                    if ($response->successful()) {
+                        $data = $response->json();
+                        $request->session()->put('student_data', $data['data']);
+                    } else {
+                        Log::error('API request failed:', ['status' => $response->status()]);
+                        return redirect()->route('beranda')->withErrors(['error' => 'Gagal mengambil data.']);
                     }
-                } else {
-                    Log::error('Missing API token or NIM in session.');
+                } catch (\Exception $e) {
+                    Log::error('Failed to fetch student data:', ['message' => $e->getMessage()]);
+                    return redirect()->route('beranda')->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
                 }
+            } else {
+                Log::error('Missing API token or NIM in session.');
+                return redirect()->route('beranda')->withErrors(['error' => 'Session data tidak lengkap.']);
             }
         }
-
-        // Proceed to the next middleware or route
-        return $next($request);
     }
+
+    return $next($request);
+}
 }

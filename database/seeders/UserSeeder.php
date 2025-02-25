@@ -187,6 +187,7 @@ class UserSeeder extends Seeder
                 case 'orang_tua':
                     DB::table('orang_tua')->insert([
                         'username' => $user['username'],
+                        'nim' => '11S19001',
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
