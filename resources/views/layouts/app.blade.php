@@ -7,6 +7,7 @@
     <title>SIMBA</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <style>
         #kemajuanStudiChart {
@@ -27,8 +28,14 @@
     <div class="app-wrapper">
         @if (session('user.role') === 'admin')
             @include('components.sidebarAdmin')
-        @elseif(session('user.role') === 'student')
-            @include('components.sidebar')
+        @elseif(session('user.role') === 'mahasiswa')
+            @include('components.sidebarMahasiswa')
+        @elseif(session('user.role') === 'dosen')
+            @include('components.sidebarDosen')
+        @elseif(session('user.role') === 'keasramaan')
+            @include('components.sidebarKeasramaan')
+        @elseif(session('user.role') === 'orang_tua')
+            @include('components.sidebarOrangTua')
         @else
             {{-- Optional: Fallback jika role tidak sesuai --}}
             <p class="text-center text-danger">Role tidak dikenali.</p>
@@ -39,7 +46,7 @@
         </main>
 
         <footer class="text-center py-3">
-            <p>© {{ date('Y') }} @GOORMET</p>
+            <p>© {{ date('Y') }} @Kelompok 1 IF 1</p>
         </footer>
     </div>
 

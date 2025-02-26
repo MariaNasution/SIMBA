@@ -2,32 +2,35 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - SIMBA</title>
-  <link rel="stylesheet" href="{{ asset('assets/css/login.css') }}">
-  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - SIMBA</title>
+    <link rel="stylesheet" href="{{ asset('assets/css/login.css') }}">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+    <!-- Add SweetAlert2 CSS and JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+
 <body>
-  <div class="container active">
-    <div class="form-box login">
-        <div class="logo-container">
-            <img src="{{ asset('assets/img/Logo Institut Teknologi Del.png') }}" alt="Logo IT Del" class="logo">
-            <div class="logo-text">
-                <h2>Sistem Informasi <br>Manajemen Bimbingan<br>Mahasiswa dan Perwalian<br><span>(SIMBA)</span></h2>
+    <div class="container active">
+        <div class="form-box login">
+            <div class="logo-container">
+                <img src="{{ asset('assets/img/Logo Institut Teknologi Del.png') }}" alt="Logo IT Del" class="logo">
+                <div class="logo-text">
+                    <h2>Sistem Informasi <br>Manajemen Bimbingan<br>Mahasiswa dan Perwalian<br><span>(SIMBA)</span></h2>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="form-box">
-        <div class="logo-container">
-            <img src="{{ asset('assets/img/Logo Institut Teknologi Del.png') }}" alt="Logo IT Del" class="logo">
-            <div class="logo-text">
-                <h2>Sistem Informasi <br>Manajemen Bimbingan<br>Mahasiswa dan Perwalian<br><span>(SIMBA)</span></h2>
+        <div class="form-box">
+            <div class="logo-container">
+                <img src="{{ asset('assets/img/Logo Institut Teknologi Del.png') }}" alt="Logo IT Del" class="logo">
+                <div class="logo-text">
+                    <h2>Sistem Informasi <br>Manajemen Bimbingan<br>Mahasiswa dan Perwalian<br><span>(SIMBA)</span></h2>
+                </div>
             </div>
         </div>
-    </div>
-
     <div class="toggle-box">
         <div class="toggle-panel toggle-right">
             <div class="btn-container">
@@ -126,8 +129,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 </script>
-
-
 
 </body>
 

@@ -2,8 +2,8 @@
     <div class="sidebar-header">
         <img src="{{ asset('assets\img\Logo Institut Teknologi Del.png') }}" alt="Logo" class="header-logo">
         <div class="header-text">
-            <h4>SIS</h4>
-            <p>Student Information System</p>
+            <h4>SIMBA</h4>
+            <p>Keasramaan</p>
         </div>
     </div>
     <div class="profile-section">

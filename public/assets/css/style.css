@@ -94,9 +94,8 @@
     max-height: 100vh;
     background: radial-gradient(
         circle at top right,
-        #00456d 0%,
-        #858585 65%,
-        #ffffff 100%
+        #4975A7 0%,
+        #E4EBF0 100%
     );
     color: white;
     padding: 20px;
@@ -427,7 +426,6 @@ body {
 }
 
 /* Mengatur font untuk seluruh container */
-h4,
 ul,
 ul li,
 .btn {
@@ -436,9 +434,10 @@ ul li,
 
 /* Styling tambahan untuk judul h4 */
 h4 {
+    font-family: "Roboto Serif";
     font-size: 1.5rem;
     font-weight: 600;
-    color: #333;
+    color: #ffffff;
 }
 
 /* Styling untuk daftar ul */
@@ -546,11 +545,14 @@ ul li {
 .table {
     width: 100%;
     margin-top: 1rem;
+    
 }
 
 .table-bordered th,
 .table-bordered td {
     border: 1px solid #dee2e6;
+    text-align: center;
+    vertical-align: middle;
 }
 
 /* Mengatur posisi judul 'Absensi Mahasiswa' ke kiri */
@@ -746,4 +748,100 @@ p {
 #pengumumanModal .modal-content {
     width: 50%;
     margin: 30px auto;
+}
+
+
+.table th, .table td {
+    width: auto; 
+    text-align: center; 
+    vertical-align: middle; 
+    padding: 10px;
+    border: 1px solid #dee2e6; 
+}
+
+.date-input {
+    max-width: 300px;
+}
+.btn-custom-blue {
+    background-color: #528BB8;
+    border-color: #528BB8;
+    color: #fff;
+}
+.text-blue {
+    color: #528BB8;
+
+/*
+**
+**
+**
+Perwalian CSS
+**
+**
+**
+
+/* Container for Absensi Mahasiswa page */
+.am-container {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f5f5f5;
+}
+
+/* Header styling */
+.am-header {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.am-back-btn {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.am-back-btn:hover {
+    opacity: 0.9;
+}
+
+.am-header h1 {
+    font-size: 24px;
+    color: #333;
+    margin: 0;
+    font-weight: bold;
+}
+
+/* Class buttons styling */
+.am-class-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.am-class-btn {
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    text-align: left;
+    width: 100%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+}
+
+.am-class-btn:hover {
+    opacity: 0.9;
 }

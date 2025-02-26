@@ -9,7 +9,7 @@ class CreateAdminTable extends Migration
     {
         Schema::create('admin', function (Blueprint $table) {
             $table->string('username')->primary(); // Foreign key to users table
-            $table->string('nip')->unique(); // Employee ID
+            $table->string('nip')->unique() -> nullable(); // Employee ID
             $table->timestamps();
 
             // Define the foreign key constraint
