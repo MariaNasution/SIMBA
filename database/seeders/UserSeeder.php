@@ -38,27 +38,87 @@ class UserSeeder extends Seeder
      */
     private function seedUsersAndRoles()
     {
-        // Define users with roles
+        // Define users with roles and unique NIMs for mahasiswa
         $users = [
             [
                 'username' => 'admin',
                 'password' => Hash::make('admin'),
                 'role' => 'admin',
             ],
+                'anak_wali' => null, // No anak wali for admin
+            ],
+            
             [
-                'username' => 'mahasiswa',
+                'username' => 'ifs19001', // Added second student
                 'password' => Hash::make('mahasiswa'),
                 'role' => 'mahasiswa',
+                'anak_wali' => 'dosen', 
+            ],
+            [
+                'username' => 'ifs19002', // Added second student
+                'password' => Hash::make('mahasiswa'),
+                'role' => 'mahasiswa',
+                'anak_wali' => 'dosen', 
+            ],
+            [
+                'username' => 'ifs19003', // Added second student
+                'password' => Hash::make('mahasiswa'),
+                'role' => 'mahasiswa',
+                'anak_wali' => 'dosen', 
+            ],
+            [
+                'username' => 'ifs19004', // Added second student
+                'password' => Hash::make('mahasiswa'),
+                'role' => 'mahasiswa',
+                'anak_wali' => 'dosen', 
+            ],
+            [
+                'username' => 'ifs19005', // Added second student
+                'password' => Hash::make('mahasiswa'),
+                'role' => 'mahasiswa',
+                'anak_wali' => 'dosen', 
+            ],
+            [
+                'username' => 'ifs19031', // Added second student
+                'password' => Hash::make('mahasiswa'),
+                'role' => 'mahasiswa',
+                'anak_wali' => 'dosen', 
+            ],
+            [
+                'username' => 'ifs19032', // Added second student
+                'password' => Hash::make('mahasiswa'),
+                'role' => 'mahasiswa',
+                'anak_wali' => 'dosen', 
+            ],
+            [
+                'username' => 'ifs19033', // Added second student
+                'password' => Hash::make('mahasiswa'),
+                'role' => 'mahasiswa',
+                'anak_wali' => 'dosen', 
+            ],
+            [
+                'username' => 'ifs19034', // Added second student
+                'password' => Hash::make('mahasiswa'),
+                'role' => 'mahasiswa',
+                'anak_wali' => 'dosen', 
+            ],
+            [
+                'username' => 'ifs19035', // Added second student
+                'password' => Hash::make('mahasiswa'),
+                'role' => 'mahasiswa',
+                'anak_wali' => 'dosen', // Mahasiswa is under dosen wali 1
             ],
             [
                 'username' => 'dosen',
                 'password' => Hash::make('dosen'),
                 'role' => 'dosen',
+                'anak_wali' => null, // Dosen as wali, no anak wali
             ],
             [
                 'username' => 'keasramaan',
                 'password' => Hash::make('keasramaan'),
                 'role' => 'keasramaan',
+                'anak_wali' => null, // No anak wali for keasramaan
             ],
             [
                 'username' => 'orangtua',
@@ -66,7 +126,19 @@ class UserSeeder extends Seeder
                 'role' => 'orang_tua',
             ],
         ];
+                'anak_wali' => null, // No anak wali for orang tua
+            ],
+        ];
 
+        // Array of unique NIMs for mahasiswa (must match the number of mahasiswa users)
+        $nims = ['11S19001', '11S19002', '11S19003','11S19004',
+                 '11S19005', '11S19031', '11S19032', '11S19033',
+                 '11S19034', '11S19035'
+        ];
+
+        // Counter for assigning NIMs
+        $nimIndex = 0;
+      
         // Insert users and populate role-specific tables
         foreach ($users as $user) {
             // Insert into the users table
@@ -74,6 +146,7 @@ class UserSeeder extends Seeder
                 'username' => $user['username'],
                 'password' => $user['password'],
                 'role' => $user['role'],
+                'anak_wali' => $user['anak_wali'], // Add anak_wali column
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -94,6 +167,11 @@ class UserSeeder extends Seeder
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
+                        'nim' => $nims[$nimIndex], // Assign unique NIM
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                    $nimIndex++; // Increment to get the next NIM
                     break;
 
                 case 'dosen':
@@ -115,6 +193,7 @@ class UserSeeder extends Seeder
                 case 'orang_tua':
                     DB::table('orang_tua')->insert([
                         'username' => $user['username'],
+                        'nim' => '11S19001',
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);

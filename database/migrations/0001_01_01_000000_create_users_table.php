@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('username')->unique();
             $table->string('password');
             $table->string('role');
+            $table->string('anak_wali')->nullable(); // Add anak_wali column
             $table->timestamps();
         });
 

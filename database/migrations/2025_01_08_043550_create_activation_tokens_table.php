@@ -10,7 +10,7 @@ class CreateActivationTokensTable extends Migration
     {
         Schema::create('activation_tokens', function (Blueprint $table) {
             $table->id();
-            $table->string('nim')->unique();
+            $table->string('nim')->unique()-> nullable();;
             $table->string('email');
             $table->string('password');
             $table->string('token');

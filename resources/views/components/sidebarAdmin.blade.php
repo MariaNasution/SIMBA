@@ -1,10 +1,9 @@
 <div class="sidebar bg-dark text-light vh-100">
-    <div class="sidebar-header">
-        <img src="{{ asset('assets\img\Logo Institut Teknologi Del.png') }}" alt="Logo" class="header-logo">
-        <div class="header-text">
-            <h4>SiMBA</h4>
-            <p>Student Information System</p>
-        </div>
+    <div class="sidebar-header p-3 text-center">
+        <img src="{{ asset('assets\img\Logo Institut Teknologi Del.png') }}" alt="Logo" class="img-fluid mb-2"
+            style="width: 80px;">
+        <h4>SIMBA</h4>
+        <p>Admin</p>
     </div>
 
     <ul class="menu">
