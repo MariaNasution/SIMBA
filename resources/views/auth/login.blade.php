@@ -23,7 +23,7 @@
             </div>
         </div>
 
-        <div class="form-box">
+        <div class="form-box register">
             <div class="logo-container">
                 <img src="{{ asset('assets/img/Logo Institut Teknologi Del.png') }}" alt="Logo IT Del" class="logo">
                 <div class="logo-text">
