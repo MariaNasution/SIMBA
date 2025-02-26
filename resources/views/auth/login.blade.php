@@ -37,7 +37,7 @@
                 <button class="btn register-btn">Daftar</button>
                 <button class="btn login-btn">Masuk</button>
             </div>
-            <form action="{{ route('register.submit') }}" method="POST">
+            <form action="{{ route('login.submit') }}" method="POST">
                 @csrf
                 <div class="input-box">
                     <i class="bx bxs-user log"></i>
@@ -59,7 +59,7 @@
                 <button class="btn register-btn">Daftar</button>
                 <button class="btn login-btn">Masuk</button>
             </div>
-            <form action="{{ route('login.submit') }}" method="POST">
+            <form action="{{ route('register.submit') }}" method="POST">
                 @csrf
                 <div class="input-box">
                     <label for="username">Nama Pengguna</label>
