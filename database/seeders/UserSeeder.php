@@ -44,6 +44,7 @@ class UserSeeder extends Seeder
                 'username' => 'admin',
                 'password' => Hash::make('admin'),
                 'role' => 'admin',
+            ],
                 'anak_wali' => null, // No anak wali for admin
             ],
             
@@ -123,6 +124,8 @@ class UserSeeder extends Seeder
                 'username' => 'orangtua',
                 'password' => Hash::make('orangtua'),
                 'role' => 'orang_tua',
+            ],
+        ];
                 'anak_wali' => null, // No anak wali for orang tua
             ],
         ];
@@ -135,7 +138,7 @@ class UserSeeder extends Seeder
 
         // Counter for assigning NIMs
         $nimIndex = 0;
-
+      
         // Insert users and populate role-specific tables
         foreach ($users as $user) {
             // Insert into the users table
@@ -161,6 +164,9 @@ class UserSeeder extends Seeder
                 case 'mahasiswa':
                     DB::table('mahasiswa')->insert([
                         'username' => $user['username'],
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
                         'nim' => $nims[$nimIndex], // Assign unique NIM
                         'created_at' => now(),
                         'updated_at' => now(),

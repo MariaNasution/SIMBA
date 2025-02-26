@@ -21,6 +21,8 @@ use App\Http\Controllers\DetailNilaiController;
 use App\Http\Controllers\KemajuanStudiController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\CatatanPerilakuController;
+use App\Http\Controllers\DaftarPelanggaranController;
+use App\Http\Controllers\AjukanKonselingController;
 use App\Http\Controllers\MahasiswaKonselingController;
 use App\Http\Controllers\MahasiswaPerwalianController;
 use App\Http\Controllers\MahasiswaRequestKonselingController;
@@ -74,6 +76,15 @@ Route::middleware(['auth.session', 'role:admin'])->group(function () {
     Route::delete('/beranda/admin/{id}', [AdminController::class, 'destroy'])->name('pengumuman.destroy');
     Route::get('/pengumuman/admin/{id}', [AdminController::class, 'show'])->name('pengumumanadmin.detail');
     Route::post('/calendar/upload', [CalendarController::class, 'upload'])->name('calendar.upload');
+    // Konseling
+    Route::prefix('konseling')->group(function () {
+        Route::get('/daftar_pelanggaran', [AdminController::class, 'daftarPelanggaran'])->name('daftar_pelanggaran');
+        Route::get('/hasil_konseling', [AdminController::class, 'hasilKonseling'])->name('hasil_konseling');
+        Route::get('/riwayat_konseling', [AdminController::class, 'riwayatKonseling'])->name('riwayat_konseling');
+        Route::get('/konseling_lanjutan', [AdminController::class, 'konselingLanjutan'])->name('konseling_lanjutan');
+        Route::get('/ajukan_konseling', [AdminController::class, 'ajukanKonseling'])->name('ajukan_konseling');
+        Route::get('/daftar_request', [AdminController::class, 'daftarRequest'])->name('daftar_request');
+    });
 });
 
 // Middleware untuk dosen

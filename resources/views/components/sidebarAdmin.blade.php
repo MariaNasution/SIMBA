@@ -6,11 +6,51 @@
         <p>Admin</p>
     </div>
 
-    <ul class="nav flex-column">
-        <li class="nav-item">
-            <a class="nav-link text-light" href="{{ route('admin') }}">
+    <ul class="menu">
+        <li class="menu-item">
+            <a href="{{ route('admin') }}">
                 <i class="fas fa-home"></i> Beranda
             </a>
         </li>
+        <!-- Konseling dengan submenu -->
+        <li class="menu-item">
+            <a href="javascript:void(0);" onclick="toggleSubMenu('konseling-submenu')">
+                <i class="fas fa-file-alt"></i> Konseling
+                <i class="fas fa-chevron-down submenu-toggle" id="konseling-toggle"></i>
+            </a>
+        </li>
+        <ul class="submenu" id="konseling-submenu" style="display: none;">
+            <li class="submenu-item">
+                <a href="{{ route('daftar_pelanggaran') }}">
+                    <i class="fas fa-list"></i> Daftar Pelanggaran
+                </a>
+            </li>
+            <li class="submenu-item">
+                <a href="{{ route('hasil_konseling') }}">
+                    <i class="fas fa-book"></i> Hasil Konseling
+                </a>
+            </li>
+            <li class="submenu-item">
+                <a href="{{ route('riwayat_konseling') }}">
+                    <i class="fas fa-history"></i> Riwayat Konseling
+                </a>
+            </li>
+            <li class="submenu-item">
+                <a href="{{ route('konseling_lanjutan') }}">
+                    <i class="fas fa-forward"></i> Konseling Lanjutan
+                </a>
+            </li>
+            <li class="submenu-item">
+                <a href="{{ route('ajukan_konseling') }}">
+                <i class="fas fa-user-friends"></i> Ajukan Konseling
+
+                </a>
+            </li>
+            <li class="submenu-item">
+                <a href="{{ route('daftar_request') }}">
+                    <i class="fas fa-book-open"></i> Daftar Request
+                </a>
+            </li>
+        </ul>
     </ul>
 </div>
