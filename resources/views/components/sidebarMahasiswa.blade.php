@@ -36,10 +36,6 @@
         <i class="fas fa-list-alt"></i> Perwalian
       </a>
     </li>
-    <li class="menu-item">
-      <a href="{{ route('catatan_perilaku_orang_tua') }}">
-        <i class="fas fa-user-edit"></i> Catatan Perilaku
-      </a>
-    </li>
+
   </ul>
 </div>
