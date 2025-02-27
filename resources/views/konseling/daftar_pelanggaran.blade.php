@@ -72,7 +72,7 @@
     <script>
         function confirmLogout() {
             Swal.fire({
-                title: 'Apakah anda yakin ingin keluar?',
+                title: 'Apakah anda yakin ingin keluar',
                 text: "Anda akan keluar dari akun ini.",
                 icon: 'warning',
                 showCancelButton: true,
