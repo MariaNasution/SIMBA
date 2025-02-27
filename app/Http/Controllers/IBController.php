@@ -35,25 +35,25 @@ class IBController extends Controller
 
             Log::info('API Response', ['status' => $response->status(), 'body' => $response->body()]);
 
-            if ($response->successful()) {
-                $data = $response->json();
-                $izinBermalam = $data['data'] ?? [];
+                if ($response->successful()) {
+                    $data = $response->json();
+                    $izinBermalam = $data['data'] ?? [];
 
-                // Pagination manual
-                $perPage = 10;
-                $currentPage = $request->input('page', 1); // Ambil halaman saat ini dari input
-                $offset = ($currentPage - 1) * $perPage;
+                    // Pagination manual
+                    $perPage = 10;
+                    $currentPage = $request->input('page', 1); // Ambil halaman saat ini dari input
+                    $offset = ($currentPage - 1) * $perPage;
 
-                $paginatedData = array_slice($izinBermalam, $offset, $perPage);
-                $total = count($izinBermalam);
+                    $paginatedData = array_slice($izinBermalam, $offset, $perPage);
+                    $total = count($izinBermalam);
 
-                return view('perizinan.izin_bermalam', [
-                    'izinBermalam' => $paginatedData,
-                    'total' => $total,
-                    'currentPage' => $currentPage,
-                    'perPage' => $perPage,
-                ]);
-            }
+                    return view('perizinan.izin_bermalam', [
+                        'izinBermalam' => $paginatedData,
+                        'total' => $total,
+                        'currentPage' => $currentPage,
+                        'perPage' => $perPage,
+                    ]);
+                }
 
             return redirect()->route('beranda')->withErrors(['error' => 'Gagal mengambil data izin bermalam dari API.']);
         } catch (\Exception $e) {

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Mahasiswa extends Model
 {
-    protected $table = 'mahasiswa'; // Specify the correct table name
+    protected $table = 'mahasiswa'; // Specify the correct table name   
     protected $primaryKey = 'username'; // Set primary key
     public $incrementing = false; // Disable auto-increment
 
