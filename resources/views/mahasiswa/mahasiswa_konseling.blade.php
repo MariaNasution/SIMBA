@@ -4,7 +4,7 @@
 
   <div class="d-flex align-items-center mb-4 border-bottom-line">
     <h3 class="me-auto">
-    <a href="{{ route('beranda') }}">Home</a> /
+    <a href="{{ route('beranda') }}"><i class="fas fa-user-friends me-3"></i>Home</a> /
     <a href="{{ route('mahasiswa_konseling') }}">Konseling</a>
     </h3>
     <a href="#" onclick="confirmLogout()">
@@ -33,23 +33,23 @@
     </thead>
     <tbody>
       @foreach ($konselings as $index => $konseling)
-      <tr class="
-      @if ($konseling->status == 'approved') table-success
-  @elseif ($konseling->status == 'rejected') table-danger
-@elseif ($konseling->status == 'pending') table-primary
-@endif">
-      <td>{{ $index + 1 }}</td>
-      <td>{{ Carbon::parse($konseling->tanggal_pengajuan)->format('d M Y H:i') }}</td>
-      <td>
-      @if ($konseling->status == 'approved')
+        <tr class="
+        @if ($konseling->status == 'approved') table-success
+      @elseif ($konseling->status == 'rejected') table-danger
+    @elseif ($konseling->status == 'pending') table-primary
+    @endif">
+        <td>{{ $index + 1 }}</td>
+        <td>{{ Carbon::parse($konseling->tanggal_pengajuan)->format('d M Y H:i') }}</td>
+        <td>
+        @if ($konseling->status == 'approved')
       Telah di Approve oleh Admin
     @elseif ($konseling->status == 'rejected')
-      Dibatalkan
-    @else
-      Menunggu Approve Admin
-    @endif
-      </td>
-      </tr>
+    Dibatalkan
+  @else
+  Menunggu Approve Admin
+@endif
+        </td>
+        </tr>
     @endforeach
     </tbody>
     </table>
