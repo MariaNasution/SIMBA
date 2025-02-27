@@ -561,14 +561,11 @@ ul li {
 .table {
     width: 100%;
     margin-top: 1rem;
-    
 }
 
 .table-bordered th,
 .table-bordered td {
     border: 1px solid #dee2e6;
-    text-align: center;
-    vertical-align: middle;
 }
 
 /* Mengatur posisi judul 'Absensi Mahasiswa' ke kiri */
@@ -767,24 +764,6 @@ p {
 }
 
 
-.table th, .table td {
-    width: auto; 
-    text-align: center; 
-    vertical-align: middle; 
-    padding: 10px;
-    border: 1px solid #dee2e6; 
-}
-
-.date-input {
-    max-width: 300px;
-}
-.btn-custom-blue {
-    background-color: #528BB8;
-    border-color: #528BB8;
-    color: #fff;
-}
-.text-blue {
-    color: #528BB8;
 
 /*
 **
