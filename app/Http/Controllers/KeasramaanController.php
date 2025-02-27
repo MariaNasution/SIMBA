@@ -11,6 +11,11 @@ class KeasramaanController extends Controller
         return view('beranda.homeKeasramaan');
     }
 
+    public function pelanggaran()
+    {
+        return view('catatanPerilaku.pelanggaran_keasramaan');
+    }
+
     public function presensi()
     {
         return view('dosen.presensi');

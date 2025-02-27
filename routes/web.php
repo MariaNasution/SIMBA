@@ -103,6 +103,7 @@ Route::middleware(['auth.session', 'role:dosen'])->group(function () {
 // Middleware untuk keasramaan
 Route::middleware(['auth.session', 'role:keasramaan'])->group(function () {
     Route::get('/keasramaan/beranda', [KeasramaanController::class, 'index'])->name('keasramaan');
+    Route::get('/keasramaan/pelanggaran', [KeasramaanController::class, 'pelanggaran'])->name('pelanggaran_keasramaan');
 });
 
 // Middleware untuk orang tua
