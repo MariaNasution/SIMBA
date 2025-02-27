@@ -354,10 +354,17 @@ body {
     margin: 0;
     color: rgba(255, 255, 255, 0.8); /* Warna teks deskripsi */
 }
-.custom-btn {
-    background-color: #457ec0;
-    border-color: #457ec0; /* Mengubah border juga jika diperlukan */
+.btn-custom-blue {
+    background-color: #007bff; /* Warna biru */
+    color: white;
+    border: none;
 }
+
+.btn-custom-blue:hover {
+    background-color: #0056b3; /* Warna biru lebih gelap saat hover */
+    color: white;
+}
+
 .va-text {
     color: rgb(48, 181, 234); /* Warna biru */
 }
@@ -808,9 +815,6 @@ Perwalian CSS
     font-size: 14px;
 }
 
-.am-back-btn:hover {
-    opacity: 0.9;
-}
 
 .am-header h1 {
     font-size: 24px;
@@ -842,6 +846,3 @@ Perwalian CSS
     text-decoration: none;
 }
 
-.am-class-btn:hover {
-    opacity: 0.9;
-}

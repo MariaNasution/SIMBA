@@ -28,7 +28,7 @@
     <label class="form-label text-start d-block">Hasil Konseling</label>
     <div id="upload-section" class="border p-3 bg-light d-flex flex-column">
     <!-- Tombol Upload File -->
-    <button class="btn btn-primary mb-2 align-self-end" onclick="showDropzone()">Upload File</button>
+    <button class="btn btn-custom-blue mb-2 align-self-end" onclick="showDropzone()">Upload File</button>
 
     <!-- Dropzone untuk upload file -->
     <div id="dropzone-section" class="d-none">
@@ -60,7 +60,7 @@
 
   <!-- Menjadikan tombol sejajar -->
   <div class="d-flex justify-content-center">
-    <button class="btn btn-primary me-2">Buat</button>
+    <td><a href="{{ route('riwayat_konseling') }}" class="btn btn-custom-blue">Buat</a></td>
     <button class="btn btn-secondary">Batal</button>
   </div>
 

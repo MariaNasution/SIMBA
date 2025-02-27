@@ -31,7 +31,9 @@
                     <td>Sering sekali mempunyai kebiasaan malas</td>
                     <td>2025-02-16 12:00:00</td>
                     <td>
-                        <button class="btn btn-success btn-sm"><i class="fas fa-check"></i></button>
+                    <button class="btn btn-success btn-sm" onclick="window.location.href='{{ route('riwayat_konseling') }}'">
+                        <i class="fas fa-check"></i>
+                    </button>
                         <button class="btn btn-danger btn-sm"><i class="fas fa-times"></i></button>
                     </td>
                 </tr>
@@ -42,7 +44,9 @@
                     <td>Sangat berlarut dalam kesedihan</td>
                     <td>2025-02-12 17:00:00</td>
                     <td>
-                        <button class="btn btn-success btn-sm"><i class="fas fa-check"></i></button>
+                    <button class="btn btn-success btn-sm" onclick="window.location.href='{{ route('riwayat_konseling') }}'">
+                        <i class="fas fa-check"></i>
+                    </button>
                         <button class="btn btn-danger btn-sm"><i class="fas fa-times"></i></button>
                     </td>
                 </tr>
