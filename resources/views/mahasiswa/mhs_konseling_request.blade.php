@@ -46,12 +46,6 @@
     function resetTanggal() {
     document.getElementById('tanggal_pengajuan').value = '';
     }
-
-    function showCurrentTime() {
-    let now = new Date();
-    let dateTimeLocal = now.toISOString().slice(0, 16);
-    document.getElementById('tanggal_pengajuan').value = dateTimeLocal;
-    }
   </script>
 
 @endsection
