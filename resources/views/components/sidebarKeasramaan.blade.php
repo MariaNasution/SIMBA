@@ -10,19 +10,13 @@
         <div class="profile-card">
             <a href="{{ route('profil') }}">
                 <img src="{{ asset('assets/img/profil.jpg') }}" alt="Profile Picture" class="profile-picture">
-                <h4 class="profile-name">
-                    {{ session('student_data.nama') ?? 'Nama Tidak Ditemukan' }}
-                </h4>
-                <p class="profile-id">
-                    {{ session('student_data.nim') ?? 'NIM Tidak Ditemukan' }}
-                </p>
             </a>
 
         </div>
     </div>
     <ul class="menu">
         <li class="menu-item">
-            <a href="{{ route('beranda') }}">
+            <a href="{{ route('keasramaan') }}">
                 <i class="fas fa-home"></i> Beranda
             </a>
         </li>
@@ -88,8 +82,8 @@
             </a>
         </li>
         <li class="menu-item">
-            <a href="{{ route('catatan_perilaku') }}">
-                <i class="fas fa-user-edit"></i> Catatan Perilaku
+            <a href="{{ route('pelanggaran_keasramaan') }}">
+                <i class="fas fa-user-edit"></i> Pelanggaran
             </a>
         </li>
     </ul>

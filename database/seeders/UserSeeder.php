@@ -125,7 +125,7 @@ class UserSeeder extends Seeder
                 'anak_wali' => null, // No anak wali for orang tua
             ],
         ];
-
+ 
         // Array of unique NIMs for mahasiswa (must match the number of mahasiswa users)
         $nims = [
             '11S19001', '11S19002', '11S19003', '11S19004',
