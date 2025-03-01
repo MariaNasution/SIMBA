@@ -89,8 +89,6 @@ Route::middleware(['auth.session', 'role:admin'])->group(function () {
         Route::get('/ajukan_konseling', [AdminController::class, 'ajukanKonseling'])->name('ajukan_konseling');
         Route::get('/daftar_request', [AdminController::class, 'daftarRequest'])->name('daftar_request');
 
-
-
         Route::get('/hasil', [HasilKonselingController::class, 'index'])->name('hasil.index');
         Route::post('/hasil', [HasilKonselingController::class, 'store'])->name('hasil.store');
         Route::get('/hasil/{id}', [HasilKonselingController::class, 'show'])->name('hasil.show');
@@ -101,7 +99,6 @@ Route::middleware(['auth.session', 'role:admin'])->group(function () {
         Route::put('/admin/approve-konseling/{id}', [DaftarRequestKonselingController::class, 'approve'])->name('approve_konseling');
         Route::put('/admin/reject-konseling/{id}', [DaftarRequestKonselingController::class, 'reject'])->name('reject_konseling');
 
-
         Route::prefix('konseling')->group(function () {
             Route::get('/ajukan', [AjukanKonselingController::class, 'index'])->name('konseling.ajukan');
             Route::get('/cari', [AjukanKonselingController::class, 'cariMahasiswa'])->name('konseling.cari');
@@ -111,13 +108,11 @@ Route::middleware(['auth.session', 'role:admin'])->group(function () {
             Route::get('/riwayat-konseling', [RiwayatKonselingController::class, 'index'])->name('riwayat.konseling');
             Route::post('/hasil-konseling/upload', [HasilKonselingController::class, 'upload'])->name('hasil_konseling.upload');
 
-
-
             // Mencari riwayat konseling mahasiswa berdasarkan NIM
             Route::get('/riwayat-konseling/cari', [RiwayatKonselingController::class, 'CariRiwayatMahasiswa'])->name('riwayat.konseling.cari');
         });
 
-
+        Route::get('/konseling-lanjutan', [AdminController::class, 'konselingLanjutan'])->name('konseling.lanjutan');
 
     });
 });

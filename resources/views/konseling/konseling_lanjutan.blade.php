@@ -89,52 +89,73 @@
     </div>
     </form>
 
-
-    {{-- Tabel Mahasiswa --}}
-    <div class="table-responsive mt-4">
-    <table class="table table-striped table-bordered">
-      <thead class="table-primary">
+    {{-- Tabel Data Mahasiswa --}}
+    @if (!empty($dataMahasiswa))
+    <div class="mt-4">
+    <h4>Data Mahasiswa</h4>
+    <table class="table table-bordered table-striped">
+      <thead>
       <tr>
-        <th>#</th>
-        <th>NIM</th>
-        <th>Nama Mahasiswa</th>
-        <th>Tahun Masuk</th>
-        <th>Program Studi</th>
+      <th>NIM</th>
+      <th>Nama</th>
+      <th>Tahun Masuk</th>
+      <th>Program Studi</th>
       </tr>
       </thead>
       <tbody>
-      @php
-      $mahasiswa = [
-      ['nim' => '11S19027', 'nama' => 'Darel Deonaldo Aloysius Pinem', 'tahun' => '2019', 'prodi' => 'S1 Informatika'],
-      ['nim' => '11S19050', 'nama' => 'Risky Junior Martua Panggabean', 'tahun' => '2019', 'prodi' => 'S1 Informatika'],
-      ['nim' => '11S19055', 'nama' => 'Kartika Novia Hutauruk', 'tahun' => '2019', 'prodi' => 'S1 Informatika'],
-      ['nim' => '12S19036', 'nama' => 'Lucas Ronaldi Hutabarat', 'tahun' => '2019', 'prodi' => 'S1 Sistem Informasi'],
-      ['nim' => '14S19021', 'nama' => 'Albert Immanuel Sianipar', 'tahun' => '2019', 'prodi' => 'S1 Teknik Elektro'],
-      ['nim' => '14S19024', 'nama' => 'Jeffrey Jeverson Pasaribu', 'tahun' => '2019', 'prodi' => 'S1 Teknik Elektro'],
-      ['nim' => '14S19027', 'nama' => 'Marshal Pirhotson Lumbantobing', 'tahun' => '2019', 'prodi' => 'S1 Teknik Elektro'],
-      ['nim' => '14S19029', 'nama' => 'Herry John Peter', 'tahun' => '2019', 'prodi' => 'S1 Teknik Elektro'],
-      ['nim' => '11420012', 'nama' => 'Amiton Wanimbo', 'tahun' => '2020', 'prodi' => 'D IV Teknologi Rekayasa Perangkat Lunak'],
-      ['nim' => '11420020', 'nama' => 'Rohkid Kogoya', 'tahun' => '2020', 'prodi' => 'D IV Teknologi Rekayasa Perangkat Lunak'],
-      ];
-  @endphp
-      @foreach ($mahasiswa as $index => $mhs)
       <tr>
-      <td>{{ $index + 1 }}</td>
-      <td>{{ $mhs['nim'] }}</td>
-      <td>{{ $mhs['nama'] }}</td>
-      <td>{{ $mhs['tahun'] }}</td>
-      <td>{{ $mhs['prodi'] }}</td>
+      <td>{{ $dataMahasiswa['nim'] ?? '-' }}</td>
+      <td>{{ $dataMahasiswa['nama'] ?? '-' }}</td>
+      <td>{{ $dataMahasiswa['tahun_masuk'] ?? '-' }}</td>
+      <td>{{ $dataMahasiswa['prodi'] ?? '-' }}</td>
       </tr>
-    @endforeach
       </tbody>
     </table>
     </div>
+  @endif
+
+    {{-- Tabel Mahasiswa --}}
+    <div class="container">
+
+    @if(session('error'))
+    <div class="alert alert-danger">{{ session('error') }}</div>
+  @endif
+
+    @if (!empty($mahasiswas))
+    <div class="mt-4">
+      <h4>Daftar Mahasiswa</h4>
+      <table class="table table-bordered table-striped">
+      <thead>
+      <tr>
+      <th>NIM</th>
+      <th>Nama</th>
+      <th>Tahun Masuk</th>
+      <th>Program Studi</th>
+      </tr>
+      </thead>
+      <tbody>
+      @forelse($mahasiswas as $mahasiswa)
+      <tr>
+      <td>{{ $mahasiswa['nim'] }}</td>
+      <td>{{ $mahasiswa['nama'] }}</td>
+      <td>{{ $mahasiswa['angkatan'] }}</td>
+      <td>{{ $mahasiswa['prodi_name'] }}</td>
+      </tr>
+    @empty
+      <tr>
+      <td colspan="4" class="text-center">Tidak ada data mahasiswa.</td>
+      </tr>
+    @endforelse
+      </tbody>
+      </table>
+    </div>
+  @endif
 
     {{-- Pagination Dummy --}}
     <nav>
-    <ul class="pagination justify-content-center">
+      <ul class="pagination justify-content-center">
       <li class="page-item disabled">
-      <a class="page-link" href="#" tabindex="-1">&laquo;</a>
+        <a class="page-link" href="#" tabindex="-1">&laquo;</a>
       </li>
       <li class="page-item active"><a class="page-link" href="#">1</a></li>
       <li class="page-item"><a class="page-link" href="#">2</a></li>
@@ -142,17 +163,17 @@
       <li class="page-item"><a class="page-link" href="#">4</a></li>
       <li class="page-item"><a class="page-link" href="#">5</a></li>
       <li class="page-item">
-      <a class="page-link" href="#">&raquo;</a>
+        <a class="page-link" href="#">&raquo;</a>
       </li>
-    </ul>
+      </ul>
     </nav>
-  </div>
+    </div>
 
-  {{-- Logout Confirmation --}}
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script>
+    {{-- Logout Confirmation --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
     function confirmLogout() {
-    Swal.fire({
+      Swal.fire({
       title: 'Konfirmasi Keluar',
       text: "Anda yakin ingin keluar?",
       icon: 'warning',
@@ -160,11 +181,11 @@
       confirmButtonText: 'Ya, Keluar',
       cancelButtonText: 'Batal',
       reverseButtons: true
-    }).then((result) => {
+      }).then((result) => {
       if (result.isConfirmed) {
-      window.location.href = '{{ route('logout') }}';
+        window.location.href = '{{ route('logout') }}';
       }
-    });
+      });
     }
-  </script>
-@endsection
+    </script>
+  @endsection
