@@ -28,6 +28,7 @@ use App\Http\Controllers\MahasiswaPerwalianController;
 use App\Http\Controllers\MahasiswaRequestKonselingController;
 use App\Http\Controllers\RiwayatKonselingController;
 use App\Http\Controllers\HasilKonselingController;
+use App\Http\Controllers\DaftarRequestKonselingController;
 
 
 // Login dan Logout
@@ -88,29 +89,33 @@ Route::middleware(['auth.session', 'role:admin'])->group(function () {
         Route::get('/ajukan_konseling', [AdminController::class, 'ajukanKonseling'])->name('ajukan_konseling');
         Route::get('/daftar_request', [AdminController::class, 'daftarRequest'])->name('daftar_request');
 
-       
+
 
         Route::get('/hasil', [HasilKonselingController::class, 'index'])->name('hasil.index');
         Route::post('/hasil', [HasilKonselingController::class, 'store'])->name('hasil.store');
-        Route::get('/hasil/{id}', [HasilKonselingController::class, 'show'])->name('hasil.show');   
+        Route::get('/hasil/{id}', [HasilKonselingController::class, 'show'])->name('hasil.show');
         Route::delete('/hasil/{id}', [HasilKonselingController::class, 'destroy'])->name('hasil.destroy');
 
-        
+        //daftar request
+        Route::get('/admin/daftar-request', [DaftarRequestKonselingController::class, 'daftarRequest'])->name('daftar_request');
+        Route::put('/admin/approve-konseling/{id}', [DaftarRequestKonselingController::class, 'approve'])->name('approve_konseling');
+        Route::put('/admin/reject-konseling/{id}', [DaftarRequestKonselingController::class, 'reject'])->name('reject_konseling');
+
 
         Route::prefix('konseling')->group(function () {
-        Route::get('/ajukan', [AjukanKonselingController::class, 'index'])->name('konseling.ajukan');
-        Route::get('/cari', [AjukanKonselingController::class, 'cariMahasiswa'])->name('konseling.cari');
-        Route::post('/submit', [AjukanKonselingController::class, 'submit'])->name('konseling.ajukan');
-        Route::get('/caririwayat', [RiwayatkonselingController::class, 'CariRiwayatMahasiswa'])->name('konseling.caririwayat');
-          // Menampilkan semua riwayat konseling mahasiswa
-        Route::get('/riwayat-konseling', [RiwayatKonselingController::class, 'index'])->name('riwayat.konseling');
-        Route::post('/hasil-konseling/upload', [HasilKonselingController::class, 'upload'])->name('hasil_konseling.upload');
+            Route::get('/ajukan', [AjukanKonselingController::class, 'index'])->name('konseling.ajukan');
+            Route::get('/cari', [AjukanKonselingController::class, 'cariMahasiswa'])->name('konseling.cari');
+            Route::post('/submit', [AjukanKonselingController::class, 'submit'])->name('konseling.ajukan');
+            Route::get('/caririwayat', [RiwayatkonselingController::class, 'CariRiwayatMahasiswa'])->name('konseling.caririwayat');
+            // Menampilkan semua riwayat konseling mahasiswa
+            Route::get('/riwayat-konseling', [RiwayatKonselingController::class, 'index'])->name('riwayat.konseling');
+            Route::post('/hasil-konseling/upload', [HasilKonselingController::class, 'upload'])->name('hasil_konseling.upload');
 
 
 
-    // Mencari riwayat konseling mahasiswa berdasarkan NIM
-    Route::get('/riwayat-konseling/cari', [RiwayatKonselingController::class, 'CariRiwayatMahasiswa'])->name('riwayat.konseling.cari');
-    });
+            // Mencari riwayat konseling mahasiswa berdasarkan NIM
+            Route::get('/riwayat-konseling/cari', [RiwayatKonselingController::class, 'CariRiwayatMahasiswa'])->name('riwayat.konseling.cari');
+        });
 
 
 
@@ -144,8 +149,8 @@ Route::get('/mahasiswa/request-konseling', [MahasiswaRequestKonselingController:
 Route::post('/mahasiswa/request-konseling', [MahasiswaRequestKonselingController::class, 'store'])->name('mhs_konseling_request.store');
 Route::get('/mahasiswa/request-konseling', [MahasiswaRequestKonselingController::class, 'create'])->name('mhs_konseling_request');
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
 });
 
-  Route::get('/mahasiswa/konseling/request', [MahasiswaRequestKonselingController::class, 'create'])->name('mhs_konseling_request');
+Route::get('/mahasiswa/konseling/request', [MahasiswaRequestKonselingController::class, 'create'])->name('mhs_konseling_request');
 Route::post('/mahasiswa/konseling/store', [MahasiswaRequestKonselingController::class, 'store'])->name('mhs_konseling_store');

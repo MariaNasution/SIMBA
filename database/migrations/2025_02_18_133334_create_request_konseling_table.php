@@ -10,11 +10,15 @@ class CreateRequestKonselingTable extends Migration
     {
         Schema::create('request_konseling', function (Blueprint $table) {
             $table->id();
+            $table->string('nim'); // Foreign key ke tabel mahasiswa
             $table->dateTime('tanggal_pengajuan');
             $table->text('deskripsi_pengajuan');
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamps();
+        
+            $table->foreign('nim')->references('nim')->on('mahasiswa')->onDelete('cascade');
         });
+        
     }
 
     public function down()

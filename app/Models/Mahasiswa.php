@@ -20,4 +20,10 @@ class Mahasiswa extends Model
     {
         return $this->belongsTo(User::class, 'username', 'username');
     }
+
+    public function requestKonseling()
+    {
+        return $this->hasMany(RequestKonseling::class, 'nim', 'nim');
+    }
+
 }

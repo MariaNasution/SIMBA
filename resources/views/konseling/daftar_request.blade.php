@@ -13,7 +13,7 @@
 
     <div class="card-body">
         <table class="table table-bordered">
-            <thead class="table table-secondary">
+            <thead class="table-secondary">
                 <tr>
                     <th>No</th>
                     <th>NIM Mahasiswa</th>
@@ -24,52 +24,32 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>11S22016</td>
-                    <td>Fretty Debora Sirait</td>
-                    <td>Sering sekali mempunyai kebiasaan malas</td>
-                    <td>2025-02-16 12:00:00</td>
-                    <td>
-                    <button class="btn btn-success btn-sm" onclick="window.location.href='{{ route('riwayat_konseling') }}'">
-                        <i class="fas fa-check"></i>
-                    </button>
-                        <button class="btn btn-danger btn-sm"><i class="fas fa-times"></i></button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>11S22009</td>
-                    <td>Dhea Simanjuntak</td>
-                    <td>Sangat berlarut dalam kesedihan</td>
-                    <td>2025-02-12 17:00:00</td>
-                    <td>
-                    <button class="btn btn-success btn-sm" onclick="window.location.href='{{ route('riwayat_konseling') }}'">
-                        <i class="fas fa-check"></i>
-                    </button>
-                        <button class="btn btn-danger btn-sm"><i class="fas fa-times"></i></button>
-                    </td>
-                </tr>
+                @foreach ($requests as $key => $request)
+                    <tr>
+                        <td>{{ $key + 1 }}</td>
+                        <td>{{ $request->nim }}</td>
+                        <td>{{ $request->mahasiswa->nama ?? 'Tidak ditemukan' }}</td>
+                        <td>{{ $request->deskripsi_pengajuan }}</td>
+                        <td>{{ $request->tanggal_pengajuan }}</td>
+                        <td>
+                            <form action="{{ route('approve_konseling', $request->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('PUT')
+                                <button class="btn btn-success btn-sm">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            </form>
+                            <form action="{{ route('reject_konseling', $request->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('PUT')
+                                <button class="btn btn-danger btn-sm">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
             </tbody>
         </table>
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        function confirmLogout() {
-            Swal.fire({
-                title: 'Apakah anda yakin ingin keluar?',
-                text: "Anda akan keluar dari akun ini.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, keluar!',
-                cancelButtonText: 'Tidak',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = '{{ route('logout') }}';
-                }
-            });
-        }
-    </script>
 @endsection

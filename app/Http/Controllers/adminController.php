@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Pengumuman;
 use Illuminate\Http\Request;
+use App\Models\RequestKonseling;
 
 class adminController extends Controller
 {
@@ -80,7 +81,12 @@ class adminController extends Controller
 
     public function daftarRequest()
     {
-        return view('konseling.daftar_request');
+        // Ambil data request konseling dengan informasi mahasiswa
+        $requests = RequestKonseling::with('mahasiswa')->where('status', 'pending')->get();
+
+        // Kirim ke view
+        return view('konseling.daftar_request', compact('requests'));
     }
+
 
 }

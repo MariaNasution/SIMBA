@@ -10,5 +10,16 @@ class RequestKonseling extends Model
     use HasFactory;
 
     protected $table = 'request_konseling';
-    protected $fillable = ['tanggal_pengajuan', 'deskripsi_pengajuan', 'status'];
+
+    protected $fillable = [
+        'nim',
+        'tanggal_pengajuan',
+        'deskripsi_pengajuan',
+        'status',
+    ];
+
+    public function mahasiswa()
+    {
+        return $this->belongsTo(Mahasiswa::class, 'nim', 'nim');
+    }
 }
