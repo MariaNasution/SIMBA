@@ -8,6 +8,7 @@ use App\Http\Controllers\IBController;
 use App\Http\Controllers\IKController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DosenController;
 use App\Http\Controllers\KeasramaanController;
@@ -24,6 +25,8 @@ use App\Http\Controllers\DetailNilaiController;
 use App\Http\Controllers\KemajuanStudiController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\CatatanPerilakuController;
+use App\Http\Controllers\SetPerwalianController;
+
 
 // Login dan Logout
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
@@ -80,7 +83,11 @@ Route::middleware(['auth.session', 'role:dosen'])->group(function () {
     Route::get('/dosen/presensi', [DosenController::class, 'presensi'])->name('dosen.presensi');
     Route::get('/dosen/absensi-mahasiswa', [AbsensiController::class, 'index'])->name('absensi');
     Route::get('/absensi-mahasiswa/{date}/{class}', [AbsensiController::class, 'show'])->name('absensi.show');
+    Route::get('/set-perwalian', [SetPerwalianController::class, 'index'])->name('set.perwalian');
+    Route::post('/set-perwalian', [SetPerwalianController::class, 'store'])->name('set.perwalian.store');
 });
+
+
 
 // Middleware untuk keasramaan
 Route::middleware(['auth.session', 'role:keasramaan'])->group(function () {
