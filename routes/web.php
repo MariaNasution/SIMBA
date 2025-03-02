@@ -1,8 +1,5 @@
 <?php
 
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\IBController;
 use App\Http\Controllers\IKController;
@@ -26,7 +23,11 @@ use App\Http\Controllers\KemajuanStudiController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\CatatanPerilakuController;
 use App\Http\Controllers\SetPerwalianController;
-
+use App\Http\Controllers\DaftarPelanggaranController;
+use App\Http\Controllers\AjukanKonselingController;
+use App\Http\Controllers\MahasiswaKonselingController;
+use App\Http\Controllers\MahasiswaPerwalianController;
+use App\Http\Controllers\MahasiswaRequestKonselingController;
 
 // Login dan Logout
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
@@ -65,6 +66,9 @@ Route::middleware(['auth.session', 'ensure.student.data', 'role:mahasiswa'])->gr
     Route::get('perkuliahan/kemajuan_studi', [KemajuanStudiController::class, 'index'])->name('kemajuan_studi');
     Route::get('/detailnilai/{kode_mk}', [DetailNilaiController::class, 'show'])->name('detailnilai');
     Route::get('/catatan_perilaku', [CatatanPerilakuController::class, 'index'])->name('catatan_perilaku');
+    Route::get('/mahasiswa_konseling', [MahasiswaKonselingController::class, 'index'])->name('mahasiswa_konseling');
+    Route::get('/mahasiswa_perwalian', [MahasiswaPerwalianController::class, 'index'])->name('mahasiswa_perwalian');
+    Route::get('/mahasiswa/konseling/request', [MahasiswaRequestKonselingController::class, 'create'])->name('mhs_konseling_request');
 });
 
 // Middleware untuk admin
@@ -87,14 +91,16 @@ Route::middleware(['auth.session', 'role:dosen'])->group(function () {
     Route::post('/set-perwalian', [SetPerwalianController::class, 'store'])->name('set.perwalian.store');
 });
 
-
-
 // Middleware untuk keasramaan
 Route::middleware(['auth.session', 'role:keasramaan'])->group(function () {
     Route::get('/keasramaan/beranda', [KeasramaanController::class, 'index'])->name('keasramaan');
+    Route::get('/keasramaan/pelanggaran', [KeasramaanController::class, 'pelanggaran'])->name('pelanggaran_keasramaan');
 });
 
 // Middleware untuk orang tua
 Route::middleware(['auth.session', 'role:orang_tua'])->group(function () {
-    Route::get('/orangtua/beranda', [OrangTuaController::class, 'index'])->name('orang_tua');
+    Route::get('/orang_tua/beranda', [OrangTuaController::class, 'index'])->name('orang_tua');
+    Route::get('/orang_tua/catatan_perilaku', [OrangTuaController::class, 'catatan_perilaku'])
+        ->name('catatan_perilaku_orang_tua')
+        ->middleware('ensure.student.data');
 });

@@ -46,60 +46,59 @@ class UserSeeder extends Seeder
                 'role' => 'admin',
                 'anak_wali' => null, // No anak wali for admin
             ],
-            
             [
                 'username' => 'ifs19001', // Added second student
                 'password' => Hash::make('mahasiswa'),
                 'role' => 'mahasiswa',
-                'anak_wali' => 'dosen', 
+                'anak_wali' => 'dosen',
             ],
             [
                 'username' => 'ifs19002', // Added second student
                 'password' => Hash::make('mahasiswa'),
                 'role' => 'mahasiswa',
-                'anak_wali' => 'dosen', 
+                'anak_wali' => 'dosen',
             ],
             [
                 'username' => 'ifs19003', // Added second student
                 'password' => Hash::make('mahasiswa'),
                 'role' => 'mahasiswa',
-                'anak_wali' => 'dosen', 
+                'anak_wali' => 'dosen',
             ],
             [
                 'username' => 'ifs19004', // Added second student
                 'password' => Hash::make('mahasiswa'),
                 'role' => 'mahasiswa',
-                'anak_wali' => 'dosen', 
+                'anak_wali' => 'dosen',
             ],
             [
                 'username' => 'ifs19005', // Added second student
                 'password' => Hash::make('mahasiswa'),
                 'role' => 'mahasiswa',
-                'anak_wali' => 'dosen', 
+                'anak_wali' => 'dosen',
             ],
             [
                 'username' => 'ifs19031', // Added second student
                 'password' => Hash::make('mahasiswa'),
                 'role' => 'mahasiswa',
-                'anak_wali' => 'dosen', 
+                'anak_wali' => 'dosen',
             ],
             [
                 'username' => 'ifs19032', // Added second student
                 'password' => Hash::make('mahasiswa'),
                 'role' => 'mahasiswa',
-                'anak_wali' => 'dosen', 
+                'anak_wali' => 'dosen',
             ],
             [
                 'username' => 'ifs19033', // Added second student
                 'password' => Hash::make('mahasiswa'),
                 'role' => 'mahasiswa',
-                'anak_wali' => 'dosen', 
+                'anak_wali' => 'dosen',
             ],
             [
                 'username' => 'ifs19034', // Added second student
                 'password' => Hash::make('mahasiswa'),
                 'role' => 'mahasiswa',
-                'anak_wali' => 'dosen', 
+                'anak_wali' => 'dosen',
             ],
             [
                 'username' => 'ifs19035', // Added second student
@@ -126,11 +125,12 @@ class UserSeeder extends Seeder
                 'anak_wali' => null, // No anak wali for orang tua
             ],
         ];
-
+ 
         // Array of unique NIMs for mahasiswa (must match the number of mahasiswa users)
-        $nims = ['11S19001', '11S19002', '11S19003','11S19004',
-                 '11S19005', '11S19031', '11S19032', '11S19033',
-                 '11S19034', '11S19035'
+        $nims = [
+            '11S19001', '11S19002', '11S19003', '11S19004',
+            '11S19005', '11S19031', '11S19032', '11S19033',
+            '11S19034', '11S19035'
         ];
 
         // Counter for assigning NIMs
@@ -187,6 +187,7 @@ class UserSeeder extends Seeder
                 case 'orang_tua':
                     DB::table('orang_tua')->insert([
                         'username' => $user['username'],
+                        'nim' => '11S19001', // Fixed: Assign a default NIM for orang tua
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);

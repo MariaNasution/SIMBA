@@ -1,29 +1,34 @@
-
-
 * {
-    margin: 0%;
-    padding: 0%;
+    margin: 0;
+    padding: 0;
     box-sizing: border-box;
     font-family: "Poppins", sans-serif;
     text-decoration: none;
     list-style: none;
 }
 
+body,
+html {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden; /* Mencegah scroll */
+}
+
 body {
-    display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    min-width: 100vh;
     background: linear-gradient(90deg, #e2e2e2, #c9d6ff);
+    overflow: hidden;
 }
 
 .container {
-    position: relative;
-    width: 900px;
-    height: 500px;
+    position: flex;
+    width: 1550px;
+    height: 864px;
     background: url("../img/del.png") no-repeat center/cover; /* Tambahkan ini */
-    margin: 20px;
-    border-radius: 30px;
+    border-radius: 0;
     box-shadow: 0 0 30px rgba(0, 0, 0, 0, 0.2);
     overflow: hidden;
 }
@@ -34,7 +39,6 @@ body {
     width: 100%;
     height: 100%;
     background: rgba(255, 255, 255, 0.9);
-    background-size: cover; /* Fit the container */
     opacity: 0.7; /* 25% opacity */
     z-index: 1;
 }
@@ -56,11 +60,12 @@ body {
     margin-left: 10%;
     position: absolute;
     width: 100%;
+    margin-bottom: 300px;
 }
 
 .logo {
-    width: 100px;
-    height: px;
+    width: 180px;
+    height: 180px;
     margin-right: 10px;
 }
 
@@ -70,10 +75,10 @@ body {
     margin-top: auto;
 }
 .logo-text h2 {
-    font-size: 18px;
+    font-size: 25px;
     color: #2c3e50;
     line-height: 1.3;
-    margin-bottom: 5px;
+    margin-bottom: 20;
     font-weight: 800;
     text-align: justify;
 }
@@ -98,16 +103,15 @@ form {
     position: absolute;
     width: 50%;
     height: 100%;
-    background: transparent !important;
+    background: transparent;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    padding: 40px 60px;
+    justify-content: center;
+    padding: 40px;
     transition: all 0.6s ease-in-out;
     z-index: 2;
 }
-
 .container.active .form-box {
     right: 50%;
 }
@@ -138,6 +142,16 @@ form {
     visibility: visible;
 }
 
+.form-box.register {
+    transform: translateX(-100%);
+    opacity: 0;
+    visibility: hidden;
+}
+
+.no-transition * {
+    transition: none !important;
+    animation: none !important;
+}
 /* Hapus background autofill */
 .input-box input:-webkit-autofill,
 .input-box input:-webkit-autofill:hover,
@@ -156,9 +170,8 @@ form {
 }
 
 .input-box {
-    position: relative;
+    width: 80%;
     margin: 20px 0;
-    width: 100%;
 }
 
 .input-box label {
@@ -182,11 +195,11 @@ form {
     color: black;
 }
 
-.input-box input.reg{
+.input-box input.reg {
     padding-left: 28px; /* Add padding-left to create space for the icon */
 }
 
-.input-box input.log{
+.input-box input.log {
     padding-right: 28px; /* Add padding-left to create space for the icon */
 }
 
@@ -201,31 +214,31 @@ form {
 }
 
 .input-box i {
-    position:absolute;
-    top: 70%;
+    position: absolute;
+    top: 55.3%;
     transform: translateY(-50%);
     font-size: 18px;
     color: rgba(0, 0, 0, 0.7); /* Sesuaikan warna ikon */
 }
 
-.input-box i.reg{
-    left:10px;
+.input-box i.reg {
+    left: 23px;
 }
 
-.input-box i.log{
-    right:10px;
+.input-box i.log {
+    right: 10px;
 }
 
-.input-box i.jabatan{
+.input-box i.jabatan {
     cursor: pointer;
-    right: 20px;
+    right: 140px;
 }
 
 .input-box select {
     background: none;
     -webkit-appearance: none; /* Menghilangkan tampilan default select */
     -moz-appearance: none;
-    appearance : none;
+    appearance: none;
     width: 100%;
     padding: 13px 28px 13px 20px; /* Perbesar padding kanan */
     background: transparent;
@@ -235,7 +248,7 @@ form {
     font-size: 14px;
     font-weight: 500;
     color: black;
-    text-overflow:ellipsis; /* Tambahkan jika teks terlalu panjang */
+    text-overflow: ellipsis; /* Tambahkan jika teks terlalu panjang */
 }
 
 /* Style for the option text */
@@ -264,17 +277,17 @@ form {
 }
 
 /* Mengatur warna link pada .register-link dan .login-link */
-.register-link, .login-link {
+.register-link,
+.login-link {
     color: rgba(28, 75, 177, 1);
     text-decoration: none; /* Menghilangkan garis bawah */
 }
 
 /* Jika ingin efek hover, bisa ditambahkan seperti berikut */
-.register-link:hover, .login-link:hover {
+.register-link:hover,
+.login-link:hover {
     text-decoration: underline; /* Menambahkan garis bawah saat hover */
 }
-
-
 
 /* Dropdown yang dibuka */
 .select-container.open i {
@@ -289,90 +302,92 @@ form {
     border: none;
     padding: 10px;
     /* cursor: pointer; */
-    /* border-radius: 8px;
+/* border-radius: 8px;
     font-size: 16px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     font-weight: 600;
-} */ 
+} */
 
-.btn-container {
-    display: flex;
-    /* margin-left: 40%; */
-}
-
+/* Tombol Login saat toggle-right */
 .toggle-panel.toggle-right .btn-container .login-btn {
     flex: 1;
-    background-color: rgba(53, 64, 236, 1) !important; /* Background putih */
-    color: #fff; /* Teks hitam */
-    border: none !important;
-    border-radius: 10px;
-    margin: 0;
-    padding: 8px 0;
-    height: 33px !important;
-    font-weight: bold;
-    text-align: center;
-    position: relative; /* Menambahkan posisi relative untuk memudahkan kontrol */
-    z-index: 1; /* Mengatur urutan lapisan tombol */
-    width: 195px  !important;
-    margin-left: 43%;
-}
-
-.toggle-panel.toggle-right .btn-container .register-btn {
-    flex: 1 ;
-    background-color:  #fff  !important; /* Background biru */
-    color: #000; /* Teks putih */
-    border: none !important;
-    border-radius: 10px;
-    margin: 0;
-    padding: 8px 0;
-    height: 33px !important;
-    font-weight: bold;
-    text-align: center;
-    position: absolute; /* Posisi absolute agar bisa menimpa */
-    left: 0; /* Posisi kiri tombol register */
-    z-index: 0; /* Tombol login berada di bawah register */
-    /* width: 30%; */
-    margin-left: 20%;
-}
-
-
-.toggle-panel.toggle-left .btn-container .login-btn {
-    flex: 1;
-    background-color: #fff  !important; /* Background putih */
-    color: #000; /* Teks hitam */
-    border: none !important;
-    border-radius: 10px;
-    margin: 0;
-    padding: 8px 0;
-    height: 33px !important;
-    font-weight: bold;
-    text-align: center;
-    position: relative; /* Menambahkan posisi relative untuk memudahkan kontrol */
-    z-index: 0; /* Mengatur urutan lapisan tombol */
-    width: 195px  !important;
-    margin-left: 43%;
-    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2); /* Efek bayangan */
-    cursor: default;
-}
-
-.toggle-panel.toggle-left .btn-container .register-btn {
-    flex: 1 ;
     background-color: rgba(53, 64, 236, 1) !important; /* Background biru */
     color: #fff; /* Teks putih */
     border: none !important;
     border-radius: 10px;
     margin: 0;
     padding: 8px 0;
-    height: 33px !important;
+    height: 40px !important;
+    width: 130px;
     font-weight: bold;
     text-align: center;
-    cursor: pointer;
-    position: absolute; /* Posisi absolute agar bisa menimpa */
-    left: 0; /* Posisi kiri tombol register */
-    z-index: 1; /* Tombol login berada di bawah register */
-    /* width: 30%; */
-    margin-left: 20%;
+    position: relative;
+    z-index: 1;
+    width: 195px !important;
+    margin-left: 27%;
+    cursor: default; /* Kursor pointer saat toggle-right */
+}
+
+/* Tombol Register saat toggle-right */
+.toggle-panel.toggle-right .btn-container .register-btn {
+    flex: 1;
+    background-color: #fff !important; /* Background putih */
+    color: #000; /* Teks hitam */
+    border: none !important;
+    border-radius: 10px;
+    margin: 0;
+    padding: 8px 0;
+    height: 40px !important;
+    width: 130px;
+    font-weight: bold;
+    text-align: center;
+    position: absolute;
+    left: 0;
+    z-index: 0;
+    margin-left: 23%;
+    cursor: pointer; /* Kursor default saat toggle-right */
+}
+
+/* Tombol Login saat toggle-left */
+.toggle-panel.toggle-left .btn-container .login-btn {
+    flex: 1;
+    background-color: #fff !important; /* Background putih */
+    color: #000; /* Teks hitam */
+    border: none !important;
+    border-radius: 10px;
+    margin: 0;
+    padding: 8px 0;
+    height: 40px !important;
+    width: 130px;
+    font-weight: bold;
+    text-align: center;
+    position: relative;
+    z-index: 0;
+    width: 195px !important;
+    margin-left: 27%;
     box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2); /* Efek bayangan */
+    cursor: pointer; /* Kursor default saat toggle-left */
+}
+
+/* Tombol Register saat toggle-left */
+.toggle-panel.toggle-left .btn-container .register-btn {
+    flex: 1;
+    background-color: rgba(53, 64, 236, 1) !important; /* Background biru */
+    color: #fff; /* Teks putih */
+    border: none !important;
+    border-radius: 10px;
+    margin: 0;
+    padding: 8px 0;
+    height: 40px !important;
+    width: 130px;
+    font-weight: bold;
+    text-align: center;
+    position: absolute;
+    left: 0;
+    z-index: 1;
+    margin-left: 23%;
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2); /* Efek bayangan */
+    cursor: default; /* Kursor pointer saat toggle-left */
 }
 
 /* Default state: Show the login section */
@@ -394,20 +409,24 @@ form {
     padding: 20px;
 }
 
-
 .toggle-panel.toggle-right p {
     text-align: center; /* Menempatkan teks di tengah */
     margin-top: 55px; /* Menggeser tulisan lebih dekat ke button */
-
+    margin-right: 150px;
 }
 
 .toggle-panel.toggle-left p {
     text-align: center; /* Menempatkan teks di tengah */
     margin-top: 55px; /* Menggeser tulisan lebih dekat ke button */
-    
+    margin-right: 150px;
 }
 
-.toggle-panel.toggle-right .btn, 
+/* Menonaktifkan semua transisi untuk elemen dan pseudo-element */
+.no-transition .toggle-box::before {
+    transition: none !important;
+}
+
+.toggle-panel.toggle-right .btn,
 .toggle-panel.toggle-left .btn {
     display: flex;
     flex-direction: column;
@@ -416,10 +435,16 @@ form {
     margin-top: 30px; /* Geser lebih ke bawah */
     border-radius: 20px;
     background-color: #ffffff !important; /* Background putih */
-    margin-left: 75px;
+    margin-left: 170px;
     box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2); /* Efek bayangan */
     cursor: pointer;
-    
+}
+
+.btn-container .login-btn:hover,
+.btn-container .register-btn:hover {
+    background-color: rgba(53, 64, 236, 0.8);
+    box-shadow: 0px 0px 15px rgba(53, 64, 236, 0.5);
+    transition: 0.3s ease;
 }
 
 .social-icons {
@@ -439,7 +464,7 @@ form {
 
 .toggle-box {
     position: absolute;
-    width: 100%;
+    width: 110%;
     height: 100%;
 }
 
@@ -447,7 +472,7 @@ form {
     position: absolute;
     content: "";
     left: -250%;
-    width: 298%;
+    width: 290%;
     height: 100%;
     background: linear-gradient(
         to bottom,
@@ -524,6 +549,7 @@ form {
     .logo-container {
         flex-direction: column;
         text-align: center;
+        margin-bottom: 250px;
     }
 
     .logo {
@@ -568,13 +594,13 @@ form {
     }
 
     /* Default state: Show the login section */
-.toggle-panel {
-    display: none; /* Hide both panels by default */
-  }
-  
-  .toggle-right {
-    display: block; /* Show the login section by default */
-  }
+    .toggle-panel {
+        display: none; /* Hide both panels by default */
+    }
+
+    .toggle-right {
+        display: block; /* Show the login section by default */
+    }
 
     .toggle-panel.toggle-left {
         top: 0;
@@ -589,11 +615,15 @@ form {
     }
 }
 
-@media screen and (max-width: 450px) {
-    .form-box {
-        padding: 20px;
-    }
-    .toggle-panel h1 {
-        font-size: 30px;
-    }
+.btn-container .login-btn:hover,
+.btn-container .register-btn:hover {
+    background-color: rgba(53, 64, 236, 0.8);
+    box-shadow: 0px 0px 15px rgba(53, 64, 236, 0.5);
+    transition: 0.3s ease;
+}
+
+.btn-container {
+    display: flex;
+    gap: 0;
+    /* margin-left: 40%; */
 }

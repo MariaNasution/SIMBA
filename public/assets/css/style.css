@@ -94,9 +94,8 @@
     max-height: 100vh;
     background: radial-gradient(
         circle at top right,
-        #00456d 0%,
-        #858585 65%,
-        #ffffff 100%
+        #4975A7 0%,
+        #E4EBF0 100%
     );
     color: white;
     padding: 20px;
@@ -185,9 +184,16 @@
 }
 
 .menu-item i {
-    font-size: 18px; /* Ukuran ikon */
-    color: rgb(63, 63, 63); /* Warna ikon menjadi hitam */
-    margin-right: 10px; /* Jarak antara ikon dan teks */
+    font-size: 18px !important; 
+    color: rgb(63, 63, 63);
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 24px;
+    text-align: center;
+    margin-right: 10px;
 }
 
 .menu-item.has-submenu .submenu-toggle.open {
@@ -241,6 +247,15 @@
     margin-left: auto;
     transition: transform 0.3s;
 }
+
+#perkuliahan-toggle {
+    font-size: 13px !important; /* Ubah ukuran ikon */
+}
+
+#perizinan-toggle {
+    font-size: 13px !important; /* Ubah ukuran ikon */
+}
+
 
 .sidebar,
 main {
@@ -427,7 +442,6 @@ body {
 }
 
 /* Mengatur font untuk seluruh container */
-h4,
 ul,
 ul li,
 .btn {
@@ -436,9 +450,10 @@ ul li,
 
 /* Styling tambahan untuk judul h4 */
 h4 {
+    font-family: "Roboto Serif";
     font-size: 1.5rem;
     font-weight: 600;
-    color: #333;
+    color: #ffffff;
 }
 
 /* Styling untuk daftar ul */
