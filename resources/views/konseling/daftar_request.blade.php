@@ -1,10 +1,11 @@
+
 @extends('layouts.app')
 
 @section('content')
     <div class="d-flex align-items-center mb-4 border-bottom-line">
         <h3 class="me-auto">
-            <a href="{{ route('admin') }}"> <i class="fas fa-home me-3"></i>Home</a> /
-            <a href="{{ route('daftar_request') }}">Daftar Request</a>
+            <a href="{{ route('admin') }}"> <i class="fas fa-list me-3"></i>Home</a> /
+            <a href="{{ route('daftar_pelanggaran') }}">Daftar Pelanggaran</a>
         </h3>
         <a href="#" onclick="confirmLogout()">
             <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
@@ -13,43 +14,60 @@
 
     <div class="card-body">
         <table class="table table-bordered">
-            <thead class="table-secondary">
+            <thead class="table table-secondary">
                 <tr>
-                    <th>No</th>
+                    <th class="no-column">No</th>
                     <th>NIM Mahasiswa</th>
                     <th>Nama Mahasiswa</th>
-                    <th>Alasan Konseling</th>
-                    <th>Waktu</th>
-                    <th>Approve</th>
+                    <th>Detail Pelanggaran</th>
+                    <th>Jenis Pelanggaran</th>
+                    <th>Ajukan</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($requests as $key => $request)
+                @if(isset($pelanggaranList) && count($pelanggaranList) > 0)
+                    @foreach($pelanggaranList as $index => $pelanggaran)
+                        <tr>
+                            <td class="no-column">{{ $index + 1 }}</td>
+                            <td>{{ $pelanggaran['nim'] ?? '-' }}</td>
+                            <td>{{ $pelanggaran['nama'] ?? '-' }}</td>
+                            <td>{{ $pelanggaran['pelanggaran'] ?? '-' }}</td>
+                            <td>{{ $pelanggaran['tingkat'] ?? '-' }}</td>
+                            <td>
+                                <a href="{{ route('konseling_lanjutan') }}" class="btn btn-custom-blue">
+                                    Ajukan Konseling
+                                </a>
+                            </td>
+                        </tr>
+                    @endforeach
+                @else
                     <tr>
-                        <td>{{ $key + 1 }}</td>
-                        <td>{{ $request->nim }}</td>
-                        <td>{{ $request->mahasiswa->nama ?? 'Tidak ditemukan' }}</td>
-                        <td>{{ $request->deskripsi_pengajuan }}</td>
-                        <td>{{ $request->tanggal_pengajuan }}</td>
-                        <td>
-                            <form action="{{ route('approve_konseling', $request->id) }}" method="POST" class="d-inline">
-                                @csrf
-                                @method('PUT')
-                                <button class="btn btn-success btn-sm">
-                                    <i class="fas fa-check"></i>
-                                </button>
-                            </form>
-                            <form action="{{ route('reject_konseling', $request->id) }}" method="POST" class="d-inline">
-                                @csrf
-                                @method('PUT')
-                                <button class="btn btn-danger btn-sm">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </form>
-                        </td>
+                        <td colspan="6" class="text-center">Tidak ada data pelanggaran.</td>
                     </tr>
-                @endforeach
+                @endif
             </tbody>
         </table>
-    </div>
+    </div>    
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmLogout() {
+            Swal.fire({
+                title: 'Apakah anda yakin ingin keluar?',
+                text: "Anda akan keluar dari akun ini.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, keluar!',
+                cancelButtonText: 'Tidak',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '{{ route('logout') }}'; // Arahkan ke route logout jika 'Ya' dipilih
+                }
+            });
+        }
+    </script>
 @endsection
+
+
+

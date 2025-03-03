@@ -55,10 +55,7 @@ class adminController extends Controller
         return view('beranda.detailpengumuman', compact('pengumuman'));
     }
 
-    public function daftarPelanggaran()
-    {
-        return view('konseling.daftar_pelanggaran');
-    }
+
 
     public function hasilKonseling()
     {

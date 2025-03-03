@@ -82,7 +82,7 @@ Route::middleware(['auth.session', 'role:admin'])->group(function () {
     Route::post('/calendar/upload', [CalendarController::class, 'upload'])->name('calendar.upload');
     // Konseling
     Route::prefix('konseling')->group(function () {
-        Route::get('/daftar_pelanggaran', [AdminController::class, 'daftarPelanggaran'])->name('daftar_pelanggaran');
+        Route::get('/daftar_pelanggaran', [DaftarPelanggaranController::class, 'daftarPelanggaran'])->name('daftar_pelanggaran');
         Route::get('/hasil_konseling', [AdminController::class, 'hasilKonseling'])->name('hasil_konseling');
         Route::get('/riwayat_konseling', [RiwayatKonselingController::class, 'index'])->name('riwayat_konseling');
         Route::get('/konseling_lanjutan', [AdminController::class, 'konselingLanjutan'])->name('konseling_lanjutan');

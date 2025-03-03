@@ -12,67 +12,49 @@
     </div>
 
     <div class="card-body">
-            <table class="table table-bordered">
-                <thead class="table table-secondary">
+        <table class="table table-bordered">
+            <thead class="table table-secondary">
+                <tr>
+                    <th class="no-column">No</th>
+                    <th>NIM Mahasiswa</th>
+                    <th>Nama Mahasiswa</th>
+                    <th>Detail Pelanggaran</th>
+                    <th>Jenis Pelanggaran</th>
+                    <th>Ajukan</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if(isset($pelanggaranList) && count($pelanggaranList) > 0)
+                    @foreach($pelanggaranList as $index => $pelanggaran)
+                        <tr>
+                            <td class="no-column">{{ $index + 1 }}</td>
+                            <td>{{ $pelanggaran['nim'] ?? '-' }}</td>
+                            <td>{{ $pelanggaran['nama'] ?? '-' }}</td>
+                            <td>{{ $pelanggaran['pelanggaran'] ?? '-' }}</td>
+                            <td>{{ $pelanggaran['tingkat'] ?? '-' }}</td>
+                            <td>
+                                <a href="{{ route('konseling_lanjutan') }}" class="btn btn-custom-blue">
+                                    Ajukan Konseling
+                                </a>
+                            </td>
+                        </tr>
+                    @endforeach
+                @else
                     <tr>
-                        <th class="no-column">No</th>
-                        <th>NIM Mahasiswa</th>
-                        <th>Nama Mahasiswa</th>
-                        <th>Detail Pelanggaran</th>
-                        <th>Jenis Pelanggaran</th>
-                        <th>Ajukan</th>
+                        <td colspan="6" class="text-center">Tidak ada data pelanggaran.</td>
                     </tr>
-                </thead>
-                <tbody>
-                    <!-- Data Dummy -->
-                    <tr>
-                        <td class="no-column">1</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td><a href="{{ route('konseling_lanjutan') }}" class="btn btn-custom-blue">Ajukan Konseling</a></td>
-                    </tr>
-                    <tr>
-                        <td class="no-column">2</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td><a href="{{ route('konseling_lanjutan') }}" class="btn btn-custom-blue">Ajukan Konseling</a></td>
-                    </tr>
-                    <tr>
-                        <td class="no-column">3</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td><a href="{{ route('konseling_lanjutan') }}" class="btn btn-custom-blue">Ajukan Konseling</a></td>
-                    </tr>
-                    <tr>
-                        <td class="no-column">4</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td><a href="{{ route('konseling_lanjutan') }}" class="btn btn-custom-blue">Ajukan Konseling</a></td>
-                    </tr>
-                    <tr>
-                        <td class="no-column">5</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td><a href="{{ route('konseling_lanjutan') }}" class="btn btn-custom-blue">Ajukan Konseling</a></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>    
+                @endif
+            </tbody>
+        </table>
+    </div>    
+
+    
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function confirmLogout() {
             Swal.fire({
-                title: 'Apakah anda yakin ingin keluar',
+                title: 'Apakah anda yakin ingin keluar?',
                 text: "Anda akan keluar dari akun ini.",
                 icon: 'warning',
                 showCancelButton: true,
