@@ -25,7 +25,7 @@
                                     <span>
                                         <strong
                                             class="@switch($item->sumber)
-                                            @case('BEM') text-primary @break
+                                              @case('BEM') text-primary @break
                                             @case('INFO') text-danger @break
                                             @case('BURSAR') text-info @break
                                             @case('KEASRAMAAN') text-success @break
