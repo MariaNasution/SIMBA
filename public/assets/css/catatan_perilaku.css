@@ -1,0 +1,121 @@
+h3.me-auto {
+  font-size: 18px !important; /* Ubah ukuran sesuai kebutuhan */
+  font-weight: normal; /* Opsional: Menghindari teks terlalu tebal */
+}
+
+h3.me-auto i {
+  margin-right: 8px; /* Ubah angka sesuai kebutuhan */
+}
+
+
+
+p.text-center.mb-4 {
+  color: black; /* Mengatur warna teks menjadi hitam */
+  margin-top: 50px !important; /* Angka lebih besar = lebih naik */
+  font-weight: normal; /* Menghindari teks tebal */
+
+}
+
+hr.mb-4 {
+  width: 40%; /* Sesuaikan dengan teks */
+  margin: auto;
+  border: 1px solid black;
+  margin-top: -20px !important; /* Angka lebih besar = lebih naik */
+  margin-bottom: 60px !important; /* Kurangi jarak bawah jika perlu */
+}
+
+.nilai-huruf-cell {
+  position: relative;
+  padding-right: 30px; /* Tambahkan ruang untuk ikon */
+}
+
+.dropdown-icon {
+  position: absolute;
+  right: 5px; /* Menempel ke kanan */
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px; /* Ukuran ikon lebih kecil */
+  color: #333; /* Warna lebih gelap */
+  text-decoration: none; /* Hilangkan underline */
+}
+
+.dropdown-icon:hover {
+  color: #007bff; /* Warna berubah saat hover */
+}
+
+.table {
+  border-collapse: collapse;
+  border: none;
+  width: 100%;
+}
+
+.table {
+  border-collapse: collapse;
+  border: none;
+  width: 100%;
+  font-size: 14px;
+  background-color: #FFFFFF !important; /* Warna latar belakang tabel */
+}
+
+.table thead tr {
+  border-bottom: none !important; /* Menghapus garis bawah header */
+}
+
+.table th,
+.table td {
+  border-top: none !important; /* Menghapus garis atas */
+  border-left: none !important; /* Menghapus garis kiri */
+  border-right: none !important; /* Menghapus garis kanan */
+  border-bottom: 1px solid #ddd !important; /* Garis bawah tetap ada */
+  padding: 8px;
+  font-size: 14px;
+  background-color: #FFFFFF !important; /* Warna latar belakang sel */    
+}
+
+/* CSS untuk Kotak Pelanggaran dan Perbuatan Baik */
+.custom-box-container {
+  display: flex;
+  margin-bottom: 0; /* Hilangkan margin bawah */
+}
+
+.custom-box {
+   /* Membagi lebar kotak secara merata */
+  text-align: center;
+  cursor: pointer;
+  padding: 8px; /* Padding lebih kecil */
+  font-size: 14px; /* Ukuran font lebih kecil */
+  background-color: #FFFF; /* Warna latar belakang */
+  border: 1px solid #ddd; /* Border tipis */
+  border-bottom: none; /* Hilangkan border bawah */
+  border-top: 2px solid transparent; /* Garis atas transparan secara default */
+  transition: all 0.3s ease; /* Animasi transisi */
+}
+
+#pelanggaranBox {
+  border-right: #333;
+}
+
+.custom-box:hover {
+  background-color: #FFFF; /* Warna latar belakang saat hover */
+}
+
+/* Garis biru tebal untuk kotak aktif */
+.custom-box.active {
+  border-top: 2px solid #0d6efd; /* Garis atas biru tebal */
+  background-color: #FFFFFF; /* Warna latar belakang saat aktif */
+}
+
+/* Atur lebar kotak */
+.custom-box-container .custom-box {
+  width: 30% !important; /* Lebar kotak diatur menjadi 50% */
+}
+
+.collapse h5 {
+  font-size: 15px; /* Sesuaikan ukuran sesuai kebutuhan */
+}
+
+.p-3 {
+ background-color: #f8f9fa; /* Warna latar belakang */
+}
+
+

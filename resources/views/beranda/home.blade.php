@@ -1,28 +1,45 @@
-@extends('layouts.app') <!-- Layout utama -->
+@extends('layouts.app') <!-- Assuming this is your main layout -->
 
 @section('content')
-    <!-- Header -->
+    <!-- Header with Notification and Logout -->
     <div class="d-flex align-items-center mb-4 border-bottom-line">
         <h3 class="me-auto">
             <a href="{{ route('beranda') }}">Home</a>
         </h3>
+        <!-- Notification Dropdown -->
+        <div class="dropdown position-relative me-3">
+            <a href="#" class="text-decoration-none" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-bell fs-5 cursor-pointer" title="Notifications"></i>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    3 <!-- Placeholder for notification count -->
+                    <span class="visually-hidden">unread notifications</span>
+                </span>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="notificationDropdown">
+                <li><h6 class="dropdown-header">Notifications</h6></li>
+                <!-- Placeholder Perwalian Notifications -->
+                @for ($i = 0; $i < 3; $i++)
+                    <li><a class="dropdown-item" href="#">Perwalian on 2025-02-27 by Dosen NIP: 123456</a></li>
+                @endfor
+            </ul>
+        </div>
+        <!-- Logout Button -->
         <a href="#" onclick="confirmLogout()">
             <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
         </a>
-
     </div>
 
-    <!-- Konten Utama -->
+    <!-- Main Content -->
     <div class="app-content-header">
         <div class="container-fluid">
-            <!-- Waktu di bagian atas -->
+            <!-- Current Date and Time -->
             <div class="d-flex justify-content-start align-items-center">
                 <p class="text-muted mb-3">{{ now()->addHours(7)->isoFormat('dddd, D MMMM YYYY HH:mm') }}</p>
             </div>
 
-            <!-- Kontainer untuk Komponen -->
+            <!-- Study Progress and Announcements -->
             <div class="row">
-                <!-- Grafik Kemajuan Studi -->
+                <!-- Study Progress Chart -->
                 <div class="col-md-6">
                     <div class="card p-3 shadow-sm">
                         <h5 class="card-title">Kemajuan Studi</h5>
@@ -30,7 +47,7 @@
                     </div>
                 </div>
 
-                <!-- Pengumuman -->
+                <!-- Announcements -->
                 <div class="col-md-6">
                     <div class="cards p-3">
                         <h5 class="border-bottom-line text-start">PENGUMUMAN</h5>
@@ -60,7 +77,7 @@
                 </div>
             </div>
 
-            <!-- Tombol Unduh Kalender -->
+            <!-- Calendar Download Buttons -->
             <div class="row mt-4">
                 <div class="col-md-12 text-center">
                     @if ($akademik)
@@ -84,7 +101,7 @@
         </div>
     </div>
 
-    <!-- Modal untuk Deskripsi Pengumuman -->
+    <!-- Announcement Modal (Unchanged) -->
     <div class="modal fade" id="pengumumanModal" tabindex="-1" aria-labelledby="pengumumanModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
