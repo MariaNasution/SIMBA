@@ -13,7 +13,7 @@ class KeasramaanController extends Controller
 
     public function pelanggaran()
     {
-        return view('catatanPerilaku.pelanggaran_keasramaan');
+        return view('catatanPerilaku.catatan_perilaku_keasramaan');
     }
 
     public function presensi()

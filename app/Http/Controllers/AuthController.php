@@ -48,8 +48,6 @@ class AuthController extends Controller
                                         'form_params' => [
                                                 'username' => 'johannes', // Use the logged-in user's username
                                                 'password' => 'Del@2022', // Use the provided password
-                                                'username' => 'johannes', // Should this be $user->username instead?
-                                                'password' => 'Del@2022', // Should this be $request->password?
                                         ],
                                         'headers' => [
                                                 'Accept' => 'application/json',
@@ -82,8 +80,7 @@ class AuthController extends Controller
                                                 'user' => [
                                                         'username' => $user->username,
                                                         'role' => $user->role,
-                                                        'nim' => $data['user']['nim'] ?? null, // Store NIM only for students
-                                                        'nim' => $nim, // Store NIM from mahasiswa table
+                                                        'nim' => $data['user']['nim'] ?? ($mahasiswa?->nim ?? null),
                                                 ],
                                         ]);
 
@@ -104,11 +101,9 @@ class AuthController extends Controller
                                                         return redirect()->route('keasramaan')->with('success', 'Login sebagai keasramaan berhasil!');
 
                                                 case 'orang_tua':
-                                                        Log::info('Redirecting to keasramaan route...');
-                                                        return redirect()->route('orang_tua')->with('success', 'Login sebagai keasramaan berhasil!');
-
                                                         Log::info('Redirecting to orang_tua route...');
                                                         return redirect()->route('orang_tua')->with('success', 'Login sebagai orang tua berhasil!');
+
                                                 case 'admin':
                                                         Log::info('Redirecting to admin route...');
                                                         return redirect()->route('admin')->with('success', 'Login sebagai admin berhasil!');

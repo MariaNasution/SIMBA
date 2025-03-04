@@ -54,10 +54,6 @@ Route::middleware(['auth.session', 'ensure.student.data', 'role:mahasiswa'])->gr
     Route::get('/beranda', [HomeController::class, 'index'])->name('beranda');
     Route::get('/pengumuman/{id}', [HomeController::class, 'show'])->name('pengumuman.detail');
     Route::get('/profil', [ProfilController::class, 'index'])->name('profil');
-    Route::get('/perizinan/izin_bermalam', [IBController::class, 'index'])->name('izin_bermalam');
-    Route::get('/perizinan/izin_keluar', [IKController::class, 'index'])->name('izin_keluar');
-    Route::get('bursar/bursar', [BursarController::class, 'index'])->name('bursar');
-    Route::get('/bursar/{id}', [BursarController::class, 'showDetail'])->name('bursar.detail');
     Route::get('asrama/asrama', [AsramaController::class, 'index'])->name('asrama');
     Route::get('perkuliahan/prodi', [ProdiController::class, 'index'])->name('prodi');
     Route::get('perkuliahan/jadwal', [JadwalController::class, 'index'])->name('jadwal');
@@ -78,6 +74,42 @@ Route::middleware(['auth.session', 'role:admin'])->group(function () {
     Route::delete('/beranda/admin/{id}', [AdminController::class, 'destroy'])->name('pengumuman.destroy');
     Route::get('/pengumuman/admin/{id}', [AdminController::class, 'show'])->name('pengumumanadmin.detail');
     Route::post('/calendar/upload', [CalendarController::class, 'upload'])->name('calendar.upload');
+
+    // Konseling
+    Route::prefix('konseling')->group(function () {
+        Route::get('/daftar_pelanggaran', [DaftarPelanggaranController::class, 'daftarPelanggaran'])->name('daftar_pelanggaran');
+        Route::get('/hasil_konseling', [AdminController::class, 'hasilKonseling'])->name('hasil_konseling');
+        Route::get('/riwayat_konseling', [RiwayatKonselingController::class, 'index'])->name('riwayat_konseling');
+        Route::get('/konseling_lanjutan', [AdminController::class, 'konselingLanjutan'])->name('konseling_lanjutan');
+        Route::get('/ajukan_konseling', [AdminController::class, 'ajukanKonseling'])->name('ajukan_konseling');
+        Route::get('/daftar_request', [AdminController::class, 'daftarRequest'])->name('daftar_request');
+
+        Route::get('/hasil', [HasilKonselingController::class, 'index'])->name('hasil.index');
+        Route::post('/hasil', [HasilKonselingController::class, 'store'])->name('hasil.store');
+        Route::get('/hasil/{id}', [HasilKonselingController::class, 'show'])->name('hasil.show');
+        Route::delete('/hasil/{id}', [HasilKonselingController::class, 'destroy'])->name('hasil.destroy');
+
+        //daftar request
+        Route::get('/admin/daftar-request', [DaftarRequestKonselingController::class, 'daftarRequest'])->name('daftar_request');
+        Route::put('/admin/approve-konseling/{id}', [DaftarRequestKonselingController::class, 'approve'])->name('approve_konseling');
+        Route::put('/admin/reject-konseling/{id}', [DaftarRequestKonselingController::class, 'reject'])->name('reject_konseling');
+
+        Route::prefix('konseling')->group(function () {
+            Route::get('/ajukan', [AjukanKonselingController::class, 'index'])->name('konseling.ajukan');
+            Route::get('/cari', [AjukanKonselingController::class, 'cariMahasiswa'])->name('konseling.cari');
+            Route::post('/submit', [AjukanKonselingController::class, 'submit'])->name('konseling.ajukan');
+            Route::get('/caririwayat', [RiwayatkonselingController::class, 'CariRiwayatMahasiswa'])->name('konseling.caririwayat');
+            // Menampilkan semua riwayat konseling mahasiswa
+            Route::get('/riwayat-konseling', [RiwayatKonselingController::class, 'index'])->name('riwayat.konseling');
+            Route::post('/hasil-konseling/upload', [HasilKonselingController::class, 'upload'])->name('hasil_konseling.upload');
+
+            // Mencari riwayat konseling mahasiswa berdasarkan NIM
+            Route::get('/riwayat-konseling/cari', [RiwayatKonselingController::class, 'CariRiwayatMahasiswa'])->name('riwayat.konseling.cari');
+        });
+
+        Route::get('/konseling-lanjutan', [AdminController::class, 'konselingLanjutan'])->name('konseling.lanjutan');
+    });
+    
 });
 
 // Middleware untuk dosen
