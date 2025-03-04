@@ -35,15 +35,5 @@
                 <i class="fas fa-check-square"></i> Absensi Mahasiswa
             </a>
         </li>
-        <li class="menu-item">
-            <a href="{{ route('bursar') }}">
-                <i class="fas fa-wallet"></i> Berita Acara
-            </a>
-        </li>
-        <li class="menu-item">
-            <a href="{{ route('bursar') }}">
-                <i class="fas fa-wallet"></i> History
-            </a>
-        </li>
     </ul>
 </div>
