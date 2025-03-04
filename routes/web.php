@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\IBController;
-use App\Http\Controllers\IKController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AbsensiController;
@@ -12,7 +10,6 @@ use App\Http\Controllers\KeasramaanController;
 use App\Http\Controllers\OrangTuaController;
 use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\AsramaController;
-use App\Http\Controllers\BursarController;
 use App\Http\Controllers\JadwalController;
 use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\CalendarController;
