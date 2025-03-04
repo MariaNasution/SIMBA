@@ -12,10 +12,14 @@ class RequestKonseling extends Model
     protected $table = 'request_konseling';
 
     protected $fillable = [
-        'nama',
         'nim',
         'tanggal_pengajuan',
+        'deskripsi_pengajuan',
         'status',
-        'deskripsi_pengajuan'
     ];
+
+    public function mahasiswa()
+    {
+        return $this->belongsTo(Mahasiswa::class, 'nim', 'nim');
+    }
 }

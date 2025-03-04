@@ -7,10 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Mahasiswa extends Model
 {
-    use HasFactory;
-
-    protected $table = 'mahasiswa'; // Use plural for consistency with Laravel convention
-    protected $primaryKey = 'nim'; // String primary key
+    protected $table = 'mahasiswa'; // Specify the correct table name   
+    protected $primaryKey = 'username'; // Set primary key
     public $incrementing = false; // Disable auto-increment
 
     protected $fillable = ['nim', 'username', 'nama', 'kelas', 'ID_Dosen', 'ID_Perwalian'];
@@ -34,4 +32,10 @@ class Mahasiswa extends Model
     {
         return $this->hasMany(Notifikasi::class, 'nim', 'nim'); // Relationship to Notifikasi model (if applicable)
     }
+
+    public function requestKonseling()
+    {
+        return $this->hasMany(RequestKonseling::class, 'nim', 'nim');
+    }
+
 }
