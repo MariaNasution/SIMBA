@@ -60,4 +60,22 @@ public function presensi()
 
         return view('dosen.presensi', compact('anakWali'));
 }
+
+public function setPerwalian()
+    {
+        if (!session('user') || session('user')['role'] !== 'dosen') {
+            return redirect()->route('login')->with('error', 'Unauthorized access.');
+        }
+
+        $dosenUsername = session('user')['username'];
+        $anakWali = DB::table('users')
+            ->where('anak_wali', $dosenUsername)
+            ->where('role', 'mahasiswa')
+            ->select('username')
+            ->get()
+            ->pluck('username')
+            ->toArray();
+
+        return view('perwalian.setPerwalian');
+    }
 }

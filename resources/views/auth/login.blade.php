@@ -10,6 +10,8 @@
 
     <!-- Add SweetAlert2 CSS and JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    
 </head>
 
 <body>
@@ -23,7 +25,7 @@
             </div>
         </div>
 
-        <div class="form-box">
+        <div class="form-box register">
             <div class="logo-container">
                 <img src="{{ asset('assets/img/Logo Institut Teknologi Del.png') }}" alt="Logo IT Del" class="logo">
                 <div class="logo-text">
@@ -72,10 +74,14 @@
                         <input class="reg" type="password" id="password" name="password" required>
                         <i class="bx bxs-lock-alt reg"></i>
                     </div>
+                    
                     <div class="input-box">
                         <label for="role">Jabatan</label>
+                        
+                        <i class="bx bx-chevron-down jabatan"></i>
                         <select id="role" name="jabatan" required>
                             <option value="" disabled selected><span class="option-text">Pilih Jabatan</span>
+                               
                             </option>
                             <option value="admin"><span class="option-text">Admin (Kemahasiswaan dan DIRDIK
                                     Konselor)</span></option>
@@ -84,7 +90,7 @@
                             <option value="mahasiswa"><span class="option-text">Mahasiswa</span></option>
                             <option value="orang_tua"><span class="option-text">Orangtua</span></option>
                         </select>
-                        <i class="bx bx-chevron-down jabatan"></i>
+                        
                     </div>
                     <p>Sudah Daftar? <a href="#" class="login-link">Masuk Disini</a></p>
                     <button type="submit" class="btn">Buat Akun</button>

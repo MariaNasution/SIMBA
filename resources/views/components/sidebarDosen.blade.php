@@ -26,13 +26,13 @@
             </a>
         </li>
         <li class="menu-item">
-            <a href="{{ route('dosen.perwalian') }}">
+            <a href="{{ route('set.perwalian') }}">
                 <i class="fas fa-users"></i> Set Perwalian
             </a>
         </li>
         <li class="menu-item">
-            <a href="{{ route('dosen.presensi') }}">
-                <i class="fas fa-check-square"></i> Presensi
+            <a href="{{ route('absensi') }}">
+                <i class="fas fa-check-square"></i> Absensi Mahasiswa
             </a>
         </li>
         <li class="menu-item">
