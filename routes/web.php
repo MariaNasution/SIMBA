@@ -28,6 +28,10 @@ use App\Http\Controllers\AjukanKonselingController;
 use App\Http\Controllers\MahasiswaKonselingController;
 use App\Http\Controllers\MahasiswaPerwalianController;
 use App\Http\Controllers\MahasiswaRequestKonselingController;
+use App\Http\Controllers\RiwayatKonselingController;
+use App\Http\Controllers\HasilKonselingController;
+use App\Http\Controllers\DaftarRequestKonselingController;
+
 
 // Login dan Logout
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
@@ -134,5 +138,15 @@ Route::middleware(['auth.session', 'role:orang_tua'])->group(function () {
     Route::get('/orang_tua/beranda', [OrangTuaController::class, 'index'])->name('orang_tua');
     Route::get('/orang_tua/catatan_perilaku', [OrangTuaController::class, 'catatan_perilaku'])
         ->name('catatan_perilaku_orang_tua')
-        ->middleware('ensure.student.data');
+        ->middleware('ensure.student.data'); // Tambahkan middleware khusus jika diperlukan 
 });
+
+Route::get('/mahasiswa/request-konseling', [MahasiswaRequestKonselingController::class, 'create'])->name('mhs_konseling_request');
+Route::post('/mahasiswa/request-konseling', [MahasiswaRequestKonselingController::class, 'store'])->name('mhs_konseling_request.store');
+Route::get('/mahasiswa/request-konseling', [MahasiswaRequestKonselingController::class, 'create'])->name('mhs_konseling_request');
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
+});
+
+Route::get('/mahasiswa/konseling/request', [MahasiswaRequestKonselingController::class, 'create'])->name('mhs_konseling_request');
+Route::post('/mahasiswa/konseling/store', [MahasiswaRequestKonselingController::class, 'store'])->name('mhs_konseling_store');

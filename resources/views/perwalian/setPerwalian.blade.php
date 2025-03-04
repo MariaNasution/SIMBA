@@ -1,8 +1,16 @@
 @extends('layouts.app')
 
 @section('content')
+
+    <div class="d-flex align-items-center mb-4 border-bottom-line">
+        <h3 class="me-auto">
+        <a> Set Perwalian</a> 
+        </h3>
+        <a href="#" onclick="confirmLogout()">
+        <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
+        </a>
+    </div>
     <div class="container-fluid py-4">
-        <h1 class="h3 mb-4 text-center text-dark fw-bold">Set Perwalian</h1>
 
         <!-- Success/Error Messages -->
         @if (session('success'))

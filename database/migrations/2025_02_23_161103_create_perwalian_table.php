@@ -3,29 +3,25 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Models\DosenWali; // Import DosenWali model
 
-return new class extends Migration
+class CreatePerwalianTable extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
-        Schema::create('perwalians', function (Blueprint $table) {
-            $table->id();
-            $table->string('dosen_nip')->nullable(); // Foreign key or identifier for dosen
-            $table->date('date');
+        Schema::create('perwalian', function (Blueprint $table) {
+            $table->id('ID_Perwalian')->primary(); 
+            $table->foreignIdFor(DosenWali::class, 'ID_Dosen_Wali')->nullable(); // Foreign key to DosenWali, renamed to 'ID_Dosen_Wali'
+            $table->string('Status')->default('pending'); // Status of the perwalian
+            $table->date('Tanggal'); // Date of the perwalian
             $table->timestamps();
-            // Optional: Add foreign key constraint if 'dosens' table exists
-            // $table->foreign('dosen_nip')->references('nip')->on('dosens')->onDelete('set null');
+
+            // No need for a manual foreign key constraint for ID_Dosen_Wali; constrained() handles it
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
-        Schema::dropIfExists('perwalians');
+        Schema::dropIfExists('perwalian');
     }
-};
+}

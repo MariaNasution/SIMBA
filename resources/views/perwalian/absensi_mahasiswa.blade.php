@@ -1,12 +1,19 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="am-container">
-        <!-- Header -->
-        <div class="am-header">
-            <button onclick="goBack()" class="am-back-btn">← Back</button>
-            <h1>Absensi Mahasiswa</h1>
-        </div>
+
+<!-- Header -->
+    <div class="d-flex align-items-center mb-4 border-bottom-line">
+        <h3 class="me-auto">
+        <a> Absensi Mahasiswa</a> 
+        </h3>
+        <a href="#" onclick="confirmLogout()">
+        <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
+        </a>
+    </div>
+
+
+    <div class="container">
 
         <!-- Class Selection Buttons -->
         <div class="am-class-buttons">
