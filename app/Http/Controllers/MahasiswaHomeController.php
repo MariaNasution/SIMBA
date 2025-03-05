@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use App\Models\Mahasiswa;
 
-class HomeController extends Controller
+class MahasiswaHomeController extends Controller
 {
     public function index()
     {
@@ -89,7 +89,7 @@ class HomeController extends Controller
                 $akademik = Calendar::where('type', 'akademik')->latest()->first();
                 $bem = Calendar::where('type', 'bem')->latest()->first();
 
-                return view('beranda.home', compact('labels', 'values', 'pengumuman', 'akademik', 'bem'));
+                return view('beranda.homeMahasiswa', compact('labels', 'values', 'pengumuman', 'akademik', 'bem'));
             }
 
             Log::error('Gagal mengambil data API', ['response' => $response->body()]);

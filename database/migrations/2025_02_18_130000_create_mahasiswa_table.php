@@ -14,8 +14,8 @@ class CreateMahasiswaTable extends Migration
         Schema::create('mahasiswa', function (Blueprint $table) {
             $table->string('nim', 8)->primary(); // Primary key, string type (e.g., 11S22010), length 8
             $table->string('username')->nullable(); // Foreign key to users table, can be null
-            $table->string('nama'); // Student name
-            $table->string('kelas'); // Class name
+            $table->string('nama') ->nullable(); // Student name
+            $table->string('kelas') ->nullable(); // Class name
             $table->foreignIdFor(Dosen::class, 'ID_Dosen')->nullable(); // Foreign key to Dosen, renamed to 'ID_Dosen'
             $table->foreignIdFor(Perwalian::class, 'ID_Perwalian')->nullable(); // Foreign key to Perwalian, renamed to 'ID_Perwalian'
             $table->timestamps();
