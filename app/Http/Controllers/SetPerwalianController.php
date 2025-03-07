@@ -6,8 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\Perwalian;
 use Illuminate\Support\Facades\Log;
 
-
-
 class SetPerwalianController extends Controller
 {
     public function index()

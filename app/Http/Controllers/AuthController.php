@@ -62,26 +62,26 @@ class AuthController extends Controller
                                 $data = json_decode($body, true);
                                 Log::info('Respons API setelah diuraikan:', ['parsed_response' => $data]);
 
-                                // Check if the API response is valid
                                 if ($data && isset($data['result']) && $data['result'] === true) {
-                                        // Fetch nim from mahasiswa table if role is mahasiswa
+                                        // Fetch nim based on user role
                                         $nim = null;
                                         if ($user->role === 'mahasiswa') {
-                                                $mahasiswa = Mahasiswa::where('username', $user->username)->first();
-                                                $nim = $mahasiswa ? $mahasiswa->nim : null;
+                                            $mahasiswa = Mahasiswa::where('username', $user->username)->first();
+                                            $nim = $mahasiswa ? $mahasiswa->nim : null;
                                         } else if ($user->role == 'orang_tua') {
-                                                $nim = $user->orangTua?->nim; // Gunakan optional chaining
+                                            // Use optional chaining to get nim for orang_tua
+                                            $nim = $user->orangTua?->nim;
                                         }
-
+                                    
                                         // Store API token and user data in the session
                                         session([
-                                                'api_token' => $data['token'],
-                                                'user_api' => $data['user'],
-                                                'user' => [
-                                                        'username' => $user->username,
-                                                        'role' => $user->role,
-                                                        'nim' => $data['user']['nim'] ?? ($mahasiswa?->nim ?? null),
-                                                ],
+                                            'api_token' => $data['token'],
+                                            'user_api'  => $data['user'],
+                                            'user'      => [
+                                                'username' => $user->username,
+                                                'role'     => $user->role,
+                                                'nim'      => $nim, // Now correctly handles both roles
+                                            ],
                                         ]);
 
                                         Log::info('Token API diterima:', ['token' => $data['token']]);

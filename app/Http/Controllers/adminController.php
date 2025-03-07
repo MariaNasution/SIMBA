@@ -6,6 +6,7 @@ use App\Models\Pengumuman;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\RequestKonseling;
+use Illuminate\Support\Facades\Log;
 
 class adminController extends Controller
 {

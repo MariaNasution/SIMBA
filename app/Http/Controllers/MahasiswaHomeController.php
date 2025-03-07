@@ -4,9 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Calendar;
 use App\Models\Pengumuman;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use App\Models\Mahasiswa;
