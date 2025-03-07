@@ -28,41 +28,64 @@
     </div>
   @endif
 
-  {{-- Form Request Konseling --}}
-  <h3>Request Konseling</h3>
-  <form action="{{ route('mhs_konseling_store') }}" method="POST">
-    @csrf
+  {{-- Cek apakah session student_data tersedia --}}
+@php
+  $user = session('student_data') ?? [];
+  $nim = $user['nim'] ?? null;
+  $namaMahasiswa = $user['nama'] ?? 'Nama tidak ditemukan';
+@endphp
 
-    {{-- Waktu Konseling --}}
-    <div class="mb-3 col-md-5">
-      <label class="form-label text-start">Waktu Konseling</label>
-      <div class="input-group">
-        <input type="datetime-local" class="form-control" name="tanggal_pengajuan" id="tanggal_pengajuan" 
-          value="{{ old('tanggal_pengajuan') }}" required>
-        <button type="button" class="btn btn-danger btn-sm" onclick="resetTanggal()" title="Hapus Waktu">
-          <i class="fas fa-times"></i>
-        </button>
+
+  @if (!$nim)
+    <div class="alert alert-warning">
+      <strong>Perhatian:</strong> Data mahasiswa tidak ditemukan. Silakan hubungi administrator.
+    </div>
+  @else
+    {{-- Form Request Konseling --}}
+    <h3>Request Konseling</h3>
+    <form action="{{ route('mhs_konseling_store') }}" method="POST">
+      @csrf
+
+      {{-- Menampilkan Informasi Mahasiswa --}}
+      <div class="mb-3 col-md-4">
+        <label class="form-label text-start">NIM</label>
+        <input type="text" class="form-control" name="nim" value="{{ $nim }}" readonly>
       </div>
-    </div>
 
-    {{-- Keperluan Konseling --}}
-    <div class="mb-3">
-      <label class="form-label text-start">Keperluan Konseling</label>
-      <textarea class="form-control" name="deskripsi_pengajuan" rows="10" required>{{ old('deskripsi_pengajuan') }}</textarea>
-    </div>
+      <div class="mb-3 col-md-4">
+        <label class="form-label text-start">Nama Mahasiswa</label>
+        <input type="text" class="form-control" name="nama_mahasiswa"value="{{ $namaMahasiswa }}" readonly>
+      </div>
 
-    {{-- Tombol Submit dan Reset --}}
-    <div class="text-start m-0">
-    <button type="submit"class="btn btn-success me-2">Kirim</button>
-    <button type="reset" class="btn btn-secondary">Reset</button>
-     
-    </div>
+      {{-- Waktu Konseling --}}
+      <div class="mb-3 col-md-5">
+          <label class="form-label text-start">Waktu Konseling</label>
+          <div class="input-group">
+              <input type="datetime-local" class="form-control" name="tanggal_pengajuan" required>
+              <button type="button" class="btn btn-danger btn-sm" onclick="resetTanggal()" title="Hapus Waktu">
+                  <i class="fas fa-times"></i>
+              </button>
+          </div>
+      </div>
 
-  </form>
+      {{-- Keperluan Konseling --}}
+      <div class="mb-3">
+          <label class="form-label text-start">Keperluan Konseling</label>
+          <textarea class="form-control" name="deskripsi_pengajuan" rows="10" required></textarea>
+      </div>
+
+      {{-- Tombol Submit --}}
+      <div class="text-start m-0">
+          <button type="submit" class="btn btn-success me-2">Kirim</button>
+          <button type="reset" class="btn btn-secondary">Reset</button>
+      </div>
+    </form>
+
+  @endif
 
   <script>
     function resetTanggal() {
-      document.getElementById('tanggal_pengajuan').value = '';
+      document.getElementsByName('tanggal_pengajuan')[0].value = '';
     }
   </script>
 

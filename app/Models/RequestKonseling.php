@@ -9,10 +9,11 @@ class RequestKonseling extends Model
 {
     use HasFactory;
 
-    protected $table = 'request_konseling';
+    protected $table = 'request_konselings';
 
     protected $fillable = [
         'nim',
+        'nama_mahasiswa',
         'tanggal_pengajuan',
         'deskripsi_pengajuan',
         'status',

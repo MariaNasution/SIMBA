@@ -26,7 +26,7 @@
 
 <!-- Tabel Riwayat Konseling -->
 <div class="table-responsive">
-  <table class="table table-bordered text-center">
+<table class="table table-bordered text-center">
     <thead class="table-light">
       <tr>
         <th>No</th>
@@ -36,27 +36,28 @@
       </tr>
     </thead>
     <tbody>
-      @foreach ($konselings as $index => $konseling)
+    @foreach ($konselings as $index => $konseling)
         <tr class="
-          @if ($konseling->status == 'approved') table-success
-          @elseif ($konseling->status == 'rejected') table-danger
-          @elseif ($konseling->status == 'pending') table-primary
-          @endif">
-          <td>{{ $index + 1 }}</td>
-          <td>{{ Carbon::parse($konseling->tanggal_pengajuan)->format('d M Y H:i') }}</td>
-          <td>{{ $konseling->deskripsi_pengajuan }}</td>
-          <td>
-            @if ($konseling->status == 'approved')
-              ✅ Disetujui oleh Admin
-            @elseif ($konseling->status == 'rejected')
-              ❌ Ditolak
-            @else
-              ⏳ Menunggu Persetujuan Admin
-            @endif
-          </td>
+            @if ($konseling->status == 'approved') table-success
+            @elseif ($konseling->status == 'rejected') table-danger
+            @elseif ($konseling->status == 'pending') table-primary
+            @endif">
+            <td>{{ $index + 1 }}</td>
+            <td>{{ \Carbon\Carbon::parse($konseling->tanggal_pengajuan)->format('d M Y H:i') }}</td>
+            <td>{{ $konseling->deskripsi_pengajuan }}</td>
+            <td>
+                @if ($konseling->status == 'approved')
+                    ✅ Disetujui oleh Admin
+                @elseif ($konseling->status == 'rejected')
+                    ❌ Ditolak
+                @else
+                    ⏳ Menunggu Persetujuan Admin
+                @endif
+            </td>
         </tr>
-      @endforeach
-    </tbody>
+    @endforeach
+</tbody>
+
   </table>
 </div>
 
