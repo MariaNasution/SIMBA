@@ -24,7 +24,7 @@ use App\Http\Controllers\MahasiswaRequestKonselingController;
 use App\Http\Controllers\RiwayatKonselingController;
 use App\Http\Controllers\HasilKonselingController;
 use App\Http\Controllers\DaftarRequestKonselingController;
-
+use App\Http\Controllers\StudentBehaviorController;
 
 // Login dan Logout
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
@@ -116,17 +116,34 @@ Route::middleware(['auth.session', 'role:dosen'])->group(function () {
 });
 
 // Middleware untuk keasramaan
-Route::middleware(['auth.session', 'role:keasramaan'])->group(function () {
+Route::middleware(['auth.session', 'ensure.student.data.all.student', 'role:keasramaan'])->group(function () {
     Route::get('/keasramaan/beranda', [KeasramaanController::class, 'index'])->name('keasramaan');
-    Route::get('/keasramaan/pelanggaran', [KeasramaanController::class, 'pelanggaran'])->name('pelanggaran_keasramaan');
+    Route::get('/keasramaan/catatan-perilaku', [KeasramaanController::class, 'pelanggaran'])->name('pelanggaran_keasramaan');
+    Route::get('/keasramaan/catatan-perilaku/detail/{studentNim}', [KeasramaanController::class, 'detail'])->name('catatan_perilaku_detail');
+
+Route::prefix('student-behaviors')->group(function () {
+    Route::get('/create/{studentNim}/{ta}/{semester}', [StudentBehaviorController::class, 'create'])
+        ->name('student_behaviors.create');
+
+    Route::post('/store', [StudentBehaviorController::class, 'store'])
+        ->name('student_behaviors.store');
+        
+    Route::get('/{id}/edit', [StudentBehaviorController::class, 'edit'])
+        ->name('student_behaviors.edit');
+
+    Route::post('/{id}/update', [StudentBehaviorController::class, 'update'])
+        ->name('student_behaviors.update');
+        
+    Route::delete('/{id}/destroy', [StudentBehaviorController::class, 'destroy'])
+        ->name('student_behaviors.destroy');
+});
+
 });
 
 // Middleware untuk orang tua
-Route::middleware(['auth.session', 'role:orang_tua'])->group(function () {
+Route::middleware(['auth.session', 'ensure.student.data.ortu', 'role:orang_tua'])->group(function () {
     Route::get('/orang_tua/beranda', [OrangTuaController::class, 'index'])->name('orang_tua');
-    Route::get('/orang_tua/catatan_perilaku', [OrangTuaController::class, 'catatan_perilaku'])
-        ->name('catatan_perilaku_orang_tua')
-        ->middleware('ensure.student.data'); // Tambahkan middleware khusus jika diperlukan 
+    Route::get('/orang_tua/catatan_perilaku', [OrangTuaController::class, 'catatan_perilaku']) ->name('catatan_perilaku_orang_tua');
 });
 
 Route::get('/mahasiswa/request-konseling', [MahasiswaRequestKonselingController::class, 'create'])->name('mhs_konseling_request');

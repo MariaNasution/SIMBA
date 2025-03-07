@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Pengumuman;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 
@@ -10,12 +11,8 @@ class OrangTuaController extends Controller
 
     public function index()
     {
-        return view('beranda.homeOrangTua');
-    }
-
-    public function presensi()
-    {
-        return view('dosen.presensi');
+        $pengumuman = Pengumuman::orderBy('created_at', 'desc')->get();
+        return view('beranda.homeOrangTua', compact('pengumuman'));
     }
 
     public function catatan_perilaku()
@@ -76,10 +73,10 @@ class OrangTuaController extends Controller
                 return view('catatanPerilaku.catatan_perilaku_orang_tua', compact('nilaiPerilaku'));
             }
 
-            return redirect()->route('beranda')->withErrors(['error' => 'Gagal mengambil data dari API.']);
+            return redirect()->route('orang_tua')->withErrors(['error' => 'Gagal mengambil data dari API.']);
         } catch (\Exception $e) {
             Log::error('Exception terjadi:', ['message' => $e->getMessage()]);
-            return redirect()->route('beranda')->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            return redirect()->route('orang_tua')->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
     }
 

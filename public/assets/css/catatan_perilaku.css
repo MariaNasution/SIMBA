@@ -1,121 +1,116 @@
+/* catatan_perilaku.css - Adjusted to align with style.css */
+
+/* Header styles */
 h3.me-auto {
-  font-size: 18px !important; /* Ubah ukuran sesuai kebutuhan */
-  font-weight: normal; /* Opsional: Menghindari teks terlalu tebal */
+  font-size: 1.5rem !important;  /* Approximately 24px */
+  font-weight: normal;
 }
 
 h3.me-auto i {
-  margin-right: 8px; /* Ubah angka sesuai kebutuhan */
+  margin-right: 0.5rem; /* Approximately 8px */
 }
 
-
-
+/* Main paragraph styling */
 p.text-center.mb-4 {
-  color: black; /* Mengatur warna teks menjadi hitam */
-  margin-top: 50px !important; /* Angka lebih besar = lebih naik */
-  font-weight: normal; /* Menghindari teks tebal */
-
+  color: #000; /* Text color set to black */
+  margin-top: 2rem !important;  /* Increased top margin for better spacing */
+  font-weight: normal;
+  font-size: 1.1rem;  /* Approximately 17.6px */
 }
 
+/* Horizontal rule styling */
 hr.mb-4 {
-  width: 40%; /* Sesuaikan dengan teks */
+  width: 40%; /* Adjust width as needed */
   margin: auto;
-  border: 1px solid black;
-  margin-top: -20px !important; /* Angka lebih besar = lebih naik */
-  margin-bottom: 60px !important; /* Kurangi jarak bawah jika perlu */
+  border: 1px solid #000;
+  margin-top: -1.25rem !important; /* Adjusted to align better */
+  margin-bottom: 3.75rem !important; /* Adjusted spacing below */
 }
 
-.nilai-huruf-cell {
-  position: relative;
-  padding-right: 30px; /* Tambahkan ruang untuk ikon */
-}
-
-.dropdown-icon {
-  position: absolute;
-  right: 5px; /* Menempel ke kanan */
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 10px; /* Ukuran ikon lebih kecil */
-  color: #333; /* Warna lebih gelap */
-  text-decoration: none; /* Hilangkan underline */
-}
-
-.dropdown-icon:hover {
-  color: #007bff; /* Warna berubah saat hover */
-}
-
+/* Table styling */
 .table {
   border-collapse: collapse;
-  border: none;
   width: 100%;
-}
-
-.table {
-  border-collapse: collapse;
-  border: none;
-  width: 100%;
-  font-size: 14px;
-  background-color: #FFFFFF !important; /* Warna latar belakang tabel */
+  font-size: 1rem;  /* Approximately 16px */
+  background-color: #fff !important;
 }
 
 .table thead tr {
-  border-bottom: none !important; /* Menghapus garis bawah header */
+  border-bottom: none !important;
 }
 
 .table th,
 .table td {
-  border-top: none !important; /* Menghapus garis atas */
-  border-left: none !important; /* Menghapus garis kiri */
-  border-right: none !important; /* Menghapus garis kanan */
-  border-bottom: 1px solid #ddd !important; /* Garis bawah tetap ada */
-  padding: 8px;
-  font-size: 14px;
-  background-color: #FFFFFF !important; /* Warna latar belakang sel */    
+  border-top: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-bottom: 1px solid #ddd !important;
+  padding: 0.5rem;  /* Approximately 8px padding */
+  font-size: 1rem;  /* Approximately 16px */
+  background-color: #fff !important;
 }
 
-/* CSS untuk Kotak Pelanggaran dan Perbuatan Baik */
+/* Nilai Huruf cell (for behavior score column) */
+.nilai-huruf-cell {
+  position: relative;
+  padding-right: 1.875rem;  /* Approximately 30px */
+}
+
+/* Dropdown Icon for collapsible sections */
+.dropdown-icon {
+  position: absolute;
+  right: 0.3125rem;  /* Approximately 5px */
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.625rem;  /* Approximately 10px */
+  color: #333;
+  text-decoration: none;
+}
+
+.dropdown-icon:hover {
+  color: #007bff;
+}
+
+/* Custom Box Container for Pelanggaran and Perbuatan Baik */
 .custom-box-container {
   display: flex;
-  margin-bottom: 0; /* Hilangkan margin bawah */
+  margin-bottom: 0;  /* Remove extra bottom margin */
 }
 
+/* Custom Box styling */
 .custom-box {
-   /* Membagi lebar kotak secara merata */
   text-align: center;
   cursor: pointer;
-  padding: 8px; /* Padding lebih kecil */
-  font-size: 14px; /* Ukuran font lebih kecil */
-  background-color: #FFFF; /* Warna latar belakang */
-  border: 1px solid #ddd; /* Border tipis */
-  border-bottom: none; /* Hilangkan border bawah */
-  border-top: 2px solid transparent; /* Garis atas transparan secara default */
-  transition: all 0.3s ease; /* Animasi transisi */
-}
-
-#pelanggaranBox {
-  border-right: #333;
+  padding: 0.5rem;  /* Adjusted padding for consistency */
+  font-size: 1rem;  /* Approximately 16px */
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-bottom: none;
+  border-top: 2px solid transparent; /* Transparent top border by default */
+  transition: all 0.3s ease;
 }
 
 .custom-box:hover {
-  background-color: #FFFF; /* Warna latar belakang saat hover */
+  background-color: #fff;
 }
 
-/* Garis biru tebal untuk kotak aktif */
+/* Active custom box (when selected) */
 .custom-box.active {
-  border-top: 2px solid #0d6efd; /* Garis atas biru tebal */
-  background-color: #FFFFFF; /* Warna latar belakang saat aktif */
+  border-top: 2px solid #0d6efd; /* Blue top border when active */
+  background-color: #fff;
 }
 
-/* Atur lebar kotak */
+/* Set each custom box to equal width (30% of container) */
 .custom-box-container .custom-box {
-  width: 30% !important; /* Lebar kotak diatur menjadi 50% */
+  width: 30% !important;
 }
 
+/* Collapse header for the Pembinaan section */
 .collapse h5 {
-  font-size: 15px; /* Sesuaikan ukuran sesuai kebutuhan */
+  font-size: 1rem;  /* Approximately 16px */
 }
 
+/* Padding for container inside collapse */
 .p-3 {
- background-color: #f8f9fa; /* Warna latar belakang */
+  background-color: #f8f9fa;
 }
-
-

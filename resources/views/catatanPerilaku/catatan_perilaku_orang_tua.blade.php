@@ -6,9 +6,7 @@
 <!-- Header -->
 <div class="d-flex align-items-center mb-4 border-bottom">
   <h3 class="me-auto">
-    <a href="{{ route('orang_tua') }}">
-      <i class="fas fa-home"></i> Beranda / </a>
-    <a href="{{ route('catatan_perilaku_orang_tua') }}">Catatan Perilaku</a>
+    <a href="{{ route('catatan_perilaku_orang_tua') }}"> <i class ="fas fa-user-edit"></i>Catatan Perilaku</a>
   </h3>
   <a href="#" onclick="confirmLogout()">
     <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
