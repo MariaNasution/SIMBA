@@ -112,6 +112,28 @@ class UserSeeder extends Seeder
                 'role' => 'dosen',
                 'anak_wali' => null, // Dosen as wali, no anak wali
             ],
+
+            [
+                'username' => '0308190348',
+                'password' => Hash::make('dosen'),
+                'role' => 'dosen',
+                'anak_wali' => null, // Dosen as wali, no anak wali
+            ],
+
+            [
+                'username' => '0309130087',
+                'password' => Hash::make('dosen'),
+                'role' => 'dosen',
+                'anak_wali' => null, // Dosen as wali, no anak wali
+            ],
+
+            [
+                'username' => '0309020008',
+                'password' => Hash::make('dosen'),
+                'role' => 'dosen',
+                'anak_wali' => null, // Dosen as wali, no anak wali
+            ],
+
             [
                 'username' => 'keasramaan',
                 'password' => Hash::make('keasramaan'),
@@ -124,6 +146,8 @@ class UserSeeder extends Seeder
                 'role' => 'orang_tua',
                 'anak_wali' => null, // No anak wali for orang tua
             ],
+
+
         ];
  
         // Array of unique NIMs for mahasiswa (must match the number of mahasiswa users)
@@ -133,7 +157,12 @@ class UserSeeder extends Seeder
             '11S19034', '11S19035'
         ];
 
+        $nips = [
+            'dosen', '0308190348', '0309130087', '0309020008'
+           
+        ];
         // Counter for assigning NIMs
+        $nipIndex = 0;
         $nimIndex = 0;
 
         // Insert users and populate role-specific tables
@@ -171,10 +200,16 @@ class UserSeeder extends Seeder
                 case 'dosen':
                     DB::table('dosen')->insert([
                         'username' => $user['username'],
+                        'nip' => $nips[$nipIndex], 
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
+
+                    
+                    $nipIndex++;
                     break;
+
+                
 
                 case 'keasramaan':
                     DB::table('keasramaan')->insert([

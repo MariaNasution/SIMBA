@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+
+use Illuminate\Support\Facades\Http;
+
 
 class AbsensiController extends Controller
 {
@@ -29,30 +33,58 @@ class AbsensiController extends Controller
 
     public function show(Request $request, $date, $class)
     {
-        // In a real application, fetch attendance data from a database
-        $students = []; // This would be populated from a database query
+        // Get API token from session
+        $apiToken = session('api_token');
+        $studentData = [];
+        $students = [];
 
-        if ($class === 'IF1') {
-            $students = [
-                'Yanrikho Sicilagan', 'Joel Bonar Septian Sinambela', 'Rajphael Zefanya Siahaan',
-                'Pangeran Simamora', 'Olga Frischilla G.', 'Febiola Cindy Tampubolon',
-                'Patricia Agustin Sibarani', 'DHEA GRACE A. SIMANJUNTAK', 'William Napitupulu',
-                'Christian Theofani Napitpulu', 'Jonathan Martinus Pangaribuan', 'Baha Ambrosius Sibarani',
-                'Gabriela Amelia Silitonga'
-            ];
-        } elseif ($class === 'IF2') {
-            $students = [
-                'Mario Agustin Sijabat', 'Bertrand Cornelius Sianipar', 'Roy Jonathan Hutajulu',
-                'Chavvin E Melkishear Sihombing', 'JOEL CHANDIO P. C. ARITONANG', 'Glen Sofian Pardede',
-                'Rohit Jayapalan Parreira Sibarani', 'Samuel Dulan Parreira Sibarani', 'Yireel Schwartz Sihaputar',
-                'Frans Daniel Simarmata', 'Ferdinand Martua Shombing', 'Viktoria Maria Kristianti Lubis',
-                'KRISTINA ANGGRIANI MARULIN'
-            ];
+        if ($apiToken) {
+            try {
+                // Fetch all students with base keyword '11S20'
+                $response = Http::withToken($apiToken)
+                    ->withOptions(['verify' => false])
+                    ->get('https://cis-dev.del.ac.id/api/library-api/mahasiswa', [
+                        'nim' => '11S20', // Fetch all students with NIMs starting with 11S20
+                    ]);
+
+                if ($response->successful()) {
+                    $studentData = $response->json()['data']['mahasiswa'] ?? [];
+
+                    // Sort the student data by 'nim'
+                    usort($studentData, function ($a, $b) {
+                        return strcmp($a['nim'], $b['nim']);
+                    });
+
+
+                    // Calculate the number of students and split into IF1 and IF2
+                    $totalStudents = count($studentData);
+                    $halfStudents = ceil($totalStudents / 2); // Round up to split into two groups
+
+                    // Assign students to IF1 and IF2 based on $class
+                    if ($class === 'IF1') {
+                        $students = array_slice($studentData, 0, $halfStudents);
+                    } elseif ($class === 'IF2') {
+                        $students = array_slice($studentData, $halfStudents);
+                    }
+
+                    // Index by NIM for easier lookup in the view
+                    $studentData = array_column($studentData, null, 'nim');
+                } else {
+                    Log::error('API request failed:', ['status' => $response->status(), 'body' => $response->body()]);
+                }
+            } catch (\Exception $e) {
+                Log::error('Exception occurred:', ['message' => $e->getMessage()]);
+            }
+        }
+
+        // Fallback if API fails or no token
+        if (empty($students)) {
+            $students = []; // Empty array as fallback
         }
 
         $title = "Absensi Mahasiswa / IF {$class} Angkatan 2022";
         $attendanceData = []; // This would include status for each student (e.g., present, absent, permission)
 
-        return view('perwalian.perwalianKelas', compact('title', 'students', 'date', 'class', 'attendanceData'));
+        return view('perwalian.perwalianKelas', compact('title', 'students', 'date', 'class', 'attendanceData', 'studentData'));
     }
 }

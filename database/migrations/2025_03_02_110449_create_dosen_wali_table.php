@@ -15,8 +15,6 @@ class CreateDosenWaliTable extends Migration
             $table->softDeletes(); // Add soft deletes column
             $table->timestamps(); // Created_at and updated_at timestamps
 
-            // Define foreign key constraint for username using foreignIdFor and constrained
-            $table->foreignIdFor(Dosen::class, 'username')->nullable()->constrained()->onDelete('set null');
         });
     }
 

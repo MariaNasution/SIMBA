@@ -44,7 +44,7 @@
             padding: 8px 16px;
             border: none;
             border-radius: 4px;
-            cursor: quick-access-button;
+            cursor: pointer; /* Fixed typo: cursor: quick-access-button */
             font-size: 14px;
             margin-right: 10px;
         }
@@ -131,7 +131,7 @@
     </div>
 
     <!-- Header -->
-    <h1>Absensi Mahasiswa / IF 1 Angkatan 2022</h1>
+    <h1>{{ $title }}</h1>
     <h2>Quick Access</h2>
 
     <!-- Quick Access Buttons -->
@@ -149,10 +149,10 @@
             </tr>
         </thead>
         <tbody>
-            @foreach(['Yanrikho Sicilagan', 'Joel Bonar Septian Sinambela', 'Rajphael Zefanya Siahaan', 'Pangeran Simamora', 'Olga Frischilla G.', 'Febiola Cindy Tampubolon', 'Patricia Agustin Sibarani', 'DHEA GRACE A. SIMANJUNTAK', 'William Napitupulu', 'Christian Theofani Napitpulu', 'Jonathan Martinus Pangaribuan', 'Baha Ambrosius Sibarani', 'Gabriela Amelia Silitonga'] as $name)
+            @forelse ($students as $student)
             <tr>
-                <td></td> <!-- You can dynamically add NIM here if available -->
-                <td>{{ $name }}</td>
+                <td>{{ $student['nim'] ?? 'N/A' }}</td>
+                <td>{{ $student['nama'] ?? 'Unknown' }}</td>
                 <td class="status-cell" onclick="showDropdown(this)">
                     <div class="status-buttons">
                         <button class="status-btn present" onclick="updateStatus(event, this, '✅', 'Hadir')">✅</button>
@@ -170,11 +170,13 @@
                 </td>
                 <td class="status-desc"></td>
             </tr>
-            @endforeach
+            @empty
+            <tr>
+                <td colspan="4">No students found.</td>
+            </tr>
+            @endforelse
         </tbody>
     </table>
-
-    <h1>Text Radnrom trait_exists</h1>
 
     <script>
         function updateStatus(event, element, emoji, text) {
@@ -221,12 +223,18 @@
         }
 
         function markAllHadir() {
-            document.querySelectorAll("td:nth-child(3)").forEach(statusCell => {
-                statusCell.innerHTML = "✅ Hadir"; // Change the status
-            });
+            document.querySelectorAll(".status-cell").forEach(statusCell => {
+                let statusDisplay = statusCell.querySelector('.status-display');
+                let statusButtons = statusCell.querySelector('.status-buttons');
+                let dropdown = statusCell.querySelector('.dropdown');
 
-            document.querySelectorAll("td:nth-child(4)").forEach(keteranganCell => {
-                keteranganCell.textContent = "Hadir"; // Update the description column
+                statusDisplay.innerHTML = `<span class="selected-status">✅ Hadir</span>`;
+                statusButtons.style.display = "none";
+                statusDisplay.style.display = "block";
+                dropdown.style.display = "none";
+
+                let statusDesc = statusCell.closest('tr').querySelector('.status-desc');
+                statusDesc.textContent = "Hadir";
             });
         }
     </script>

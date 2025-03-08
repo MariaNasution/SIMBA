@@ -27,11 +27,14 @@ class SetPerwalianController extends Controller
                 throw new \Exception('Authenticated user ID is missing or invalid.');
             }
 
+            dd($dosen);
             // Create the perwalian record
             Perwalian::create([
                 'date' => $validatedData['selectedDate'],
                 'dosen_nip' => $dosen['nip'], // Use dosen_id to link to the dosen (user)
             ]);
+
+
             dd(Perwalian::All());
             // Log the successful creation
             Log::info('Perwalian date set for: ' . $validatedData['selectedDate'] . ' by dosen ID: ' . $dosen);
