@@ -2,11 +2,9 @@
 @section('content')
     <div class="d-flex align-items-center mb-4 border-bottom-line">
         <h3 class="me-auto">
-            <a href="{{ route('dosen') }}">Home</a>
+            <a href="{{ route('dosen') }}">Home</a> / <span>Detailed Class</span>
         </h3>
-        <a href="#" onclick="confirmLogout()">
-            <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
-        </a>
+        <a href="{{ route('dosen') }}" class="btn btn-secondary">Back</a>
     </div>
     <div class="app-content-header">
         <div class="container-fluid">
@@ -14,10 +12,10 @@
                 <p class="text-muted mb-3">{{ now()->addHours(7)->isoFormat('dddd, D MMMM YYYY HH:mm') }}</p>
             </div>
             <div class="row">
-                <div class="col-md-12 mb-4">
+                <div class="col-md-12">
                     <div class="card p-3 shadow-sm">
-                        <h5 class="card-title">Informatika 2022</h5>
-                        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                        <h5 class="card-title">Informatika 2022 {{ $class }}</h5>
+                        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
@@ -44,7 +42,8 @@
                             </table>
                         </div>
                         <div class="text-end mt-2">
-                            <a href="{{ route('dosen.detailedClass', 'all') }}" class="btn btn-secondary">Selengkapnya</a>
+                            <!-- Optional: a button to proceed to next page of details -->
+                            <a href="#" class="btn btn-secondary">Selanjutnya</a>
                         </div>
                     </div>
                 </div>

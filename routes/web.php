@@ -106,14 +106,16 @@ Route::middleware(['auth.session', 'role:admin'])->group(function () {
 
 // Middleware untuk dosen
 Route::middleware(['auth.session', 'role:dosen'])->group(function () {
-    Route::get('/dosen/beranda', [DosenController::class, 'beranda'])->name('dosen');
-    Route::get('/dosen/perwalian', [DosenController::class, 'index'])->name('dosen.perwalian');
-    Route::get('/dosen/presensi', [DosenController::class, 'presensi'])->name('dosen.presensi');
-    Route::get('/dosen/absensi-mahasiswa', [AbsensiController::class, 'index'])->name('absensi');
-    Route::get('/absensi-mahasiswa/{date}/{class}', [AbsensiController::class, 'show'])->name('absensi.show');
-    Route::get('/set-perwalian', [SetPerwalianController::class, 'index'])->name('set.perwalian');
-    Route::post('/set-perwalian', [SetPerwalianController::class, 'store'])->name('set.perwalian.store');
+    Route::get('/dosen/beranda', [App\Http\Controllers\DosenController::class, 'beranda'])->name('dosen');
+    Route::get('/dosen/perwalian', [App\Http\Controllers\DosenController::class, 'index'])->name('dosen.perwalian');
+    Route::get('/dosen/presensi', [App\Http\Controllers\DosenController::class, 'presensi'])->name('dosen.presensi');
+    Route::get('/dosen/absensi-mahasiswa', [App\Http\Controllers\AbsensiController::class, 'index'])->name('absensi');
+    Route::get('/absensi-mahasiswa/{date}/{class}', [App\Http\Controllers\AbsensiController::class, 'show'])->name('absensi.show');
+    Route::get('/set-perwalian', [App\Http\Controllers\SetPerwalianController::class, 'index'])->name('set.perwalian');
+    Route::post('/set-perwalian', [App\Http\Controllers\SetPerwalianController::class, 'store'])->name('set.perwalian.store');
+    Route::get('/dosen/detailed-class/{class}', [App\Http\Controllers\DosenController::class, 'showDetailedClass'])->name('dosen.detailedClass');
 });
+
 
 // Middleware untuk keasramaan
 Route::middleware(['auth.session', 'ensure.student.data.all.student', 'role:keasramaan'])->group(function () {
