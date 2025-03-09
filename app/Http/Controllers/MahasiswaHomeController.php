@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Calendar;
 use App\Models\Pengumuman;
+use App\Models\Notifikasi; // Add this import
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use App\Models\Mahasiswa;
@@ -12,10 +13,10 @@ class MahasiswaHomeController extends Controller
 {
     public function index()
     {
-        // Get the authenticated user from session (as per your AuthController)
-        $user = session('user'); // Changed from Auth::user() to match your session-based auth
+        // Get the authenticated user from session
+        $user = session('user'); // Matches your session-based auth
 
-        // Check if the user exists and has a mahasiswa record
+        // Check if the user exists and has a mahasiswa role
         if (!$user || !isset($user['role']) || $user['role'] !== 'mahasiswa') {
             Log::error('User not authenticated or not a mahasiswa', ['user' => $user]);
             return redirect()->route('login')->withErrors(['error' => 'Please log in as a mahasiswa.']);
@@ -41,7 +42,6 @@ class MahasiswaHomeController extends Controller
 
             if ($studentResponse->successful()) {
                 $studentData = $studentResponse->json()['data'] ?? [];
-
                 // Simpan sem_ta dan ta ke session
                 session([
                     'sem_ta' => $studentData['sem_ta'] ?? null,
@@ -53,11 +53,11 @@ class MahasiswaHomeController extends Controller
                 ->withOptions(['verify' => false])
                 ->asForm()
                 ->get('https://cis-dev.del.ac.id/api/library-api/get-penilaian', [
-                    
                     'nim' => $nim,
                 ]);
             Log::info('Respons API mentah:', ['body' => $response->body()]);
 
+            
             if ($response->successful()) {
                 $data = $response->json();
                 $ipSemester = $data['IP Semester'] ?? [];
@@ -79,14 +79,37 @@ class MahasiswaHomeController extends Controller
                     $values[] = is_numeric($details['ip_semester']) ? (float) $details['ip_semester'] : 0;
                 }
 
+
                 Log::info('Data labels:', $labels);
                 Log::info('Data values:', $values);
+
+
+                // Fetch notifications for the current mahasiswa
+                $notifications = Notifikasi::all();
+                // dd($notifications);
+                // $response = Http::withToken($apiToken)
+                // ->withOptions(['verify' => false])
+                // ->asForm()
+                // ->get('https://cis-dev.del.ac.id/api/library-api/get-penilaian', [
+                //     'nim' => $nim,
+                // ]);
+                dd($notifications['0']['perwalian']['ID_Dosen_Wali']);
+
+                $notificationCount = $notifications->count(); // Total notifications (can refine to unread later)
 
                 $pengumuman = Pengumuman::orderBy('created_at', 'desc')->get();
                 $akademik = Calendar::where('type', 'akademik')->latest()->first();
                 $bem = Calendar::where('type', 'bem')->latest()->first();
 
-                return view('beranda.homeMahasiswa', compact('labels', 'values', 'pengumuman', 'akademik', 'bem'));
+                return view('beranda.homeMahasiswa', compact(
+                    'labels', 
+                    'values', 
+                    'pengumuman', 
+                    'akademik', 
+                    'bem', 
+                    'notifications', 
+                    'notificationCount'
+                ));
             }
 
             Log::error('Gagal mengambil data API', ['response' => $response->body()]);

@@ -8,7 +8,8 @@ class Perwalian extends Model
 {
     protected $table = 'perwalian';
     protected $primaryKey = 'ID_Perwalian';
-    public $incrementing = false; // Disable auto-increment (if it's not an integer)
+    public $incrementing = true; 
+    protected $keyType = 'int'; // Ensure the key type is an integer (default for id())
 
     protected $fillable = ['ID_Perwalian', 'ID_Dosen_Wali', 'Status', 'Tanggal'];
 

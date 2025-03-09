@@ -31,3 +31,4 @@ class CreateBeritaAcaraTable extends Migration
         Schema::dropIfExists('berita_acara');
     }
 }
+

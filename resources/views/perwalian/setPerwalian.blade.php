@@ -1,16 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
-
-    <div class="d-flex align-items-center mb-4 border-bottom-line">
-        <h3 class="me-auto">
-        <a> Set Perwalian</a> 
-        </h3>
-        <a href="#" onclick="confirmLogout()">
-        <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
-        </a>
-    </div>
-    <div class="container-fluid py-4">
+    <div class="main-content flex-grow-1 p-4">
+        <!-- Header -->
+        <div class="d-flex align-items-center mb-4 border-bottom-line">
+            <h3 class="me-auto" style="font-size: 24px; font-weight: 700; color: #333;">Set Perwalian</h3>
+            <a href="#" onclick="confirmLogout()">
+                <i class="fas fa-sign-out-alt fs-5 cursor-pointer" style="color: #333; font-size: 24px;" title="Logout"></i>
+            </a>
+        </div>
 
         <!-- Success/Error Messages -->
         @if (session('success'))
@@ -26,148 +24,160 @@
             </div>
         @endif
 
-        <!-- Calendar -->
-        <div id="calendar" class="card shadow-sm mb-4 mx-auto" style="max-width: 800px; border-radius: 8px;">
-            <div class="card-body p-3">
-                <!-- FullCalendar will render here -->
+        <!-- Calendar Container -->
+        <div class="calendar-container mb-4 mx-auto" style="max-width: 400px;">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <button class="btn btn-outline-secondary" onclick="changeMonth(-1)"><</button>
+                <h4 class="text-center flex-grow-1 mb-0" id="calendar-title"></h4>
+                <button class="btn btn-outline-secondary" onclick="changeMonth(1)">></button>
             </div>
+            <div class="card shadow-sm" style="border-radius: 8px;">
+                <div class="card-body p-0">
+                    <div id="calendar-month"></div>
+                </div>
+            </div>
+            @if (session('perwalian_requested'))
+                <p class="text-center mt-2" style="color: #28A745;">Perwalian telah di-request</p>
+            @endif
         </div>
 
-        <!-- Form for Setting Perwalian Date -->
+        <!-- Request/Edit Button -->
         <div class="text-center mt-4">
-            <form method="POST" action="{{ route('set.perwalian.store') }}">
-                @csrf <!-- Laravel CSRF token for security -->
+            <form method="POST" action="{{ route('set.perwalian.store') }}" id="requestForm">
+                @csrf
                 <label for="selectedDate" class="visually-hidden">Selected Date for Perwalian:</label>
                 <input type="hidden" id="selectedDate" name="selectedDate" value="">
-                <button type="submit" class="btn btn-success px-4 py-2">Request</button>
+                <button type="submit" class="btn btn-success px-4 py-2" id="actionButton" style="background-color: #28A745; color: white; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+                    @if (session('perwalian_requested'))
+                        Edit
+                    @else
+                        Request
+                    @endif
+                </button>
             </form>
         </div>
     </div>
 
-    <!-- FullCalendar JS (using CDN for simplicity; move to assets for production) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
+    <!-- JavaScript for Calendar -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl.querySelector('.card-body'), {
-                initialView: 'dayGridMonth',
-                selectable: true,
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'monthSelector'
-                },
-                customButtons: {
-                    monthSelector: {
-                        text: 'Month',
-                        click: function() {
-                            var monthSelect = document.createElement('select');
-                            const months = [
-                                'January', 'February', 'March', 'April', 'May', 'June'
-                            ];
-                            months.forEach((month, index) => {
-                                var option = document.createElement('option');
-                                option.value = index;
-                                option.text = month + ' 2025';
-                                monthSelect.appendChild(option);
-                            });
-                            monthSelect.value = 1; // Set initial month to February 2025 (index 1 for February)
-                            monthSelect.onchange = function() {
-                                calendar.gotoDate(new Date(2025, this.value, 1));
-                            };
-                            monthSelect.classList.add('form-select', 'form-select-sm', 'border', 'rounded', 'shadow-sm'); // Bootstrap + custom styling
-                            monthSelect.style.maxWidth = '150px'; // Limit width for better fit
-                            calendarEl.querySelector('.fc-header-toolbar').appendChild(monthSelect);
-                        }
+        let currentDate = new Date(2025, 0); // Start with January 2025
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const months = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+            document.getElementById('calendar-title').textContent = `${months[month]} ${year}`;
+
+            // Marked dates with red dots
+            const markedDates = {
+                '2025-01-13': true, '2025-01-14': true, '2025-01-15': true, '2025-01-16': true,
+                '2025-01-17': true, '2025-01-18': true, '2025-01-21': true, '2025-01-24': true,
+                '2025-01-25': true, '2025-02-09': true, '2025-02-10': true, '2025-02-11': true,
+                '2025-02-13': true
+            };
+
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDay = firstDay.getDay();
+
+            let html = '<table class="calendar-table"><thead><tr>';
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            days.forEach(day => html += `<th>${day}</th>`);
+            html += '</tr></thead><tbody>';
+
+            let date = 1;
+            for (let i = 0; i < 6; i++) {
+                html += '<tr>';
+                for (let j = 0; j < 7; j++) {
+                    if (i === 0 && j < startingDay) {
+                        html += '<td></td>';
+                    } else if (date > daysInMonth) {
+                        html += '<td></td>';
+                    } else {
+                        const currentDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+                        const isMarked = markedDates[currentDateStr] ? '<div class="dot"></div>' : '';
+                        html += `<td class="day ${new Date().toISOString().split('T')[0] === currentDateStr ? 'today' : ''}" onclick="selectDate('${currentDateStr}')">${date}${isMarked}</td>`;
+                        date++;
                     }
-                },
-                dateClick: function(info) {
-                    calendar.unselect();
-                    var selectedDate = info.dateStr;
-                    $('#selectedDate').val(selectedDate);
-                    // alert('You selected: ' + selectedDate);
-                },
-                validRange: {
-                    start: '2025-01-01',
-                    end: '2025-06-30' // Limit to January–June 2025
-                },
-                height: 'auto', // Adjust height to fit content
-                dayMaxEvents: true, // Prevent overlapping events
-                eventTimeFormat: { // Optional: Customize time format if needed
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    meridiem: false
                 }
-            });
-            calendar.render();
-        });
+                html += '</tr>';
+                if (date > daysInMonth) break;
+            }
+            html += '</tbody></table>';
+            document.getElementById('calendar-month').innerHTML = html;
+        }
+
+        function changeMonth(offset) {
+            currentDate.setMonth(currentDate.getMonth() + offset);
+            if (currentDate < new Date(2025, 0)) currentDate = new Date(2025, 0); // Limit to January 2025
+            if (currentDate > new Date(2025, 5)) currentDate = new Date(2025, 5); // Limit to June 2025
+            renderCalendar();
+        }
+
+        function selectDate(dateStr) {
+            document.getElementById('selectedDate').value = dateStr;
+            console.log('Selected date:', dateStr);
+        }
+
+        // Initial render
+        renderCalendar();
     </script>
 
     <style>
-        /* Ensure these styles override others with higher specificity */
-        #calendar .fc {
-            border: none !important;
+        .border-bottom-line {
+            border-bottom: 1px solid #E5E5E5;
+            padding-bottom: 10px;
         }
 
-        #calendar .fc-header-toolbar {
-            margin-bottom: 15px;
-            text-align: center;
+        .calendar-container {
+            width: 100%;
         }
 
-        #calendar .fc-button {
-            background-color: #fff;
+        .calendar-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+        }
+
+        .calendar-table th,
+        .calendar-table td {
             border: 1px solid #ddd;
-            color: #333;
-            padding: 5px 10px;
-            border-radius: 4px;
+            text-align: center;
+            padding: 8px;
             font-size: 14px;
-            box-shadow: none !important;
         }
 
-        #calendar .fc-button:hover {
-            background-color: #f1f1f1;
-            border-color: #ddd;
+        .calendar-table th {
+            background-color: #f8f9fa;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 500;
         }
 
-        #calendar .fc-button-active {
-            background-color: #007bff;
-            color: #fff;
-            border-color: #007bff;
+        .day {
+            cursor: pointer;
+            position: relative;
         }
 
-        #calendar .fc-daygrid-day-number {
-            color: #333 !important; /* Black text for dates, matching screenshot */
+        .day:hover {
+            background-color: #f8f9fa;
         }
 
-        #calendar .fc-daygrid-day:hover {
-            background-color: #f8f9fa !important; /* Light gray hover effect */
+        .today {
+            background-color: #e9ecef;
         }
 
-        #calendar .fc-today {
-            background-color: #e9ecef !important; /* Light gray for today, matching screenshot */
-        }
-
-        #calendar .fc-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: #333 !important; /* Black text for title, matching screenshot */
-        }
-
-        /* Ensure the month dropdown matches the design */
-        #calendar .form-select {
-            background-color: #fff;
-            border-color: #ddd;
-            color: #333;
-            font-size: 14px;
-            padding: 5px 10px;
-            border-radius: 4px;
-            box-shadow: none !important;
-        }
-
-        #calendar .form-select:focus {
-            border-color: #ddd;
-            box-shadow: none;
+        .dot {
+            width: 6px;
+            height: 6px;
+            background-color: #DC3545; /* Red dot as per Figma */
+            border-radius: 50%;
+            display: block;
+            margin: 2px auto;
         }
     </style>
 @endsection

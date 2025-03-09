@@ -24,6 +24,7 @@ class AuthController extends Controller
                         'password' => 'required|string',
                 ]);
 
+
                 // Find the user by username
                 $user = User::where('username', $request->username)->first();
                 if (!$user) {
@@ -83,9 +84,7 @@ class AuthController extends Controller
                                                 'nim'      => $nim, // Now correctly handles both roles
                                             ],
                                         ]);
-
                                         Log::info('Token API diterima:', ['token' => $data['token']]);
-
                                         // Redirect based on the user's role
                                         switch ($user->role) {
                                                 case 'mahasiswa':
