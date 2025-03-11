@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Pengumuman;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 
@@ -10,7 +10,8 @@ class KeasramaanController extends Controller
 {
     public function index()
     {
-        return view('beranda.homeKeasramaan');
+        $pengumuman = Pengumuman::orderBy('created_at', 'desc')->get();
+        return view('beranda.homeKeasramaan', compact('pengumuman'));
     }
 
     public function pelanggaran()
