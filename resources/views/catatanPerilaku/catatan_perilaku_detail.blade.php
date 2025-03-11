@@ -69,7 +69,7 @@
       <tr class="collapse" id="details{{ $key }}">
         <td colspan="7">
           <div class="p-3">
-            <h5>Pembinaan:</h5>
+            <h5 class ="text-start">Pembinaan:</h5>
 
             <!-- Container for Pelanggaran and Perbuatan Baik tabs -->
             <div class="custom-box-container">
