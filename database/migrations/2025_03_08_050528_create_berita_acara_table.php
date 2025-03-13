@@ -4,31 +4,22 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateBeritaAcaraTable extends Migration
+class CreateBeritaAcarasTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
-        Schema::create('berita_acara', function (Blueprint $table) {
-            $table->id('ID_BeritaAcara'); // Auto-incrementing primary key
-            $table->text('PesanBeritaAcara'); // Text column for message
-            $table->string('nama'); // String column for name
-            $table->timestamps(); // Adds created_at and updated_at columns
+        Schema::create('berita_acaras', function (Blueprint $table) {
+            $table->id();
+            $table->string('judul'); // Judul berita acara
+            $table->text('deskripsi'); // Isi berita acara
+            $table->date('tanggal'); // Tanggal pelaksanaan
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Pengguna yang membuat (relasi ke tabel users)
+            $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-        Schema::dropIfExists('berita_acara');
+        Schema::dropIfExists('berita_acaras');
     }
 }
-
