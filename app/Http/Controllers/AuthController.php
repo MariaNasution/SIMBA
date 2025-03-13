@@ -18,11 +18,14 @@ class AuthController extends Controller
 
         public function login(Request $request)
         {
+        
+
                 // Validate input
                 $request->validate([
                         'username' => 'required|string',
                         'password' => 'required|string',
                 ]);
+               
 
 
                 // Find the user by username
@@ -30,6 +33,7 @@ class AuthController extends Controller
                 if (!$user) {
                         return back()->withErrors(['login' => 'Username tidak ditemukan.']);
                 }
+                
 
                 // Log password details for debugging
                 Log::info('Input Password:', ['input' => $request->password]);
@@ -41,10 +45,14 @@ class AuthController extends Controller
                         Log::info('Login berhasil untuk user:', ['username' => $user->username, 'role' => $user->role]);
 
                         try {
+                               
+
+
                                 // Call external API for authentication
                                 Log::info('Mengirim permintaan API eksternal...');
                                 $client = new \GuzzleHttp\Client(['verify' => false]);
                                 $client = new Client(['verify' => false]);
+
                                 $response = $client->post('https://cis-dev.del.ac.id/api/jwt-api/do-auth', [
                                         'form_params' => [
                                                 'username' => 'johannes', // Use the logged-in user's username
@@ -93,6 +101,7 @@ class AuthController extends Controller
 
                                                 case 'dosen':
                                                         Log::info('Redirecting to dosen route...');
+
                                                         return redirect()->route('dosen')->with('success', 'Login sebagai dosen berhasil!');
 
                                                 case 'keasramaan':
@@ -112,7 +121,6 @@ class AuthController extends Controller
                                                         return back()->withErrors(['login' => 'Role tidak dikenali.']);
                                         }
                                 }
-
                                 // Handle invalid API response
                                 Log::error('API login gagal', ['response_parsed' => $data]);
                                 return back()->withErrors(['login' => 'Gagal mendapatkan token API.']);

@@ -27,7 +27,10 @@ class DosenController extends Controller
         
         if ($apiToken) {
             try {
+
+
                 // Step 1: Fetch dosen details
+                
                 $dosenResponse = Http::withToken($apiToken)
                     ->withOptions(['verify' => false])
                     ->get("{$baseUrl}/api/library-api/dosen", ['nip' => $nip]);
@@ -42,6 +45,8 @@ class DosenController extends Controller
                 if (!$dosenId) {
                     return back()->with('error', 'Dosen ID not found.');
                 }
+
+
                 
                 // Step 2: Fetch anak wali using the get-all-students-by-dosen-wali endpoint
                 $mahasiswaResponse = Http::withToken($apiToken)
@@ -56,14 +61,14 @@ class DosenController extends Controller
                     Log::error('Failed to fetch anak wali data', ['status' => $mahasiswaResponse->status()]);
                     return back()->with('error', 'Failed to fetch student data.');
                 }
-                
                 $responseData = $mahasiswaResponse->json();
                 if (!isset($responseData['anak_wali'])) {
                     Log::error('Anak wali data not found in response', ['response' => $responseData]);
                     return back()->with('error', 'No student data found.');
                 }
+               
                 $mahasiswaData = $responseData['anak_wali'];
-                
+
                 // Step 3: For each student, fetch penilaian (cumulative) and calculate IPK and IPS
                 foreach ($mahasiswaData as $student) {
                     $nim = $student['nim'] ?? null;
@@ -78,7 +83,7 @@ class DosenController extends Controller
                             ]);
                         
                         $penilaianData = $penilaianResponse->successful() ? $penilaianResponse->json() : [];
-                        
+
                         // Calculate IPK as the average of all valid (numeric) IPS values
                         $ipSemesterData = $penilaianData['IP Semester'] ?? [];
                         $sum = 0;
