@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Models\Perwalian; // Assuming you have a Perwalian model
 
 class DosenController extends Controller
 {
@@ -27,10 +28,7 @@ class DosenController extends Controller
         
         if ($apiToken) {
             try {
-
-
                 // Step 1: Fetch dosen details
-                
                 $dosenResponse = Http::withToken($apiToken)
                     ->withOptions(['verify' => false])
                     ->get("{$baseUrl}/api/library-api/dosen", ['nip' => $nip]);
@@ -46,8 +44,6 @@ class DosenController extends Controller
                     return back()->with('error', 'Dosen ID not found.');
                 }
 
-
-                
                 // Step 2: Fetch anak wali using the get-all-students-by-dosen-wali endpoint
                 $mahasiswaResponse = Http::withToken($apiToken)
                     ->withOptions(['verify' => false])
@@ -127,13 +123,16 @@ class DosenController extends Controller
                         $students[] = $studentData;
                     }
                 }
+
+                // Step 4: Check for perwalian schedules
+                $perwalianAnnouncement = $this->checkPerwalian($nip, $apiToken, $baseUrl);
             } catch (\Exception $e) {
                 Log::error('Error fetching data in beranda:', ['message' => $e->getMessage()]);
                 return back()->with('error', 'An error occurred while fetching data.');
             }
         }
 
-        return view('beranda.homeDosen', compact('students'));
+        return view('beranda.homeDosen', compact('students', 'perwalianAnnouncement'));
     }
     
     public function showDetailedClass($class)
@@ -242,13 +241,16 @@ class DosenController extends Controller
                         $students[] = $studentData;
                     }
                 }
+
+                // Step 4: Check for perwalian schedules
+                $perwalianAnnouncement = $this->checkPerwalian($dosenId, $apiToken, $baseUrl);
             } catch (\Exception $e) {
                 Log::error('Error fetching data in showDetailedClass:', ['message' => $e->getMessage()]);
                 return back()->with('error', 'An error occurred while fetching data.');
             }
         }
         
-        return view('dosen.detailedClass', compact('students', 'class'));
+        return view('dosen.detailedClass', compact('students', 'class', 'perwalianAnnouncement'));
     }
     
     public function index()
@@ -300,5 +302,62 @@ class DosenController extends Controller
             ->toArray();
         
         return view('perwalian.setPerwalian', compact('anakWali'));
+    }
+
+    /**
+     * Check for perwalian schedules and return announcement text
+     *
+     * @param string $dosenId
+     * @param string $apiToken
+     * @param string $baseUrl
+     * @return string|null
+     */
+    private function checkPerwalian($dosenId, $apiToken, $baseUrl)
+    {
+        try {
+            // Assuming perwalian data is stored in a local database or API
+            // Option 1: Using Eloquent (if you have a Perwalian model)
+            $perwalian = Perwalian::where('ID_Dosen_Wali', $dosenId)
+                ->where('Status', 'ongoing')
+                ->orWhere('Tanggal', '>=', now()->toDateString())
+                ->get();
+
+
+            if ($perwalian->isNotEmpty()) {
+                $announcements = [];
+                foreach ($perwalian as $p) {
+                    $date = \Carbon\Carbon::parse($p->Tanggal)->format('D, d/m/Y');
+                    $announcements[] = "Jadwal Perwalian Kelas 13 IF 1 ({$date})";
+                }
+                return implode("\n", $announcements);
+            }
+
+            // Option 2: Using API
+            /*
+            $perwalianResponse = Http::withToken($apiToken)
+                ->withOptions(['verify' => false])
+                ->get("{$baseUrl}/api/library-api/get-perwalian", [
+                    'dosen_id' => $dosenId,
+                    'status'   => 'ongoing',
+                ]);
+
+            if ($perwalianResponse->successful()) {
+                $perwalianData = $perwalianResponse->json();
+                if (!empty($perwalianData['perwalian'])) {
+                    $announcements = [];
+                    foreach ($perwalianData['perwalian'] as $p) {
+                        $date = \Carbon\Carbon::parse($p['tanggal'])->format('D, d/m/Y');
+                        $announcements[] = "Jadwal Perwalian Kelas 13 IF 1 ({$date})";
+                    }
+                    return implode("\n", $announcements);
+                }
+            }
+            */
+
+            return null; // No perwalian found
+        } catch (\Exception $e) {
+            Log::error('Error checking perwalian:', ['message' => $e->getMessage()]);
+            return null; // Return null on error to avoid breaking the page
+        }
     }
 }

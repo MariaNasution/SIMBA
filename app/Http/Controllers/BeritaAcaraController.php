@@ -11,7 +11,9 @@ class BeritaAcaraController extends Controller
     // Menampilkan daftar berita acara (riwayat)
     public function index()
     {
-        $beritaAcaras = BeritaAcara::where('user_id', Auth::id())->latest()->get();
+
+        // $beritaAcaras = BeritaAcara::where('user_id', Auth::id())->latest()->get();
+        $beritaAcaras = BeritaAcara::All();
         return view('berita_acara.index', compact('beritaAcaras'));
     }
 

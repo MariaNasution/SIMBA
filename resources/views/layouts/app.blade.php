@@ -7,6 +7,7 @@
     <title>SIMBA</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/mingcute-icon@latest/dist/mingcute.css">
     
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <style>
@@ -24,7 +25,6 @@
 </head>
 
 <body>
-
     <div class="app-wrapper">
         @if (session('user.role') === 'admin')
             @include('components.sidebarAdmin')
@@ -37,7 +37,6 @@
         @elseif(session('user.role') === 'orang_tua')
             @include('components.sidebarOrangTua')
         @else
-            {{-- Optional: Fallback jika role tidak sesuai --}}
             <p class="text-center text-danger">Role tidak dikenali.</p>
         @endif
 
@@ -55,50 +54,55 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const ctx = document.getElementById('kemajuanStudiChart').getContext('2d');
-            const labels = @json($labels ?? []);
-            const data = @json($values ?? []);
+            // Check if the kemajuanStudiChart element exists before initializing Chart.js
+            const chartElement = document.getElementById('kemajuanStudiChart');
+            if (chartElement) {
+                const ctx = chartElement.getContext('2d');
+                const labels = @json($labels ?? []);
+                const data = @json($values ?? []);
 
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Kemajuan Studi',
-                        data: data,
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 2,
-                        fill: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: {
-                            display: true
-                        }
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Kemajuan Studi',
+                            data: data,
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 2,
+                            fill: false
+                        }]
                     },
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Semester'
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                display: true
                             }
                         },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'IP Semester'
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Semester'
+                                }
                             },
-                            beginAtZero: true
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'IP Semester'
+                                },
+                                beginAtZero: true
+                            }
                         }
                     }
-                }
-            });
+                });
+            } else {
+                console.log('kemajuanStudiChart element not found on this page');
+            }
         });
     </script>
-
 
     <script>
         function toggleSubMenu(submenuId) {
@@ -115,50 +119,9 @@
         }
     </script>
 
-    <script>
-        function confirmLogout() {
-            Swal.fire({
-                title: 'Apakah anda yakin ingin keluar?',
-                text: "Anda akan keluar dari akun ini.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, keluar!',
-                cancelButtonText: 'Tidak',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = '{{ route('logout') }}'; // Arahkan ke route logout jika 'Ya' dipilih
-                }
-            });
-        }
-    </script>
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const pengumumanModal = document.getElementById('pengumumanModal');
-            const modalTitle = document.getElementById('pengumumanModalLabel'); // Elemen judul modal
-            const modalBody = document.getElementById('pengumumanDeskripsi'); // Elemen deskripsi modal
-
-            pengumumanModal.addEventListener('show.bs.modal', function(event) {
-                // Elemen yang memicu modal
-                const button = event.relatedTarget;
-
-                // Ambil data dari atribut tombol
-                const judul = button.getAttribute('data-judul');
-                const deskripsi = button.getAttribute('data-deskripsi');
-
-                // Cetak nilai ke console setelah didefinisikan
-                console.log('Judul:', judul);
-                console.log('Deskripsi:', deskripsi);
-
-                // Masukkan data ke modal
-                modalTitle.textContent = judul;
-                modalBody.textContent = deskripsi;
-            });
-        });
-
         function confirmLogout() {
             Swal.fire({
                 title: 'Apakah anda yakin ingin keluar?',
@@ -176,6 +139,34 @@
         }
     </script>
 
-</body>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if the pengumumanModal element exists before adding the event listener
+            const pengumumanModal = document.getElementById('pengumumanModal');
+            if (pengumumanModal) {
+                const modalTitle = document.getElementById('pengumumanModalLabel'); // Elemen judul modal
+                const modalBody = document.getElementById('pengumumanDeskripsi'); // Elemen deskripsi modal
 
+                pengumumanModal.addEventListener('show.bs.modal', function(event) {
+                    // Elemen yang memicu modal
+                    const button = event.relatedTarget;
+
+                    // Ambil data dari atribut tombol
+                    const judul = button.getAttribute('data-judul');
+                    const deskripsi = button.getAttribute('data-deskripsi');
+
+                    // Cetak nilai ke console setelah didefinisikan
+                    console.log('Judul:', judul);
+                    console.log('Deskripsi:', deskripsi);
+
+                    // Masukkan data ke modal
+                    modalTitle.textContent = judul;
+                    modalBody.textContent = deskripsi;
+                });
+            } else {
+                console.log('pengumumanModal element not found on this page');
+            }
+        });
+    </script>
+</body>
 </html>

@@ -59,11 +59,7 @@ Route::middleware(['auth.session', 'ensure.student.data', 'role:mahasiswa'])->gr
     Route::get('/mahasiswa_perwalian', [MahasiswaPerwalianController::class, 'index'])->name('mahasiswa_perwalian');
     Route::get('/mahasiswa/konseling/request', [MahasiswaRequestKonselingController::class, 'create'])->name('mhs_konseling_request');
     
-    // Routes untuk Berita Acara (Mahasiswa)
-    Route::get('/berita-acara', [BeritaAcaraController::class, 'index'])->name('berita_acara.index');
-    Route::get('/berita-acara/create', [BeritaAcaraController::class, 'create'])->name('berita_acara.create');
-    Route::post('/berita-acara/store', [BeritaAcaraController::class, 'store'])->name('berita_acara.store');
-    Route::get('/berita-acara/{id}', [BeritaAcaraController::class, 'show'])->name('berita_acara.show');
+   
 });
 
 // Middleware untuk admin
@@ -75,10 +71,10 @@ Route::middleware(['auth.session', 'role:admin'])->group(function () {
     Route::post('/calendar/upload', [CalendarController::class, 'upload'])->name('calendar.upload');
 
     // Routes untuk Berita Acara (Admin)
-    Route::get('/admin/berita-acara', [BeritaAcaraController::class, 'index'])->name('admin.berita_acara.index');
-    Route::get('/admin/berita-acara/create', [BeritaAcaraController::class, 'create'])->name('admin.berita_acara.create');
-    Route::post('/admin/berita-acara/store', [BeritaAcaraController::class, 'store'])->name('admin.berita_acara.store');
-    Route::get('/admin/berita-acara/{id}', [BeritaAcaraController::class, 'show'])->name('admin.berita_acara.show');
+    Route::get('/admin/berita-acara', [BeritaAcaraController::class, 'index'])->name('berita_acara.index');
+    Route::get('/admin/berita-acara/create', [BeritaAcaraController::class, 'create'])->name('berita_acara.create');
+    Route::post('/admin/berita-acara/store', [BeritaAcaraController::class, 'store'])->name('berita_acara.store');
+    Route::get('/admin/berita-acara/{id}', [BeritaAcaraController::class, 'show'])->name('berita_acara.show');
 
     // Konseling
     Route::prefix('konseling')->group(function () {
@@ -124,6 +120,12 @@ Route::middleware(['auth.session', 'role:dosen'])->group(function () {
     Route::post('/set-perwalian', [SetPerwalianController::class, 'store'])->name('set.perwalian.store');
     Route::delete('set-perwalian', [SetPerwalianController::class, 'destroy'])->name('set.perwalian.destroy');
     Route::get('/dosen/detailed-class/{class}', [DosenController::class, 'showDetailedClass'])->name('dosen.detailedClass');
+
+    // Routes untuk Berita Acara (Mahasiswa)
+    Route::get('/berita-acara', [BeritaAcaraController::class, 'index'])->name('berita_acara.index');
+    Route::get('/berita-acara/create', [BeritaAcaraController::class, 'create'])->name('berita_acara.create');
+    Route::post('/berita-acara/store', [BeritaAcaraController::class, 'store'])->name('berita_acara.store');
+    Route::get('/berita-acara/{id}', [BeritaAcaraController::class, 'show'])->name('berita_acara.show');
 });
 
 // Middleware untuk keasramaan

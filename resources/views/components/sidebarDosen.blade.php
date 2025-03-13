@@ -35,5 +35,11 @@
                 <i class="fas fa-check-square"></i> Absensi Mahasiswa
             </a>
         </li>
+        <li class="menu-item">
+            <a href="{{ route('berita_acara.index') }}">
+                <i class="fas fa-check-square"></i> Berita Acara
+            </a>
+        </li>
+        
     </ul>
 </div>
