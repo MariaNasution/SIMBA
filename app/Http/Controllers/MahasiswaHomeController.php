@@ -84,24 +84,30 @@ class MahasiswaHomeController extends Controller
                 Log::info('Data values:', $values);
 
 
-                // Fetch notifications for the current mahasiswa
+                // Fetch all notifications
                 $notifications = Notifikasi::all();
-                // dd($notifications);
-                // $response = Http::withToken($apiToken)
-                // ->withOptions(['verify' => false])
-                // ->asForm()
-                // ->get('https://cis-dev.del.ac.id/api/library-api/get-penilaian', [
-                //     'nim' => $nim,
-                // ]);
-                dd($notifications['0']['perwalian']['ID_Dosen_Wali']);
 
-                $notificationCount = $notifications->count(); // Total notifications (can refine to unread later)
+                // Get dosen data
+                $dosen = Http::withToken($apiToken)
+                    ->withOptions(['verify' => false])
+                    ->asForm()
+                    ->get('https://cis-dev.del.ac.id/api/library-api/dosen')
+                    ->json();
 
+                // Get all ID_Dosen_Wali values from notifications
+                $dosenWaliIds = $notifications->pluck('perwalian.ID_Dosen_Wali')->unique()->filter();
+                // Filter dosen data to only include matches
+                $dosenNotifications = collect($dosen)->whereIn('nip', $dosenWaliIds)->values();
+
+                // Get notification count
+                $notificationCount = $notifications->count();
+                
                 $pengumuman = Pengumuman::orderBy('created_at', 'desc')->get();
                 $akademik = Calendar::where('type', 'akademik')->latest()->first();
                 $bem = Calendar::where('type', 'bem')->latest()->first();
 
                 return view('beranda.homeMahasiswa', compact(
+                    
                     'labels', 
                     'values', 
                     'pengumuman', 

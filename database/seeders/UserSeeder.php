@@ -158,7 +158,7 @@ class UserSeeder extends Seeder
         ];
 
         $nips = [
-            'dosen', '0308190348', '0309130087', '0309020008'
+            'dosen', '0308190348', '0311020009', '0309020008'
            
         ];
         // Counter for assigning NIMs
@@ -204,12 +204,8 @@ class UserSeeder extends Seeder
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
-
-                    
                     $nipIndex++;
                     break;
-
-                
 
                 case 'keasramaan':
                     DB::table('keasramaan')->insert([

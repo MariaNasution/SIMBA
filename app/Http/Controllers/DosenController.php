@@ -63,7 +63,7 @@ class DosenController extends Controller
                     return back()->with('error', 'No student data found.');
                 }
                 $mahasiswaData = $responseData['anak_wali'];
-                
+
                 // Step 3: For each student, fetch penilaian (cumulative) and calculate IPK and IPS
                 foreach ($mahasiswaData as $student) {
                     $nim = $student['nim'] ?? null;
@@ -127,7 +127,7 @@ class DosenController extends Controller
                 return back()->with('error', 'An error occurred while fetching data.');
             }
         }
-        
+
         return view('beranda.homeDosen', compact('students'));
     }
     

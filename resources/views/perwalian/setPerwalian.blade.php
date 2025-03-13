@@ -1,15 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
+    <div class="d-flex align-items-center mb-4 border-bottom-line">
+        <h3 class="me-auto" style="font-size: 24px; font-weight: 700; color: #333;">Set Perwalian</h3>
+        <a href="#" onclick="confirmLogout()">
+            <i class="fas fa-sign-out-alt fs-5 cursor-pointer" style="color: #333; font-size: 24px;" title="Logout"></i>
+        </a>
+    </div>
     <div class="main-content flex-grow-1 p-4">
-        <!-- Header -->
-        <div class="d-flex align-items-center mb-4 border-bottom-line">
-            <h3 class="me-auto" style="font-size: 24px; font-weight: 700; color: #333;">Set Perwalian</h3>
-            <a href="#" onclick="confirmLogout()">
-                <i class="fas fa-sign-out-alt fs-5 cursor-pointer" style="color: #333; font-size: 24px;" title="Logout"></i>
-            </a>
-        </div>
-
         <!-- Success/Error Messages -->
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -24,108 +22,218 @@
             </div>
         @endif
 
+    
         <!-- Calendar Container -->
-        <div class="calendar-container mb-4 mx-auto" style="max-width: 400px;">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <button class="btn btn-outline-secondary" onclick="changeMonth(-1)"><</button>
-                <h4 class="text-center flex-grow-1 mb-0" id="calendar-title"></h4>
-                <button class="btn btn-outline-secondary" onclick="changeMonth(1)">></button>
+        <div class="calendar-container mb-5 mx-auto position-relative" style="max-width: 500px; background: #fff;">
+            <div class="d-flex justify-content-between align-items-center mb-2 p-3 border-bottom">
+                <form method="GET" action="{{ route('set.perwalian') }}" class="d-inline">
+                    <input type="hidden" name="month" value="{{ $currentDate->copy()->subMonth()->format('Y-m') }}">
+                    <button type="submit" class="btn btn-outline-secondary" style="border-radius: 4px;"><</button>
+                </form>
+                <h4 class="text-center flex-grow-1 mb-0" style="font-weight: 600; color: #333;">
+                    {{ $currentDate->format('F Y') }}
+                </h4>
+                <form method="GET" action="{{ route('set.perwalian') }}" class="d-inline">
+                    <input type="hidden" name="month" value="{{ $currentDate->copy()->addMonth()->format('Y-m') }}">
+                    <button type="submit" class="btn btn-outline-secondary" style="border-radius: 4px;">></button>
+                </form>
             </div>
-            <div class="card shadow-sm" style="border-radius: 8px;">
-                <div class="card-body p-0">
-                    <div id="calendar-month"></div>
-                </div>
+            <div class="card-body p-0">
+                <!-- Static HTML Table Structure -->
+                @php
+                    $firstDay = $currentDate->copy()->startOfMonth();
+                    $lastDay = $currentDate->copy()->endOfMonth();
+                    $daysInMonth = $lastDay->day;
+                    $startingDay = $firstDay->dayOfWeek;
+                    $markedDates = [
+                        '2025-01-13' => true, '2025-01-14' => true, '2025-01-15' => true, '2025-01-16' => true,
+                        '2025-01-17' => true, '2025-01-18' => true, '2025-01-21' => true, '2025-01-24' => true,
+                        '2025-01-25' => true, '2025-02-09' => true, '2025-02-10' => true, '2025-02-11' => true,
+                        '2025-02-13' => true,
+                    ];
+                    $calendarDays = array_fill(0, 42, '');
+                    $date = 1;
+                    for ($i = $startingDay; $i < $startingDay + $daysInMonth; $i++) {
+                        $calendarDays[$i] = $date;
+                        $date++;
+                    }
+                @endphp
+
+                <table class="calendar-table">
+                    <thead>
+                        <tr>
+                            <th>Sun</th>
+                            <th>Mon</th>
+                            <th>Tue</th>
+                            <th>Wed</th>
+                            <th>Thu</th>
+                            <th>Fri</th>
+                            <th>Sat</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            @for($i = 0; $i < 7; $i++)
+                                @php
+                                    $currentDateStr = $calendarDays[$i] ? $currentDate->copy()->setDay($calendarDays[$i])->format('Y-m-d') : '';
+                                    $isToday = $currentDateStr === now()->format('Y-m-d');
+                                    $isMarked = $currentDateStr && isset($markedDates[$currentDateStr]);
+                                    $isWeekend = ($i % 7 === 0 || $i % 7 === 6); // Sunday (0) or Saturday (6)
+                                @endphp
+                                <td class="day {{ $isToday ? 'today' : '' }} {{ $isWeekend ? 'weekend' : '' }}"
+                                    @if($calendarDays[$i])
+                                        onclick="document.getElementById('selectedDate').value = '{{ $currentDateStr }}'; document.getElementById('actionButton').disabled = false;"
+                                    @endif>
+                                    <span class="date-number">{{ $calendarDays[$i] ?: '' }}</span>
+                                    @if($isMarked)
+                                        <div class="dot"></div>
+                                    @endif
+                                </td>
+                            @endfor
+                        </tr>
+                        <tr>
+                            @for($i = 7; $i < 14; $i++)
+                                @php
+                                    $currentDateStr = $calendarDays[$i] ? $currentDate->copy()->setDay($calendarDays[$i])->format('Y-m-d') : '';
+                                    $isToday = $currentDateStr === now()->format('Y-m-d');
+                                    $isMarked = $currentDateStr && isset($markedDates[$currentDateStr]);
+                                    $isWeekend = ($i % 7 === 0 || $i % 7 === 6);
+                                @endphp
+                                <td class="day {{ $isToday ? 'today' : '' }} {{ $isWeekend ? 'weekend' : '' }}"
+                                    @if($calendarDays[$i])
+                                        onclick="document.getElementById('selectedDate').value = '{{ $currentDateStr }}'; document.getElementById('actionButton').disabled = false;"
+                                    @endif>
+                                    <span class="date-number">{{ $calendarDays[$i] ?: '' }}</span>
+                                    @if($isMarked)
+                                        <div class="dot"></div>
+                                    @endif
+                                </td>
+                            @endfor
+                        </tr>
+                        <tr>
+                            @for($i = 14; $i < 21; $i++)
+                                @php
+                                    $currentDateStr = $calendarDays[$i] ? $currentDate->copy()->setDay($calendarDays[$i])->format('Y-m-d') : '';
+                                    $isToday = $currentDateStr === now()->format('Y-m-d');
+                                    $isMarked = $currentDateStr && isset($markedDates[$currentDateStr]);
+                                    $isWeekend = ($i % 7 === 0 || $i % 7 === 6);
+                                @endphp
+                                <td class="day {{ $isToday ? 'today' : '' }} {{ $isWeekend ? 'weekend' : '' }}"
+                                    @if($calendarDays[$i])
+                                        onclick="document.getElementById('selectedDate').value = '{{ $currentDateStr }}'; document.getElementById('actionButton').disabled = false;"
+                                    @endif>
+                                    <span class="date-number">{{ $calendarDays[$i] ?: '' }}</span>
+                                    @if($isMarked)
+                                        <div class="dot"></div>
+                                    @endif
+                                </td>
+                            @endfor
+                        </tr>
+                        <tr>
+                            @for($i = 21; $i < 28; $i++)
+                                @php
+                                    $currentDateStr = $calendarDays[$i] ? $currentDate->copy()->setDay($calendarDays[$i])->format('Y-m-d') : '';
+                                    $isToday = $currentDateStr === now()->format('Y-m-d');
+                                    $isMarked = $currentDateStr && isset($markedDates[$currentDateStr]);
+                                    $isWeekend = ($i % 7 === 0 || $i % 7 === 6);
+                                @endphp
+                                <td class="day {{ $isToday ? 'today' : '' }} {{ $isWeekend ? 'weekend' : '' }}"
+                                    @if($calendarDays[$i])
+                                        onclick="document.getElementById('selectedDate').value = '{{ $currentDateStr }}'; document.getElementById('actionButton').disabled = false;"
+                                    @endif>
+                                    <span class="date-number">{{ $calendarDays[$i] ?: '' }}</span>
+                                    @if($isMarked)
+                                        <div class="dot"></div>
+                                    @endif
+                                </td>
+                            @endfor
+                        </tr>
+                        <tr>
+                            @for($i = 28; $i < 35; $i++)
+                                @php
+                                    $currentDateStr = $calendarDays[$i] ? $currentDate->copy()->setDay($calendarDays[$i])->format('Y-m-d') : '';
+                                    $isToday = $currentDateStr === now()->format('Y-m-d');
+                                    $isMarked = $currentDateStr && isset($markedDates[$currentDateStr]);
+                                    $isWeekend = ($i % 7 === 0 || $i % 7 === 6);
+                                @endphp
+                                <td class="day {{ $isToday ? 'today' : '' }} {{ $isWeekend ? 'weekend' : '' }}"
+                                    @if($calendarDays[$i])
+                                        onclick="document.getElementById('selectedDate').value = '{{ $currentDateStr }}'; document.getElementById('actionButton').disabled = false;"
+                                    @endif>
+                                    <span class="date-number">{{ $calendarDays[$i] ?: '' }}</span>
+                                    @if($isMarked)
+                                        <div class="dot"></div>
+                                    @endif
+                                </td>
+                            @endfor
+                        </tr>
+                        <tr>
+                            @for($i = 35; $i < 42; $i++)
+                                @php
+                                    $currentDateStr = $calendarDays[$i] ? $currentDate->copy()->setDay($calendarDays[$i])->format('Y-m-d') : '';
+                                    $isToday = $currentDateStr === now()->format('Y-m-d');
+                                    $isMarked = $currentDateStr && isset($markedDates[$currentDateStr]);
+                                    $isWeekend = ($i % 7 === 0 || $i % 7 === 6);
+                                @endphp
+                                <td class="day {{ $isToday ? 'today' : '' }} {{ $isWeekend ? 'weekend' : '' }}"
+                                    @if($calendarDays[$i])
+                                        onclick="document.getElementById('selectedDate').value = '{{ $currentDateStr }}'; document.getElementById('actionButton').disabled = false;"
+                                    @endif>
+                                    <span class="date-number">{{ $calendarDays[$i] ?: '' }}</span>
+                                    @if($isMarked)
+                                        <div class="dot"></div>
+                                    @endif
+                                </td>
+                            @endfor
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-            @if (session('perwalian_requested'))
-                <p class="text-center mt-2" style="color: #28A745;">Perwalian telah di-request</p>
+            @if ($perwalian_requested)
+                <p class="text-center mt-2 position-absolute start-50 translate-middle-x" style="color: #28A745; font-weight: 500; font-size: 14px; background-color: #e6f4ea; width: fit-content; padding: 4px 12px; border-radius: 12px;">
+                    Perwalian telah di-request
+                </p>
             @endif
         </div>
 
         <!-- Request/Edit Button -->
-        <div class="text-center mt-4">
-            <form method="POST" action="{{ route('set.perwalian.store') }}" id="requestForm">
+        <div class="d-flex justify-content-end mt-4">
+            <form method="POST" action="{{ $perwalian_requested ? route('set.perwalian.destroy') : route('set.perwalian.store') }}" id="requestForm">
                 @csrf
+                @if ($perwalian_requested)
+                    @method('DELETE')
+                @endif
                 <label for="selectedDate" class="visually-hidden">Selected Date for Perwalian:</label>
                 <input type="hidden" id="selectedDate" name="selectedDate" value="">
-                <button type="submit" class="btn btn-success px-4 py-2" id="actionButton" style="background-color: #28A745; color: white; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
-                    @if (session('perwalian_requested'))
-                        Edit
+                <button type="submit" class="btn px-4 py-2" id="actionButton" 
+                    style="background-color: {{ $perwalian_requested ? '#DC3545' : '#28A745' }}; color: white; border: none; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); transition: all 0.3s ease;"
+                    @if(!$perwalian_requested) disabled @endif>
+                    @if ($perwalian_requested)
+                        <span>Edit</span>
                     @else
-                        Request
+                        <span>Request</span>
                     @endif
                 </button>
             </form>
         </div>
+        @if(!$perwalian_requested)
+            <p class="text-muted mt-2" style="font-size: 12px;">Note: You can only request once. Use 'Edit' to delete and request again.</p>
+        @endif
+
+        <!-- Dosen Notifications (Optional Display) -->
+        @if(!empty($dosenNotifications) && $dosenNotifications->count() > 0)
+            <div class="mt-4">
+                <h5 style="font-size: 18px; font-weight: 600; color: #333;">Related Dosen</h5>
+                <ul class="list-group">
+                    @foreach($dosenNotifications as $dosen)
+                        <li class="list-group-item">
+                            {{ $dosen['nama'] ?? 'Unknown Dosen' }} (NIP: {{ $dosen['nip'] }})
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
     </div>
-
-    <!-- JavaScript for Calendar -->
-    <script>
-        let currentDate = new Date(2025, 0); // Start with January 2025
-
-        function renderCalendar() {
-            const year = currentDate.getFullYear();
-            const month = currentDate.getMonth();
-            const months = [
-                'January', 'February', 'March', 'April', 'May', 'June',
-                'July', 'August', 'September', 'October', 'November', 'December'
-            ];
-            document.getElementById('calendar-title').textContent = `${months[month]} ${year}`;
-
-            // Marked dates with red dots
-            const markedDates = {
-                '2025-01-13': true, '2025-01-14': true, '2025-01-15': true, '2025-01-16': true,
-                '2025-01-17': true, '2025-01-18': true, '2025-01-21': true, '2025-01-24': true,
-                '2025-01-25': true, '2025-02-09': true, '2025-02-10': true, '2025-02-11': true,
-                '2025-02-13': true
-            };
-
-            const firstDay = new Date(year, month, 1);
-            const lastDay = new Date(year, month + 1, 0);
-            const daysInMonth = lastDay.getDate();
-            const startingDay = firstDay.getDay();
-
-            let html = '<table class="calendar-table"><thead><tr>';
-            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            days.forEach(day => html += `<th>${day}</th>`);
-            html += '</tr></thead><tbody>';
-
-            let date = 1;
-            for (let i = 0; i < 6; i++) {
-                html += '<tr>';
-                for (let j = 0; j < 7; j++) {
-                    if (i === 0 && j < startingDay) {
-                        html += '<td></td>';
-                    } else if (date > daysInMonth) {
-                        html += '<td></td>';
-                    } else {
-                        const currentDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
-                        const isMarked = markedDates[currentDateStr] ? '<div class="dot"></div>' : '';
-                        html += `<td class="day ${new Date().toISOString().split('T')[0] === currentDateStr ? 'today' : ''}" onclick="selectDate('${currentDateStr}')">${date}${isMarked}</td>`;
-                        date++;
-                    }
-                }
-                html += '</tr>';
-                if (date > daysInMonth) break;
-            }
-            html += '</tbody></table>';
-            document.getElementById('calendar-month').innerHTML = html;
-        }
-
-        function changeMonth(offset) {
-            currentDate.setMonth(currentDate.getMonth() + offset);
-            if (currentDate < new Date(2025, 0)) currentDate = new Date(2025, 0); // Limit to January 2025
-            if (currentDate > new Date(2025, 5)) currentDate = new Date(2025, 5); // Limit to June 2025
-            renderCalendar();
-        }
-
-        function selectDate(dateStr) {
-            document.getElementById('selectedDate').value = dateStr;
-            console.log('Selected date:', dateStr);
-        }
-
-        // Initial render
-        renderCalendar();
-    </script>
 
     <style>
         .border-bottom-line {
@@ -135,24 +243,37 @@
 
         .calendar-container {
             width: 100%;
+            border: none;
         }
 
         .calendar-table {
             width: 100%;
             border-collapse: collapse;
             background: #fff;
+            border: none;
+            font-weight: bold;
+        }
+
+        .calendar-table thead th {
+            border: none;
+            text-align: center;
+            padding: 12px;
+            color: #13946D;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.2s;
         }
 
         .calendar-table th,
         .calendar-table td {
-            border: 1px solid #ddd;
+            border: none;
             text-align: center;
-            padding: 8px;
-            font-size: 14px;
+            padding: 12px;
+            font-size: 18px;
+            transition: background-color 0.2s;
         }
 
         .calendar-table th {
-            background-color: #f8f9fa;
             color: #666;
             text-transform: uppercase;
             font-weight: 500;
@@ -164,20 +285,41 @@
         }
 
         .day:hover {
-            background-color: #f8f9fa;
+            background-color: #f0f0f0;
         }
 
         .today {
             background-color: #e9ecef;
+            font-weight: 600;
+        }
+
+        .weekend .date-number {
+            color: #DC3545; /* Red color for Sundays and Saturdays */
         }
 
         .dot {
             width: 6px;
             height: 6px;
-            background-color: #DC3545; /* Red dot as per Figma */
+            background-color: #DC3545;
             border-radius: 50%;
             display: block;
             margin: 2px auto;
+        }
+
+        .date-number {
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .btn:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .debug-status {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
         }
     </style>
 @endsection
