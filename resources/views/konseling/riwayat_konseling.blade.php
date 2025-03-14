@@ -23,7 +23,13 @@
                 <div class="mb-2 row">
                     <label class="col-sm-2 col-form-label fw-bold">NIM</label>
                         <div class="col-sm-9">
-                            <input type="text" class="form-control" id="nim" name="nim" value="{{ $nim ?? '' }}" required>
+                            <input type="text" class="form-control" id="nim" name="nim" value="{{ $nim ?? '' }}">
+                        </div>
+                </div>
+                <div class="mb-2 row">
+                    <label class="col-sm-2 col-form-label fw-bold">Nama</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="nama" name="nama" value="{{ $nama ?? '' }}">
                         </div>
                 </div>
             </div>

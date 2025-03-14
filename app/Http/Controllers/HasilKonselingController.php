@@ -1,10 +1,9 @@
 <?php
 
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\MahasiswaKonseling;
+use App\Models\HasilKonseling; // Perbaiki Model
 use Illuminate\Support\Facades\Storage;
 
 class HasilKonselingController extends Controller
@@ -13,7 +12,7 @@ class HasilKonselingController extends Controller
     {
         $request->validate([
             'nama' => 'required|string|max:255',
-            'nim' => 'required|string|unique:mahasiswa_konseling,nim|max:20',
+            'nim' => 'required|string|unique:hasil_konseling,nim|max:20', // Sesuaikan dengan migration
             'file' => 'required|file|mimes:pdf,doc,docx,png,jpg,jpeg|max:12000',
             'keterangan' => 'nullable|string',
         ]);
@@ -22,13 +21,13 @@ class HasilKonselingController extends Controller
         $filePath = $request->file('file')->store('konseling_files', 'public');
 
         // Simpan ke database
-        MahasiswaKonseling::create([
+        HasilKonseling::create([
             'nama' => $request->nama,
             'nim' => $request->nim,
             'file' => $filePath,
             'keterangan' => $request->keterangan,
         ]);
 
-        return back()->with('success', 'Data berhasil disimpan.');
+        return redirect()->back()->with('success', 'Data berhasil disimpan.');
     }
 }

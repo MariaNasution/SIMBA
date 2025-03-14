@@ -57,6 +57,15 @@ Route::middleware(['auth.session', 'ensure.student.data', 'role:mahasiswa'])->gr
     Route::get('/mahasiswa_konseling', [MahasiswaKonselingController::class, 'index'])->name('mahasiswa_konseling');
     Route::get('/mahasiswa_perwalian', [MahasiswaPerwalianController::class, 'index'])->name('mahasiswa_perwalian');
     Route::get('/mahasiswa/konseling/request', [MahasiswaRequestKonselingController::class, 'create'])->name('mhs_konseling_request');
+    Route::get('/mahasiswa/request-konseling', [MahasiswaRequestKonselingController::class, 'create'])->name('mhs_konseling_request');
+    Route::post('/mahasiswa/request-konseling', [MahasiswaRequestKonselingController::class, 'store'])->name('mhs_konseling_request.store');
+    Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
+    });
+
+    Route::get('/mahasiswa/konseling/request', [MahasiswaRequestKonselingController::class, 'create'])->name('mhs_konseling_request');
+    Route::post('/mahasiswa/konseling/store', [MahasiswaRequestKonselingController::class, 'store'])->name('mhs_konseling_store');
+
 });
 
 // Middleware untuk admin
@@ -77,7 +86,7 @@ Route::middleware(['auth.session', 'role:admin'])->group(function () {
         Route::get('/daftar_request', [AdminController::class, 'daftarRequest'])->name('daftar_request');
 
         Route::get('/hasil', [HasilKonselingController::class, 'index'])->name('hasil.index');
-        Route::post('/hasil', [HasilKonselingController::class, 'store'])->name('hasil.store');
+        Route::post('/hasil-konseling', [HasilKonselingController::class, 'store'])->name('hasil_konseling.store');
         Route::get('/hasil/{id}', [HasilKonselingController::class, 'show'])->name('hasil.show');
         Route::delete('/hasil/{id}', [HasilKonselingController::class, 'destroy'])->name('hasil.destroy');
 
@@ -101,7 +110,7 @@ Route::middleware(['auth.session', 'role:admin'])->group(function () {
 
         Route::get('/konseling-lanjutan', [AdminController::class, 'konselingLanjutan'])->name('konseling.lanjutan');
     });
-    
+
 });
 
 // Middleware untuk dosen

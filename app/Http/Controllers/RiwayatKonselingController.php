@@ -41,6 +41,7 @@ class RiwayatKonselingController extends Controller
         public function CariRiwayatMahasiswa(Request $request)
     {
         $nim = $request->input('nim');
+        $nama = $request->input('nama');
         $apiToken = session('api_token');
         if (!$apiToken) {
             return redirect()->back()->withErrors(['error' => 'API token tidak tersedia']);
@@ -54,6 +55,7 @@ class RiwayatKonselingController extends Controller
                 ->withOptions(['verify' => false])
                 ->get('https://cis-dev.del.ac.id/api/library-api/get-student-by-nim', [
                     'nim' => $nim,
+                    'nama' => $nama,
                 ]);
             
             if ($mahasiswaResponse->successful()) {
