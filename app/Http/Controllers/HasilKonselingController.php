@@ -12,7 +12,7 @@ class HasilKonselingController extends Controller
     {
         $request->validate([
             'nama' => 'required|string|max:255',
-            'nim' => 'required|string|unique:hasil_konseling,nim|max:20', // Sesuaikan dengan migration
+            'nim' => 'required', // Sesuaikan dengan migration
             'file' => 'required|file|mimes:pdf,doc,docx,png,jpg,jpeg|max:12000',
             'keterangan' => 'nullable|string',
         ]);
