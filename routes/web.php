@@ -80,29 +80,29 @@ Route::middleware(['auth.session', 'role:admin'])->group(function () {
         Route::get('/admin/konseling_lanjutan', [AdminController::class, 'konselingLanjutan'])->name('konseling_lanjutan');
         Route::get('/admin/ajukan_konseling', [AdminController::class, 'ajukanKonseling'])->name('ajukan_konseling');
 
-        //daftar request admin
+        //daftar request konseling admin
         Route::get('/admin/daftar-request', [DaftarRequestKonselingController::class, 'daftarRequest'])->name('daftar_request');
         Route::put('/admin/approve-konseling/{id}', [DaftarRequestKonselingController::class, 'approve'])->name('approve_konseling');
         Route::put('/admin/reject-konseling/{id}', [DaftarRequestKonselingController::class, 'reject'])->name('reject_konseling');
-
+        
+        //admin melihat hasil konseling
         Route::get('/hasil', [HasilKonselingController::class, 'index'])->name('hasil.index');
         Route::post('/hasil-konseling', [HasilKonselingController::class, 'store'])->name('hasil_konseling.store');
         Route::get('/hasil/{id}', [HasilKonselingController::class, 'show'])->name('hasil.show');
         Route::delete('/hasil/{id}', [HasilKonselingController::class, 'destroy'])->name('hasil.destroy');
-
+        Route::post('/hasil-konseling/upload', [HasilKonselingController::class, 'upload'])->name('hasil_konseling.upload');
+        
+        //admin request konseling
         Route::get('/ajukan', [AjukanKonselingController::class, 'index'])->name('konseling.ajukan');
         Route::get('/cari', [AjukanKonselingController::class, 'cariMahasiswa'])->name('konseling.cari');
         Route::post('/submit', [AjukanKonselingController::class, 'submit'])->name('konseling.ajukan');
         Route::get('/caririwayat', [RiwayatkonselingController::class, 'CariRiwayatMahasiswa'])->name('konseling.caririwayat');
-        // Menampilkan semua riwayat konseling mahasiswa
+        
+        // Admin riwayat konseling mahasiswa
         Route::get('/riwayat-konseling', [RiwayatKonselingController::class, 'index'])->name('riwayat.konseling');
-        Route::post('/hasil-konseling/upload', [HasilKonselingController::class, 'upload'])->name('hasil_konseling.upload');
-
-        // Mencari riwayat konseling mahasiswa berdasarkan NIM
         Route::get('/riwayat-konseling/cari', [RiwayatKonselingController::class, 'CariRiwayatMahasiswa'])->name('riwayat.konseling.cari');
-
+        Route::get('/riwayat-konseling/{nim}', [RiwayatKonselingController::class, 'detail'])->name('riwayat.konseling.detail');
     });
-
 });
 
 // Middleware untuk dosen

@@ -22,115 +22,68 @@
             <div class="col-md-6">
                 <div class="mb-2 row">
                     <label class="col-sm-2 col-form-label fw-bold">NIM</label>
-                        <div class="col-sm-9">
-                            <input type="text" class="form-control" id="nim" name="nim" value="{{ $nim ?? '' }}">
-                        </div>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="nim" name="nim" value="{{ request('nim') }}">
+                    </div>
                 </div>
                 <div class="mb-2 row">
                     <label class="col-sm-2 col-form-label fw-bold">Nama</label>
-                        <div class="col-sm-9">
-                            <input type="text" class="form-control" id="nama" name="nama" value="{{ $nama ?? '' }}">
-                        </div>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="nama" name="nama" value="{{ request('nama') }}">
+                    </div>
                 </div>
             </div>
-</br>
-        {{-- Tombol --}}
-        <div class="text-center">
-            <button type="submit" class="btn btn-custom-blue">Cari</button>
-            <button type="button" id="resetButton" class="btn btn-secondary">Hapus</button>
-        </div>
-    </form>
-    
-    {{-- Menampilkan Error --}}
-    @if ($errors->any())
-        <div class="alert alert-danger mt-3">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-    
-    {{-- Tabel Data Mahasiswa --}}
-    @if (!empty($dataMahasiswa))
-        <div class="mt-4">
-            <h4>Data Mahasiswa</h4>
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>NIM</th>
-                        <th>Nama</th>
-                        <th>Tahun Masuk</th>
-                        <th>Program Studi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>{{ $dataMahasiswa['nim'] ?? '-' }}</td>
-                        <td>{{ $dataMahasiswa['nama'] ?? '-' }}</td>
-                        <td>{{ $dataMahasiswa['tahun_masuk'] ?? '-' }}</td>
-                        <td>{{ $dataMahasiswa['prodi'] ?? '-' }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    @endif
-        
-    {{-- Tabel Mahasiswa --}}
-        <div class="container">
 
-    @if(session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
-    @endif
+            {{-- Tombol --}}
+            <div class="text-center mt-3">
+                <button type="submit" class="btn btn-custom-blue">Cari</button>
+                <a href="{{ route('riwayat.konseling') }}" class="btn btn-secondary">Reset</a>
+            </div>
+        </form>
 
-    @if (!empty($mahasiswas))
-    <div class="mt-4">
-        <h4>Daftar Mahasiswa</h4>
-        <table class="table table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th>NIM</th>
-                    <th>Nama</th>
-                    <th>Tahun Masuk</th>
-                    <th>Program Studi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($mahasiswas as $mahasiswa)
-                    <tr>
-                        <td>{{ $mahasiswa['nim'] }}</td>
-                        <td>{{ $mahasiswa['nama'] }}</td>
-                        <td>{{ $mahasiswa['angkatan'] }}</td>
-                        <td>{{ $mahasiswa['prodi_name'] }}</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="4" class="text-center">Tidak ada data mahasiswa.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-    @endif
+        {{-- Menampilkan Error --}}
+        @if ($errors->any())
+            <div class="alert alert-danger mt-3">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
+        {{-- Tabel Data Mahasiswa --}}
+        @if ($hasilKonseling->isNotEmpty())
+            <div class="mt-4">
+                <h4>Data Mahasiswa</h4>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>NIM</th>
+                            <th>Nama</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($hasilKonseling as $index => $mahasiswa)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+                                <td>{{ $mahasiswa->nim }}</td>
+                                <td>
+                                    <a href="{{ route('riwayat.konseling.detail', $mahasiswa->nim) }}">
+                                        {{ $mahasiswa->nama }}
+                                    </a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
 
-        {{-- Pagination Dummy --}}
-        <nav>
-            <ul class="pagination justify-content-center">
-                <li class="page-item disabled">
-                    <a class="page-link" href="#" tabindex="-1">&laquo;</a>
-                </li>
-                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item"><a class="page-link" href="#">4</a></li>
-                <li class="page-item"><a class="page-link" href="#">5</a></li>
-                <li class="page-item">
-                    <a class="page-link" href="#">&raquo;</a>
-                </li>
-            </ul>
-        </nav>
+                </table>
+            </div>
+        @else
+            <div class="alert alert-info mt-3">Tidak ada data mahasiswa yang ditemukan.</div>
+        @endif
+
     </div>
 
     {{-- Logout Confirmation --}}
