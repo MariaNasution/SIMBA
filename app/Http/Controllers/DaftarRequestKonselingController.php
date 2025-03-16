@@ -22,7 +22,7 @@ class DaftarRequestKonselingController extends Controller
         $request = RequestKonseling::findOrFail($id);
         $request->update(['status' => 'approved']);
 
-        return redirect()->route('konseling.daftar_request')->with('success', 'Request berhasil disetujui.');
+        return redirect()->route('daftar_request')->with('success', 'Request berhasil disetujui.');
     }
 
     public function reject($id)
@@ -30,7 +30,7 @@ class DaftarRequestKonselingController extends Controller
         $request = RequestKonseling::findOrFail($id);
         $request->update(['status' => 'rejected']);
 
-        return redirect()->route('konseling.daftar_request')->with('success', 'Request berhasil ditolak.');
+        return redirect()->route('daftar_request')->with('error', 'Request berhasil ditolak.');
     }
 
 }
