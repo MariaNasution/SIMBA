@@ -10,7 +10,7 @@ class DaftarRequestKonselingController extends Controller
     public function daftarRequest()
     {
         // Ambil semua request konseling dengan relasi mahasiswa
-        $requests = RequestKonseling::with('mahasiswa')->where('status', 'pending')->get();
+        $requests = RequestKonseling::where('status', 'pending')->get();
 
         // Kirim data ke view
         return view('konseling.daftar_request', compact('requests'));

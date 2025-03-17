@@ -14,11 +14,9 @@ class CreateRequestKonselingTable extends Migration
             $table->string('nama_mahasiswa');
             $table->dateTime('tanggal_pengajuan');
             $table->text('deskripsi_pengajuan');
-            $table->string('status')->default('pending');
+            $table->string('status');;
             $table->timestamps();
 
-            // // Foreign key ke tabel mahasiswa
-            // $table->foreign('nim')->references('nim')->on('mahasiswa')->onDelete('cascade');
         });
     }
 
