@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\HasilKonseling;
-use App\Models\Mahasiswa;
 
 class RiwayatKonselingController extends Controller
 {
@@ -37,16 +36,15 @@ class RiwayatKonselingController extends Controller
         return view('konseling.riwayat_konseling', compact('hasilKonseling'));
     }
 
-    // Menampilkan detail hasil konseling berdasarkan NIM
+    // Menampilkan detail hasil konseling berdasarkan NIM dari tabel hasil_konseling
     public function detail($nim)
     {
-        // Ambil data mahasiswa berdasarkan NIM
-        $mahasiswa = Mahasiswa::where('nim', $nim)->firstOrFail();
-
-        // Ambil hasil konseling berdasarkan NIM
+        // Ambil data hasil konseling berdasarkan NIM
         $hasilKonseling = HasilKonseling::where('nim', $nim)->get();
 
-        return view('konseling.riwayat_konseling_detail', compact('mahasiswa', 'hasilKonseling'));
-    }
+        // Ambil nama mahasiswa dari hasil konseling pertama (jika ada data)
+        $nama = $hasilKonseling->first()->nama ?? 'Nama tidak ditemukan';
 
+        return view('konseling.riwayat_konseling_detail', compact('nama', 'nim', 'hasilKonseling'));
+    }
 }
