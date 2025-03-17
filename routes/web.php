@@ -24,7 +24,7 @@ use App\Http\Controllers\MahasiswaRequestKonselingController;
 use App\Http\Controllers\RiwayatKonselingController;
 use App\Http\Controllers\HasilKonselingController;
 use App\Http\Controllers\DaftarRequestKonselingController;
-
+use App\Http\Controllers\KonselingLanjutanController;
 
 // Login dan Logout
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
@@ -105,6 +105,9 @@ Route::middleware(['auth.session', 'role:admin'])->group(function () {
         Route::get('/riwayat-konseling', [RiwayatKonselingController::class, 'index'])->name('riwayat.konseling');
         Route::get('/riwayat-konseling/cari', [RiwayatKonselingController::class, 'CariRiwayatMahasiswa'])->name('riwayat.konseling.cari');
         Route::get('/riwayat-konseling/{nim}', [RiwayatKonselingController::class, 'detail'])->name('riwayat.konseling.detail');
+
+        Route::post('/konseling/lanjutan', [KonselingLanjutanController::class, 'store'])->name('konseling.lanjutan.store');
+
     });
 });
 
