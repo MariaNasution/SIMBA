@@ -95,8 +95,11 @@ Route::middleware(['auth.session', 'role:admin'])->group(function () {
         //admin request konseling
         Route::get('/ajukan', [AjukanKonselingController::class, 'index'])->name('konseling.ajukan');
         Route::get('/cari', [AjukanKonselingController::class, 'cariMahasiswa'])->name('konseling.cari');
-        Route::post('/submit', [AjukanKonselingController::class, 'submit'])->name('konseling.ajukan');
+        Route::post('/konseling/ajukan', [AjukanKonselingController::class, 'ajukanKonseling'])->name('konseling.ajukan');
         Route::get('/caririwayat', [RiwayatkonselingController::class, 'CariRiwayatMahasiswa'])->name('konseling.caririwayat');
+        Route::get('/konseling', [AjukanKonselingController::class, 'index'])->name('konseling.index');
+        Route::get('/konseling/pilih', [AjukanKonselingController::class, 'pilihMahasiswa'])->name('konseling.pilih');
+
         
         // Admin riwayat konseling mahasiswa
         Route::get('/riwayat-konseling', [RiwayatKonselingController::class, 'index'])->name('riwayat.konseling');

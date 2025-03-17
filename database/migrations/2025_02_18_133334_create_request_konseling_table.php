@@ -8,7 +8,7 @@ class CreateRequestKonselingTable extends Migration
 {
     public function up()
     {
-        Schema::create('request_konselings', function (Blueprint $table) {
+        Schema::create('request_konseling', function (Blueprint $table) {
             $table->id();
             $table->string('nim', 8);
             $table->string('nama_mahasiswa');
@@ -17,8 +17,8 @@ class CreateRequestKonselingTable extends Migration
             $table->string('status')->default('pending');
             $table->timestamps();
 
-            // Foreign key ke tabel mahasiswa
-            $table->foreign('nim')->references('nim')->on('mahasiswa')->onDelete('cascade');
+            // // Foreign key ke tabel mahasiswa
+            // $table->foreign('nim')->references('nim')->on('mahasiswa')->onDelete('cascade');
         });
     }
 

@@ -9,7 +9,7 @@ class RequestKonseling extends Model
 {
     use HasFactory;
 
-    protected $table = 'request_konselings';
+    protected $table = 'request_konseling';
 
     protected $fillable = [
         'nim',
@@ -19,8 +19,5 @@ class RequestKonseling extends Model
         'status',
     ];
 
-    public function mahasiswa()
-    {
-        return $this->belongsTo(Mahasiswa::class, 'nim', 'nim');
-    }
+   
 }
