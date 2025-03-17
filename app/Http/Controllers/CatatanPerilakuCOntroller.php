@@ -62,7 +62,7 @@ class CatatanPerilakuController extends Controller
                 Log::info('Processed Perilaku with Pelanggaran', ['nilaiPerilaku' => $nilaiPerilaku]);
 
 
-                return view('catatanPerilaku.catatan_perilaku', compact('nilaiPerilaku'));
+                return view('catatanPerilaku.catatan_perilaku_mahasiswa', compact('nilaiPerilaku'));
             }
 
             return redirect()->route('beranda')->withErrors(['error' => 'Gagal mengambil data dari API.']);

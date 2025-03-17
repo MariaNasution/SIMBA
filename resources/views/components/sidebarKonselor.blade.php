@@ -3,13 +3,13 @@
         <img src="{{ asset('assets\img\Logo Institut Teknologi Del.png') }}" alt="Logo" class="header-logo">
         <div class="header-text">
             <h4>SiMBA</h4>
-            <p>Admin</p>
+            <p>Konselor</p>
         </div>
     </div>
 
     <ul class="menu">
         <li class="menu-item">
-            <a href="{{ route('admin') }}">
+            <a href="{{ route('konselor') }}">
                 <i class="fas fa-home"></i> Beranda
             </a>
         </li>

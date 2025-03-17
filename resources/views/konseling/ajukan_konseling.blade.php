@@ -90,7 +90,7 @@
             {{-- Tombol Konfirmasi --}}
             <div class="d-flex justify-content-center mt-4">
                 <button type="submit" class="btn btn-custom-blue btn-lg px-4 me-2">Buat</button>
-                <a href="{{ route('beranda') }}" class="btn btn-secondary btn-lg px-4">Batal</a>
+                <a href="{{ route('') }}" class="btn btn-secondary btn-lg px-4">Batal</a>
             </div>
         </form>
     </div>

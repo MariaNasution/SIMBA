@@ -2,11 +2,45 @@
 
 <link rel="stylesheet" href="{{ url('assets/css/catatan_perilaku.css') }}">
 
+<!-- Tambahkan CSS untuk animasi dropdown -->
+<style>
+  /* Memastikan elemen .collapse tertutup rapat dan menerapkan transisi */
+  .collapse {
+    overflow: hidden;                       /* Sembunyikan isi saat tertutup */
+    max-height: 0;                         /* Mulai dari tinggi 0 */
+    opacity: 0;                            /* Mulai transparan */
+    transition: max-height 0.4s ease, opacity 0.4s ease;
+  }
+  /* Saat .collapse dibuka (show), atur tinggi dan opacity */
+  .collapse.show {
+    max-height: 1000px;                   /* Sesuaikan dengan tinggi konten */
+    opacity: 1;
+  }
+
+  /* Efek tambahan fade+slide pada konten detail */
+  .collapse-content {
+    transform: translateY(-10px);
+    opacity: 0;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+  }
+  .collapse.show .collapse-content {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  /* Rotasi icon panah jika ingin pakai pendekatan .rotated (opsional) */
+  .dropdown-icon i.rotated {
+    transform: rotate(90deg);
+  }
+</style>
+
 @section('content')
 <!-- Header -->
 <div class="d-flex align-items-center mb-4 border-bottom">
   <h3 class="me-auto">
-    <a href="{{ route('catatan_perilaku_orang_tua') }}"> <i class ="fas fa-user-edit"></i>Catatan Perilaku</a>
+    <a href="{{ route('catatan_perilaku_orang_tua') }}">
+      <i class="fas fa-user-edit"></i> Catatan Perilaku
+    </a>
   </h3>
   <a href="#" onclick="confirmLogout()">
     <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
@@ -40,37 +74,41 @@
         <td>{{ $perilaku['akumulasi_skor'] ?? 0 }}</td>
         <td class="nilai-huruf-cell">
           {{ $perilaku['nilai_huruf'] ?? '-' }}
+          <!-- Tombol toggle collapse -->
           <a href="#" class="dropdown-icon" data-bs-toggle="collapse" data-bs-target="#details{{ $key }}">
             <i class="fas fa-chevron-left"></i>
           </a>
         </td>
       </tr>
 
+      <!-- Row detail dengan animasi collapse -->
       <tr class="collapse" id="details{{ $key }}">
         <td colspan="7">
-          <div class="p-3">
+          <!-- Bungkus isi detail di dalam .collapse-content untuk efek fade+slide -->
+          <div class="collapse-content p-3">
             <h5>Pembinaan: </h5>
 
             <!-- Container untuk Kotak Pelanggaran dan Perbuatan Baik -->
             <div class="custom-box-container">
               <!-- Kotak Pelanggaran -->
               <div id="pelanggaranBox{{ $key }}" class="custom-box active"
-                onclick="showTable('pelanggaranTable{{ $key }}', 'pelanggaranBox{{ $key }}', 'perbuatanBaikBox{{ $key }}')">
+                   onclick="showTable('pelanggaranTable{{ $key }}', 'pelanggaranBox{{ $key }}', 'perbuatanBaikBox{{ $key }}')">
                 Pelanggaran ({{ count($perilaku['pelanggaran'] ?? []) }})
               </div>
 
               <!-- Kotak Perbuatan Baik -->
               <div id="perbuatanBaikBox{{ $key }}" class="custom-box"
-                onclick="showTable('perbuatanBaikTable{{ $key }}', 'perbuatanBaikBox{{ $key }}', 'pelanggaranBox{{ $key }}')">
+                   onclick="showTable('perbuatanBaikTable{{ $key }}', 'perbuatanBaikBox{{ $key }}', 'pelanggaranBox{{ $key }}')">
                 Perbuatan Baik Baru ({{ count($perilaku['perbuatan_baik'] ?? []) }})
               </div>
             </div>
 
+            <!-- Tabel Pelanggaran -->
             <div id="pelanggaranTable{{ $key }}">
               <table class="table table-bordered table-striped" style="margin-top: 0; border-top: none;">
                 <thead>
                   <tr>
-                    <th style="width: 0.7%">#</th> <!-- Lebar kolom # diatur menjadi 5% -->
+                    <th style="width: 0.7%">#</th>
                     <th>Pelanggaran</th>
                     <th>Unit</th>
                     <th>Tanggal</th>
@@ -98,11 +136,12 @@
               </table>
             </div>
 
+            <!-- Tabel Perbuatan Baik -->
             <div id="perbuatanBaikTable{{ $key }}" style="display: none;">
               <table class="table table-bordered table-striped" style="margin-top: 0; border-top: none;">
                 <thead>
                   <tr>
-                    <th style="width: 0.7%">#</th> <!-- Lebar kolom # diatur menjadi 5% -->
+                    <th style="width: 0.7%">#</th>
                     <th>Perbuatan Baik</th>
                     <th>Keterangan</th>
                     <th>Kredit Kebaikan Poin</th>
@@ -122,99 +161,100 @@
                     <td>{{ $perbuatan['tanggal'] ?? '-' }}</td>
                   </tr>
                   @empty
-                  <td colspan="6" class="no-results">No results found.</td>
-
+                  <tr>
+                    <td colspan="6" class="no-results">No results found.</td>
+                  </tr>
                   @endforelse
                 </tbody>
               </table>
             </div>
 
+            <!-- Script khusus di dalam detail -->
             <script>
-            // Fungsi untuk menampilkan tabel dan mengatur kotak aktif
-            function showTable(tableId, activeBoxId, inactiveBoxId) {
-              // Sembunyikan semua tabel
-              document.querySelectorAll('[id^="pelanggaranTable"], [id^="perbuatanBaikTable"]').forEach(function(
-                table) {
-                table.style.display = 'none';
-              });
+              // Fungsi untuk menampilkan tabel dan mengatur kotak aktif
+              function showTable(tableId, activeBoxId, inactiveBoxId) {
+                // Sembunyikan semua tabel
+                document.querySelectorAll('[id^="pelanggaranTable"], [id^="perbuatanBaikTable"]').forEach(function(table) {
+                  table.style.display = 'none';
+                });
 
-              // Tampilkan tabel yang dipilih
-              if (tableId) {
-                document.getElementById(tableId).style.display = 'block';
+                // Tampilkan tabel yang dipilih
+                if (tableId) {
+                  document.getElementById(tableId).style.display = 'block';
+                }
+
+                // Tambahkan kelas 'active' ke kotak yang dipilih dan hapus dari kotak lain
+                if (activeBoxId) {
+                  document.getElementById(activeBoxId).classList.add('active');
+                }
+                if (inactiveBoxId) {
+                  document.getElementById(inactiveBoxId).classList.remove('active');
+                }
               }
 
-              // Tambahkan kelas 'active' ke kotak yang dipilih dan hapus dari kotak yang tidak aktif
-              if (activeBoxId) {
-                document.getElementById(activeBoxId).classList.add('active');
+              // Fungsi untuk mengubah ikon dropdown
+              function toggleDropdownIcon(element, isOpen) {
+                const icon = element.querySelector('i');
+                if (isOpen) {
+                  icon.classList.remove('fa-chevron-left');
+                  icon.classList.add('fa-chevron-down');
+                } else {
+                  icon.classList.remove('fa-chevron-down');
+                  icon.classList.add('fa-chevron-left');
+                }
               }
-              if (inactiveBoxId) {
-                document.getElementById(inactiveBoxId).classList.remove('active');
-              }
-            }
 
-            // Fungsi untuk mengubah ikon dropdown
-            function toggleDropdownIcon(element, isOpen) {
-              const icon = element.querySelector('i');
-              if (isOpen) {
-                icon.classList.remove('fa-chevron-left');
-                icon.classList.add('fa-chevron-down');
-              } else {
-                icon.classList.remove('fa-chevron-down');
-                icon.classList.add('fa-chevron-left');
-              }
-            }
+              // Saat halaman dimuat
+              document.addEventListener('DOMContentLoaded', function() {
+                // Loop melalui semua tombol dropdown
+                document.querySelectorAll('.dropdown-icon').forEach(function(dropdown) {
+                  const target = dropdown.getAttribute('data-bs-target');
+                  const collapseElement = document.querySelector(target);
 
-            // Saat halaman dimuat
-            document.addEventListener('DOMContentLoaded', function() {
-              // Loop melalui semua dropdown
-              document.querySelectorAll('.dropdown-icon').forEach(function(dropdown) {
-                const target = dropdown.getAttribute('data-bs-target');
-                const collapseElement = document.querySelector(target);
+                  // Event listener saat dropdown dibuka atau ditutup
+                  collapseElement.addEventListener('show.bs.collapse', function() {
+                    toggleDropdownIcon(dropdown, true); // Ikon berubah saat dropdown dibuka
 
-                // Event listener saat dropdown dibuka atau ditutup
-                collapseElement.addEventListener('show.bs.collapse', function() {
-                  toggleDropdownIcon(dropdown, true); // Ikon berubah saat dropdown dibuka
+                    // Dapatkan key dari data-bs-target
+                    const key = target.replace('#details', '');
 
-                  // Dapatkan key dari data-bs-target
-                  const key = target.replace('#details', '');
+                    // Tampilkan tabel pelanggaran secara otomatis saat dropdown dibuka
+                    showTable(`pelanggaranTable${key}`, `pelanggaranBox${key}`, `perbuatanBaikBox${key}`);
+                  });
 
-                  // Tampilkan tabel pelanggaran secara otomatis saat dropdown dibuka
+                  collapseElement.addEventListener('hide.bs.collapse', function() {
+                    toggleDropdownIcon(dropdown, false); // Ikon kembali saat dropdown ditutup
+                  });
+                });
+
+                // Pastikan ikon berubah jika dropdown dalam keadaan terbuka saat pertama dimuat
+                document.querySelectorAll('.collapse.show').forEach(function(collapse) {
+                  const key = collapse.id.replace('details', '');
+                  const dropdown = document.querySelector(`[data-bs-target="#details${key}"]`);
+                  if (dropdown) {
+                    toggleDropdownIcon(dropdown, true);
+                  }
+                  // Tampilkan tabel pelanggaran secara otomatis jika sudah terbuka
                   showTable(`pelanggaranTable${key}`, `pelanggaranBox${key}`, `perbuatanBaikBox${key}`);
                 });
 
-                collapseElement.addEventListener('hide.bs.collapse', function() {
-                  toggleDropdownIcon(dropdown, false); // Ikon kembali saat dropdown ditutup
+                // Tambahkan event listener untuk kotak Pelanggaran / Perbuatan Baik
+                document.querySelectorAll('.custom-box').forEach(function(box) {
+                  box.addEventListener('click', function() {
+                    const key = this.id.replace('pelanggaranBox', '').replace('perbuatanBaikBox', '');
+                    if (this.id.startsWith('pelanggaranBox')) {
+                      showTable(`pelanggaranTable${key}`, `pelanggaranBox${key}`, `perbuatanBaikBox${key}`);
+                    } else if (this.id.startsWith('perbuatanBaikBox')) {
+                      showTable(`perbuatanBaikTable${key}`, `perbuatanBaikBox${key}`, `pelanggaranBox${key}`);
+                    }
+                  });
                 });
               });
-
-              // Pastikan ikon berubah jika dropdown dalam keadaan terbuka saat pertama dimuat
-              document.querySelectorAll('.collapse.show').forEach(function(collapse) {
-                const key = collapse.id.replace('details', '');
-                const dropdown = document.querySelector(`[data-bs-target="#details${key}"]`);
-                if (dropdown) {
-                  toggleDropdownIcon(dropdown, true); // Ikon berubah sesuai keadaan awal
-                }
-
-                // Tampilkan tabel pelanggaran secara otomatis saat dropdown dalam keadaan terbuka saat pertama dimuat
-                showTable(`pelanggaraganTable${key}`, `pelanggaranBox${key}`, `perbuatanBaikBox${key}`);
-              });
-
-              // Tambahkan event listener untuk kotak Pelanggaran dan Perbuatan Baik
-              document.querySelectorAll('.custom-box').forEach(function(box) {
-                box.addEventListener('click', function() {
-                  const key = this.id.replace('pelanggaranBox', '').replace('perbuatanBaikBox', '');
-                  if (this.id.startsWith('pelanggaranBox')) {
-                    showTable(`pelanggaranTable${key}`, `pelanggaranBox${key}`, `perbuatanBaikBox${key}`);
-                  } else if (this.id.startsWith('perbuatanBaikBox')) {
-                    showTable(`perbuatanBaikTable${key}`, `perbuatanBaikBox${key}`, `pelanggaranBox${key}`);
-                  }
-                });
-              });
-            });
             </script>
-
-
-            @empty
+          </div>
+        </td>
+      </tr>
+      @empty
       <tr>
         <td colspan="7" class="text-center">Tidak ada data perilaku.</td>
       </tr>

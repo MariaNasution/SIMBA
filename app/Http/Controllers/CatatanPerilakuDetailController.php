@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\StudentBehavior;
 use Illuminate\Support\Facades\Log;
 
-class StudentBehaviorController extends Controller
+class CatatanPerilakuDetailController extends Controller
 {
     /**
      * Store a newly created record in storage (inline form).
@@ -15,56 +15,50 @@ class StudentBehaviorController extends Controller
     {
         // Validate required fields
         $validated = $request->validate([
-            'student_nim' => 'required',
-            'ta'          => 'required',
-            'semester'    => 'required|integer',
-            'type'        => 'required|in:pelanggaran,perbuatan_baik',
+            'student_nim'      => 'required',
+            'ta'               => 'required',
+            'semester'         => 'required|integer',
+            'type'             => 'required|in:pelanggaran,perbuatan_baik',
 
-            // If you're storing "pelanggaran" in a single column (e.g., 'description'):
-            'pelanggaran'       => 'nullable|string',
-            'perbuatan_baik'    => 'nullable|string',
+            // Jika menyimpan "pelanggaran" di satu kolom (misalnya 'description'):
+            'pelanggaran'      => 'nullable|string',
+            'perbuatan_baik'   => 'nullable|string',
 
             // Common fields
-            'unit'       => 'nullable|string',
-            'tanggal'    => 'nullable|date',
-            'poin'       => 'nullable|integer',
-            'tindakan'   => 'nullable|string',
+            'unit'             => 'nullable|string',
+            'tanggal'          => 'nullable|date',
+            'poin'             => 'nullable|integer',
+            'tindakan'         => 'nullable|string',
 
-            // Additional fields if you have them:
-            'keterangan'  => 'nullable|string',
-            'kredit_poin' => 'nullable|integer',
+            // Additional fields jika ada:
+            'keterangan'       => 'nullable|string',
+            'kredit_poin'      => 'nullable|integer',
         ]);
 
-        // Prepare data for insertion
-        // We'll map 'pelanggaran' or 'perbuatan_baik' into a single 'description' column
+        // Siapkan data untuk disimpan
         $data = [
-            'student_nim' => $validated['student_nim'],
-            'ta'          => $validated['ta'],
-            'semester'    => $validated['semester'],
-            'type'        => $validated['type'],
-            'unit'        => $validated['unit'] ?? null,
-            'tanggal'     => $validated['tanggal'] ?? null,
-            'poin'        => $validated['poin'] ?? 0,
-            'tindakan'    => $validated['tindakan'] ?? null,
+            'student_nim'  => $validated['student_nim'],
+            'ta'           => $validated['ta'],
+            'semester'     => $validated['semester'],
+            'type'         => $validated['type'],
+            'unit'         => $validated['unit'] ?? null,
+            'tanggal'      => $validated['tanggal'] ?? null,
+            'poin'         => $validated['poin'] ?? 0,
+            'tindakan'     => $validated['tindakan'] ?? null,
         ];
 
-        // If it's pelanggaran, store 'pelanggaran' in 'description'
+        // Simpan input ke kolom description sesuai tipe
         if ($validated['type'] === 'pelanggaran') {
             $data['description'] = $validated['pelanggaran'] ?? null;
-        }
-        // If it's perbuatan_baik, store 'perbuatan_baik' in 'description'
-        else {
+        } else {
             $data['description'] = $validated['perbuatan_baik'] ?? null;
-
-            // If you want to store keterangan or kredit_poin separately:
-            // $data['keterangan'] = $validated['keterangan'] ?? null;
-            // $data['poin']       = $validated['kredit_poin'] ?? 0;
+            // Jika ingin simpan keterangan atau kredit poin secara terpisah, bisa ditambahkan di sini.
         }
 
-        // Create the record
+        // Buat record
         StudentBehavior::create($data);
 
-        // Redirect back to the detail page for the same student
+        // Redirect dengan flash message
         return redirect()
             ->route('catatan_perilaku_detail', ['studentNim' => $validated['student_nim']])
             ->with('success', 'Data berhasil ditambahkan.');
@@ -92,12 +86,10 @@ class StudentBehaviorController extends Controller
             'tanggal'     => 'nullable|date',
             'poin'        => 'nullable|integer',
             'tindakan'    => 'nullable|string',
-            // Add more if needed
         ]);
 
         $behavior->update($validated);
 
-        // Return to the same detail page
         return redirect()
             ->route('catatan_perilaku_detail', ['studentNim' => $behavior->student_nim])
             ->with('success', 'Data berhasil diperbarui.');
@@ -109,8 +101,7 @@ class StudentBehaviorController extends Controller
     public function destroy($id)
     {
         $behavior = StudentBehavior::findOrFail($id);
-        $studentNim = $behavior->student_nim;  // Remember the student's NIM before deleting
-
+        $studentNim = $behavior->student_nim;
         $behavior->delete();
 
         return redirect()
