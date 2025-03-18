@@ -6,7 +6,7 @@
         <div class="d-flex align-items-center mb-4 border-bottom-line">
             <h3 class="me-auto">
                 <a href="{{ route('admin') }}"><i class="fas fa-history me-3"></i>Home</a> /
-                <a href="{{ route('riwayat.konseling') }}">Riwayat Konseling</a>
+                <a href="{{ route('riwayat.konseling') }}">Detail Konseling Lanjutan</a>
             </h3>
             <a href="#" onclick="confirmLogout()">
                 <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
@@ -27,43 +27,22 @@
 
         {{-- Tabel Hasil Konseling --}}
         <h5>Hasil Konseling:</h5>
-        @if ($hasilKonseling->isNotEmpty())
+        @if ($mahasiswas->isNotEmpty())
             <table class="table table-bordered">
                 <thead>
                     <tr>
                         <th>No</th>
                         <th>Waktu</th>
                         <th>Hasil Konseling</th>
-                        <th>File</th>
-                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($hasilKonseling as $index => $konseling)
+                    @foreach ($mahasiswas as $index => $konseling)
                         <tr>
                             <td>{{ $index + 1 }}</td>
                             <td>{{ \Carbon\Carbon::parse($konseling->created_at)->translatedFormat('d F Y') }}</td>
                             <td>{{ $konseling->keterangan }}</td>
-                            <td>
-                                @if ($konseling->file)
-                                    <a href="{{ asset('storage/konseling_files/' . $konseling->file) }}" target="_blank">
-                                       Lihat File
-                                    </a>
-                                @else
-                                    <span class="text-muted">No file found.</span>
-                                @endif
-                            </td>
-                            <td>
-                                <form action="{{ route('konseling.lanjutan.store') }}" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="nama" value="{{ $nama }}">
-                                    <input type="hidden" name="nim" value="{{ $nim }}">
-                                    <input type="hidden" name="konseling_id" value="{{ $konseling->id }}">
-                                    <button type="submit" class="btn btn-success btn-sm">
-                                        <i class="fas fa-check"></i> Lanjutkan
-                                    </button>
-                                </form>
-                            </td>
+                            
                         </tr>
                     @endforeach
                 </tbody>

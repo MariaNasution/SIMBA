@@ -75,22 +75,21 @@ class adminController extends Controller
             $nim = $request->input('nim');
             $nama = $request->input('nama');
 
-            // Query pencarian dengan data unik berdasarkan NIM
-            $mahasiswas = KonselingLanjutan::select('nim', 'nama')
+            // Query untuk mencari data berdasarkan NIM atau nama
+            $mahasiswas = KonselingLanjutan::query()
                 ->when($nim, function ($query, $nim) {
                     return $query->where('nim', 'like', "%$nim%");
                 })
                 ->when($nama, function ($query, $nama) {
                     return $query->where('nama', 'like', "%$nama%");
                 })
-                ->groupBy('nim', 'nama')
                 ->get();
-
             return view('konseling.konseling_lanjutan', compact('mahasiswas'));
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
     }
+
 
     public function ajukanKonseling()
     {
@@ -105,6 +104,16 @@ class adminController extends Controller
         // Kirim ke view
         return view('konseling.daftar_request', compact('requests'));
     }
+    public function detail($nim)
+    {
+        // Ambil data hasil konseling berdasarkan NIM
+        $mahasiswas = KonselingLanjutan::where('nim', $nim)->get();
 
+        // Ambil nama mahasiswa dari hasil konseling pertama (jika ada data)
+        $nama = $mahasiswas->first()->nama ?? 'Nama tidak ditemukan';
 
+        return view('konseling.konseling_lanjutan_detail', compact('nama', 'nim', 'mahasiswas'));
+    }
 }
+
+

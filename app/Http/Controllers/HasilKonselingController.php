@@ -13,7 +13,7 @@ class HasilKonselingController extends Controller
         $request->validate([
             'nama' => 'required|string|max:255',
             'nim' => 'required', // Sesuaikan dengan migration
-            'file' => 'required|file|mimes:pdf,doc,docx,png,jpg,jpeg|max:12000',
+            'file' => 'required|file|mimes:pdf,doc,docx,png,jpg,jpeg|max:60000',
             'keterangan' => 'nullable|string',
         ]);
 
