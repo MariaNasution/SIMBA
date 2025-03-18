@@ -4,34 +4,40 @@
 
 <!-- Tambahkan CSS untuk animasi dropdown -->
 <style>
-  /* Memastikan elemen .collapse tertutup rapat dan menerapkan transisi */
-  .collapse {
-    overflow: hidden;                       /* Sembunyikan isi saat tertutup */
-    max-height: 0;                         /* Mulai dari tinggi 0 */
-    opacity: 0;                            /* Mulai transparan */
-    transition: max-height 0.4s ease, opacity 0.4s ease;
-  }
-  /* Saat .collapse dibuka (show), atur tinggi dan opacity */
-  .collapse.show {
-    max-height: 1000px;                   /* Sesuaikan dengan tinggi konten */
-    opacity: 1;
-  }
+/* Memastikan elemen .collapse tertutup rapat dan menerapkan transisi */
+.collapse {
+  overflow: hidden;
+  /* Sembunyikan isi saat tertutup */
+  max-height: 0;
+  /* Mulai dari tinggi 0 */
+  opacity: 0;
+  /* Mulai transparan */
+  transition: max-height 0.4s ease, opacity 0.4s ease;
+}
 
-  /* Efek tambahan fade+slide pada konten detail */
-  .collapse-content {
-    transform: translateY(-10px);
-    opacity: 0;
-    transition: transform 0.4s ease, opacity 0.4s ease;
-  }
-  .collapse.show .collapse-content {
-    transform: translateY(0);
-    opacity: 1;
-  }
+/* Saat .collapse dibuka (show), atur tinggi dan opacity */
+.collapse.show {
+  max-height: 1000px;
+  /* Sesuaikan dengan tinggi konten */
+  opacity: 1;
+}
 
-  /* Rotasi icon panah jika ingin pakai pendekatan .rotated (opsional) */
-  .dropdown-icon i.rotated {
-    transform: rotate(90deg);
-  }
+/* Efek tambahan fade+slide pada konten detail */
+.collapse-content {
+  transform: translateY(-10px);
+  opacity: 0;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+.collapse.show .collapse-content {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Rotasi icon panah jika ingin pakai pendekatan .rotated (opsional) */
+.dropdown-icon i.rotated {
+  transform: rotate(90deg);
+}
 </style>
 
 @section('content')
@@ -92,13 +98,13 @@
             <div class="custom-box-container">
               <!-- Kotak Pelanggaran -->
               <div id="pelanggaranBox{{ $key }}" class="custom-box active"
-                   onclick="showTable('pelanggaranTable{{ $key }}', 'pelanggaranBox{{ $key }}', 'perbuatanBaikBox{{ $key }}')">
+                onclick="showTable('pelanggaranTable{{ $key }}', 'pelanggaranBox{{ $key }}', 'perbuatanBaikBox{{ $key }}')">
                 Pelanggaran ({{ count($perilaku['pelanggaran'] ?? []) }})
               </div>
 
               <!-- Kotak Perbuatan Baik -->
               <div id="perbuatanBaikBox{{ $key }}" class="custom-box"
-                   onclick="showTable('perbuatanBaikTable{{ $key }}', 'perbuatanBaikBox{{ $key }}', 'pelanggaranBox{{ $key }}')">
+                onclick="showTable('perbuatanBaikTable{{ $key }}', 'perbuatanBaikBox{{ $key }}', 'pelanggaranBox{{ $key }}')">
                 Perbuatan Baik Baru ({{ count($perilaku['perbuatan_baik'] ?? []) }})
               </div>
             </div>
@@ -169,88 +175,126 @@
               </table>
             </div>
 
-            <!-- Script khusus di dalam detail -->
             <script>
-              // Fungsi untuk menampilkan tabel dan mengatur kotak aktif
-              function showTable(tableId, activeBoxId, inactiveBoxId) {
-                // Sembunyikan semua tabel
-                document.querySelectorAll('[id^="pelanggaranTable"], [id^="perbuatanBaikTable"]').forEach(function(table) {
-                  table.style.display = 'none';
-                });
+            document.addEventListener('DOMContentLoaded', function() {
+              // Loop melalui semua tombol dropdown
+              document.querySelectorAll('.dropdown-icon').forEach(function(dropdown) {
+                const target = dropdown.getAttribute('data-bs-target');
+                const collapseElement = document.querySelector(target);
 
-                // Tampilkan tabel yang dipilih
-                if (tableId) {
-                  document.getElementById(tableId).style.display = 'block';
-                }
+                // Event listener saat dropdown dibuka
+                collapseElement.addEventListener('show.bs.collapse', function() {
+                  toggleDropdownIcon(dropdown, true); // Ikon berubah saat dropdown dibuka
 
-                // Tambahkan kelas 'active' ke kotak yang dipilih dan hapus dari kotak lain
-                if (activeBoxId) {
-                  document.getElementById(activeBoxId).classList.add('active');
-                }
-                if (inactiveBoxId) {
-                  document.getElementById(inactiveBoxId).classList.remove('active');
-                }
-              }
+                  // Dapatkan key dari data-bs-target
+                  const key = target.replace('#details', '');
 
-              // Fungsi untuk mengubah ikon dropdown
-              function toggleDropdownIcon(element, isOpen) {
-                const icon = element.querySelector('i');
-                if (isOpen) {
-                  icon.classList.remove('fa-chevron-left');
-                  icon.classList.add('fa-chevron-down');
-                } else {
-                  icon.classList.remove('fa-chevron-down');
-                  icon.classList.add('fa-chevron-left');
-                }
-              }
-
-              // Saat halaman dimuat
-              document.addEventListener('DOMContentLoaded', function() {
-                // Loop melalui semua tombol dropdown
-                document.querySelectorAll('.dropdown-icon').forEach(function(dropdown) {
-                  const target = dropdown.getAttribute('data-bs-target');
-                  const collapseElement = document.querySelector(target);
-
-                  // Event listener saat dropdown dibuka atau ditutup
-                  collapseElement.addEventListener('show.bs.collapse', function() {
-                    toggleDropdownIcon(dropdown, true); // Ikon berubah saat dropdown dibuka
-
-                    // Dapatkan key dari data-bs-target
-                    const key = target.replace('#details', '');
-
-                    // Tampilkan tabel pelanggaran secara otomatis saat dropdown dibuka
-                    showTable(`pelanggaranTable${key}`, `pelanggaranBox${key}`, `perbuatanBaikBox${key}`);
-                  });
-
-                  collapseElement.addEventListener('hide.bs.collapse', function() {
-                    toggleDropdownIcon(dropdown, false); // Ikon kembali saat dropdown ditutup
-                  });
-                });
-
-                // Pastikan ikon berubah jika dropdown dalam keadaan terbuka saat pertama dimuat
-                document.querySelectorAll('.collapse.show').forEach(function(collapse) {
-                  const key = collapse.id.replace('details', '');
-                  const dropdown = document.querySelector(`[data-bs-target="#details${key}"]`);
-                  if (dropdown) {
-                    toggleDropdownIcon(dropdown, true);
-                  }
-                  // Tampilkan tabel pelanggaran secara otomatis jika sudah terbuka
+                  // Tampilkan tabel pelanggaran secara otomatis saat dropdown dibuka
                   showTable(`pelanggaranTable${key}`, `pelanggaranBox${key}`, `perbuatanBaikBox${key}`);
+
+                  // Tambahkan animasi fade-in saat tabel muncul
+                  const table = document.getElementById(`pelanggaranTable${key}`);
+                  if (table) {
+                    table.style.opacity = '0';
+                    table.style.transform = 'translateY(-10px)';
+                    setTimeout(() => {
+                      table.style.opacity = '1';
+                      table.style.transform = 'translateY(0)';
+                    }, 150);
+                  }
                 });
 
-                // Tambahkan event listener untuk kotak Pelanggaran / Perbuatan Baik
-                document.querySelectorAll('.custom-box').forEach(function(box) {
-                  box.addEventListener('click', function() {
-                    const key = this.id.replace('pelanggaranBox', '').replace('perbuatanBaikBox', '');
-                    if (this.id.startsWith('pelanggaranBox')) {
-                      showTable(`pelanggaranTable${key}`, `pelanggaranBox${key}`, `perbuatanBaikBox${key}`);
-                    } else if (this.id.startsWith('perbuatanBaikBox')) {
-                      showTable(`perbuatanBaikTable${key}`, `perbuatanBaikBox${key}`, `pelanggaranBox${key}`);
-                    }
-                  });
+                // Event listener saat dropdown ditutup
+                collapseElement.addEventListener('hide.bs.collapse', function() {
+                  toggleDropdownIcon(dropdown, false); // Ikon kembali saat dropdown ditutup
+
+                  // Tambahkan animasi fade-out saat tabel menghilang
+                  const key = target.replace('#details', '');
+                  const table = document.getElementById(`pelanggaranTable${key}`);
+                  if (table) {
+                    table.style.opacity = '1';
+                    table.style.transform = 'translateY(0)';
+                    setTimeout(() => {
+                      table.style.opacity = '0';
+                      table.style.transform = 'translateY(-10px)';
+                    }, 100);
+                  }
                 });
               });
+
+              // Pastikan ikon berubah jika dropdown dalam keadaan terbuka saat pertama dimuat
+              document.querySelectorAll('.collapse.show').forEach(function(collapse) {
+                const key = collapse.id.replace('details', '');
+                const dropdown = document.querySelector(`[data-bs-target="#details${key}"]`);
+                if (dropdown) {
+                  toggleDropdownIcon(dropdown, true);
+                }
+                showTable(`pelanggaranTable${key}`, `pelanggaranBox${key}`, `perbuatanBaikBox${key}`);
+              });
+
+              // Tambahkan event listener untuk kotak Pelanggaran / Perbuatan Baik
+              document.querySelectorAll('.custom-box').forEach(function(box) {
+                box.addEventListener('click', function() {
+                  const key = this.id.replace('pelanggaranBox', '').replace('perbuatanBaikBox', '');
+                  if (this.id.startsWith('pelanggaranBox')) {
+                    showTable(`pelanggaranTable${key}`, `pelanggaranBox${key}`, `perbuatanBaikBox${key}`);
+                  } else if (this.id.startsWith('perbuatanBaikBox')) {
+                    showTable(`perbuatanBaikTable${key}`, `perbuatanBaikBox${key}`, `pelanggaranBox${key}`);
+                  }
+
+                  // Tambahkan animasi fade-in saat tabel muncul
+                  const activeTable = document.getElementById(this.id.startsWith('pelanggaranBox') ?
+                    `pelanggaranTable${key}` : `perbuatanBaikTable${key}`);
+                  if (activeTable) {
+                    activeTable.style.opacity = '0';
+                    activeTable.style.transform = 'translateY(-10px)';
+                    setTimeout(() => {
+                      activeTable.style.opacity = '1';
+                      activeTable.style.transform = 'translateY(0)';
+                    }, 150);
+                  }
+                });
+              });
+            });
+
+            // Fungsi untuk menampilkan tabel dan mengatur kotak aktif
+            function showTable(tableId, activeBoxId, inactiveBoxId) {
+              const currentDropdown = document.getElementById(activeBoxId).closest('.collapse');
+
+              // Sembunyikan semua tabel di dalam dropdown yang sedang aktif
+              currentDropdown.querySelectorAll('[id^="pelanggaranTable"], [id^="perbuatanBaikTable"]').forEach(function(
+                table) {
+                table.style.display = 'none';
+              });
+
+              // Tampilkan tabel yang dipilih di dalam dropdown yang sedang aktif
+              if (tableId) {
+                document.getElementById(tableId).style.display = 'block';
+              }
+
+              // Tambahkan kelas 'active' ke kotak yang dipilih dan hapus dari kotak lain
+              if (activeBoxId) {
+                document.getElementById(activeBoxId).classList.add('active');
+              }
+              if (inactiveBoxId) {
+                document.getElementById(inactiveBoxId).classList.remove('active');
+              }
+            }
+
+            // Fungsi untuk mengubah ikon dropdown
+            function toggleDropdownIcon(element, isOpen) {
+              const icon = element.querySelector('i');
+              if (isOpen) {
+                icon.classList.remove('fa-chevron-left');
+                icon.classList.add('fa-chevron-down');
+              } else {
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-left');
+              }
+            }
             </script>
+
+
           </div>
         </td>
       </tr>
