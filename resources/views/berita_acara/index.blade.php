@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="container">
-        <h1>Riwayat Berita Acara</h1>
+        <h1>Berita Acara</h1>
         @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
@@ -10,9 +10,10 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Judul</th>
-                    <th>Tanggal</th>
-                    <th>Aksi</th>
+                    <th>NIM</th>
+                    <th>Nama</th>
+                    <th>Status Kehadiran</th>
+                    <th>Keterangan</th>
                 </tr>
             </thead>
             <tbody>
