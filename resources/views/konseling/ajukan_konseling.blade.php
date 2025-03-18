@@ -27,12 +27,17 @@
             @csrf
             <div class="col-md-6">
                 <div class="mb-2 row">
-                    <label class="col-sm-2 col-form-label fw-bold">Nama</label>
-                    <div class="col-sm-9">
-                        <input type="text" class="form-control" id="keyword" name="keyword" 
-                               value="{{ $keyword ?? '' }}" placeholder="Masukkan nama mahasiswa" required>
-                    </div>
-            </div>
+                <label class="col-sm-2 col-form-label fw-bold">NIM</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" id="nim" name="nim" value="{{ request('nim') }}">
+                </div>
+                </div>
+                <div class="mb-2 row">
+                <label class="col-sm-2 col-form-label fw-bold">Nama</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" id="nama" name="nama" value="{{ request('nama') }}">
+                </div>
+                </div>
             </div>
             </br>
             {{-- Tombol --}}

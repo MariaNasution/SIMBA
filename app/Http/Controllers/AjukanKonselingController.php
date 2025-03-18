@@ -17,57 +17,65 @@ class AjukanKonselingController extends Controller
     }
 
     public function cariMahasiswa(Request $request)
-    {
-        $nama = $request['keyword'];
-        $apiToken = session('api_token');
+{
+    $nim = $request->input('nim');
+    $nama = $request->input('nama');
+    $apiToken = session('api_token');
 
+    if (!$apiToken) {
+        return redirect()->back()->withErrors(['error' => 'API token tidak tersedia']);
+    }
 
-        if (!$apiToken) {
-            return redirect()->back()->withErrors(['error' => 'API token tidak tersedia']);
+    try {
+        Log::info('Mengambil data mahasiswa dari API', ['nim' => $nim, 'nama' => $nama]);
+
+        // Prepare query parameters
+        $queryParams = [];
+        if (!empty($nim)) {
+            $queryParams['nim'] = $nim;
+        }
+        if (!empty($nama)) {
+            $queryParams['nama'] = $nama;
         }
 
-        try {
-            Log::info('Mengambil data mahasiswa dari API dengan filter nama', ['nama' => $nama]);
+        // If both are empty, redirect back with error
+        if (empty($queryParams)) {
+            return redirect()->back()->withErrors(['error' => 'Mohon masukkan NIM atau Nama untuk pencarian']);
+        }
 
-            // Get student data from API with name filter
-            $response = Http::withToken($apiToken)
-                ->withOptions(['verify' => false])
-                ->get('https://cis-dev.del.ac.id/api/library-api/mahasiswa', [
-                    'nama' => $nama,
-                ]);
-            // dd($response->json());
+        // Get student data from API with filters
+        $response = Http::withToken($apiToken)
+            ->withOptions(['verify' => false])
+            ->get('https://cis-dev.del.ac.id/api/library-api/mahasiswa', $queryParams);
 
-            if ($response->successful()) {
-                $hasil = $response->json();
-                $daftarMahasiswa = [];
+        if ($response->successful()) {
+            $hasil = $response->json();
+            $daftarMahasiswa = [];
 
-                if (!empty($hasil['data']['mahasiswa'])) {
-                    Log::info('Data mahasiswa ditemukan', ['data' => $hasil['data']]); // Log untuk debug
+            if (!empty($hasil['data']['mahasiswa'])) {
+                Log::info('Data mahasiswa ditemukan', ['jumlah' => count($hasil['data']['mahasiswa'])]);
 
-                    foreach ($hasil['data']['mahasiswa'] as $mahasiswa) {
-                        $daftarMahasiswa[] = [
-                            'nim' => $mahasiswa['nim'] ?? 'N/A',
-                            'nama' => $mahasiswa['nama'] ?? '',
-                            'tahun_masuk' => $mahasiswa['angkatan'] ?? '',
-                            'prodi' => $mahasiswa['prodi_name'] ?? '',
-                        ];
-                    }
-
-
-
-                } else {
-                    Log::warning('Tidak ada data mahasiswa ditemukan');
+                foreach ($hasil['data']['mahasiswa'] as $mahasiswa) {
+                    $daftarMahasiswa[] = [
+                        'nim' => $mahasiswa['nim'] ?? 'N/A',
+                        'nama' => $mahasiswa['nama'] ?? '',
+                        'tahun_masuk' => $mahasiswa['angkatan'] ?? '',
+                        'prodi' => $mahasiswa['prodi_name'] ?? '',
+                    ];
                 }
-
-                return view('konseling.ajukan_konseling', compact('daftarMahasiswa', 'nama'));
+            } else {
+                Log::warning('Tidak ada data mahasiswa ditemukan');
             }
 
-            return redirect()->back()->withErrors(['error' => 'Gagal mengambil data mahasiswa dari API.']);
-        } catch (Exception $e) {
-            Log::error('Exception terjadi:', ['message' => $e->getMessage()]);
-            return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            return view('konseling.ajukan_konseling', compact('daftarMahasiswa', 'nim', 'nama'));
         }
+
+        return redirect()->back()->withErrors(['error' => 'Gagal mengambil data mahasiswa dari API.']);
+    } catch (Exception $e) {
+        Log::error('Exception terjadi:', ['message' => $e->getMessage()]);
+        return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
     }
+}
 
     public function pilihMahasiswa(Request $request)
     {
