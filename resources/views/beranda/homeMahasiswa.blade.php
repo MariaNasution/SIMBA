@@ -18,10 +18,10 @@
             <ul class="dropdown-menu" aria-labelledby="notificationDropdown">
                 <li><h6 class="dropdown-header">Notifications</h6></li>
                 <!-- Dynamic Perwalian Notifications -->
-                @forelse ($notifications as $notification)
+                @forelse ($dosenNotifications as $notification)
                     <li>
                         <a class="dropdown-item" href="#">
-                            {{ $notification->Pesan }} by Dosen Nama: {{ $notification->perwalian->nama ?? 'Unknown' }}
+                            {{ $notification->Pesan }} by Dosen Nama: {{ $notification->nama ?? 'Unknown' }}
                         </a>
                     </li>
                 @empty

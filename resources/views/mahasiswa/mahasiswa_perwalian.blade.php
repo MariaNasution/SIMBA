@@ -12,7 +12,7 @@
         <a href="#" class="text-decoration-none" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="fas fa-bell fs-5 cursor-pointer" title="Notifications"></i>
             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                {{ $notificationCount }} <!-- Dynamic notification count -->
+                {{ $notificationCount ?? 0 }} <!-- Dynamic notification count with fallback -->
                 <span class="visually-hidden">unread notifications</span>
             </span>
         </a>
@@ -22,7 +22,7 @@
             @forelse ($notifications as $notification)
                 <li>
                     <a class="dropdown-item" href="#">
-                        {{ $notification->Pesan }} by Dosen Nama: {{ $notification->perwalian->nama ?? 'Unknown' }}
+                        {{ $notification->Pesan ?? 'No message' }} by Dosen Nama: {{ $notification->perwalian->dosen->nama ?? 'Unknown Dosen' }}
                     </a>
                 </li>
             @empty
@@ -31,17 +31,26 @@
         </ul>
     </div>
     <!-- Logout Button -->
-    <a href="#" onclick="confirmLogout()">
+    <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
         <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
     </a>
+    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+        @csrf
+    </form>
 </div>
 
-<strong class="dosen_wali"> Anak wali dari Herimanto S.kom </strong>
+<strong class="dosen_wali">
+    Anak wali dari {{ $dosenNotifications->first()->nama ?? 'Unknown Dosen' }}
+</strong>
 
-<!-- New box for date and status -->
 <div class="status-box">
-    <p><strong>Hari:</strong> Sabtu, 15 Februari 2025</p>
-    <p><strong>Status:</strong> <span class="status-hadir">Hadir</span></p>
+    @if($perwalian)
+        <p><strong>Hari:</strong> {{ \Carbon\Carbon::parse($perwalian->Tanggal)->translatedFormat('l, d F Y') }}</p>
+        <p><strong>Status:</strong> <span class="status-{{ strtolower($perwalian->Status) }}">{{ $perwalian->Status }}</span></p>
+    @else
+        <p><strong>Hari:</strong> Tidak tersedia</p>
+        <p><strong>Status:</strong> <span class="status-unknown">Tidak diketahui</span></p>
+    @endif
 </div>
 
 <style>
@@ -68,7 +77,7 @@
         margin-bottom: 10px;
     }
 
-    .status-hadir {
+    .status-scheduled {
         background-color: #28a745; /* Green background for "Hadir" */
         color: white; /* White text */
         padding: 2px 8px; /* Padding for the status label */

@@ -10,7 +10,7 @@ class Absensi extends Model
 {
     protected $table = 'absensi'; 
     protected $primaryKey = 'ID_Absensi'; 
-    public $incrementing = false; // Disable auto-increment
+    public $incrementing = true; // Disable auto-increment
 
     protected $fillable = ['ID_Absensi', 'Kelas'];
 

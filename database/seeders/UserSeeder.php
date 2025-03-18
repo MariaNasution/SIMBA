@@ -163,6 +163,13 @@ class UserSeeder extends Seeder
             '12IF2','12IF2'
         ];
 
+        $names = [
+            'Bungaran Martua Pakpahan', 'Hans Mayson Pranajaya Situmeang', 
+            'Rafelli Simangunsong', 'Sophian Kalam Nainggolan', 'Jhonatan Edward Sitorus',
+            'Gunado Sirega', 'Fori Okto Pakpahan', 'BINTANG LBN RAJA',
+            'Hotmangasi Manurung', 'Rahmad Joko Susilo Situmorang'
+        ];
+        // array for dosen 
         $nips = [
             'dosen', '0308190348', '0311020009', '0309020008'
            
@@ -170,6 +177,10 @@ class UserSeeder extends Seeder
 
         $dosenNames = [
             'Dosen', 'Iustisia Natalia Simbolon, S.Kom., M.T.', 'Dr. Arlinta Christy Barus, ST., M.InfoTech.', 'Dr. Johannes Harungguan Sianipar, S.T., M.T.'
+        ];
+
+        $dosenClasses = [
+            '12IF2', '12IF2', '14IF1', '12IF1',
         ];
         // Counter for assigning NIMs
         $nipIndex = 0;
@@ -201,6 +212,7 @@ class UserSeeder extends Seeder
                     DB::table('mahasiswa')->insert([
                         'username' => $user['username'],
                         'nim' => $nims[$nimIndex], // Assign unique NIM
+                        'nama' => $names[$nimIndex],
                         'kelas' => $kelas[$nimIndex],
                         'created_at' => now(),
                         'updated_at' => now(),
@@ -216,8 +228,19 @@ class UserSeeder extends Seeder
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
+
+                    DB::table('dosen_wali')->insert([
+                        'username' => $user['username'],
+                        'kelas' => $dosenClasses[$nipIndex],
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                    
+
                     $nipIndex++;
                     break;
+
+                    
 
                 case 'keasramaan':
                     DB::table('keasramaan')->insert([

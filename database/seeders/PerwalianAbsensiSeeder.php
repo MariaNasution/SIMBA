@@ -18,27 +18,27 @@ class PerwalianAbsensiSeeder extends Seeder
         // Disable foreign key checks to avoid constraint issues
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
-        // Truncate the perwalian and absensi tables to start fresh
+        // Truncate the perwalian, absensi, and notifikasi tables to start fresh
         DB::table('perwalian')->truncate();
         DB::table('absensi')->truncate();
+        DB::table('notifikasi')->truncate();
 
         // Re-enable foreign key checks
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-        // Seed Perwalian and Absensi data
+        // Seed Perwalian, Absensi, and Notifikasi data
         $this->seedPerwalianAndAbsensi();
     }
 
     /**
-     * Seed Perwalian and Absensi tables.
+     * Seed Perwalian, Absensi, and Notifikasi tables.
      */
     private function seedPerwalianAndAbsensi()
     {
         // Fetch all mahasiswa records
-        $mahasiswa = DB::table('mahasiswa')->get();
-
+        $mahasiswas = DB::table('mahasiswa')->get();
         // Group mahasiswa by kelas
-        $kelasGroups = $mahasiswa->groupBy('kelas');
+        $kelasGroups = $mahasiswas->groupBy('kelas');
 
         // Fetch the specific dosen by nip
         $dosen = DB::table('dosen')->where('nip', '0308190348')->first();
@@ -50,16 +50,16 @@ class PerwalianAbsensiSeeder extends Seeder
         // Define possible statuses for Perwalian and statusKehadiran for Mahasiswa
         $perwalianStatuses = ['Scheduled', 'Completed', 'Canceled'];
         $kehadiranStatuses = ['Hadir', 'Tidak Hadir', 'Izin'];
+        $notificationMessages = [
+            'Reminder: Your perwalian session is scheduled.',
+            'Update: Perwalian status has changed.',
+            'Notification: Please attend your perwalian.',
+        ];
 
-        // Counter for assigning Perwalian and Absensi IDs
-        $perwalianCounter = 1;
-
-        // Create one Perwalian and Absensi record per kelas
+        // Create one Perwalian, Absensi, and related Notifikasi records per kelas
         foreach ($kelasGroups as $kelas => $students) {
             // Create a Perwalian record for this kelas
-            $perwalianId = $perwalianCounter;
             DB::table('perwalian')->insert([
-                'ID_Perwalian' => $perwalianId,
                 'ID_Dosen_Wali' => $idDosenWali, // Use the specific dosen's nip
                 'Status' => $perwalianStatuses[array_rand($perwalianStatuses)], // Random status
                 'Tanggal' => Carbon::now()->subDays(rand(1, 30))->format('Y-m-d'), // Random date within the last 30 days
@@ -69,25 +69,37 @@ class PerwalianAbsensiSeeder extends Seeder
                 'updated_at' => now(),
             ]);
 
-            // Create an Absensi record (no ID_Perwalian reference)
-            $idAbsensi = $perwalianCounter; // Use integer for ID_Absensi
+            // Create an Absensi record
             DB::table('absensi')->insert([
-                'ID_Absensi' => $idAbsensi,
                 'Kelas' => $kelas, // Store the kelas in Absensi
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+
+            // Get the last inserted Perwalian and Absensi IDs
+            $perwalianId = DB::getPdo()->lastInsertId();
+            $absensiId = DB::getPdo()->lastInsertId();
 
             // Update all mahasiswa in this kelas to link to the Perwalian and Absensi
             DB::table('mahasiswa')
                 ->where('kelas', $kelas)
                 ->update([
                     'ID_Perwalian' => $perwalianId,
-                    'ID_Absensi' => $idAbsensi,
+                    'ID_Absensi' => $absensiId,
                     'statusKehadiran' => $kehadiranStatuses[array_rand($kehadiranStatuses)], // Random statusKehadiran
                 ]);
 
-            $perwalianCounter++;
+            // Create a notification for each mahasiswa in this kelas
+            foreach ($mahasiswas as $mahasiswa) {
+                DB::table('notifikasi')->insert([
+                    'Pesan' => $notificationMessages[array_rand($notificationMessages)], // Random message
+                    'nim' => $mahasiswa->nim,
+                    'Id_Perwalian' => $perwalianId,
+                    'nama' => $mahasiswa->nama, // Use the student's nama
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
         }
     }
 }

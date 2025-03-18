@@ -8,7 +8,7 @@ class Notifikasi extends Model
 {
     protected $table = 'notifikasi'; // Specify the table name
     protected $primaryKey = 'ID_Notifikasi'; // Set primary key
-    public $incrementing = false; // Disable auto-increment (if it's not an integer)
+    public $incrementing = true; // Disable auto-increment (if it's not an integer)
 
     protected $fillable = ['ID_Notifikasi', 'Pesan', 'nim', 'Id_Perwalian', 'nama'];
 
