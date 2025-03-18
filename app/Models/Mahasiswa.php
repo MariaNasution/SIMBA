@@ -11,7 +11,7 @@ class Mahasiswa extends Model
     protected $primaryKey = 'username'; // Set primary key
     public $incrementing = false; // Disable auto-increment
 
-    protected $fillable = ['nim', 'username', 'nama', 'kelas', 'ID_Dosen', 'ID_Perwalian'];
+    protected $fillable = ['nim', 'username', 'ID_Dosen', 'ID_Perwalian',  'ID_Absensi', 'nama', 'kelas', 'statusKehadiran'];
 
     public function user()
     {
@@ -26,6 +26,11 @@ class Mahasiswa extends Model
     public function perwalian()
     {
         return $this->belongsTo(Perwalian::class, 'ID_Perwalian', 'ID_Perwalian'); // Relationship to Perwalian model
+    }
+
+    public function absensi()
+    {
+        return $this->belongsTo(Absensi::class, 'ID_Absensi', 'ID_Absensi'); // Relationship to Perwalian model
     }
 
     public function notifikasi()

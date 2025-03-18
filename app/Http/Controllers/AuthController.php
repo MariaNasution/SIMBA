@@ -25,7 +25,7 @@ class AuthController extends Controller
                         'username' => 'required|string',
                         'password' => 'required|string',
                 ]);
-               
+
 
 
                 // Find the user by username
@@ -45,7 +45,6 @@ class AuthController extends Controller
                         Log::info('Login berhasil untuk user:', ['username' => $user->username, 'role' => $user->role]);
 
                         try {
-                               
 
 
                                 // Call external API for authentication
@@ -70,8 +69,8 @@ class AuthController extends Controller
 
                                 $data = json_decode($body, true);
                                 Log::info('Respons API setelah diuraikan:', ['parsed_response' => $data]);
-
                                 if ($data && isset($data['result']) && $data['result'] === true) {
+                                // if (true) {
                                         // Fetch nim based on user role
                                         $nim = null;
                                         if ($user->role === 'mahasiswa') {
@@ -82,17 +81,21 @@ class AuthController extends Controller
                                             $nim = $user->orangTua?->nim;
                                         }
                                     
-                                        // Store API token and user data in the session
+
+                                                // Store API token and user data in the session
                                         session([
-                                            'api_token' => $data['token'],
-                                            'user_api'  => $data['user'],
-                                            'user'      => [
-                                                'username' => $user->username,
-                                                'role'     => $user->role,
-                                                'nim'      => $nim, // Now correctly handles both roles
-                                            ],
-                                        ]);
-                                        Log::info('Token API diterima:', ['token' => $data['token']]);
+                                                'api_token' => $data['token'],
+                                                'user_api'  => ' ',
+                                                'user'      => [
+                                                    'username' => $user->username,
+                                                    'role'     => $user->role,
+                                                    'nim'      => $nim, // Now correctly handles both roles
+                                                ],
+                                            ]);
+                                                
+                                        
+                                        
+                                        // Log::info('Token API diterima:', ['token' => $data['token']]);
                                         // Redirect based on the user's role
                                         switch ($user->role) {
                                                 case 'mahasiswa':
@@ -100,8 +103,8 @@ class AuthController extends Controller
                                                         return redirect()->route('beranda')->with('success', 'Login sebagai mahasiswa berhasil!');
 
                                                 case 'dosen':
-                                                        Log::info('Redirecting to dosen route...');
 
+                                                        Log::info('Redirecting to dosen route...');
                                                         return redirect()->route('dosen')->with('success', 'Login sebagai dosen berhasil!');
 
                                                 case 'keasramaan':

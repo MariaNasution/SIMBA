@@ -13,6 +13,7 @@ class MahasiswaHomeController extends Controller
 {
     public function index()
     {
+
         // Get the authenticated user from session
         $user = session('user'); // Matches your session-based auth
 
@@ -31,7 +32,6 @@ class MahasiswaHomeController extends Controller
         $nim = $mahasiswa->nim;
 
         $apiToken = session('api_token');
-
         try {
             $studentResponse = Http::withToken($apiToken)
                 ->withOptions(['verify' => false])
@@ -117,7 +117,6 @@ class MahasiswaHomeController extends Controller
                     'notificationCount'
                 ));
             }
-
             Log::error('Gagal mengambil data API', ['response' => $response->body()]);
             return redirect()->route('beranda')->withErrors(['error' => 'Gagal mengambil data kemajuan studi.']);
         } catch (\Exception $e) {

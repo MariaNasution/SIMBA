@@ -88,6 +88,7 @@ class SetPerwalianController extends Controller
                 'ID_Dosen_Wali' => $user->nip,
                 'Tanggal' => Carbon::parse($validatedData['selectedDate'])->format('Y-m-d'),
                 'Status' => 'ongoing',
+                'nama' =>  $user->nama,
             ]);
 
             if (!$perwalian) {
@@ -102,6 +103,7 @@ class SetPerwalianController extends Controller
                 'Pesan' => "Perwalian scheduled for " . $validatedData['selectedDate'],
                 'NIM' => $nim,
                 'Id_Perwalian' => $perwalian->getKey(),
+                'nama' => $user->nama,
             ]);
 
             Log::info('Perwalian date set for: ' . $validatedData['selectedDate'] . ' by dosen NIP: ' . $user->nip);

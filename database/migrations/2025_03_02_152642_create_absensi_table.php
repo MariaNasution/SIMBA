@@ -11,8 +11,7 @@ class CreateAbsensiTable extends Migration
     {
         Schema::create('absensi', function (Blueprint $table) {
             $table->id('ID_Absensi')->primary(); // Auto-incrementing bigInteger primary key for attendance record
-            $table->foreignIdFor(Perwalian::class, 'ID_Perwalian')->nullable(); // Foreign key to Perwalian, renamed to 'ID_Perwalian'
-            $table->string('SatusKehadiran')->default('hadir'); // Attendance status (e.g., 'hadir', 'tidak hadir'), default to 'hadir'
+            $table->string('Kelas'); // Attendance status (e.g., 'hadir', 'tidak hadir'), default to 'hadir'
             $table->timestamps();
 
             // No need for a manual foreign key constraint for ID_Perwalian; constrained() handles it

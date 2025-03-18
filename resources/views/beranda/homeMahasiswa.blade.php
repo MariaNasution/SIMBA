@@ -21,7 +21,7 @@
                 @forelse ($notifications as $notification)
                     <li>
                         <a class="dropdown-item" href="#">
-                            {{ $notification->Pesan }} by Dosen NIP: {{ $notification->perwalian->ID_Dosen_Wali ?? 'Unknown' }}
+                            {{ $notification->Pesan }} by Dosen Nama: {{ $notification->perwalian->nama ?? 'Unknown' }}
                         </a>
                     </li>
                 @empty

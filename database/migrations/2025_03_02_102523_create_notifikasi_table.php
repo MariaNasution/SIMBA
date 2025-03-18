@@ -14,6 +14,7 @@ class CreateNotifikasiTable extends Migration
             $table->id('ID_Notifikasi')->primary(); // Unique notification ID (auto-incrementing bigInteger)
             $table->text('Pesan'); // Notification message
             $table->string('NIM')->nullable(); // Student ID (foreign key to Mahasiswa), string type
+            $table->string('nama');
             $table->foreignIdFor(Perwalian::class, 'Id_Perwalian')->nullable(); // Foreign key to Perwalian, renamed to 'Id_Perwalian'
             $table->timestamps();
 

@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Schema;
 use App\Models\User; // Import User model
 use App\Models\Dosen; // Import Dosen model
 use App\Models\Perwalian; // Import Perwalian model
+use App\Models\Absensi; // Import Dosen model
+
 
 class CreateMahasiswaTable extends Migration
 {
@@ -14,10 +16,13 @@ class CreateMahasiswaTable extends Migration
         Schema::create('mahasiswa', function (Blueprint $table) {
             $table->string('nim', 8)->primary(); // Primary key, string type (e.g., 11S22010), length 8
             $table->string('username')->nullable(); // Foreign key to users table, can be null
-            $table->string('nama') ->nullable(); // Student name
-            $table->string('kelas') ->nullable(); // Class name
             $table->foreignIdFor(Dosen::class, 'ID_Dosen')->nullable(); // Foreign key to Dosen, renamed to 'ID_Dosen'
             $table->foreignIdFor(Perwalian::class, 'ID_Perwalian')->nullable(); // Foreign key to Perwalian, renamed to 'ID_Perwalian'
+            $table->foreignIdFor(Absensi::class, 'ID_Absensi')->nullable(); // Foreign key to Perwalian, renamed to 'ID_Perwalian'
+            $table->string('nama') ->nullable(); // Student name
+            $table->string('kelas') ->nullable(); // Class name
+            $table->string('statusKehadiran')->default('hadir');
+            
             $table->timestamps();
 
             // Define foreign key constraint for username manually (since it's a string)

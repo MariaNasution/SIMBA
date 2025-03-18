@@ -12,12 +12,9 @@ class Absensi extends Model
     protected $primaryKey = 'ID_Absensi'; 
     public $incrementing = false; // Disable auto-increment
 
-    protected $fillable = ['ID_Absensi', 'ID_Perwalian', 'SatusKehadiran'];
+    protected $fillable = ['ID_Absensi', 'Kelas'];
 
-    public function perwalian()
-    {
-        return $this->belongsTo(Perwalian::class, 'ID_Perwalian', 'ID_Perwalian'); // Relationship to Perwalian model
-    }
+    
 
 
 }

@@ -11,7 +11,7 @@ class Perwalian extends Model
     public $incrementing = true; 
     protected $keyType = 'int'; // Ensure the key type is an integer (default for id())
 
-    protected $fillable = ['ID_Perwalian', 'ID_Dosen_Wali', 'Status', 'Tanggal'];
+    protected $fillable = ['ID_Perwalian', 'ID_Dosen_Wali', 'Status', 'Tanggal', 'nama', 'kelas'];
 
     public function dosenWali()
     {

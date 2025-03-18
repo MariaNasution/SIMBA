@@ -128,7 +128,7 @@ class UserSeeder extends Seeder
             ],
 
             [
-                'username' => '0309020008',
+                'username' => '0311020009',
                 'password' => Hash::make('dosen'),
                 'role' => 'dosen',
                 'anak_wali' => null, // Dosen as wali, no anak wali
@@ -157,9 +157,19 @@ class UserSeeder extends Seeder
             '11S19034', '11S19035'
         ];
 
+        $kelas = [
+            '12IF1','12IF1','12IF1','12IF1',
+            '12IF1','12IF2','12IF2','12IF2',
+            '12IF2','12IF2'
+        ];
+
         $nips = [
             'dosen', '0308190348', '0311020009', '0309020008'
            
+        ];
+
+        $dosenNames = [
+            'Dosen', 'Iustisia Natalia Simbolon, S.Kom., M.T.', 'Dr. Arlinta Christy Barus, ST., M.InfoTech.', 'Dr. Johannes Harungguan Sianipar, S.T., M.T.'
         ];
         // Counter for assigning NIMs
         $nipIndex = 0;
@@ -191,6 +201,7 @@ class UserSeeder extends Seeder
                     DB::table('mahasiswa')->insert([
                         'username' => $user['username'],
                         'nim' => $nims[$nimIndex], // Assign unique NIM
+                        'kelas' => $kelas[$nimIndex],
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
@@ -201,6 +212,7 @@ class UserSeeder extends Seeder
                     DB::table('dosen')->insert([
                         'username' => $user['username'],
                         'nip' => $nips[$nipIndex], 
+                        'nama' => $dosenNames[$nipIndex],
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
