@@ -13,12 +13,12 @@
             </a>
         </div>
 
-        
-            {{-- Notifikasi Sukses/Error --}}
-            @if (session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
-            
+
+        {{-- Notifikasi Sukses/Error --}}
+        @if (session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+
         {{-- Judul --}}
         <h5 class="header-title text-primary mb-4">Mahasiswa Aktif TA 2024</h5>
 
@@ -29,10 +29,10 @@
                 <div class="mb-2 row">
                     <label class="col-sm-2 col-form-label fw-bold">Nama</label>
                     <div class="col-sm-9">
-                        <input type="text" class="form-control" id="keyword" name="keyword" 
-                               value="{{ $keyword ?? '' }}" placeholder="Masukkan nama mahasiswa" required>
+                        <input type="text" class="form-control" id="keyword" name="keyword" value="{{ $keyword ?? '' }}"
+                            placeholder="Masukkan nama mahasiswa" required>
                     </div>
-            </div>
+                </div>
             </div>
             </br>
             {{-- Tombol --}}
@@ -69,22 +69,22 @@
                     </thead>
                     <tbody>
                         @foreach($daftarMahasiswa as $mahasiswa)
-                        <tr>
-                            <td>{{ $mahasiswa['nim'] ?? '-' }}</td>
-                            <td>{{ $mahasiswa['nama'] ?? '-' }}</td>
-                            <td>{{ $mahasiswa['tahun_masuk'] ?? '-' }}</td>
-                            <td>{{ $mahasiswa['prodi'] ?? '-' }}</td>
-                            <td>
-                                <form action="{{ route('konseling.pilih') }}" method="GET">
-                                    @csrf
-                                    <input type="hidden" name="nim" value="{{ $mahasiswa['nim'] }}">
-                                    <input type="hidden" name="nama" value="{{ $mahasiswa['nama'] }}">
-                                    <input type="hidden" name="tahun_masuk" value="{{ $mahasiswa['tahun_masuk'] }}">
-                                    <input type="hidden" name="prodi" value="{{ $mahasiswa['prodi'] }}">
-                                    <button type="submit" class="btn btn-sm btn-primary">Pilih</button>
-                                </form>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td>{{ $mahasiswa['nim'] ?? '-' }}</td>
+                                <td>{{ $mahasiswa['nama'] ?? '-' }}</td>
+                                <td>{{ $mahasiswa['tahun_masuk'] ?? '-' }}</td>
+                                <td>{{ $mahasiswa['prodi'] ?? '-' }}</td>
+                                <td>
+                                    <form action="{{ route('konseling.pilih') }}" method="GET">
+                                        @csrf
+                                        <input type="hidden" name="nim" value="{{ $mahasiswa['nim'] }}">
+                                        <input type="hidden" name="nama" value="{{ $mahasiswa['nama'] }}">
+                                        <input type="hidden" name="tahun_masuk" value="{{ $mahasiswa['tahun_masuk'] }}">
+                                        <input type="hidden" name="prodi" value="{{ $mahasiswa['prodi'] }}">
+                                        <button type="submit" class="btn btn-sm btn-primary">Pilih</button>
+                                    </form>
+                                </td>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -132,7 +132,7 @@
                     <label class="form-label text-start d-block">Waktu Konseling</label>
                     <div class="input-group">
                         <input type="datetime-local" class="form-control" name="tanggal_pengajuan" id="tanggal_pengajuan"
-                            required>
+                            min="{{ now()->format('Y-m-d\TH:i') }}" required>
                         <button type="button" class="btn btn-danger btn-sm" onclick="resetTanggal()">
                             <i class="fas fa-times"></i>
                         </button>
@@ -151,22 +151,6 @@
     {{-- SweetAlert untuk Logout --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        function confirmLogout() {
-            Swal.fire({
-                title: 'Apakah anda yakin ingin keluar?',
-                text: "Anda akan keluar dari akun ini.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, keluar!',
-                cancelButtonText: 'Tidak',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = '{{ route('logout') }}';
-                }
-            });
-        }
-
         document.addEventListener('DOMContentLoaded', function () {
             // Fungsi reset untuk tombol Hapus
             const resetButton = document.getElementById('resetButton');
@@ -176,11 +160,33 @@
                 resetButton.addEventListener('click', function () {
                     // Reset form input
                     keywordInput.value = '';
-                    
+
                     // Fokus kembali ke input keyword
                     keywordInput.focus();
                 });
             }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const tanggalPengajuan = document.getElementById('tanggal_pengajuan');
+
+            function setMinDateTime() {
+                const now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); // Sesuaikan dengan zona waktu lokal
+
+                // Format datetime-local (YYYY-MM-DDTHH:MM)
+                const minDateTime = now.toISOString().slice(0, 16);
+                tanggalPengajuan.min = minDateTime;
+            }
+
+            setMinDateTime();
+
+            // Mencegah pengguna memilih waktu yang sudah lewat
+            tanggalPengajuan.addEventListener('input', function () {
+                if (tanggalPengajuan.value < tanggalPengajuan.min) {
+                    tanggalPengajuan.value = tanggalPengajuan.min;
+                }
+            });
         });
 
         function resetTanggal() {
