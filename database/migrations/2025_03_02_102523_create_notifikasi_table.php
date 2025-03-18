@@ -5,6 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use App\Models\Mahasiswa; // Import Mahasiswa model
 use App\Models\Perwalian; // Import Perwalian model
+use App\Models\Notifikasi; // Import Notifikasi model
 
 class CreateNotifikasiTable extends Migration
 {
@@ -15,6 +16,7 @@ class CreateNotifikasiTable extends Migration
             $table->text('Pesan'); // Notification message
             $table->string('NIM')->nullable(); // Student ID (foreign key to Mahasiswa), string type
             $table->foreignIdFor(Perwalian::class, 'Id_Perwalian')->nullable(); // Foreign key to Perwalian, renamed to 'Id_Perwalian'
+            $table->foreignIdFor(Notifikasi::class, 'Id_Konseling')->nullable(); // Foreign key to Konseling, renamed to 'Id_Konseling'
             $table->timestamps();
 
             // Define foreign key constraint for NIM manually (since it's a string)

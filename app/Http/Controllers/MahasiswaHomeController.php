@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use App\Models\Mahasiswa;
+use App\Models\Notifikasi;
 
 class MahasiswaHomeController extends Controller
 {
@@ -30,7 +31,11 @@ class MahasiswaHomeController extends Controller
             Log::error('No mahasiswa record found for user', ['username' => $user['username']]);
             return redirect()->route('login')->withErrors(['error' => 'Mahasiswa data not found.']);
         }
+
         $nim = $mahasiswa->nim;
+
+        // Ambil notifikasi untuk mahasiswa berdasarkan NIM
+        $notifications = Notifikasi::where('nim', $nim)->latest()->get();
 
         $apiToken = session('api_token');
 
@@ -56,7 +61,7 @@ class MahasiswaHomeController extends Controller
                 ->withOptions(['verify' => false])
                 ->asForm()
                 ->get('https://cis-dev.del.ac.id/api/library-api/get-penilaian', [
-                    
+
                     'nim' => $nim,
                 ]);
             Log::info('Respons API mentah:', ['body' => $response->body()]);
@@ -75,7 +80,7 @@ class MahasiswaHomeController extends Controller
 
                 $labels = [];
                 $values = [];
-                
+
                 foreach ($ipSemester as $semester => $details) {
                     // Tambahkan label dan nilai dengan placeholder jika ip_semester tidak valid
                     $labels[] = "TA {$details['ta']} - Semester {$details['sem']}";
@@ -89,7 +94,7 @@ class MahasiswaHomeController extends Controller
                 $akademik = Calendar::where('type', 'akademik')->latest()->first();
                 $bem = Calendar::where('type', 'bem')->latest()->first();
 
-                return view('beranda.homeMahasiswa', compact('labels', 'values', 'pengumuman', 'akademik', 'bem'));
+                return view('beranda.homeMahasiswa', compact('labels', 'values', 'pengumuman', 'akademik', 'bem', 'notifications'));
             }
 
             Log::error('Gagal mengambil data API', ['response' => $response->body()]);
