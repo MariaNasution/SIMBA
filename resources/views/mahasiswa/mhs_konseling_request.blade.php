@@ -59,14 +59,17 @@
 
       {{-- Waktu Konseling --}}
       <div class="mb-3 col-md-5">
-          <label class="form-label text-start">Waktu Konseling</label>
-          <div class="input-group">
-              <input type="datetime-local" class="form-control" name="tanggal_pengajuan" required>
-              <button type="button" class="btn btn-danger btn-sm" onclick="resetTanggal()" title="Hapus Waktu">
+            <label class="form-label text-start d-block">Waktu Konseling</label>
+                <div class="input-group">
+                <input type="datetime-local" class="form-control" name="tanggal_pengajuan" id="tanggal_pengajuan"
+                  min="{{ now()->format('Y-m-d\TH:i') }}" required>
+                <button type="button" class="btn btn-danger btn-sm" onclick="resetTanggal()">
                   <i class="fas fa-times"></i>
-              </button>
+                </button>
           </div>
       </div>
+
+      
 
       {{-- Keperluan Konseling --}}
       <div class="mb-3">
@@ -83,10 +86,65 @@
 
   @endif
 
-  <script>
-    function resetTanggal() {
-      document.getElementsByName('tanggal_pengajuan')[0].value = '';
-    }
-  </script>
+  {{-- SweetAlert untuk Logout --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmLogout() {
+            Swal.fire({
+                title: 'Apakah anda yakin ingin keluar?',
+                text: "Anda akan keluar dari akun ini.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, keluar!',
+                cancelButtonText: 'Tidak',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '{{ route('logout') }}';
+                }
+            });
+        }
 
-@endsection
+        document.addEventListener('DOMContentLoaded', function () {
+            // Fungsi reset untuk tombol Hapus
+            const resetButton = document.getElementById('resetButton');
+            const keywordInput = document.getElementById('keyword');
+
+            if (resetButton) {
+                resetButton.addEventListener('click', function () {
+                    // Reset form input
+                    keywordInput.value = '';
+                    
+                    // Fokus kembali ke input keyword
+                    keywordInput.focus();
+                });
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', function () {
+            const tanggalPengajuan = document.getElementById('tanggal_pengajuan');
+
+            function setMinDateTime() {
+                const now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); // Sesuaikan dengan zona waktu lokal
+
+                // Format datetime-local (YYYY-MM-DDTHH:MM)
+                const minDateTime = now.toISOString().slice(0, 16);
+                tanggalPengajuan.min = minDateTime;
+            }
+
+            setMinDateTime();
+
+            // Mencegah pengguna memilih waktu yang sudah lewat
+            tanggalPengajuan.addEventListener('input', function () {
+                if (tanggalPengajuan.value < tanggalPengajuan.min) {
+                    tanggalPengajuan.value = tanggalPengajuan.min;
+                }
+            });
+        });
+        
+        function resetTanggal() {
+            document.getElementById('tanggal_pengajuan').value = '';
+        }
+        </script>
+        @endsection
