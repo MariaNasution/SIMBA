@@ -2,28 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BeritaAcara;
 use Illuminate\Http\Request;
+use App\Models\BeritaAcara;
 use Illuminate\Support\Facades\Auth;
 
 class BeritaAcaraController extends Controller
 {
-    // Menampilkan daftar berita acara (riwayat)
     public function index()
     {
-
-        // $beritaAcaras = BeritaAcara::where('user_id', Auth::id())->latest()->get();
-        $beritaAcaras = BeritaAcara::All();
-        return view('berita_acara.index', compact('beritaAcaras'));
+        $berita_acaras = BeritaAcara::where('user_id', Auth::id())->get();
+        return view('perwalian.berita_acara', compact('berita_acaras'));
     }
 
-    // Menampilkan form untuk membuat berita acara baru
-    public function create()
-    {
-        return view('berita_acara.create');
-    }
-
-    // Menyimpan berita acara baru
     public function store(Request $request)
     {
         $request->validate([
@@ -39,13 +29,6 @@ class BeritaAcaraController extends Controller
             'user_id' => Auth::id(),
         ]);
 
-        return redirect()->route('berita_acara.index')->with('success', 'Berita Acara berhasil disimpan.');
-    }
-
-    // Menampilkan detail berita acara
-    public function show($id)
-    {
-        $beritaAcara = BeritaAcara::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
-        return view('berita_acara.show', compact('beritaAcara'));
+        return redirect()->route('berita.acara')->with('success', 'Berita acara berhasil disimpan!');
     }
 }

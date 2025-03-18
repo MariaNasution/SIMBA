@@ -13,7 +13,7 @@ class CreateBeritaAcaraTable extends Migration
             $table->string('judul'); // Judul berita acara
             $table->text('deskripsi'); // Isi berita acara
             $table->date('tanggal'); // Tanggal pelaksanaan
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Pengguna yang membuat (relasi ke tabel users)
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
