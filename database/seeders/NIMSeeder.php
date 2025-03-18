@@ -11,11 +11,11 @@ class NIMSeeder extends Seeder
   {
     DB::table('nim')->insert([
 
-      ['nim' => '11S20001', 'nama' => 'Samuel Adika Lumban Tobing'],
-      ['nim' => '11S20002', 'nama' => 'Yoel Ganda Aprilco Napitupulu'],
-      ['nim' => '11S20003', 'nama' => 'Reinhard Hottua S'],
-      ['nim' => '11S20004', 'nama' => 'Samuel Immanuel Sibuea'],
-      ['nim' => '11S20005', 'nama' => 'LASRIA SRI REZEKI RAJAGUKGUK'],
+      ['nim' => '11S20001'],
+      ['nim' => '11S20002'],
+      ['nim' => '11S20003'],
+      ['nim' => '11S20004'],
+      ['nim' => '11S20005'],
     ]);
   }
 }

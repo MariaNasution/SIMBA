@@ -13,7 +13,6 @@ return new class extends Migration {
     Schema::create('nim', function (Blueprint $table) {
       $table->id();
       $table->string('nim')->unique(); // Kolom untuk NIM
-      $table->string('nama')->nullable(); // Tambahkan kolom nama
       $table->timestamps();
     });
   }

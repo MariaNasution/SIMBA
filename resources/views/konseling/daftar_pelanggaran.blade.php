@@ -24,18 +24,23 @@
                 </tr>
             </thead>
             <tbody>
-                @if(isset($pelanggaranList) && count($pelanggaranList) > 0)
-                    @foreach($pelanggaranList as $index => $pelanggaran)
+                @if(isset($pelanggaranList) && count($pelanggaranList) > 0 )
+                    @foreach($pelanggaranList as $index => $dataMahasiswa)
                         <tr>
                             <td class="no-column">{{ $index + 1 }}</td>
-                            <td>{{ $pelanggaran['nim'] ?? '-' }}</td>
-                            <td>{{ $pelanggaran['nama'] ?? '-' }}</td>
-                            <td>{{ $pelanggaran['pelanggaran'] ?? '-' }}</td>
-                            <td>{{ $pelanggaran['tingkat'] ?? '-' }}</td>
+                            <td>{{ $dataMahasiswa['nim'] ?? '-' }}</td>
+                            <td>{{ $dataMahasiswa['nama'] ?? '-' }}</td>
+                            <td>{{ $dataMahasiswa['pelanggaran'] ?? '-' }}</td>
+                            <td>{{ $dataMahasiswa['tingkat'] ?? '-' }}</td>
                             <td>
-                                <a href="{{ route('konseling_lanjutan') }}" class="btn btn-custom-blue">
-                                    Ajukan Konseling
-                                </a>
+                                <form action="{{ route('konseling.pilih') }}" method="GET">
+                                    @csrf
+                                    <input type="hidden" name="nim" value="{{ $dataMahasiswa['nim'] }}">
+                                    <input type="hidden" name="nama" value="{{ $dataMahasiswa['nama'] }}">
+                                    <input type="hidden" name="tahun_masuk" value="{{ $dataMahasiswa['tahun_masuk'] }}">
+                                    <input type="hidden" name="prodi" value="{{ $dataMahasiswa['prodi'] }}">
+                                    <button type="submit" class="btn btn-sm btn-primary">Ajukan Konseling</button>
+                                </form>
                             </td>
                         </tr>
                     @endforeach

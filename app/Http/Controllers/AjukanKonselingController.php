@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use App\Models\RequestKonseling; 
+use App\Models\RequestKonseling;
 use Exception;
 
 class AjukanKonselingController extends Controller
@@ -18,9 +18,9 @@ class AjukanKonselingController extends Controller
 
     public function cariMahasiswa(Request $request)
     {
-        $nama = $request['keyword']; 
+        $nama = $request['keyword'];
         $apiToken = session('api_token');
-        
+
 
         if (!$apiToken) {
             return redirect()->back()->withErrors(['error' => 'API token tidak tersedia']);
@@ -33,9 +33,9 @@ class AjukanKonselingController extends Controller
             $response = Http::withToken($apiToken)
                 ->withOptions(['verify' => false])
                 ->get('https://cis-dev.del.ac.id/api/library-api/mahasiswa', [
-                    'nama' => $nama, 
+                    'nama' => $nama,
                 ]);
-                // dd($response->json());
+            // dd($response->json());
 
             if ($response->successful()) {
                 $hasil = $response->json();
@@ -43,7 +43,7 @@ class AjukanKonselingController extends Controller
 
                 if (!empty($hasil['data']['mahasiswa'])) {
                     Log::info('Data mahasiswa ditemukan', ['data' => $hasil['data']]); // Log untuk debug
-                
+
                     foreach ($hasil['data']['mahasiswa'] as $mahasiswa) {
                         $daftarMahasiswa[] = [
                             'nim' => $mahasiswa['nim'] ?? 'N/A',
@@ -52,13 +52,13 @@ class AjukanKonselingController extends Controller
                             'prodi' => $mahasiswa['prodi_name'] ?? '',
                         ];
                     }
-                 
 
-                    
+
+
                 } else {
                     Log::warning('Tidak ada data mahasiswa ditemukan');
                 }
-                
+
                 return view('konseling.ajukan_konseling', compact('daftarMahasiswa', 'nama'));
             }
 
@@ -88,19 +88,19 @@ class AjukanKonselingController extends Controller
             'tanggal_pengajuan' => 'required|date',
             'deskripsi_pengajuan' => 'nullable|string',
         ]);
-    
+
         try {
-            
+
             RequestKonseling::create([
                 'nim' => $request->input('nim'),
                 'nama_mahasiswa' => $request->input('nama'),
                 'tanggal_pengajuan' => $request->input('tanggal_pengajuan'),
-                'deskripsi_pengajuan' =>$request->deskripsi ?? '',
+                'deskripsi_pengajuan' => $request->deskripsi ?? '',
                 'status' => 'approved',
             ]);
-    
+
             return redirect()->route('konseling.index')->with('success', 'Berhasil mengajukan konseling');
-            
+
         } catch (Exception $e) {
             Log::error('Exception saat mengajukan konseling:', ['message' => $e->getMessage()]);
             return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
