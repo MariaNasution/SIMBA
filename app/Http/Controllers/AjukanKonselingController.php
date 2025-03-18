@@ -111,7 +111,7 @@ class AjukanKonselingController extends Controller
 
             // Buat notifikasi untuk mahasiswa terkait
             Notifikasi::create([
-                'Pesan' => "Pengajuan konseling Anda telah diterima pada " . $request->input('tanggal_pengajuan'),
+                'Pesan' => "Anda telah diajukan untuk mengadakan konseling pada " . $request->input('tanggal_pengajuan'),
                 'nim' => $request->input('nim'),
                 'Id_Konseling' => $konseling->id,
             ]);
