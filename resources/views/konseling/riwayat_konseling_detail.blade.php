@@ -6,7 +6,8 @@
     <div class="d-flex align-items-center mb-4 border-bottom-line">
         <h3 class="me-auto">
             <a href="{{ route('admin') }}"><i class="fas fa-history me-3"></i>Home</a> /
-            <a href="{{ route('riwayat.konseling') }}">Riwayat Konseling</a>
+            <a href="{{ route('riwayat.konseling') }}">Riwayat Konseling</a> /
+            <a href="#">Riwayat Konseling Detail</a>
         </h3>
         <a href="#" onclick="confirmLogout()">
             <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
