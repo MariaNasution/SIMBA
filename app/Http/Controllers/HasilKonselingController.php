@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\HasilKonseling; // Perbaiki Model
+use App\Models\HasilKonseling;
+use App\Models\RequestKonseling;
 use Illuminate\Support\Facades\Storage;
 
 class HasilKonselingController extends Controller
@@ -11,20 +12,22 @@ class HasilKonselingController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama' => 'required|string|max:255',
-            'nim' => 'required', // Sesuaikan dengan migration
-            'file' => 'required|file|mimes:pdf,doc,docx,png,jpg,jpeg|max:12000',
+            'request_konseling_id' => 'required|exists:request_konseling,id',
+            'file' => 'required|file|mimes:pdf,doc,docx,png,jpg,jpeg|max:60000',
             'keterangan' => 'nullable|string',
         ]);
 
-        // Simpan file ke storage
-        $filePath = $request->file('file')->store('konseling_files', 'public');
+        // Simpan file ke storage dalam folder 'konseling_files'
+        $file = $request->file('file');
+        $fileName = time() . '_' . $file->getClientOriginalName();
+        $filePath = $file->storeAs('konseling_files', $fileName, 'public');
 
         // Simpan ke database
         HasilKonseling::create([
-            'nama' => $request->nama,
-            'nim' => $request->nim,
-            'file' => $filePath,
+            'request_konseling_id' => $request->request_konseling_id,
+            'nama' => $request->nama,  // Pastikan nama dikirim
+            'nim' => $request->nim,    // Pastikan nim dikirim
+            'file' => $fileName,
             'keterangan' => $request->keterangan,
         ]);
 

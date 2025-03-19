@@ -106,8 +106,9 @@ Route::middleware(['auth.session', 'role:admin'])->group(function () {
         Route::get('/riwayat-konseling/cari', [RiwayatKonselingController::class, 'CariRiwayatMahasiswa'])->name('riwayat.konseling.cari');
         Route::get('/riwayat-konseling/{nim}', [RiwayatKonselingController::class, 'detail'])->name('riwayat.konseling.detail');
 
+        Route::get('/konseling-lanjutan/{nim}', [AdminController::class, 'detail'])->name('konseling.lanjutan.detail');
         Route::post('/konseling/lanjutan', [KonselingLanjutanController::class, 'store'])->name('konseling.lanjutan.store');
-
+        
     });
 });
 
