@@ -74,24 +74,5 @@
       <p class="text-center mt-4">Tidak ada data mahasiswa.</p>
     @endif
 
-    {{-- Logout Confirmation --}}
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-      function confirmLogout() {
-        Swal.fire({
-          title: 'Konfirmasi Keluar',
-          text: "Anda yakin ingin keluar?",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonText: 'Ya, Keluar',
-          cancelButtonText: 'Batal',
-          reverseButtons: true
-        }).then((result) => {
-          if (result.isConfirmed) {
-            window.location.href = '{{ route('logout') }}';
-          }
-        });
-      }
-    </script>
   </div>
 @endsection
