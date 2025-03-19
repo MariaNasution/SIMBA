@@ -20,7 +20,7 @@ class CreateNotifikasiTable extends Migration
             $table->timestamps();
 
             // Define foreign key constraint for NIM manually (since it's a string)
-            $table->foreign('NIM')->references('nim')->on('mahasiswa')->onDelete('cascade');
+            //$table->foreign('NIM')->references('nim')->on('mahasiswa')->onDelete('cascade');
         });
     }
 

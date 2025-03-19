@@ -18,7 +18,7 @@ class Notifikasi extends Model
      */
     public function mahasiswa()
     {
-        return $this->belongsTo(Mahasiswa::class, 'NIM', 'nim');
+        //return $this->belongsTo(Mahasiswa::class, 'NIM', 'nim');
     }
 
     /**
