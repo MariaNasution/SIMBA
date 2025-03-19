@@ -17,15 +17,17 @@ class HasilKonselingController extends Controller
             'keterangan' => 'nullable|string',
         ]);
 
-        // Simpan file ke storage
-        $filePath = $request->file('file')->store('konseling_files', 'public');
+        // Simpan file ke storage dalam folder 'konseling_files'
+        $file = $request->file('file');
+        $fileName = time() . '_' . $file->getClientOriginalName();
+        $filePath = $file->storeAs('konseling_files', $fileName, 'public');
 
         // Simpan ke database
         HasilKonseling::create([
             'request_konseling_id' => $request->request_konseling_id,
             'nama' => $request->nama,  // Pastikan nama dikirim
             'nim' => $request->nim,    // Pastikan nim dikirim
-            'file' => $filePath,
+            'file' => $fileName,
             'keterangan' => $request->keterangan,
         ]);
 
