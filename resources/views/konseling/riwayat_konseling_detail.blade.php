@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+
     {{-- Header dan Logout --}}
     <div class="d-flex align-items-center mb-4 border-bottom-line">
         <h3 class="me-auto">
@@ -15,9 +15,10 @@
     </div>
 
     {{-- Informasi Mahasiswa --}}
-    <div class="mb-4">
+    <div class="mb-4 text-start text-start">
         <p>{{ $nama }}</p>
         <p>NIM: {{ $nim }}</p>
+    
     </div>
 
     @if (session('success'))
@@ -27,7 +28,8 @@
     @endif
 
     {{-- Tabel Hasil Konseling --}}
-    <h5>Hasil Konseling:</h5>
+  
+    <h5 class="text-start">Hasil Konseling:</h5>
     @if ($hasilKonseling->isNotEmpty())
     <table class="table table-bordered">
         <thead>
@@ -72,5 +74,5 @@
     @else
     <p class="text-muted">Belum ada hasil konseling.</p>
     @endif
-</div>
+
 @endsection

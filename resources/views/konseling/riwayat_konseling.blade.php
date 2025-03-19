@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container">
+    
         {{-- Header dan Logout --}}
         <div class="d-flex align-items-center mb-4 border-bottom-line">
             <h3 class="me-auto">
@@ -14,7 +14,7 @@
         </div>
 
         {{-- Judul --}}
-        <h5 class="header-title text-primary mb-4">Mahasiswa Aktif TA 2024</h5>
+        <h5 class="header-title text-primary mb-4 text-start">Mahasiswa Aktif TA 2024</h5>
 
         {{-- Form Pencarian Mahasiswa --}}
         <form action="{{ route('riwayat.konseling.cari') }}" method="GET">
@@ -55,7 +55,7 @@
         {{-- Tabel Data Mahasiswa --}}
         @if ($hasilKonseling->isNotEmpty())
             <div class="mt-4">
-                <h4>Data Mahasiswa</h4>
+                <h4 class="text-start">Data Mahasiswa</h4>
                 <table class="table table-bordered table-striped">
                     <thead>
                         <tr>
@@ -84,5 +84,5 @@
             <div class="alert alert-info mt-3">Tidak ada data mahasiswa yang ditemukan.</div>
         @endif
 
-    </div>
+
 @endsection

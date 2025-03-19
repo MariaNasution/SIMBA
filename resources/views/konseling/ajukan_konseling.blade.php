@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container">
+    
         {{-- Header dan Logout --}}
         <div class="d-flex align-items-center mb-4 border-bottom-line">
             <h3 class="me-auto">
@@ -19,7 +19,7 @@
         @endif
 
         {{-- Judul --}}
-        <h5 class="header-title text-primary mb-4">Mahasiswa Aktif TA 2024</h5>
+        <h5 class="header-title text-primary mb-4 text-start">Mahasiswa Aktif TA 2024</h5>
 
         {{-- Form Pencarian Mahasiswa --}}
         <form action="{{ route('konseling.cari') }}" method="GET">
@@ -60,7 +60,7 @@
         {{-- Daftar Hasil Pencarian Mahasiswa --}}
         @if (!empty($daftarMahasiswa) && count($daftarMahasiswa) > 0)
             <div class="mt-4">
-                <h4>Hasil Pencarian Mahasiswa</h4>
+                <h4 class="text-start">Hasil Pencarian Mahasiswa</h4>
                 <table class="table table-bordered table-striped">
                     <thead>
                         <tr>
@@ -102,7 +102,7 @@
         {{-- Tampilkan data mahasiswa yang dipilih --}}
         @if (!empty($dataMahasiswa))
             <div class="mt-4">
-                <h4>Data Mahasiswa yang Dipilih</h4>
+                <h4 class="text-start">Data Mahasiswa yang Dipilih</h4>
                 <table class="table table-bordered table-striped">
                     <thead>
                         <tr>
@@ -150,7 +150,7 @@
                 </div>
             </form>
         @endif
-    </div>
+    
 
     {{-- SweetAlert untuk Logout --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
