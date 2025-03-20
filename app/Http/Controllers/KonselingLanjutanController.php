@@ -10,8 +10,6 @@ class KonselingLanjutanController extends Controller
 {
     public function index()
     {
-+
-
         // Mengambil semua data dari tabel hasil_konseling
         $hasilKonseling = HasilKonseling::all();
         

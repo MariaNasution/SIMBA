@@ -40,6 +40,18 @@
       </div>
     </form>
 
+    
+    {{-- Menampilkan Error --}}
+    @if ($errors->any())
+        <div class="alert alert-danger mt-3">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     {{-- Tabel Data Mahasiswa Konseling Lanjutan --}}
     @if ($mahasiswas->isNotEmpty())
       <div class="mt-4">
@@ -70,9 +82,9 @@
           </tbody>
         </table>
       </div>
-    @else
-      <p class="text-center mt-4 ">Tidak ada data mahasiswa.</p>
-    @endif
 
+  @else
+        <div class="alert alert-info mt-3">Tidak ada data mahasiswa yang ditemukan.</div>
+    @endif
 
 @endsection
