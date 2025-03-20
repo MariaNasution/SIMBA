@@ -3,42 +3,7 @@
 <link rel="stylesheet" href="{{ url('assets/css/catatan_perilaku.css') }}">
 
 <!-- Tambahkan CSS untuk animasi dropdown -->
-<style>
-/* Memastikan elemen .collapse tertutup rapat dan menerapkan transisi */
-.collapse {
-  overflow: hidden;
-  /* Sembunyikan isi saat tertutup */
-  max-height: 0;
-  /* Mulai dari tinggi 0 */
-  opacity: 0;
-  /* Mulai transparan */
-  transition: max-height 0.4s ease, opacity 0.4s ease;
-}
 
-/* Saat .collapse dibuka (show), atur tinggi dan opacity */
-.collapse.show {
-  max-height: 1000px;
-  /* Sesuaikan dengan tinggi konten */
-  opacity: 1;
-}
-
-/* Efek tambahan fade+slide pada konten detail */
-.collapse-content {
-  transform: translateY(-10px);
-  opacity: 0;
-  transition: transform 0.4s ease, opacity 0.4s ease;
-}
-
-.collapse.show .collapse-content {
-  transform: translateY(0);
-  opacity: 1;
-}
-
-/* Rotasi icon panah jika ingin pakai pendekatan .rotated (opsional) */
-.dropdown-icon i.rotated {
-  transform: rotate(90deg);
-}
-</style>
 
 @section('content')
 <!-- Header -->
@@ -92,7 +57,7 @@
         <td colspan="7">
           <!-- Bungkus isi detail di dalam .collapse-content untuk efek fade+slide -->
           <div class="collapse-content p-3">
-            <h5>Pembinaan: </h5>
+            <h5 style="font-size: 1.1rem; text-align: left;">Pembinaan: </h5>
 
             <!-- Container untuk Kotak Pelanggaran dan Perbuatan Baik -->
             <div class="custom-box-container">
