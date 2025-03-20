@@ -106,14 +106,15 @@ class adminController extends Controller
     }
     public function detail($nim)
     {
-        // Ambil data hasil konseling berdasarkan NIM
-        $mahasiswas = KonselingLanjutan::where('nim', $nim)->get();
-
+        // Ambil data hasil konseling berdasarkan NIM dengan pagination (5 per halaman)
+        $mahasiswas = KonselingLanjutan::where('nim', $nim)->paginate(5);
+    
         // Ambil nama mahasiswa dari hasil konseling pertama (jika ada data)
         $nama = $mahasiswas->first()->nama ?? 'Nama tidak ditemukan';
-
+    
         return view('konseling.konseling_lanjutan_detail', compact('nama', 'nim', 'mahasiswas'));
     }
+    
 }
 
 

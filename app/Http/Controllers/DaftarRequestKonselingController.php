@@ -9,13 +9,12 @@ class DaftarRequestKonselingController extends Controller
 {
     public function daftarRequest()
     {
-        // Ambil semua request konseling dengan relasi mahasiswa
-        $requests = RequestKonseling::where('status', 'pending')->get();
+        // Ambil request konseling dengan status pending dan paginasi 5 data per halaman
+        $requests = RequestKonseling::where('status', 'pending')->paginate(5);
 
         // Kirim data ke view
         return view('konseling.daftar_request', compact('requests'));
     }
-
 
     public function approve($id)
     {
@@ -32,5 +31,4 @@ class DaftarRequestKonselingController extends Controller
 
         return redirect()->route('daftar_request')->with('error', 'Request berhasil ditolak.');
     }
-
 }

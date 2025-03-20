@@ -1,88 +1,91 @@
 @extends('layouts.app')
 
 @section('content')
-    
-        {{-- Header dan Logout --}}
-        <div class="d-flex align-items-center mb-4 border-bottom-line">
-            <h3 class="me-auto">
-                <a href="{{ route('admin') }}"><i class="fas fa-history me-3"></i>Home</a> /
-                <a href="{{ route('riwayat.konseling') }}">Riwayat Konseling</a>
-            </h3>
-            <a href="#" onclick="confirmLogout()">
-                <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
-            </a>
+
+    {{-- Header dan Logout --}}
+    <div class="d-flex align-items-center mb-4 border-bottom-line">
+        <h3 class="me-auto">
+            <a href="{{ route('admin') }}"><i class="fas fa-history me-3"></i>Home</a> /
+            <a href="{{ route('riwayat.konseling') }}">Riwayat Konseling</a>
+        </h3>
+        <a href="#" onclick="confirmLogout()">
+            <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
+        </a>
+    </div>
+
+    {{-- Judul --}}
+    <h5 class="header-title text-primary mb-4 text-start">Mahasiswa Aktif TA 2024</h5>
+
+    {{-- Form Pencarian Mahasiswa --}}
+    <form action="{{ route('riwayat.konseling.cari') }}" method="GET">
+        @csrf
+        <div class="col-md-6">
+            <div class="mb-2 row">
+                <label class="col-sm-2 col-form-label fw-bold">NIM</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" id="nim" name="nim" value="{{ request('nim') }}">
+                </div>
+            </div>
+            <div class="mb-2 row">
+                <label class="col-sm-2 col-form-label fw-bold">Nama</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" id="nama" name="nama" value="{{ request('nama') }}">
+                </div>
+            </div>
         </div>
 
-        {{-- Judul --}}
-        <h5 class="header-title text-primary mb-4 text-start">Mahasiswa Aktif TA 2024</h5>
+        {{-- Tombol --}}
+        <div class="text-center mt-3">
+            <button type="submit" class="btn btn-custom-blue">Cari</button>
+            <a href="{{ route('riwayat.konseling') }}" class="btn btn-secondary">Reset</a>
+        </div>
+    </form>
 
-        {{-- Form Pencarian Mahasiswa --}}
-        <form action="{{ route('riwayat.konseling.cari') }}" method="GET">
-            @csrf
-            <div class="col-md-6">
-                <div class="mb-2 row">
-                    <label class="col-sm-2 col-form-label fw-bold">NIM</label>
-                    <div class="col-sm-9">
-                        <input type="text" class="form-control" id="nim" name="nim" value="{{ request('nim') }}">
-                    </div>
-                </div>
-                <div class="mb-2 row">
-                    <label class="col-sm-2 col-form-label fw-bold">Nama</label>
-                    <div class="col-sm-9">
-                        <input type="text" class="form-control" id="nama" name="nama" value="{{ request('nama') }}">
-                    </div>
-                </div>
-            </div>
+    {{-- Menampilkan Error --}}
+    @if ($errors->any())
+        <div class="alert alert-danger mt-3">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-            {{-- Tombol --}}
-            <div class="text-center mt-3">
-                <button type="submit" class="btn btn-custom-blue">Cari</button>
-                <a href="{{ route('riwayat.konseling') }}" class="btn btn-secondary">Reset</a>
-            </div>
-        </form>
-
-        {{-- Menampilkan Error --}}
-        @if ($errors->any())
-            <div class="alert alert-danger mt-3">
-                <ul class="mb-0">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        {{-- Tabel Data Mahasiswa --}}
-        @if ($hasilKonseling->isNotEmpty())
-            <div class="mt-4">
-                <h4 class="text-start">Data Mahasiswa</h4>
-                <table class="table table-bordered table-striped">
-                    <thead>
+    {{-- Tabel Data Mahasiswa --}}
+    @if ($hasilKonseling->isNotEmpty())
+        <div class="mt-4">
+            <h4 class="text-start">Data Mahasiswa</h4>
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>NIM</th>
+                        <th>Nama</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($hasilKonseling as $index => $mahasiswa)
                         <tr>
-                            <th>No</th>
-                            <th>NIM</th>
-                            <th>Nama</th>
+                            <td>{{ ($hasilKonseling->currentPage() - 1) * $hasilKonseling->perPage() + $loop->iteration }}</td>
+                            <td>{{ $mahasiswa->nim }}</td>
+                            <td>
+                                <a href="{{ route('riwayat.konseling.detail', $mahasiswa->nim) }}">
+                                    {{ $mahasiswa->nama }}
+                                </a>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($hasilKonseling as $index => $mahasiswa)
-                            <tr>
-                                <td>{{ $index + 1 }}</td>
-                                <td>{{ $mahasiswa->nim }}</td>
-                                <td>
-                                    <a href="{{ route('riwayat.konseling.detail', $mahasiswa->nim) }}">
-                                        {{ $mahasiswa->nama }}
-                                    </a>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
 
-                </table>
-            </div>
-        @else
-            <div class="alert alert-info mt-3">Tidak ada data mahasiswa yang ditemukan.</div>
-        @endif
-
+        {{-- Pagination Tengah --}}
+        <div class="d-flex justify-content-center w-100 mt-3">
+            {{ $hasilKonseling->links('pagination::bootstrap-5') }}
+        </div>
+    @else
+        <div class="alert alert-info mt-3">Tidak ada data mahasiswa yang ditemukan.</div>
+    @endif
 
 @endsection

@@ -13,7 +13,7 @@
 
     <div class="card-body">
         <table class="table table-bordered">
-            <thead class="table table-secondary">
+            <thead class="table-secondary">
                 <tr>
                     <th class="no-column">No</th>
                     <th>NIM Mahasiswa</th>
@@ -24,32 +24,37 @@
                 </tr>
             </thead>
             <tbody>
-                @if(isset($pelanggaranList) && count($pelanggaranList) > 0 )
-                    @foreach($pelanggaranList as $index => $dataMahasiswa)
-                        <tr>
-                            <td class="no-column">{{ $index + 1 }}</td>
-                            <td>{{ $dataMahasiswa['nim'] ?? '-' }}</td>
-                            <td>{{ $dataMahasiswa['nama'] ?? '-' }}</td>
-                            <td>{{ $dataMahasiswa['pelanggaran'] ?? '-' }}</td>
-                            <td>{{ $dataMahasiswa['tingkat'] ?? '-' }}</td>
-                            <td>
-                                <form action="{{ route('konseling.pilih') }}" method="GET">
-                                    @csrf
-                                    <input type="hidden" name="nim" value="{{ $dataMahasiswa['nim'] }}">
-                                    <input type="hidden" name="nama" value="{{ $dataMahasiswa['nama'] }}">
-                                    <input type="hidden" name="tahun_masuk" value="{{ $dataMahasiswa['tahun_masuk'] }}">
-                                    <input type="hidden" name="prodi" value="{{ $dataMahasiswa['prodi'] }}">
-                                    <button type="submit" class="btn btn-sm btn-primary">Ajukan Konseling</button>
-                                </form>
-                            </td>
-                        </tr>
-                    @endforeach
-                @else
+                @forelse($pelanggaranList as $dataMahasiswa)
+                    <tr>
+                        <td class="no-column">{{ ($pelanggaranList->currentPage() - 1) * $pelanggaranList->perPage() + $loop->iteration }}</td>
+                        <td>{{ $dataMahasiswa['nim'] ?? '-' }}</td>
+                        <td>{{ $dataMahasiswa['nama'] ?? '-' }}</td>
+                        <td>{{ $dataMahasiswa['pelanggaran'] ?? '-' }}</td>
+                        <td>{{ $dataMahasiswa['tingkat'] ?? '-' }}</td>
+                        <td>
+                            <form action="{{ route('konseling.pilih') }}" method="GET">
+                                @csrf
+                                <input type="hidden" name="nim" value="{{ $dataMahasiswa['nim'] }}">
+                                <input type="hidden" name="nama" value="{{ $dataMahasiswa['nama'] }}">
+                                <input type="hidden" name="tahun_masuk" value="{{ $dataMahasiswa['tahun_masuk'] }}">
+                                <input type="hidden" name="prodi" value="{{ $dataMahasiswa['prodi'] }}">
+                                <button type="submit" class="btn btn-sm btn-primary">Ajukan Konseling</button>
+                            </form>
+                        </td>
+                    </tr>
+                @empty
                     <tr>
                         <td colspan="6" class="text-center">Tidak ada data pelanggaran.</td>
                     </tr>
-                @endif
+                @endforelse
             </tbody>
         </table>
-    </div>    
+
+        {{-- Tampilkan pagination hanya jika ada lebih dari 1 halaman --}}
+        @if($pelanggaranList->hasPages())
+            <div class="d-flex justify-content-center mt-3">
+                {{ $pelanggaranList->links('pagination::bootstrap-5') }}
+            </div>
+        @endif
+    </div>
 @endsection
