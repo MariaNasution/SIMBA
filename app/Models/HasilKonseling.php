@@ -12,7 +12,7 @@ class HasilKonseling extends Model
 
     protected $table = 'hasil_konseling';
 
-    protected $fillable = ['request_konseling_id', 'nama', 'nim', 'file', 'keterangan'];
+    protected $fillable = ['request_konseling_id', 'nama', 'nim', 'file', 'keterangan', 'status'];
 
     public function requestKonseling()
     {
@@ -23,4 +23,5 @@ class HasilKonseling extends Model
     {
         return $this->file ? Storage::url('konseling_files/' . $this->file) : null;
     }
+    
 }

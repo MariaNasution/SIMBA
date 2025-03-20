@@ -37,6 +37,11 @@ class KonselingLanjutanController extends Controller
         if (!$hasilKonseling) {
             return redirect()->back()->with('error', 'Data hasil konseling tidak ditemukan.');
         }
+
+          // Update the status of the original record
+            $hasilKonseling->status = 'continued';
+            $hasilKonseling->save();
+
         // Simpan data ke tabel konseling_lanjutans
         KonselingLanjutan::create([
             'nama' => $hasilKonseling->nama,

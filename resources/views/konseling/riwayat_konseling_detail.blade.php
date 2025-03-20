@@ -56,16 +56,22 @@
                     <span class="text-muted">No file found.</span>
                     @endif
                 </td>
-                <td>
-                    <form action="{{ route('konseling.lanjutan.store') }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="nama" value="{{ $nama }}">
-                        <input type="hidden" name="nim" value="{{ $nim }}">
-                        <input type="hidden" name="konseling_id" value="{{ $konseling->id }}">
-                        <button type="submit" class="btn btn-success btn-sm">
-                            <i class="fas fa-check"></i> Lanjutkan
+                <td> 
+                    @if ($konseling->status == 'continued')
+                        <button type="button" class="btn btn-secondary btn-sm" disabled>
+                            <i class="fas fa-check"></i> Berhasil Dilanjutkan
                         </button>
-                    </form>
+                    @else
+                        <form action="{{ route('konseling.lanjutan.store') }}" method="POST"> 
+                            @csrf 
+                            <input type="hidden" name="nama" value="{{ $nama }}"> 
+                            <input type="hidden" name="nim" value="{{ $nim }}"> 
+                            <input type="hidden" name="konseling_id" value="{{ $konseling->id }}"> 
+                            <button type="submit" class="btn btn-success btn-sm"> 
+                                <i class="fas fa-check"></i> Lanjutkan 
+                            </button> 
+                        </form>
+                    @endif
                 </td>
             </tr>
             @endforeach
