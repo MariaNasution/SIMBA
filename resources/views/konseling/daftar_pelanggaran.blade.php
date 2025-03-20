@@ -53,7 +53,7 @@
         {{-- Tampilkan pagination hanya jika ada lebih dari 1 halaman --}}
         @if($pelanggaranList->hasPages())
             <div class="d-flex justify-content-center mt-3">
-                {{ $pelanggaranList->links('pagination::bootstrap-5') }}
+                {{ $pelanggaranList->links('pagination::bootstrap-4') }}
             </div>
         @endif
     </div>

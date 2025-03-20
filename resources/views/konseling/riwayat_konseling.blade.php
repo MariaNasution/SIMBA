@@ -82,7 +82,7 @@
 
         {{-- Pagination Tengah --}}
         <div class="d-flex justify-content-center w-100 mt-3">
-            {{ $hasilKonseling->links('pagination::bootstrap-5') }}
+            {{ $hasilKonseling->links('pagination::bootstrap-4') }}
         </div>
     @else
         <div class="alert alert-info mt-3">Tidak ada data mahasiswa yang ditemukan.</div>

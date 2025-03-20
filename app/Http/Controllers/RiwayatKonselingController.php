@@ -12,7 +12,7 @@ class RiwayatKonselingController extends Controller
     {
         $hasilKonseling = HasilKonseling::select('nim', 'nama')
             ->groupBy('nim', 'nama')
-            ->paginate(5); // Gunakan pagination dengan 5 data per halaman
+            ->paginate(7); // Gunakan pagination dengan 5 data per halaman
 
         return view('konseling.riwayat_konseling', compact('hasilKonseling'));
     }
@@ -44,7 +44,7 @@ class RiwayatKonselingController extends Controller
         // Ambil data hasil konseling berdasarkan NIM dengan pagination (5 data per halaman)
         $hasilKonseling = HasilKonseling::where('nim', $nim)
             ->orderBy('created_at', 'desc') // Urutkan dari yang terbaru
-            ->paginate(5);
+            ->paginate(7);
 
         // Ambil nama mahasiswa dari hasil konseling pertama (jika ada data)
         $nama = $hasilKonseling->isNotEmpty() ? $hasilKonseling->first()->nama : 'Nama tidak ditemukan';

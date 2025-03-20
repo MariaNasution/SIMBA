@@ -29,8 +29,6 @@
     @endif
 
     
-
-    <div class="card">
         <div class="card-body">
             <table class="table table-bordered">
                 <thead class="table-secondary">
@@ -76,8 +74,7 @@
 
             {{-- Pagination --}}
             <div class="d-flex content-center mt-3">
-                {{ $requests->links('pagination::bootstrap-5') }}
+                {{ $requests->links('pagination::bootstrap-4') }}
             </div>
         </div>
-    </div>
 @endsection

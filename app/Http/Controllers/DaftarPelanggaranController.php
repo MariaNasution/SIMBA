@@ -86,7 +86,7 @@ class DaftarPelanggaranController extends Controller
     
         // Pagination dengan 5 data per halaman
         $page = $request->query('page', 1); // Ambil halaman dari query string
-        $perPage = 5; // Jumlah data per halaman
+        $perPage = 7; // Jumlah data per halaman
         $paginatedPelanggaran = new \Illuminate\Pagination\LengthAwarePaginator(
             $pelanggaranList->forPage($page, $perPage),
             $pelanggaranList->count(),

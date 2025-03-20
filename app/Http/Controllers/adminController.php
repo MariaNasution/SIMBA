@@ -107,7 +107,7 @@ class adminController extends Controller
     public function detail($nim)
     {
         // Ambil data hasil konseling berdasarkan NIM dengan pagination (5 per halaman)
-        $mahasiswas = KonselingLanjutan::where('nim', $nim)->paginate(5);
+        $mahasiswas = KonselingLanjutan::where('nim', $nim)->paginate(7);
     
         // Ambil nama mahasiswa dari hasil konseling pertama (jika ada data)
         $nama = $mahasiswas->first()->nama ?? 'Nama tidak ditemukan';

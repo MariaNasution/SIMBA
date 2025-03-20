@@ -10,7 +10,7 @@ class DaftarRequestKonselingController extends Controller
     public function daftarRequest()
     {
         // Ambil request konseling dengan status pending dan paginasi 5 data per halaman
-        $requests = RequestKonseling::where('status', 'pending')->paginate(5);
+        $requests = RequestKonseling::where('status', 'pending')->paginate(7);
 
         // Kirim data ke view
         return view('konseling.daftar_request', compact('requests'));

@@ -79,8 +79,8 @@
 
         {{-- Pagination di tengah --}}
         <div class="d-flex justify-content-center w-100 mt-3">
-        {{ $hasilKonseling->links('pagination::bootstrap-5') }}
-    </div>
+        {{ $hasilKonseling->links('pagination::bootstrap-4') }}
+    </div>  
     @else
         <p class="text-muted">Belum ada hasil konseling.</p>
     @endif
