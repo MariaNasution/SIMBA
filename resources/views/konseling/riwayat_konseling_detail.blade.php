@@ -65,7 +65,7 @@
                                     @csrf
                                     <input type="hidden" name="nama" value="{{ $nama }}">
                                     <input type="hidden" name="nim" value="{{ $nim }}">
-                                    <input type="hidden" name="konseling_id" value="{{ $konseling->id }}">
+                                    <input type="hidden" name="request_konseling_id" value="{{ $konseling->id }}">
                                     <button type="submit" class="btn btn-success btn-sm">
                                         <i class="fas fa-check"></i> Lanjutkan
                                     </button>

@@ -26,12 +26,11 @@ class KonselingLanjutanController extends Controller
             'nama' => 'required|string|max:255',
             'nim' => 'required|string',
             'keterangan' => 'nullable|string',
+            'request_konseling_id' => 'required|exists:hasil_konseling,id', // ID dari konseling yang spesifik
         ]);
-
-        // Ambil hasil konseling terbaru berdasarkan NIM
-        $hasilKonseling = HasilKonseling::where('nim', $request->nim)
-                               ->latest()
-                               ->first();
+    
+        // Ambil hasil konseling berdasarkan ID yang diberikan
+        $hasilKonseling = HasilKonseling::find($request->request_konseling_id);
 
                               
         if (!$hasilKonseling) {
