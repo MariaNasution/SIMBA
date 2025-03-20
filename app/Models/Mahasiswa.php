@@ -28,9 +28,14 @@ class Mahasiswa extends Model
         return $this->belongsTo(Perwalian::class, 'ID_Perwalian', 'ID_Perwalian'); // Relationship to Perwalian model
     }
 
+    // public function absensi()
+    // {
+    //     return $this->belongsTo(Absensi::class, 'ID_Perwalian', 'ID_Perwalian'); // Relationship to Perwalian model
+    // }
+
     public function absensi()
     {
-        return $this->belongsTo(Absensi::class, 'ID_Absensi', 'ID_Absensi'); // Relationship to Perwalian model
+        return $this->hasMany(Absensi::class, 'ID_perwalian', 'ID_perwalian');
     }
 
     public function notifikasi()

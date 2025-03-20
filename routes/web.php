@@ -128,6 +128,12 @@ Route::middleware(['auth.session', 'role:dosen'])->group(function () {
     Route::get('/berita-acara/create', [BeritaAcaraController::class, 'create'])->name('berita_acara.create');
     Route::post('/berita-acara/store', [BeritaAcaraController::class, 'store'])->name('berita_acara.store');
     Route::get('/berita-acara/{id}', [BeritaAcaraController::class, 'show'])->name('berita_acara.show');
+    Route::get('/berita-acara/success', [BeritaAcaraController::class, 'successPage'])->name('berita-acara.success');
+    Route::get('/berita-acara/success/{kelas}/{tanggal_perwalian}', [BeritaAcaraController::class, 'success'])
+        ->name('berita-acara.success');
+
+
+
 });
 
 // Middleware untuk keasramaan

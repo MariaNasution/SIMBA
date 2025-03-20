@@ -10,7 +10,21 @@ class BeritaAcara extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['judul', 'deskripsi', 'tanggal', 'user_id'];
+    protected $fillable = [
+        'kelas',
+        'angkatan',
+        'dosen_wali',
+        'tanggal_perwalian',
+        'perihal_perwalian',
+        'agenda_perwalian',
+        'hari_tanggal_feedback',
+        'perihal_feedback', // ✅ Tambahkan ini jika belum ada
+        'catatan_feedback',
+        'tanggal_ttd',
+        'dosen_wali_ttd',
+        'user_id'
+    ];
+
 
     public function user()
     {

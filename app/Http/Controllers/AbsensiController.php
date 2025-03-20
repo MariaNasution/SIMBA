@@ -38,7 +38,6 @@ class AbsensiController extends Controller
                                     'ta' => $year,
                                     'sem_ta' => 2,
                                 ]);
-    
                             if ($mahasiswaResponse->successful()) {
                                 $responseData = $mahasiswaResponse->json();
                                 if (isset($responseData['anak_wali']) && !empty($responseData['anak_wali'])) {
