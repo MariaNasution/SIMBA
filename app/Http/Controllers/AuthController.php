@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use GuzzleHttp\Client;
 use App\Models\User;
 use App\Models\Mahasiswa;
 
@@ -111,9 +110,13 @@ class AuthController extends Controller
                                         Log::info('Redirecting to orang_tua route...');
                                         return redirect()->route('orang_tua')->with('success', 'Login sebagai orang tua berhasil!');
 
-                                case 'admin':
-                                        Log::info('Redirecting to admin route...');
-                                        return redirect()->route('admin')->with('success', 'Login sebagai admin berhasil!');
+                                case 'kemahasiswaan':
+                                        Log::info('Redirecting to kemahasiswaan route...');
+                                        return redirect()->route('kemahasiswaan')->with('success', 'Login sebagai kemahasiswaan berhasil!');
+                                
+                                case 'konselor':
+                                        Log::info('Redirecting to konselor route...');
+                                        return redirect()->route('konselor')->with('success', 'Login sebagai konselor berhasil!');
 
                                 default:
                                         Log::warning('Unknown role detected:', ['role' => $user->role]);

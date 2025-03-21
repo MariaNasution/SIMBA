@@ -8,6 +8,7 @@ class StudentBehavior extends Model
 {
     protected $table = 'student_behaviors';
 
+    protected $primaryKey = 'id';
     protected $fillable = [
         'student_nim',
         'ta',

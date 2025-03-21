@@ -1,6 +1,6 @@
 <div class="sidebar bg-dark text-light vh-100">
     <div class="sidebar-header">
-        <img src="{{ asset('assets\img\Logo Institut Teknologi Del.png') }}" alt="Logo" class="header-logo">
+        <img src="{{ asset('assets/img/Logo Institut Teknologi Del.png') }}" alt="Logo" class="header-logo">
         <div class="header-text">
             <h4>SiMBA</h4>
             <p>Kemahasiswaan</p>
@@ -22,7 +22,7 @@
         </li>
         <ul class="submenu" id="konseling-submenu" style="display: none;">
             <li class="submenu-item">
-                <a href="{{ route('daftar_pelanggaran') }}">
+                <a href="{{ route('daftar_pelanggaran_kemahasiswaan') }}">
                     <i class="fas fa-list"></i> Daftar Pelanggaran
                 </a>
             </li>

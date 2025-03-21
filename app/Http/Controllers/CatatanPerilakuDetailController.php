@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\StudentBehavior;
-use Illuminate\Support\Facades\Log;
 
 class CatatanPerilakuDetailController extends Controller
 {
@@ -64,31 +63,54 @@ class CatatanPerilakuDetailController extends Controller
             ->with('success', 'Data berhasil ditambahkan.');
     }
 
-    /**
-     * Show the form for editing a record (if you prefer a separate page).
-     */
+    // Method edit untuk menampilkan form edit
     public function edit($id)
     {
         $behavior = StudentBehavior::findOrFail($id);
-        return view('catatan_perilaku_detail', compact('behavior'));
+        return view('catatan_perilaku_edit', compact('behavior'));
     }
 
-    /**
-     * Update the specified record in storage.
-     */
+    // Method update untuk mengupdate data sesuai tipe catatan
     public function update(Request $request, $id)
     {
         $behavior = StudentBehavior::findOrFail($id);
 
-        $validated = $request->validate([
-            'description' => 'nullable|string',
-            'unit'        => 'nullable|string',
-            'tanggal'     => 'nullable|date',
-            'poin'        => 'nullable|integer',
-            'tindakan'    => 'nullable|string',
-        ]);
+        if ($behavior->type == 'pelanggaran') {
+            $validated = $request->validate([
+                'pelanggaran' => 'required|string',
+                'unit'        => 'nullable|string',
+                'tanggal'     => 'nullable|date',
+                'poin'        => 'nullable|integer',
+                'tindakan'    => 'nullable|string',
+            ]);
+            $data = [
+                'description' => $validated['pelanggaran'],
+                'unit'        => $validated['unit'] ?? null,
+                'tanggal'     => $validated['tanggal'] ?? null,
+                'poin'        => $validated['poin'] ?? 0,
+                'tindakan'    => $validated['tindakan'] ?? null,
+            ];
+        } elseif ($behavior->type == 'perbuatan_baik') {
+            $validated = $request->validate([
+                'perbuatan_baik' => 'required|string',
+                'keterangan'     => 'nullable|string',
+                'unit'           => 'nullable|string',
+                'tanggal'        => 'nullable|date',
+                'kredit_poin'    => 'nullable|integer',
+                'tindakan'       => 'nullable|string',
+            ]);
+            $data = [
+                'description' => $validated['perbuatan_baik'],
+                'unit'        => $validated['unit'] ?? null,
+                'tanggal'     => $validated['tanggal'] ?? null,
+                'poin'        => $validated['kredit_poin'] ?? 0,
+                'tindakan'    => $validated['tindakan'] ?? null,
+                'keterangan'  => $validated['keterangan'] ?? null,
+                'kredit_poin' => $validated['kredit_poin'] ?? 0,
+            ];
+        }
 
-        $behavior->update($validated);
+        $behavior->update($data);
 
         return redirect()
             ->route('catatan_perilaku_detail', ['studentNim' => $behavior->student_nim])

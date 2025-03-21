@@ -8,13 +8,13 @@ use Illuminate\Support\Facades\Http;
 use App\Models\RequestKonseling;
 use Illuminate\Support\Facades\Log;
 
-class adminController extends Controller
+class KemahasiswaanController extends Controller
 {
     public function index()
     {
         $pengumuman = Pengumuman::orderBy('created_at', 'desc')->get();
 
-        return view('beranda.homeAdmin', compact('pengumuman'));
+        return view('beranda.homeKemahasiswaan', compact('pengumuman'));
     }
 
     public function store(Request $request)
@@ -31,7 +31,7 @@ class adminController extends Controller
             'deskripsi' => $request->deskripsi,
         ]);
 
-        return redirect()->route('admin')->with('success', 'Data berhasil disimpan!');
+        return redirect()->route('kemahasiswaan')->with('success', 'Data berhasil disimpan!');
     }
 
     public function destroy($id)

@@ -3,8 +3,13 @@
 @section('content')
     <div class="d-flex align-items-center mb-4 border-bottom-line">
         <h3 class="me-auto">
-            <a href="{{ route('admin') }}"> <i class="fas fa-list me-3"></i>Home</a> /
-            <a href="{{ route('daftar_pelanggaran') }}">Daftar Pelanggaran</a>
+            @if(session('user.role') == 'kemahasiswaan')
+                <a href="{{ route('kemahasiswaan') }}"> <i class="fas fa-list me-3"></i>Home</a> /
+                <a href="{{ route('daftar_pelanggaran_kemahasiswaan') }}">Daftar Pelanggaran</a>
+            @elseif(session('user.role') == 'konselor')
+                <a href="{{ route('konselor') }}"> <i class="fas fa-list me-3"></i>Home</a> /
+                <a href="{{ route('daftar_pelanggaran_konselor') }}">Daftar Pelanggaran</a>
+            @endif
         </h3>
         <a href="#" onclick="confirmLogout()">
             <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
@@ -48,8 +53,6 @@
         </table>
     </div>    
 
-    
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function confirmLogout() {
@@ -63,7 +66,7 @@
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = '{{ route('logout') }}'; // Arahkan ke route logout jika 'Ya' dipilih
+                    window.location.href = '{{ route('logout') }}';
                 }
             });
         }
