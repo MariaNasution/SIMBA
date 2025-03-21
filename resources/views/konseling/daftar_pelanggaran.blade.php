@@ -12,6 +12,13 @@
     </div>
 
     <div class="card-body">
+              {{-- Menampilkan jumlah data yang sedang ditampilkan --}}
+              <p class="mt-3 text-end">
+    Page <span class="fw-bold text-danger">{{ $pelanggaranList->currentPage() }}</span> of 
+    <span class="fw-bold text-danger">{{ $pelanggaranList->lastPage() }}</span> | 
+    Showing <span class="fw-bold text-danger">{{ $pelanggaranList->count() }}</span> out of 
+    <span class="fw-bold text-danger">{{ $pelanggaranList->total() }}</span> Data entries
+</p>
         <table class="table table-bordered">
             <thead class="table-secondary">
                 <tr>

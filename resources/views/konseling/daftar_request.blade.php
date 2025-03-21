@@ -12,7 +12,6 @@
         </a>
     </div>
      
-
     {{-- Alert Notifikasi --}}
     @if (session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -28,53 +27,60 @@
         </div>
     @endif
 
-    
-        <div class="card-body">
-            <table class="table table-bordered">
-                <thead class="table-secondary">
-                    <tr>
-                        <th>No</th>
-                        <th>NIM Mahasiswa</th>
-                        <th>Nama Mahasiswa</th>
-                        <th>Alasan Konseling</th>
-                        <th>Waktu</th>
-                        <th>Approve</th>
-                    </tr>
-                </thead>
-                
-                <tbody>
-                    @foreach ($requests as $key => $request)
-                        <tr>
-                            <td>{{ $requests->firstItem() + $key }}</td>
-                            <td>{{ $request->nim }}</td>
-                            <td>{{ $request->nama_mahasiswa }}</td>
-                            <td>{{ $request->deskripsi_pengajuan }}</td>
-                            <td>{{ $request->tanggal_pengajuan }}</td>
-                            <td>
-                                <form action="{{ route('approve_konseling', $request->id) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('PUT')
-                                    <button class="btn btn-success btn-sm">
-                                        <i class="fas fa-check"></i>
-                                    </button>
-                                </form>
-                                <form action="{{ route('reject_konseling', $request->id) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('PUT')
-                                    <button class="btn btn-danger btn-sm">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-      
-            </table>
+    <div class="card-body">
+            {{-- Menampilkan jumlah data yang sedang ditampilkan --}}
+            <p class="mt-3 text-end">
+    Page <span class="fw-bold text-danger">{{ $requests->currentPage() }}</span> of 
+    <span class="fw-bold text-danger">{{ $requests->lastPage() }}</span> | 
+    Showing <span class="fw-bold text-danger">{{ $requests->count() }}</span> out of 
+    <span class="fw-bold text-danger">{{ $requests->total() }}</span> data entries
+</p>
 
-            {{-- Pagination --}}
-            <div class="d-flex content-center mt-3">
-                {{ $requests->links('pagination::bootstrap-4') }}
-            </div>
+
+        <table id="requestTable" class="table table-bordered">
+            <thead class="table-secondary">
+                <tr>
+                    <th>No</th>
+                    <th>NIM Mahasiswa</th>
+                    <th>Nama Mahasiswa</th>
+                    <th>Alasan Konseling</th>
+                    <th>Waktu</th>
+                    <th>Approve</th>
+                </tr>
+            </thead>
+            
+            <tbody>
+                @foreach ($requests as $key => $request)
+                    <tr>
+                        <td>{{ $requests->firstItem() + $key }}</td>
+                        <td>{{ $request->nim }}</td>
+                        <td>{{ $request->nama_mahasiswa }}</td>
+                        <td>{{ $request->deskripsi_pengajuan }}</td>
+                        <td>{{ $request->tanggal_pengajuan }}</td>
+                        <td>
+                            <form action="{{ route('approve_konseling', $request->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('PUT')
+                                <button class="btn btn-success btn-sm">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            </form>
+                            <form action="{{ route('reject_konseling', $request->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('PUT')
+                                <button class="btn btn-danger btn-sm">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+        {{-- Pagination --}}
+        <div class="d-flex content-center mt-3">
+            {{ $requests->links('pagination::bootstrap-4') }}
         </div>
+    </div>
+
 @endsection

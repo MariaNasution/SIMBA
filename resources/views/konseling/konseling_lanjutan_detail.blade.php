@@ -28,6 +28,12 @@
 
     {{-- Tabel Hasil Konseling --}}
     <h5 class="text-start">Hasil Konseling:</h5>
+    <p class="mt-3 text-end">
+    Page <span class="fw-bold text-danger">{{ $mahasiswas->currentPage() }}</span> of 
+    <span class="fw-bold text-danger">{{ $mahasiswas->lastPage() }}</span> | 
+    Showing <span class="fw-bold text-danger">{{$mahasiswas->count() }}</span> out of 
+    <span class="fw-bold text-danger">{{ $mahasiswas->total() }}</span> data entries.
+  </p>
     @if ($mahasiswas->isNotEmpty())
         <table class="table table-bordered">
             <thead>

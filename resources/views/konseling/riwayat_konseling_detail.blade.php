@@ -26,10 +26,22 @@
         </div>
     @endif
 
-    {{-- Tabel Hasil Konseling --}}
-    <h5 class="text-start">Hasil Konseling:</h5>
+    <div>
+  <h5 class="text-start">Hasil Konseling:</h5>
+
+  {{-- Menampilkan jumlah data yang sedang ditampilkan --}}
+  <p class="mt-3 text-end">
+    Page <span class="fw-bold text-danger">{{ $hasilKonseling->currentPage() }}</span> of 
+    <span class="fw-bold text-danger">{{ $hasilKonseling->lastPage() }}</span> | 
+    Showing <span class="fw-bold text-danger">{{ $hasilKonseling->count() }}</span> out of 
+    <span class="fw-bold text-danger">{{ $hasilKonseling->total() }}</span> data entries.
+  </p>
+</div>
+
+    
 
     @if ($hasilKonseling->isNotEmpty())
+    
         <table class="table table-bordered">
             <thead class="table-secondary text-center">
                 <tr>

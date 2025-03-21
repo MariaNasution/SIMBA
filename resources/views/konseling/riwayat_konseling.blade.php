@@ -54,8 +54,16 @@
 
     {{-- Tabel Data Mahasiswa --}}
     @if ($hasilKonseling->isNotEmpty())
+ 
         <div class="mt-4">
             <h4 class="text-start">Data Mahasiswa</h4>
+                 {{-- Menampilkan jumlah data yang sedang ditampilkan --}}
+  <p class="mt-3 text-end">
+    Page <span class="fw-bold text-danger">{{ $hasilKonseling->currentPage() }}</span> of 
+    <span class="fw-bold text-danger">{{ $hasilKonseling->lastPage() }}</span> | 
+    Showing <span class="fw-bold text-danger">{{ $hasilKonseling->count() }}</span> out of 
+    <span class="fw-bold text-danger">{{ $hasilKonseling->total() }}</span> data entries.
+  </p>
             <table class="table table-bordered table-striped">
                 <thead>
                     <tr>
