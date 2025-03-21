@@ -29,12 +29,12 @@
 
     <div class="card-body">
             {{-- Menampilkan jumlah data yang sedang ditampilkan --}}
-            <p class="mt-3 text-end">
-    Page <span class="fw-bold text-danger">{{ $requests->currentPage() }}</span> of 
-    <span class="fw-bold text-danger">{{ $requests->lastPage() }}</span> | 
-    Showing <span class="fw-bold text-danger">{{ $requests->count() }}</span> out of 
-    <span class="fw-bold text-danger">{{ $requests->total() }}</span> data entries
-</p>
+        <p class="mt-3 text-end"> 
+            Halaman <span class="fw-bold">{{ $requests->currentPage() }}</span> dari 
+            <span class="fw-bold">{{ $requests->lastPage() }}</span> | 
+            Menampilkan <span class="fw-bold">{{ $requests->count() }}</span> dari
+            <span class="fw-bold">{{ $requests->total() }}</span> Entri data
+        </p>
 
 
         <table id="requestTable" class="table table-bordered">

@@ -59,10 +59,10 @@
             <h4 class="text-start">Data Mahasiswa</h4>
                  {{-- Menampilkan jumlah data yang sedang ditampilkan --}}
   <p class="mt-3 text-end">
-    Page <span class="fw-bold text-danger">{{ $hasilKonseling->currentPage() }}</span> of 
-    <span class="fw-bold text-danger">{{ $hasilKonseling->lastPage() }}</span> | 
-    Showing <span class="fw-bold text-danger">{{ $hasilKonseling->count() }}</span> out of 
-    <span class="fw-bold text-danger">{{ $hasilKonseling->total() }}</span> data entries.
+    Halaman  <span class="fw-bold ">{{ $hasilKonseling->currentPage() }}</span> dari 
+    <span class="fw-bold">{{ $hasilKonseling->lastPage() }}</span> | 
+    Menampilkan <span class="fw-bold ">{{ $hasilKonseling->count() }}</span> dari 
+    <span class="fw-bold ">{{ $hasilKonseling->total() }}</span> Entri data
   </p>
             <table class="table table-bordered table-striped">
                 <thead>
