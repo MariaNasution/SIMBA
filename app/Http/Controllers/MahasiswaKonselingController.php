@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\RequestKonseling;
+use App\Models\RiwayatDaftarRequestKonseling;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 class MahasiswaKonselingController extends Controller
 {
@@ -16,18 +18,33 @@ class MahasiswaKonselingController extends Controller
             return redirect()->back()->with('error', 'Data mahasiswa tidak ditemukan.');
         }
 
-        // Ambil filter status dari request
-        $status = $request->query('status', '');
+        // Ambil data yang masih pending dari RequestKonseling
+        $pendingRequests = RequestKonseling::where('nim', $user['nim'])
+            ->where('status', 'pending')
+            ->orderBy('tanggal_pengajuan', 'desc')
+            ->get();
 
-        // Query request konseling dengan filter status
-        $query = RequestKonseling::where('nim', $user['nim'])->orderBy('tanggal_pengajuan', 'desc');
+        // Ambil request hanya milik mahasiswa yang sedang login
+        $processedRequests = RiwayatDaftarRequestKonseling::where('nim', $user['nim'])
+            ->orderBy('tanggal_pengajuan', 'desc')
+            ->get();
 
-        if (!empty($status)) {
-            $query->where('status', $status);
-        }
+        // Gabungkan kedua koleksi data
+        $konselings = $pendingRequests->merge($processedRequests);
 
-        // Paginasi data dengan mempertahankan filter status
-        $konselings = $query->paginate(10)->appends(['status' => $status]);
+        // Sortir berdasarkan tanggal pengajuan (descending)
+        $konselings = $konselings->sortByDesc('tanggal_pengajuan');
+
+        // Konversi ke paginator manual agar tetap bisa dipakai di blade dengan pagination
+        $currentPage = request()->input('page', 1);
+        $perPage = 7;
+        $konselings = new \Illuminate\Pagination\LengthAwarePaginator(
+            $konselings->forPage($currentPage, $perPage),
+            $konselings->count(),
+            $perPage,
+            $currentPage,
+            ['path' => request()->url()]
+        );
 
         return view('mahasiswa.mahasiswa_konseling', compact('konselings'));
     }

@@ -114,6 +114,11 @@ class adminController extends Controller
     
         return view('konseling.konseling_lanjutan_detail', compact('nama', 'nim', 'mahasiswas'));
     }
+
+    public function riwayatDaftarRequest()
+    {
+        return view('konseling.riwayat_daftar_request');
+    }
     
 }
 

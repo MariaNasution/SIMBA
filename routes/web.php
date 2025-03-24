@@ -79,11 +79,15 @@ Route::middleware(['auth.session', 'role:admin'])->group(function () {
         Route::get('/admin/riwayat_konseling', [RiwayatKonselingController::class, 'index'])->name('riwayat_konseling');
         Route::get('/admin/konseling_lanjutan', [AdminController::class, 'konselingLanjutan'])->name('konseling_lanjutan');
         Route::get('/admin/ajukan_konseling', [AdminController::class, 'ajukanKonseling'])->name('ajukan_konseling');
+        //Route::get('/admin/riwayat-daftar-request', [AdminController::class, 'riwayatDaftarRequest'])->name('riwayat_daftar_request');
 
         //daftar request konseling admin
         Route::get('/admin/daftar-request', [DaftarRequestKonselingController::class, 'daftarRequest'])->name('daftar_request');
         Route::put('/admin/approve-konseling/{id}', [DaftarRequestKonselingController::class, 'approve'])->name('approve_konseling');
         Route::put('/admin/reject-konseling/{id}', [DaftarRequestKonselingController::class, 'reject'])->name('reject_konseling');
+
+        //riwayat daftar request konseling
+        Route::get('/admin/riwayat-daftar-request', [DaftarRequestKonselingController::class, 'riwayatDaftarRequestKonseling'])->name('riwayat_daftar_request');
         
         //admin melihat hasil konseling
         Route::get('/hasil', [HasilKonselingController::class, 'index'])->name('hasil.index');
