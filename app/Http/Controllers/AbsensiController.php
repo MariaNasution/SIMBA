@@ -16,7 +16,7 @@ class AbsensiController extends Controller
         try {
             // Fetch all perwalian records to get the classes and dates
             $perwalianRecords = DB::table('perwalian')->get();
-
+            dd($perwalianRecords);
             foreach ($perwalianRecords as $record) {
                 $date = \Carbon\Carbon::parse($record->Tanggal);
                 $classes[] = [
@@ -61,9 +61,9 @@ class AbsensiController extends Controller
                 $response = Http::withToken($apiToken)
                     ->withOptions(['verify' => false])
                     ->get('https://cis-dev.del.ac.id/api/library-api/mahasiswa', [
-                        'nim' => $nimPrefix, // Fetch all students with NIMs starting with the year prefix
+                        'nim' => '11S', // Fetch all students with NIMs starting with the year prefix
                     ]);
-
+                    
                 if ($response->successful()) {
                     $studentData = $response->json()['data']['mahasiswa'] ?? [];
 
