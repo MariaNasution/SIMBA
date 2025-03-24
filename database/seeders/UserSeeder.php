@@ -211,7 +211,7 @@ class UserSeeder extends Seeder
                         'username' => $user['username'],
                         'nim' => '11S19001', // Fixed: Assign a default NIM for orang tua
                         'no_hp' => '+6281377385300',
-                        'created_at' => now(),
+                          'created_at' => now(),
                         'updated_at' => now(),
                     ]);
                     break;
