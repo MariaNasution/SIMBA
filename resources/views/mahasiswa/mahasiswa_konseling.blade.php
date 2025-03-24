@@ -8,7 +8,7 @@
 
 <div class="d-flex align-items-center mb-4 border-bottom-line">
   <h3 class="me-auto">
-    <a href="{{ route('beranda') }}"><i class="fas fa-code-branch me-3"></i>Home</a> /
+    <a href="{{ route('beranda') }}"><i class="fas fa-home me-3"></i>Home</a> /
     <a href="{{ route('mahasiswa_konseling') }}">Konseling</a>
   </h3>
   <a href="#" onclick="confirmLogout()">
@@ -23,6 +23,24 @@
     <i class="fas fa-code-branch me-2"></i> Request Konseling
   </a>
 </div>
+<div class="container my-3">
+  <div class="row">
+    <div class="col-md-3">
+      <form method="GET" action="{{ route('mahasiswa_konseling') }}">
+        <div class="mb-3">
+          <label for="status" class="form-label fw-bold">Filter Status:</label>
+          <select name="status" id="status" class="form-select" onchange="this.form.submit()">
+            <option value="">Semua</option>
+            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Menunggu Persetujuan</option>
+            <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Disetujui</option>
+            <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Ditolak</option>
+          </select>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <!-- Tabel Riwayat Konseling -->
 <div class="table-responsive">
 <table class="table table-bordered text-center">
@@ -36,13 +54,13 @@
     </thead>
     <tbody>
     @foreach ($konselings as $index => $konseling)
-        <tr class="  
+        <tr class="
             @if ($konseling->status == 'approved') table-success
             @elseif ($konseling->status == 'rejected') table-danger
             @elseif ($konseling->status == 'pending') table-primary
             @endif">
             <td>{{ ($konselings->currentPage() - 1) * $konselings->perPage() + $loop->iteration }}</td>
-            <td>{{ \Carbon\Carbon::parse($konseling->tanggal_pengajuan)->format('d M Y H:i') }}</td>
+            <td>{{ Carbon::parse($konseling->tanggal_pengajuan)->translatedFormat('d M Y H:i') }}</td>
             <td>{{ $konseling->deskripsi_pengajuan }}</td>
             <td>
                 @if ($konseling->status == 'approved')
@@ -56,14 +74,12 @@
         </tr>
     @endforeach
 </tbody>
-
   </table>
 </div>
 
 <!-- Pagination -->
 <div class="d-flex justify-content-center">
-  {{ $konselings->links('pagination::bootstrap-4') }}
+  {{ $konselings->appends(request()->query())->links('pagination::bootstrap-4') }}
 </div>
 
 @endsection
-

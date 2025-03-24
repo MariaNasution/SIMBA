@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class MahasiswaKonselingController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         // Ambil data mahasiswa dari session
         $user = session('student_data');
@@ -16,13 +16,18 @@ class MahasiswaKonselingController extends Controller
             return redirect()->back()->with('error', 'Data mahasiswa tidak ditemukan.');
         }
 
-        // Ambil request hanya milik mahasiswa yang sedang login
-        $konselings = RequestKonseling::where('nim', $user['nim'])
-            ->orderBy('tanggal_pengajuan', 'desc')
-            ->paginate(10);
+        // Ambil filter status dari request
+        $status = $request->query('status', '');
 
-        // Debugging
-       // dd($user, $konselings);
+        // Query request konseling dengan filter status
+        $query = RequestKonseling::where('nim', $user['nim'])->orderBy('tanggal_pengajuan', 'desc');
+
+        if (!empty($status)) {
+            $query->where('status', $status);
+        }
+
+        // Paginasi data dengan mempertahankan filter status
+        $konselings = $query->paginate(10)->appends(['status' => $status]);
 
         return view('mahasiswa.mahasiswa_konseling', compact('konselings'));
     }
