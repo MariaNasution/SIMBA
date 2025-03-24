@@ -27,40 +27,42 @@
             <div class="row">
                 @foreach ([2017, 2018, 2019, 2020] as $year)
                     @if (!empty($studentsByYear[$year]))
-                        <div class="col-md-12 mb-4">
-                            <div class="card p-3 shadow-sm">
-                                <h5 class="card-title">Informatika {{ $year }}</h5>
-                                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
-                                    <table class="table table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>NIM</th>
-                                                <th>Nama</th>
-                                                <th>Semester</th>
-                                                <th>IPK</th>
-                                                <th>IPS</th>
-                                                <th>Status KRS</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($studentsByYear[$year] as $student)
+                        @foreach ($studentsByYear[$year] as $kelas => $students)
+                            <div class="col-md-12 mb-4">
+                                <div class="card p-3 shadow-sm">
+                                    <h5 class="card-title">Informatika {{ $year }} - {{ $kelas }}</h5>
+                                    <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                                        <table class="table table-striped">
+                                            <thead>
                                                 <tr>
-                                                    <td>{{ $student['nim'] ?? 'N/A' }}</td>
-                                                    <td>{{ $student['nama'] ?? 'N/A' }}</td>
-                                                    <td>{{ $student['semester'] ?? 'N/A' }}</td>
-                                                    <td>{{ $student['ipk'] ?? 'N/A' }}</td>
-                                                    <td>{{ $student['ips'] ?? 'N/A' }}</td>
-                                                    <td>{{ $student['status_krs'] ?? 'N/A' }}</td>
+                                                    <th>NIM</th>
+                                                    <th>Nama</th>
+                                                    <th>Semester</th>
+                                                    <th>IPK</th>
+                                                    <th>IPS</th>
+                                                    <th>Status KRS</th>
                                                 </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div class="text-end mt-2">
-                                    <a href="{{ route('dosen.detailedClass', $year) }}" class="btn btn-secondary">Selengkapnya</a>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($students as $student)
+                                                    <tr>
+                                                        <td>{{ $student['nim'] ?? 'N/A' }}</td>
+                                                        <td>{{ $student['nama'] ?? 'N/A' }}</td>
+                                                        <td>{{ $student['semester'] ?? 'N/A' }}</td>
+                                                        <td>{{ $student['ipk'] ?? 'N/A' }}</td>
+                                                        <td>{{ $student['ips'] ?? 'N/A' }}</td>
+                                                        <td>{{ $student['status_krs'] ?? 'N/A' }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="text-end mt-2">
+                                        <a href="{{ route('dosen.detailedClass', ['year' => $year, 'kelas' => $kelas]) }}" class="btn btn-secondary">Selengkapnya</a>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @endforeach
                     @endif
                 @endforeach
             </div>

@@ -109,21 +109,22 @@ Route::middleware(['auth.session', 'role:admin'])->group(function () {
 
 // Middleware untuk dosen
 Route::middleware(['auth.session', 'role:dosen'])->group(function () {
+    
+    
     Route::get('/dosen/beranda', [DosenController::class, 'beranda'])->name('dosen');
     Route::get('/dosen/perwalian', [DosenController::class, 'index'])->name('dosen.perwalian');
     Route::get('/dosen/presensi', [DosenController::class, 'presensi'])->name('dosen.presensi');
     Route::get('/dosen/absensi-mahasiswa', [AbsensiController::class, 'index'])->name('absensi');
     Route::get('/absensi-mahasiswa/{date}/{class}', [AbsensiController::class, 'show'])->name('absensi.show');
+    Route::post('/absensi-mahasiswa/{date}/{class}', [AbsensiController::class, 'store'])->name('absensi.store');
     Route::get('/set-perwalian', [SetPerwalianController::class, 'index'])->name('set.perwalian');
     Route::post('/set-perwalian', [SetPerwalianController::class, 'store'])->name('set.perwalian.store');
     Route::delete('set-perwalian', [SetPerwalianController::class, 'destroy'])->name('set.perwalian.destroy');
-    Route::get('/dosen/detailed-class/{class}', [DosenController::class, 'showDetailedClass'])->name('dosen.detailedClass');
+    Route::get('/dosen/detailed-class/{year}/{kelas}', [DosenController::class, 'showDetailedClass'])->name('dosen.detailedClass');
 
     Route::get('/perwalian/berita-acara', [BeritaAcaraController::class, 'index'])->name('perwalian.berita_acara');
     Route::post('/perwalian/berita-acara', [BeritaAcaraController::class, 'store'])->name('perwalian.berita_acara.store');
 
-
-    // Routes untuk Berita Acara (Mahasiswa)
     Route::get('/berita-acara', [BeritaAcaraController::class, 'index'])->name('berita_acara.index');
     Route::get('/berita-acara/create', [BeritaAcaraController::class, 'create'])->name('berita_acara.create');
     Route::post('/berita-acara/store', [BeritaAcaraController::class, 'store'])->name('berita_acara.store');
@@ -131,8 +132,6 @@ Route::middleware(['auth.session', 'role:dosen'])->group(function () {
     Route::get('/berita-acara/success', [BeritaAcaraController::class, 'successPage'])->name('berita-acara.success');
     Route::get('/berita-acara/success/{kelas}/{tanggal_perwalian}', [BeritaAcaraController::class, 'success'])
         ->name('berita-acara.success');
-
-
 
 });
 

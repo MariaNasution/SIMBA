@@ -25,7 +25,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="card p-3 shadow-sm">
-                        <h5 class="card-title">Informatika {{ $class }}</h5>
+                        <h5 class="card-title">Informatika {{$kelas }}</h5>
                         <div class="table-responsive">
                             <table class="table table-striped">
                                 <thead>

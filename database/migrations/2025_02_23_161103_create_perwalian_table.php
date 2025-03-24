@@ -11,9 +11,10 @@ class CreatePerwalianTable extends Migration
         Schema::create('perwalian', function (Blueprint $table) {
             $table->id('ID_Perwalian')->primary(); // Auto-incrementing primary key
             $table->string('ID_Dosen_Wali')->nullable(); // Foreign key to dosen.nip (string)
-            $table->string('Status')->default('pending'); // Status of the perwalian
+            $table->enum('Status', ['Scheduled', 'Completed', 'Canceled']); 
             $table->string('nama');
             $table->string('kelas');
+
 
             $table->date('Tanggal'); // Date of the perwalian
             $table->timestamps();

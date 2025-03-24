@@ -12,7 +12,7 @@ class Absensi extends Model
     protected $primaryKey = 'ID_Absensi'; 
     public $incrementing = true; // Disable auto-increment
 
-    protected $fillable = ['ID_Absensi', 'Kelas'];
+    protected $fillable = ['ID_Absensi', 'Kelas', 'nim', 'status_kehadiran', 'keterangan'];
 
     
 

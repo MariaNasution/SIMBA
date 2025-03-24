@@ -180,21 +180,53 @@
             outline: none;
             border-color: #007bff;
         }
+
+        /* Alert styling */
+        .alert {
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
     </style>
 
     <!-- Breadcrumb -->
     <div class="breadcrumb">
-        <a href="{{ url()->previous() }}" class="back-btn">
+        <a href="{{ route('absensi') }}" class="back-btn">
             <span class="arrow">⟵</span> Back
         </a>
     </div>
 
     <!-- Header -->
-    <h1>Absensi Mahasiswa / IF {{ $class }} Angkatan {{ $year ?? 'N/A' }}</h1>
+    <h1>{{ $title }}</h1>
     <h2>Quick Access</h2>
 
-    <!-- Quick Access and Simpan Buttons -->
+    <!-- Success/Error Messages -->
+    @if (session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
+    @if (session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    <!-- Form for Attendance -->
+    <form action="{{ route('absensi.store', ['date' => $date, 'class' => $class]) }}" method="POST">
         @csrf
+
+        <!-- Quick Access and Simpan Buttons -->
         <div class="button-container">
             <button type="button" onclick="markAllHadir()" class="btn btn-success">✅ Quick Access</button>
             <button type="submit" class="btn btn-primary">Simpan</button>
@@ -216,14 +248,22 @@
                         <td>{{ $student['nim'] ?? 'N/A' }}</td>
                         <td>{{ $student['nama'] ?? 'Unknown' }}</td>
                         <td class="status-cell" onclick="showDropdown(this)">
-                            <input type="hidden" name="attendance[{{ $student['nim'] }}][status]" class="attendance-status" value="">
-                            <div class="status-buttons">
+                            <input type="hidden" name="attendance[{{ $student['nim'] }}][status]" class="attendance-status" value="{{ $student['status_kehadiran'] ?? '' }}">
+                            <div class="status-buttons" style="{{ $student['status_kehadiran'] ? 'display: none;' : '' }}">
                                 <button class="status-btn present" onclick="updateStatus(event, this, '✅', 'Hadir')">✅</button>
                                 <button class="status-btn absent" onclick="updateStatus(event, this, '❌', 'Alpha')">❌</button>
                                 <button class="status-btn permission" onclick="updateStatus(event, this, '📝', 'Izin')">📝</button>
                             </div>
-                            <div class="status-display">
-                                <span class="selected-status"></span>
+                            <div class="status-display" style="{{ $student['status_kehadiran'] ? 'display: block;' : 'display: none;' }}">
+                                <span class="selected-status">
+                                    @if ($student['status_kehadiran'] === 'hadir')
+                                        ✅ Hadir
+                                    @elseif ($student['status_kehadiran'] === 'alpa')
+                                        ❌ Alpha
+                                    @elseif ($student['status_kehadiran'] === 'izin')
+                                        📝 Izin
+                                    @endif
+                                </span>
                             </div>
                             <div class="dropdown">
                                 <div onclick="updateStatus(event, this, '✅', 'Hadir')">✅ Hadir</div>
@@ -233,8 +273,8 @@
                         </td>
                         <td class="status-desc">
                             <input type="hidden" name="attendance[{{ $student['nim'] }}][keterangan]" class="attendance-keterangan" value="{{ $student['keterangan'] ?? '' }}">
-                            <span class="keterangan-text">{{ $student['keterangan'] ?? '' }}</span>
-                            <input type="text" class="keterangan-input" placeholder="Enter keterangan">
+                            <span class="keterangan-text" style="{{ $student['status_kehadiran'] === 'izin' ? 'display: none;' : '' }}">{{ $student['keterangan'] ?? '' }}</span>
+                            <input type="text" class="keterangan-input" placeholder="Enter keterangan" value="{{ $student['keterangan'] ?? '' }}" style="{{ $student['status_kehadiran'] === 'izin' ? 'display: inline-block;' : 'display: none;' }}">
                         </td>
                     </tr>
                 @empty

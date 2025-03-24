@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Perwalian;
 use App\Models\Dosen;
+use App\Models\DosenWali;
+
 use App\Models\Notifikasi;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
@@ -76,20 +78,26 @@ class SetPerwalianController extends Controller
 
             // Check for existing perwalian with Status = 'ongoing'
             $existingPerwalian = Perwalian::where('ID_Dosen_Wali', $user->nip)
-                ->where('Status', 'ongoing')
+                ->where('Status', 'Scheduled')
                 ->first();
 
             if ($existingPerwalian) {
                 return redirect()->route('set.perwalian')->with('error', 'You can only have one ongoing perwalian request. Use the Edit option to delete and request again.');
             }
 
+            $dosenWali = Dosen::all();
+dd($dosenWali);
+
             // Create new perwalian
             $perwalian = Perwalian::create([
                 'ID_Dosen_Wali' => $user->nip,
                 'Tanggal' => Carbon::parse($validatedData['selectedDate'])->format('Y-m-d'),
-                'Status' => 'ongoing',
+                'Status' => 'Scheduled',
                 'nama' =>  $user->nama,
+                
             ]);
+
+
 
             if (!$perwalian) {
                 Log::error('Failed to create Perwalian record');

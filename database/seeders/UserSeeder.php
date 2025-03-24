@@ -121,14 +121,14 @@ class UserSeeder extends Seeder
             ],
 
             [
-                'username' => '0309130087',
+                'username' => '0311020009',
                 'password' => Hash::make('dosen'),
                 'role' => 'dosen',
                 'anak_wali' => null, // Dosen as wali, no anak wali
             ],
 
             [
-                'username' => '0311020009',
+                'username' => '0309020008',
                 'password' => Hash::make('dosen'),
                 'role' => 'dosen',
                 'anak_wali' => null, // Dosen as wali, no anak wali

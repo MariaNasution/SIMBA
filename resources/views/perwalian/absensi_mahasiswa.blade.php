@@ -4,7 +4,7 @@
     <!-- Header -->
     <div class="d-flex align-items-center mb-4 border-bottom-line">
         <h3 class="me-auto">
-            <a>Absensi Mahasiswa</a>
+            <a href="{{ route('dosen.presensi') }}">Absensi Mahasiswa</a>
         </h3>
         <a href="#" onclick="confirmLogout()">
             <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
@@ -15,7 +15,7 @@
         <!-- Class Selection Buttons -->
         <div class="am-class-buttons">
             @foreach ($classes as $classItem)
-                <a href="{{ route('absensi.show', ['year' => $classItem['year'], 'date' => $classItem['date'], 'class' => $classItem['class']]) }}" class="am-class-btn">
+                <a href="{{ route('absensi.show', ['date' => $classItem['date'], 'class' => $classItem['class']]) }}" class="am-class-btn">
                     {{ $classItem['display'] }}
                 </a>
             @endforeach

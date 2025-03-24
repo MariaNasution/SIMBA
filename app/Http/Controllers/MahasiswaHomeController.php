@@ -121,12 +121,14 @@ class MahasiswaHomeController extends Controller
                 // Get notification count
                 $notificationCount = $notifications->count();
                 $pengumuman = Pengumuman::orderBy('created_at', 'desc')->get();
+
                 $akademik = Calendar::where('type', 'akademik')->latest()->first();
+
                 $bem = Calendar::where('type', 'bem')->latest()->first();
+
                 // Filter dosen data to only include matches
                 $dosenNotifications = $dosenWaliIds->isNotEmpty() ? Dosen::whereIn('nip', $dosenWaliIds)->get() : collect(); // Avoid query if empty
 
-                
                 return view('beranda.homeMahasiswa', compact(
                     
                     'labels', 

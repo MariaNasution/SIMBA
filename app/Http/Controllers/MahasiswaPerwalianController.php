@@ -29,7 +29,6 @@ class MahasiswaPerwalianController extends Controller
         $absensi = Absensi::where('ID_Absensi', $student->ID_Absensi)->first();
         $perwalian = Perwalian::where('ID_Perwalian', $student->ID_Perwalian)->first();
         $dosen = Dosen::where('nip', optional($perwalian)->ID_Dosen_Wali)->first(); // Safe access if $perwalian is null
-dd($dosen);
         // Fetch all notifications with perwalian relationship to avoid N+1 problem
         $notifications = Notifikasi::with('perwalian') // Eager load perwalian
                                  ->where('Id_Perwalian', $student->ID_Perwalian)
@@ -48,7 +47,7 @@ dd($dosen);
         $notificationCount = $notifications->count();
         // Debug: Uncomment to inspect data
         // dd($student, $absensi, $perwalian, $dosen, $notifications, $dosenNotifications);
-        dd($notifications[0]->perwalian->dosen);
+        // dd($notifications[0]->perwalian->dosen);
         // Pass all necessary data to the view
         return view('mahasiswa.mahasiswa_perwalian', compact(
             'notifications',

@@ -4,80 +4,44 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-
 use Illuminate\Support\Facades\Http;
-
+use Illuminate\Support\Facades\DB;
 
 class AbsensiController extends Controller
 {
     public function index()
     {
-        $apiToken = session('api_token');
-        $nip = session('user')['username'] ?? null;
         $classes = [];
-    
-        if ($apiToken && $nip) {
-            try {
-                // Fetch the Dosen's assigned students/classes
-                $dosenResponse = Http::withToken($apiToken)
-                    ->withOptions(['verify' => false])
-                    ->get('https://cis-dev.del.ac.id/api/library-api/dosen', ['nip' => $nip]);
-    
-                if ($dosenResponse->successful()) {
-                    $dosenData = $dosenResponse->json();
-                    $dosenId = $dosenData['data']['dosen'][0]['pegawai_id'] ?? null;
-    
-                    if ($dosenId) {
-                        $years = [2017, 2018, 2019, 2020];
-                        foreach ($years as $index => $year) {
-                            // Fetch students for this Dosen and year
-                            $mahasiswaResponse = Http::withToken($apiToken)
-                                ->withOptions(['verify' => false])
-                                ->get('https://cis-dev.del.ac.id/api/library-api/get-all-students-by-dosen-wali', [
-                                    'dosen_id' => $dosenId,
-                                    'ta' => $year,
-                                    'sem_ta' => 2,
-                                ]);
-                            if ($mahasiswaResponse->successful()) {
-                                $responseData = $mahasiswaResponse->json();
-                                if (isset($responseData['anak_wali']) && !empty($responseData['anak_wali'])) {
-                                    // Generate dates starting from a base date (e.g., 2025-02-20) with 2-day increments
-                                    $baseDate = \Carbon\Carbon::createFromDate(2025, 2, 20 + $index * 2);
-                                    $classes[] = [
-                                        'year' => $year,
-                                        'date' => $baseDate->format('Y-m-d'),
-                                        'class' => 'IF1',
-                                        'formatted_date' => $baseDate->translatedFormat('l, j F Y'),
-                                        'display' => $baseDate->translatedFormat('l, j F Y') . " (13 IF1 - $year)"
-                                    ];
-                                    $classes[] = [
-                                        'year' => $year,
-                                        'date' => $baseDate->addDay()->format('Y-m-d'),
-                                        'class' => 'IF2',
-                                        'formatted_date' => $baseDate->translatedFormat('l, j F Y'),
-                                        'display' => $baseDate->translatedFormat('l, j F Y') . " (13 IF2 - $year)"
-                                    ];
-                                }
-                            } else {
-                                Log::warning("Failed to fetch students for Dosen {$nip} and year {$year}", ['status' => $mahasiswaResponse->status()]);
-                            }
-                        }
-                    }
-                } else {
-                    Log::error('Failed to fetch Dosen data', ['status' => $dosenResponse->status()]);
-                }
-            } catch (\Exception $e) {
-                Log::error('Exception in index:', ['message' => $e->getMessage()]);
+
+        try {
+            // Fetch all perwalian records to get the classes and dates
+            $perwalianRecords = DB::table('perwalian')->get();
+
+            foreach ($perwalianRecords as $record) {
+                $date = \Carbon\Carbon::parse($record->Tanggal);
+                $classes[] = [
+                    'year' => substr($record->kelas, 0, 2), // Extract the year from the kelas (e.g., '12' from '12IF1')
+                    'date' => $date->format('Y-m-d'),
+                    'class' => $record->kelas, // Use the actual kelas from the perwalian table
+                    'formatted_date' => $date->translatedFormat('l, j F Y'),
+                    'display' => $date->translatedFormat('l, j F Y') . " ({$record->kelas})",
+                ];
             }
+
+            // Sort classes by date and kelas
+            usort($classes, function ($a, $b) {
+                return strcmp($a['date'] . $a['class'], $b['date'] . $b['class']);
+            });
+        } catch (\Exception $e) {
+            Log::error('Exception occurred in AbsensiController@index:', ['message' => $e->getMessage()]);
         }
-        // Fallback to empty array if no data is fetched
+
         if (empty($classes)) {
             $classes = [];
         }
-    
+
         return view('perwalian.absensi_mahasiswa', compact('classes'));
     }
-
 
     public function show(Request $request, $date, $class)
     {
@@ -88,35 +52,36 @@ class AbsensiController extends Controller
 
         if ($apiToken) {
             try {
-                // Fetch all students with base keyword '11S20'
+                // Extract the year from the date (assuming date format is Y-m-d)
+                $year = \Carbon\Carbon::parse($date)->year;
+
+                // Fetch all students for the given year using the 'nim' prefix
+                $nimPrefix = substr($year, -2) . 'S'; // Example: '20S' for 2020
+
                 $response = Http::withToken($apiToken)
                     ->withOptions(['verify' => false])
                     ->get('https://cis-dev.del.ac.id/api/library-api/mahasiswa', [
-                        'nim' => '11S20', // Fetch all students with NIMs starting with 11S20
+                        'nim' => $nimPrefix, // Fetch all students with NIMs starting with the year prefix
                     ]);
 
                 if ($response->successful()) {
                     $studentData = $response->json()['data']['mahasiswa'] ?? [];
 
-                    // Sort the student data by 'nim'
-                    usort($studentData, function ($a, $b) {
-                        return strcmp($a['nim'], $b['nim']);
-                    });
-
-
-                    // Calculate the number of students and split into IF1 and IF2
-                    $totalStudents = count($studentData);
-                    $halfStudents = ceil($totalStudents / 2); // Round up to split into two groups
-
-                    // Assign students to IF1 and IF2 based on $class
-                    if ($class === 'IF1') {
+                    // Assign students to IF1 or IF2 based on whether $class contains 'IF1' or 'IF2'
+                    $halfStudents = ceil(count($studentData) / 2); // Round up to split into two groups
+                    if (stripos($class, 'IF1') !== false) {
                         $students = array_slice($studentData, 0, $halfStudents);
-                    } elseif ($class === 'IF2') {
+                    } elseif (stripos($class, 'IF2') !== false) {
                         $students = array_slice($studentData, $halfStudents);
                     }
 
+                    // Sort the student data by 'nim'
+                    usort($students, function ($a, $b) {
+                        return strcmp($a['nim'], $b['nim']);
+                    });
+
                     // Index by NIM for easier lookup in the view
-                    $studentData = array_column($studentData, null, 'nim');
+                    $studentData = array_column($students, null, 'nim');
                 } else {
                     Log::error('API request failed:', ['status' => $response->status(), 'body' => $response->body()]);
                 }
@@ -127,12 +92,89 @@ class AbsensiController extends Controller
 
         // Fallback if API fails or no token
         if (empty($students)) {
-            $students = []; // Empty array as fallback
+            $students = [];
         }
 
-        $title = "Absensi Mahasiswa / IF {$class} Angkatan 2022";
+        // Fetch existing attendance data from the database
+        $attendanceRecords = DB::table('absensi')
+            ->where('kelas', $class)
+            ->whereDate('created_at', $date)
+            ->get()
+            ->keyBy('nim');
+
+        foreach ($students as &$student) {
+            $nim = $student['nim'] ?? null;
+            if ($nim && isset($attendanceRecords[$nim])) {
+                $student['status_kehadiran'] = $attendanceRecords[$nim]->status_kehadiran;
+                $student['keterangan'] = $attendanceRecords[$nim]->keterangan ?? '';
+            } else {
+                $student['status_kehadiran'] = null;
+                $student['keterangan'] = '';
+            }
+        }
+        unset($student); // Unset the reference to avoid issues
+        $title = "Absensi Mahasiswa / $class Angkatan $year";
         $attendanceData = []; // This would include status for each student (e.g., present, absent, permission)
 
         return view('perwalian.perwalianKelas', compact('title', 'students', 'date', 'class', 'attendanceData', 'studentData'));
+    }
+
+    public function store(Request $request, $date, $class)
+    {
+        $attendance = $request->input('attendance', []);
+
+        try {
+            foreach ($attendance as $nim => $data) {
+                $status = $data['status'] ?? null;
+                $keterangan = $data['keterangan'] ?? '';
+
+                if ($status && in_array(strtolower($status), ['hadir', 'alpha', 'izin'])) {
+                    // Normalize status to match the database enum
+                    $status = strtolower($status) === 'alpha' ? 'alpa' : strtolower($status);
+
+                    // Check if a record already exists for this student, class, and date
+                    $existingRecord = DB::table('absensi')
+                        ->where('nim', $nim)
+                        ->where('kelas', $class)
+                        ->whereDate('created_at', $date)
+                        ->first();
+
+                    if ($existingRecord) {
+                        // Update the existing record
+                        DB::table('absensi')
+                            ->where('nim', $nim)
+                            ->where('kelas', $class)
+                            ->whereDate('created_at', $date)
+                            ->update([
+                                'status_kehadiran' => $status,
+                                'keterangan' => $keterangan,
+                                'updated_at' => now(),
+                            ]);
+                    } else {
+                        // Insert a new record
+                        DB::table('absensi')->insert([
+                            'nim' => $nim,
+                            'kelas' => $class,
+                            'status_kehadiran' => $status,
+                            'keterangan' => $keterangan,
+                            'created_at' => $date,
+                            'updated_at' => now(),
+                        ]);
+                    }
+
+                    // Update the mahasiswa table with the latest statusKehadiran
+                    DB::table('mahasiswa')
+                        ->where('nim', $nim)
+                        ->update(['statusKehadiran' => $status]);
+                }
+            }
+
+            return redirect()->route('absensi.show', ['date' => $date, 'class' => $class])
+                ->with('success', 'Attendance data saved successfully.');
+        } catch (\Exception $e) {
+            Log::error('Failed to save attendance data:', ['message' => $e->getMessage()]);
+            return redirect()->route('absensi.show', ['date' => $date, 'class' => $class])
+                ->with('error', 'Failed to save attendance data.');
+        }
     }
 }

@@ -46,7 +46,6 @@ class PerwalianAbsensiSeeder extends Seeder
             throw new \Exception("Dosen with nip 0308190348 not found.");
         }
         $idDosenWali = $dosen->nip; // Use the specific dosen's nip
-
         // Define possible statuses for Perwalian and statusKehadiran for Mahasiswa
         $perwalianStatuses = ['Scheduled', 'Completed', 'Canceled'];
         $kehadiranStatuses = ['Hadir', 'Tidak Hadir', 'Izin'];
@@ -55,9 +54,11 @@ class PerwalianAbsensiSeeder extends Seeder
             'Update: Perwalian status has changed.',
             'Notification: Please attend your perwalian.',
         ];
-
+        
+        $index = 0;
         // Create one Perwalian, Absensi, and related Notifikasi records per kelas
         foreach ($kelasGroups as $kelas => $students) {
+
             // Create a Perwalian record for this kelas
             DB::table('perwalian')->insert([
                 'ID_Dosen_Wali' => $idDosenWali, // Use the specific dosen's nip
@@ -68,14 +69,15 @@ class PerwalianAbsensiSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-
             // Create an Absensi record
             DB::table('absensi')->insert([
-                'Kelas' => $kelas, // Store the kelas in Absensi
+                'kelas' => $kelas, // Store the kelas in Absensi
+                'status_kehadiran' => $students[$index]->statusKehadiran, // Use -> instead of []
+                'nim' => $students[$index]->nim, // Use -> instead of []
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-
+            
             // Get the last inserted Perwalian and Absensi IDs
             $perwalianId = DB::getPdo()->lastInsertId();
             $absensiId = DB::getPdo()->lastInsertId();
@@ -88,7 +90,7 @@ class PerwalianAbsensiSeeder extends Seeder
                     'ID_Absensi' => $absensiId,
                     'statusKehadiran' => $kehadiranStatuses[array_rand($kehadiranStatuses)], // Random statusKehadiran
                 ]);
-
+                $index++;
             // Create a notification for each mahasiswa in this kelas
             foreach ($mahasiswas as $mahasiswa) {
                 DB::table('notifikasi')->insert([
