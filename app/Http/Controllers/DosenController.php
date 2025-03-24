@@ -10,6 +10,12 @@ use App\Models\Perwalian;
 
 class DosenController extends Controller
 {
+
+    public function histori(Request $request)
+{
+    return view('dosen.histori');
+}
+
     public function beranda()
     {
         if (!session('user') || session('user')['role'] !== 'dosen') {

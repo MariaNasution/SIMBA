@@ -121,6 +121,7 @@ Route::middleware(['auth.session', 'role:dosen'])->group(function () {
 
     Route::get('/perwalian/berita-acara', [BeritaAcaraController::class, 'index'])->name('perwalian.berita_acara');
     Route::post('/perwalian/berita-acara', [BeritaAcaraController::class, 'store'])->name('perwalian.berita_acara.store');
+    Route::get('/dosen/histori', [DosenController::class, 'histori'])->name('dosen.histori');
 
 
     // Routes untuk Berita Acara (Mahasiswa)
