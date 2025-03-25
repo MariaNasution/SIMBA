@@ -42,7 +42,7 @@ class DaftarRequestKonselingController extends Controller
         ]);
 
         // Hapus dari tabel request_konseling
-        $request->delete();
+        $request->update(['status' => 'approved']);
 
         return redirect()->route('hasil_konseling')->with('success', 'Request berhasil disetujui.');
     }
