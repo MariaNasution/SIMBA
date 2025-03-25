@@ -272,7 +272,7 @@ class DosenController extends Controller
                 return back()->with('error', 'An error occurred while fetching data: ' . $e->getMessage());
             }
         }
-
+        dd($studentsByYear);
         return view('beranda.homeDosen', compact('studentsByYear', 'perwalianAnnouncement'));
     }
 
