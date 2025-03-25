@@ -43,20 +43,20 @@ class DosenController extends Controller
                 session()->forget('user');
                 session([
                     'user' => [
-                        "username"                  => $nip,
-                        "role"                      => 'dosen',
-                        "pegawai_id"                => $dosenSession['pegawai_id'],
-                        "dosen_id"                  => $dosenSession['dosen_id'],
-                        "nip"                       => $dosenSession['nip'],
-                        "nama"                      => $dosenSession['nama'],
-                        "email"                     => $dosenSession['email'],
-                        "prodi_id"                  => $dosenSession['prodi_id'],
-                        "prodi"                     => $dosenSession['prodi'],
-                        "jabatan_akademik"          => $dosenSession['jabatan_akademik'],
-                        "jabatan_akademik_desc"     => $dosenSession['jabatan_akademik_desc'],
-                        "jenjang_pendidikan"        => $dosenSession['jenjang_pendidikan'],
-                        "nidn"                      => $dosenSession['nidn'],
-                        "user_id"                   => $dosenSession['user_id'],
+                        "username" => $nip,
+                        "role" => 'dosen',
+                        "pegawai_id" => $dosenSession['pegawai_id'],
+                        "dosen_id" => $dosenSession['dosen_id'],
+                        "nip" => $dosenSession['nip'],
+                        "nama" => $dosenSession['nama'],
+                        "email" => $dosenSession['email'],
+                        "prodi_id" => $dosenSession['prodi_id'],
+                        "prodi" => $dosenSession['prodi'],
+                        "jabatan_akademik" => $dosenSession['jabatan_akademik'],
+                        "jabatan_akademik_desc" => $dosenSession['jabatan_akademik_desc'],
+                        "jenjang_pendidikan" => $dosenSession['jenjang_pendidikan'],
+                        "nidn" => $dosenSession['nidn'],
+                        "user_id" => $dosenSession['user_id'],
                     ],
                 ]);
                 $dosenId = $dosenData['data']['dosen'][0]['pegawai_id'] ?? null;
@@ -71,8 +71,8 @@ class DosenController extends Controller
                         ->timeout(5)
                         ->get("{$baseUrl}/api/library-api/get-all-students-by-dosen-wali", [
                             'dosen_id' => $dosenId,
-                            'ta'       => $year,
-                            'sem_ta'   => $currentSem,
+                            'ta' => $year,
+                            'sem_ta' => $currentSem,
                         ]);
 
                     $studentsByYear[$year] = [];
@@ -122,9 +122,9 @@ class DosenController extends Controller
                                             ->withOptions(['verify' => false])
                                             ->timeout(5)
                                             ->get("{$baseUrl}/api/library-api/get-penilaian", [
-                                                'nim'     => $nim,
-                                                'ta'      => $year,
-                                                'sem_ta'  => $currentSem,
+                                                'nim' => $nim,
+                                                'ta' => $year,
+                                                'sem_ta' => $currentSem,
                                             ]);
 
                                         if ($penilaianResponse->successful()) {
@@ -231,7 +231,7 @@ class DosenController extends Controller
                                     }
                                     $ips = null;
                                     if (!empty($validIps)) {
-                                        usort($validIps, function($a, $b) {
+                                        usort($validIps, function ($a, $b) {
                                             return $b['sem'] - $a['sem'];
                                         });
                                         $ips = $validIps[0]['ip_semester'];
@@ -241,11 +241,11 @@ class DosenController extends Controller
                                     $semester = !empty($validIps) ? $validIps[0]['sem'] : $currentSem;
 
                                     $studentData = array_merge($student, [
-                                        'ipk'         => $ipk,
-                                        'ips'         => $ips,
-                                        'status_krs'  => $statusKrs,
-                                        'semester'    => $semester,
-                                        'kelas'       => $kelas,
+                                        'ipk' => $ipk,
+                                        'ips' => $ips,
+                                        'status_krs' => $statusKrs,
+                                        'semester' => $semester,
+                                        'kelas' => $kelas,
                                     ]);
                                     $classStudents[] = $studentData;
                                 }
@@ -272,7 +272,7 @@ class DosenController extends Controller
                 return back()->with('error', 'An error occurred while fetching data: ' . $e->getMessage());
             }
         }
-        dd($studentsByYear);
+
         return view('beranda.homeDosen', compact('studentsByYear', 'perwalianAnnouncement'));
     }
 
@@ -315,8 +315,8 @@ class DosenController extends Controller
                     ->timeout(5)
                     ->get("{$baseUrl}/api/library-api/get-all-students-by-dosen-wali", [
                         'dosen_id' => $dosenId,
-                        'ta'       => $currentTa,
-                        'sem_ta'   => $currentSem,
+                        'ta' => $currentTa,
+                        'sem_ta' => $currentSem,
                     ]);
 
                 if (!$mahasiswaResponse->successful()) {
@@ -374,9 +374,9 @@ class DosenController extends Controller
                             ->withOptions(['verify' => false])
                             ->timeout(5)
                             ->get("{$baseUrl}/api/library-api/get-penilaian", [
-                                'nim'     => $nim,
-                                'ta'      => $currentTa, // Use the correct year
-                                'sem_ta'  => $currentSem,
+                                'nim' => $nim,
+                                'ta' => $currentTa, // Use the correct year
+                                'sem_ta' => $currentSem,
                             ]);
 
                         if ($penilaianResponse->successful()) {
@@ -483,7 +483,7 @@ class DosenController extends Controller
                     }
                     $ips = null;
                     if (!empty($validIps)) {
-                        usort($validIps, function($a, $b) {
+                        usort($validIps, function ($a, $b) {
                             return $b['sem'] - $a['sem'];
                         });
                         $ips = $validIps[0]['ip_semester'];
@@ -493,11 +493,11 @@ class DosenController extends Controller
                     $semester = !empty($validIps) ? $validIps[0]['sem'] : $currentSem;
 
                     $studentData = array_merge($student, [
-                        'ipk'         => $ipk,
-                        'ips'         => $ips,
-                        'status_krs'  => $statusKrs,
-                        'semester'    => $semester,
-                        'kelas'       => $kelas,
+                        'ipk' => $ipk,
+                        'ips' => $ips,
+                        'status_krs' => $statusKrs,
+                        'semester' => $semester,
+                        'kelas' => $kelas,
                     ]);
 
                     $students[] = $studentData;

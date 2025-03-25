@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -24,7 +23,7 @@ return new class extends Migration
             $table->text('catatan_feedback'); // Catatan mahasiswa
             $table->date('tanggal_ttd'); // Tanggal tanda tangan dosen wali
             $table->string('dosen_wali_ttd'); // Nama dosen wali yang menandatangani
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Relasi ke tabel users
+            $table->foreignId('user_id');
             $table->timestamps();
         });
     }
