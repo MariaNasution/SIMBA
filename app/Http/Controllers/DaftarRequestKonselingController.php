@@ -8,14 +8,20 @@ use App\Models\RiwayatDaftarRequestKonseling;
 
 class DaftarRequestKonselingController extends Controller
 {
-    public function daftarRequest()
-    {
-        // Ambil request konseling dengan status pending dan paginasi 7 data per halaman
-        $requests = RequestKonseling::where('status', 'pending')->paginate(7);
+  public function daftarRequest(Request $request)
+  {
+    // Ambil nilai filter sorting dari query string (default: terbaru)
+    $sortOrder = $request->query('sort', 'terbaru'); 
 
-        // Kirim data ke view
-        return view('konseling.daftar_request', compact('requests'));
-    }
+    // Ambil request konseling dengan status pending dan sorting berdasarkan waktu request dibuat
+    $requests = RequestKonseling::where('status', 'pending')
+      ->orderBy('created_at', $sortOrder === 'terbaru' ? 'desc' : 'asc')
+      ->paginate(7)
+      ->appends(['sort' => $sortOrder]); // Menyimpan filter sorting saat berpindah halaman
+
+    // Kirim data ke view
+    return view('konseling.daftar_request', compact('requests', 'sortOrder'));
+  }
 
     public function riwayatDaftarRequestKonseling()
     {

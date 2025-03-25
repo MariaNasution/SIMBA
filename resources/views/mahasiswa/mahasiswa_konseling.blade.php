@@ -24,6 +24,25 @@
     </a>
   </div>
 
+  <!-- Filter Status -->
+<div class="container my-3">
+  <div class="row">
+    <div class="col-md-3">
+      <form method="GET" action="{{ route('mahasiswa_konseling') }}">
+        <div class="mb-3">
+          <label for="status" class="form-label fw-bold">Filter Status:</label>
+          <select name="status" id="status" class="form-select" onchange="this.form.submit()">
+            <option value="">Semua</option>
+            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Menunggu Persetujuan Admin</option>
+            <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Disetujui</option>
+            <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Ditolak</option>
+          </select>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
   <!-- Tabel Riwayat Daftar Request Konseling -->
   <div class="table-responsive">
     <table class="table table-bordered text-center">

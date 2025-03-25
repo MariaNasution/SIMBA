@@ -37,6 +37,16 @@
         </p>
 
 
+                      {{-- Filter Sorting --}}
+<div class="d-flex justify-content-start mb-3">
+  <form action="{{ route('daftar_request') }}" method="GET">
+    <label for="sort" class="me-2">Urutkan:</label>
+    <select name="sort" id="sort" class="form-select w-auto d-inline" onchange="this.form.submit()">
+      <option value="terbaru" {{ request('sort') == 'terbaru' ? 'selected' : '' }}>Terbaru</option>
+      <option value="terlama" {{ request('sort') == 'terlama' ? 'selected' : '' }}>Terlama</option>
+    </select>
+  </form>
+</div>
         <table id="requestTable" class="table table-bordered">
             <thead class="table-secondary">
                 <tr>
