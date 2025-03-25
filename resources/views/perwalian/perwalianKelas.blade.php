@@ -2,159 +2,68 @@
 
 @section('content')
     <style>
-        /* General styling for layout */
-        body {
-            font-family: 'Nunito Sans', sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #fff;
-        }
-
-        /* Breadcrumb and header styling */
-        .breadcrumb {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 10px;
-        }
-
-        .breadcrumb .back-btn {
-            display: inline-flex;
-            align-items: center;
-            background-color: #4a90e2;
-            color: #fff;
-            text-decoration: none;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            transition: background-color 0.3s ease;
-        }
-
-        .breadcrumb .back-btn:hover {
-            background-color: #357abd;
-        }
-
-        .breadcrumb .back-btn .arrow {
-            margin-right: 5px;
-            font-size: 16px;
-        }
-
-        h1 {
-            font-size: 24px;
-            color: #333;
-            margin-bottom: 15px;
-            font-weight: 700;
-        }
-
-        h2 {
-            font-size: 18px;
-            color: #555;
-            margin-bottom: 20px;
-            font-weight: 600;
-        }
-
-        /* Button styling */
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-left: 10px;
-        }
-
-        .btn-success {
-            background-color: #28a745;
-            color: #fff;
-        }
-
-        .btn-secondary {
-            background-color: #6c757d;
-            color: #fff;
-        }
-
-        .btn-primary {
-            background-color: #007bff;
-            color: #fff;
-        }
-
-        .btn-success:hover, .btn-secondary:hover, .btn-primary:hover {
-            opacity: 0.9;
-        }
-
-        /* Align buttons to the right */
-        .button-container {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 20px;
-        }
-
-        /* Table styling */
         table {
             width: 100%;
             border-collapse: collapse;
-            background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
         }
 
         th, td {
             border: 1px solid #ddd;
-            padding: 12px;
+            padding: 8px;
             text-align: left;
-            font-size: 14px;
         }
 
         th {
             background-color: #f2f2f2;
-            font-weight: 700;
-            color: #333;
-            text-transform: uppercase;
         }
 
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
+        .button-container {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
-        tr:hover {
-            background-color: #f1f1f1;
+        .status-cell {
+            position: relative;
+            cursor: pointer;
         }
 
-        /* Status button styling */
+        .status-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
         .status-btn {
             padding: 5px 10px;
             border: none;
+            border-radius: 3px;
             cursor: pointer;
-            margin-right: 5px;
-            border-radius: 5px;
-            font-size: 12px;
-            width: 40px;
-            text-align: center;
         }
 
-        .present { background-color: #4CAF50; color: white; }
-        .absent { background-color: #ff4444; color: white; }
-        .permission { background-color: #ff9800; color: white; }
-
-        /* Status display styling */
-        .status-display {
-            display: none;
-            font-weight: 500;
+        .present {
+            background-color: #28a745;
+            color: white;
         }
 
-        .selected-status {
-            margin-right: 5px;
+        .absent {
+            background-color: #dc3545;
+            color: white;
         }
 
-        /* Dropdown styling */
+        .permission {
+            background-color: #ffc107;
+            color: black;
+        }
+
         .dropdown {
             display: none;
             position: absolute;
-            background: white;
+            background-color: white;
             border: 1px solid #ddd;
-            border-radius: 5px;
-            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            min-width: 120px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 1;
         }
 
         .dropdown div {
@@ -163,39 +72,40 @@
         }
 
         .dropdown div:hover {
-            background: #f1f1f1;
+            background-color: #f0f0f0;
         }
 
-        /* Editable Keterangan */
+        .status-display {
+            display: none;
+        }
+
+        .status-desc {
+            position: relative;
+        }
+
         .keterangan-input {
             display: none;
             width: 100%;
             padding: 5px;
             border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
+            border-radius: 3px;
         }
 
-        .keterangan-input:focus {
-            outline: none;
-            border-color: #007bff;
-        }
-
-        /* Alert styling */
-        .alert {
-            padding: 10px;
+        .breadcrumb {
             margin-bottom: 20px;
-            border-radius: 4px;
         }
 
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
+        .back-btn {
+            text-decoration: none;
+            color: #007bff;
         }
 
-        .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
+        .back-btn:hover {
+            text-decoration: underline;
+        }
+
+        .arrow {
+            margin-right: 5px;
         }
     </style>
 
@@ -223,7 +133,7 @@
     @endif
 
     <!-- Form for Attendance -->
-    <form action="{{ route('absensi.store', ['date' => $date, 'class' => $class]) }}" method="POST">
+    <form id="attendanceForm" action="{{ route('absensi.store', ['date' => $date, 'class' => $class]) }}" method="POST" onsubmit="return confirm('Are you sure you want to save the attendance data?');">
         @csrf
 
         <!-- Quick Access and Simpan Buttons -->
@@ -250,16 +160,16 @@
                         <td class="status-cell" onclick="showDropdown(this)">
                             <input type="hidden" name="attendance[{{ $student['nim'] }}][status]" class="attendance-status" value="{{ $student['status_kehadiran'] ?? '' }}">
                             <div class="status-buttons" style="{{ $student['status_kehadiran'] ? 'display: none;' : '' }}">
-                                <button class="status-btn present" onclick="updateStatus(event, this, '✅', 'Hadir')">✅</button>
-                                <button class="status-btn absent" onclick="updateStatus(event, this, '❌', 'Alpha')">❌</button>
-                                <button class="status-btn permission" onclick="updateStatus(event, this, '📝', 'Izin')">📝</button>
+                                <button type="button" class="status-btn present" onclick="updateStatus(event, this, '✅', 'Hadir')">✅</button>
+                                <button type="button" class="status-btn absent" onclick="updateStatus(event, this, '❌', 'Alpa')">❌</button>
+                                <button type="button" class="status-btn permission" onclick="updateStatus(event, this, '📝', 'Izin')">📝</button>
                             </div>
                             <div class="status-display" style="{{ $student['status_kehadiran'] ? 'display: block;' : 'display: none;' }}">
                                 <span class="selected-status">
                                     @if ($student['status_kehadiran'] === 'hadir')
                                         ✅ Hadir
                                     @elseif ($student['status_kehadiran'] === 'alpa')
-                                        ❌ Alpha
+                                        ❌ Alpa
                                     @elseif ($student['status_kehadiran'] === 'izin')
                                         📝 Izin
                                     @endif
@@ -267,7 +177,7 @@
                             </div>
                             <div class="dropdown">
                                 <div onclick="updateStatus(event, this, '✅', 'Hadir')">✅ Hadir</div>
-                                <div onclick="updateStatus(event, this, '❌', 'Alpha')">❌ Alpha</div>
+                                <div onclick="updateStatus(event, this, '❌', 'Alpa')">❌ Alpa</div>
                                 <div onclick="updateStatus(event, this, '📝', 'Izin')">📝 Izin</div>
                             </div>
                         </td>
@@ -289,6 +199,7 @@
     <script>
         function updateStatus(event, element, emoji, text) {
             event.stopPropagation();
+            event.preventDefault();
 
             let cell = element.closest('.status-cell');
             let statusDisplay = cell.querySelector('.status-display');
@@ -310,12 +221,12 @@
                 keteranganText.style.display = 'none';
                 keteranganInput.style.display = 'inline-block';
                 keteranganInput.focus();
-                attendanceKeteranganInput.value = '';
+                attendanceKeteranganInput.value = keteranganInput.value;
             } else {
                 keteranganText.style.display = 'inline';
                 keteranganInput.style.display = 'none';
-                keteranganText.textContent = text === 'Hadir' ? '' : text;
-                attendanceKeteranganInput.value = text === 'Hadir' ? '' : text;
+                keteranganText.textContent = text === 'Hadir' ? '' : keteranganInput.value;
+                attendanceKeteranganInput.value = text === 'Hadir' ? '' : keteranganInput.value;
             }
         }
 
@@ -336,10 +247,6 @@
                 }
             });
         });
-
-        function goBack() {
-            window.history.back();
-        }
 
         function markAllHadir() {
             document.querySelectorAll(".status-cell").forEach(statusCell => {
@@ -370,6 +277,14 @@
                 let statusDesc = this.closest('.status-desc');
                 let attendanceKeteranganInput = statusDesc.querySelector('.attendance-keterangan');
                 attendanceKeteranganInput.value = this.value;
+            });
+        });
+
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                }
             });
         });
     </script>

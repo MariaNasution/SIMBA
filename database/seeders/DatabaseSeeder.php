@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             ProgramSeeder::class,
             NIMSeeder::class,
-            PerwalianAbsensiSeeder::class,
+            // PerwalianAbsensiSeeder::class,
         ]);
 
 

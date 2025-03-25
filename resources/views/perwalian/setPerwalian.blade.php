@@ -22,7 +22,19 @@
             </div>
         @endif
 
-    
+        <!-- Class Selection Dropdown -->
+        <div class="mb-4">
+            <label for="classSelect" style="font-size: 16px; font-weight: 500; color: #333;">Select Class for Perwalian:</label>
+            <select id="classSelect" name="selectedClass" class="form-select" style="max-width: 200px;" onchange="updateSelectedClass()">
+                <option value="" disabled selected>Select a class</option>
+                @forelse ($classes as $class)
+                    <option value="{{ $class }}">{{ $class }}</option>
+                @empty
+                    <option value="" disabled>No classes available</option>
+                @endforelse
+            </select>
+        </div>
+
         <!-- Calendar Container -->
         <div class="calendar-container mb-5 mx-auto position-relative" style="max-width: 500px; background: #fff;">
             <div class="d-flex justify-content-between align-items-center mb-2 p-3 border-bottom">
@@ -205,6 +217,8 @@
                 @endif
                 <label for="selectedDate" class="visually-hidden">Selected Date for Perwalian:</label>
                 <input type="hidden" id="selectedDate" name="selectedDate" value="">
+                <label for="selectedClass" class="visually-hidden">Selected Class for Perwalian:</label>
+                <input type="hidden" id="selectedClass" name="selectedClass" value="">
                 <button type="submit" class="btn px-4 py-2" id="actionButton" 
                     style="background-color: {{ $perwalian_requested ? '#DC3545' : '#28A745' }}; color: white; border: none; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); transition: all 0.3s ease;"
                     @if(!$perwalian_requested) disabled @endif>
@@ -217,7 +231,7 @@
             </form>
         </div>
         @if(!$perwalian_requested)
-            <p class="text-muted mt-2" style="font-size: 12px;">Note: You can only request once. Use 'Edit' to delete and request again.</p>
+            <p class="text-muted mt-2" style="font-size: 12px;">Note: You can only request once per class. Use 'Edit' to delete and request again.</p>
         @endif
 
         <!-- Dosen Notifications (Optional Display) -->
@@ -322,4 +336,38 @@
             border: 1px solid #dee2e6;
         }
     </style>
+
+    <script>
+        function updateSelectedClass() {
+            const classSelect = document.getElementById('classSelect');
+            const selectedClassInput = document.getElementById('selectedClass');
+            selectedClassInput.value = classSelect.value;
+            // Enable the button if both a class and a date are selected
+            if (classSelect.value && document.getElementById('selectedDate').value) {
+                document.getElementById('actionButton').disabled = false;
+            } else {
+                document.getElementById('actionButton').disabled = true;
+            }
+        }
+
+        // Update the onclick event for calendar days to also check for class selection
+        document.querySelectorAll('.day').forEach(day => {
+            day.addEventListener('click', function() {
+                const selectedDateInput = document.getElementById('selectedDate');
+                const selectedClassInput = document.getElementById('selectedClass');
+                if (this.querySelector('.date-number').textContent) {
+                    selectedDateInput.value = this.getAttribute('onclick').match(/'(\d{4}-\d{2}-\d{2})'/)[1];
+                    if (selectedClassInput.value) {
+                        document.getElementById('actionButton').disabled = false;
+                    }
+                }
+            });
+        });
+
+        function confirmLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = "{{ route('logout') }}"; // Adjust route as needed
+            }
+        }
+    </script>
 @endsection

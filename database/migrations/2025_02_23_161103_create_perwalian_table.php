@@ -9,17 +9,14 @@ class CreatePerwalianTable extends Migration
     public function up()
     {
         Schema::create('perwalian', function (Blueprint $table) {
-            $table->id('ID_Perwalian')->primary(); // Auto-incrementing primary key
-            $table->string('ID_Dosen_Wali')->nullable(); // Foreign key to dosen.nip (string)
-            $table->enum('Status', ['Scheduled', 'Completed', 'Canceled']); 
+            $table->id('ID_Perwalian');
+            $table->string('ID_Dosen_Wali')->nullable();
+            $table->enum('Status', ['Scheduled', 'Completed', 'Canceled']);
             $table->string('nama');
             $table->string('kelas');
-
-
-            $table->date('Tanggal'); // Date of the perwalian
+            $table->date('Tanggal');
             $table->timestamps();
 
-            // Define foreign key constraint manually to reference nip
             $table->foreign('ID_Dosen_Wali')->references('nip')->on('dosen')->onDelete('set null');
         });
     }

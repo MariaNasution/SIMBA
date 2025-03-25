@@ -6,11 +6,11 @@ use Illuminate\Http\Request;
 use App\Models\Perwalian;
 use App\Models\Dosen;
 use App\Models\Dosen_Wali;
-
 use App\Models\Notifikasi;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class SetPerwalianController extends Controller
 {
@@ -19,9 +19,22 @@ class SetPerwalianController extends Controller
         $username = session('user')['username'] ?? null;
         $user = Dosen::where('username', $username)->first();
 
-        // Check for an existing perwalian with Status = 'ongoing'
+        // Fetch classes associated with the dosen from the dosen table
+        $classes = [];
+        if ($username) {
+            $dosenRecord = DB::table('dosen_wali') // Adjust table name if different (e.g., 'dosen_wali')
+                ->where('username', $username)
+                ->first();
+                // dd($dosenRecord);
+
+            if ($dosenRecord && !empty($dosenRecord->kelas)) {
+                $classes = array_map('trim', explode(',', $dosenRecord->kelas));
+            }
+        }
+
+        // Check for an existing perwalian with Status = 'Scheduled' for this dosen
         $perwalianRequested = $user ? Perwalian::where('ID_Dosen_Wali', $user->nip)
-            ->where('Status', 'ongoing')
+            ->where('Status', 'Scheduled')
             ->exists() : false;
 
         // Handle month navigation
@@ -59,6 +72,7 @@ class SetPerwalianController extends Controller
             'perwalian_requested' => $perwalianRequested,
             'dosenNotifications' => $dosenNotifications,
             'currentDate' => $currentDate,
+            'classes' => $classes, // Pass the classes to the view
         ]);
     }
 
@@ -66,6 +80,7 @@ class SetPerwalianController extends Controller
     {
         $validatedData = $request->validate([
             'selectedDate' => 'required|date|date_format:Y-m-d|after_or_equal:1990-02-01|before_or_equal:2040-06-30',
+            'selectedClass' => 'required|string', // Validate the selected class
         ]);
 
         try {
@@ -76,28 +91,24 @@ class SetPerwalianController extends Controller
                 return redirect()->route('set.perwalian')->with('error', 'You must be logged in to set a perwalian date.');
             }
 
-            // Check for existing perwalian with Status = 'ongoing'
+            // Check for existing perwalian with Status = 'Scheduled' for this class
             $existingPerwalian = Perwalian::where('ID_Dosen_Wali', $user->nip)
                 ->where('Status', 'Scheduled')
+                ->where('kelas', $validatedData['selectedClass'])
                 ->first();
 
             if ($existingPerwalian) {
-                return redirect()->route('set.perwalian')->with('error', 'You can only have one ongoing perwalian request. Use the Edit option to delete and request again.');
+                return redirect()->route('set.perwalian')->with('error', 'You already have a scheduled perwalian request for this class. Use the Edit option to delete and request again.');
             }
-            // // $dosenWali = Dosen_Wali::where('username', $username)->first();
 
-            // dd($dosenWali);
             // Create new perwalian
             $perwalian = Perwalian::create([
                 'ID_Dosen_Wali' => $user->nip,
                 'Tanggal' => Carbon::parse($validatedData['selectedDate'])->format('Y-m-d'),
                 'Status' => 'Scheduled',
-                'nama' =>  $user->nama,
-                'kelas' => '12IF1',
-                
+                'nama' => $user->nama,
+                'kelas' => $validatedData['selectedClass'], // Save the selected class
             ]);
-
-
 
             if (!$perwalian) {
                 Log::error('Failed to create Perwalian record');
@@ -108,15 +119,15 @@ class SetPerwalianController extends Controller
 
             $nim = session('user')['nim'] ?? null;
             Notifikasi::create([
-                'Pesan' => "Perwalian scheduled for " . $validatedData['selectedDate'],
+                'Pesan' => "Perwalian scheduled for " . $validatedData['selectedDate'] . " (Class: " . $validatedData['selectedClass'] . ")",
                 'NIM' => $nim,
                 'Id_Perwalian' => $perwalian->getKey(),
                 'nama' => $user->nama,
             ]);
 
-            Log::info('Perwalian date set for: ' . $validatedData['selectedDate'] . ' by dosen NIP: ' . $user->nip);
+            Log::info('Perwalian date set for: ' . $validatedData['selectedDate'] . ' by dosen NIP: ' . $user->nip . ' for class: ' . $validatedData['selectedClass']);
 
-            return redirect()->route('set.perwalian')->with('success', 'Perwalian date set successfully for ' . $validatedData['selectedDate']);
+            return redirect()->route('set.perwalian')->with('success', 'Perwalian date set successfully for ' . $validatedData['selectedDate'] . ' (Class: ' . $validatedData['selectedClass'] . ')');
         } catch (\Exception $e) {
             Log::error('Failed to set Perwalian date: ' . $e->getMessage());
             return redirect()->route('set.perwalian')->with('error', 'Failed to set Perwalian date. Please try again.');
@@ -133,17 +144,24 @@ class SetPerwalianController extends Controller
                 return redirect()->route('set.perwalian')->with('error', 'You must be logged in to delete a perwalian.');
             }
 
+            // Delete the perwalian for the selected class
+            $selectedClass = $request->input('selectedClass');
+            if (!$selectedClass) {
+                return redirect()->route('set.perwalian')->with('error', 'No class selected for deletion.');
+            }
+
             $existingPerwalian = Perwalian::where('ID_Dosen_Wali', $user->nip)
-                ->where('Status', 'ongoing')
+                ->where('Status', 'Scheduled')
+                ->where('kelas', $selectedClass)
                 ->first();
 
             if ($existingPerwalian) {
                 Notifikasi::where('Id_Perwalian', $existingPerwalian->getKey())->delete();
                 $existingPerwalian->delete();
-                Log::info('Perwalian deleted for dosen NIP: ' . $user->nip);
+                Log::info('Perwalian deleted for dosen NIP: ' . $user->nip . ' for class: ' . $selectedClass);
             }
 
-            return redirect()->route('set.perwalian')->with('success', 'Perwalian request deleted. You can now create a new request.');
+            return redirect()->route('set.perwalian')->with('success', 'Perwalian request deleted for class ' . $selectedClass . '. You can now create a new request.');
         } catch (\Exception $e) {
             Log::error('Failed to delete Perwalian: ' . $e->getMessage());
             return redirect()->route('set.perwalian')->with('error', 'Failed to delete Perwalian. Please try again.');

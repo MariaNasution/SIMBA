@@ -20,7 +20,7 @@ class DosenController extends Controller
         $nip = session('user')['username'];
         $baseUrl = 'https://cis-dev.del.ac.id';
         $studentsByYear = [];
-        $academicYears = [2019, 2020];
+        $academicYears = [2020];
         $currentSem = 2;
 
         if ($apiToken) {

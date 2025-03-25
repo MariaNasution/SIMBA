@@ -4,18 +4,20 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class CreateAbsensiTable extends Migration
 {
     public function up()
     {
         Schema::create('absensi', function (Blueprint $table) {
-            $table->id('ID_Absensi'); // Auto-incrementing primary key
-            $table->string('nim'); // Foreign key reference to mahasiswa
+            $table->id('ID_Absensi');
+            $table->unsignedBigInteger('ID_Perwalian')->nullable();
+            $table->string('nim');
             $table->enum('status_kehadiran', ['hadir', 'alpa', 'izin']);
-            $table->string('kelas'); // Class info
-            $table->timestamps(); // Created_at & Updated_at
+            $table->string('kelas');
+            $table->text('keterangan')->nullable();
+            $table->timestamps();
 
-            // Foreign key constraint
+            $table->foreign('ID_Perwalian')->references('ID_Perwalian')->on('perwalian')->onDelete('cascade');
             $table->foreign('nim')->references('nim')->on('mahasiswa')->onDelete('cascade');
         });
     }
@@ -24,4 +26,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('absensi');
     }
-};
+}

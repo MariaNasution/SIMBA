@@ -7,45 +7,42 @@ use Illuminate\Database\Eloquent\Model;
 
 class Mahasiswa extends Model
 {
-    protected $table = 'mahasiswa'; // Specify the correct table name   
-    protected $primaryKey = 'username'; // Set primary key
-    public $incrementing = false; // Disable auto-increment
+    use HasFactory;
 
-    protected $fillable = ['nim', 'username', 'ID_Dosen', 'ID_Perwalian',  'ID_Absensi', 'nama', 'kelas', 'statusKehadiran'];
+    protected $table = 'mahasiswa';
+    protected $primaryKey = 'nim';
+    public $incrementing = false;
+    protected $keyType = 'string';
+
+    protected $fillable = ['nim', 'username', 'ID_Dosen', 'ID_Perwalian', 'nama', 'kelas'];
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'username', 'username'); // Relationship to User model
+        return $this->belongsTo(User::class, 'username', 'username');
     }
 
     public function dosen()
     {
-        return $this->belongsTo(Dosen::class, 'ID_Dosen', 'id'); // Relationship to Dosen model
+        return $this->belongsTo(Dosen::class, 'ID_Dosen', 'id');
     }
 
     public function perwalian()
     {
-        return $this->belongsTo(Perwalian::class, 'ID_Perwalian', 'ID_Perwalian'); // Relationship to Perwalian model
+        return $this->belongsTo(Perwalian::class, 'ID_Perwalian', 'ID_Perwalian');
     }
-
-    // public function absensi()
-    // {
-    //     return $this->belongsTo(Absensi::class, 'ID_Perwalian', 'ID_Perwalian'); // Relationship to Perwalian model
-    // }
 
     public function absensi()
     {
-        return $this->hasMany(Absensi::class, 'ID_perwalian', 'ID_perwalian');
+        return $this->hasMany(Absensi::class, 'nim', 'nim');
     }
 
     public function notifikasi()
     {
-        return $this->hasMany(Notifikasi::class, 'nim', 'nim'); // Relationship to Notifikasi model (if applicable)
+        return $this->hasMany(Notifikasi::class, 'nim', 'nim');
     }
 
     public function requestKonseling()
     {
         return $this->hasMany(RequestKonseling::class, 'nim', 'nim');
     }
-
 }
