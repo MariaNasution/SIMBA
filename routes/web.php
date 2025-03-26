@@ -118,14 +118,16 @@ Route::middleware(['auth.session', 'role:dosen'])->group(function () {
     Route::get('/absensi-mahasiswa/{date}/{class}', [AbsensiController::class, 'show'])->name('absensi.show');
     Route::post('/absensi-mahasiswa/{date}/{class}', [AbsensiController::class, 'store'])->name('absensi.store');
     Route::get('/set-perwalian', [SetPerwalianController::class, 'index'])->name('set.perwalian');
-    Route::post('/set-perwalian', [SetPerwalianController::class, 'store'])->name('set.perwalian.store');
-    Route::delete('set-perwalian', [SetPerwalianController::class, 'destroy'])->name('set.perwalian.destroy');
+    Route::post('/set-perwalian/store', [SetPerwalianController::class, 'store'])->name('set.perwalian.store');
+    Route::delete('/set-perwalian/destroy', [SetPerwalianController::class, 'destroy'])->name('set.perwalian.destroy');
+    Route::get('/set-perwalian/calendar', [SetPerwalianController::class, 'getCalendar'])->name('set.perwalian.calendar');
     Route::get('/dosen/detailed-class/{year}/{kelas}', [DosenController::class, 'showDetailedClass'])->name('dosen.detailedClass');
 
     Route::get('/perwalian/berita-acara', [BeritaAcaraController::class, 'index'])->name('perwalian.berita_acara');
     Route::post('/perwalian/berita-acara', [BeritaAcaraController::class, 'store'])->name('perwalian.berita_acara.store');
     Route::get('/dosen/histori', [DosenController::class, 'histori'])->name('dosen.histori');
 
+    Route::get('/berita-acara/select-class', [BeritaAcaraController::class, 'selectClass'])->name('berita_acara.select_class');
     Route::get('/berita-acara', [BeritaAcaraController::class, 'index'])->name('berita_acara.index');
     Route::get('/berita-acara/create', [BeritaAcaraController::class, 'create'])->name('berita_acara.create');
     Route::post('/berita-acara/store', [BeritaAcaraController::class, 'store'])->name('berita_acara.store');

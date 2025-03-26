@@ -19,7 +19,7 @@ class CreateMahasiswaTable extends Migration
             $table->string('kelas')->nullable();
             $table->timestamps();
 
-            $table->foreign('username')->references('username')->on('users')->onDelete('cascade');
+            // $table->foreign('username')->references('username')->on('users')->onDelete('cascade');
             $table->foreign('ID_Perwalian')->references('ID_Perwalian')->on('perwalian')->onDelete('set null');
         });
     }

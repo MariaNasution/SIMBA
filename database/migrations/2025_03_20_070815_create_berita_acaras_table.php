@@ -24,7 +24,7 @@ return new class extends Migration
             $table->text('catatan_feedback'); // Catatan mahasiswa
             $table->date('tanggal_ttd'); // Tanggal tanda tangan dosen wali
             $table->string('dosen_wali_ttd'); // Nama dosen wali yang menandatangani
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Relasi ke tabel users
+            $table->foreignId('user_id');
             $table->timestamps();
         });
     }

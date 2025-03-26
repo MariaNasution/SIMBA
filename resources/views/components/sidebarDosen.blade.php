@@ -36,7 +36,7 @@
             </a>
         </li>
         <li class="menu-item">
-            <a href="{{ route('berita_acara.index') }}">
+            <a href="{{ route('berita_acara.select_class') }}">
                 <i class="fas fa-check-square"></i> Berita Acara
             </a>
         </li>

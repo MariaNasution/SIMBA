@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use App\Services\StudentSyncService;
 use App\Models\Absensi;
 use App\Models\Perwalian;
@@ -15,8 +16,6 @@ class AbsensiController extends Controller
 
     public function __construct(StudentSyncService $studentSyncService)
     {
-        $this->middleware('auth');
-        $this->middleware('role:dosen');
         $this->studentSyncService = $studentSyncService;
     }
 
@@ -25,13 +24,56 @@ class AbsensiController extends Controller
         $classes = [];
         $dosen = session('user');
 
-        // Sync students from the API
-        $year = now()->year;
-        $this->studentSyncService->syncStudents($dosen['pegawai_id'], $year - 5, 2);
+        if (!$dosen) {
+            Log::error('No user authenticated in AbsensiController@index');
+            return redirect()->route('login')->with('error', 'Please log in to access this page.');
+        }
 
+        $dosenData = $dosen instanceof \Illuminate\Database\Eloquent\Model ? $dosen->toArray() : (array) $dosen;
+        Log::info('Dosen data in AbsensiController@index', [
+            'dosen' => $dosenData,
+            'nip' => $dosen['nip'] ?? 'not set',
+            'pegawai_id' => $dosen['pegawai_id'] ?? 'not set',
+        ]);
+
+        $year = now()->year;
+        $syncYear = $year - 5;
+        $semester = 2;
+
+        // Fetch Perwalian records to get the list of classes
         try {
             $perwalianRecords = Perwalian::where('Status', 'Scheduled')->get();
-            
+            Log::info('Perwalian records fetched', [
+                'count' => $perwalianRecords->count(),
+                'records' => $perwalianRecords->toArray(),
+            ]);
+
+            // Extract unique classes from Perwalian records
+            $kelasList = $perwalianRecords->pluck('kelas')->unique()->toArray();
+            Log::info('Unique classes from Perwalian', [
+                'classes' => $kelasList,
+            ]);
+
+            // Sync students for each class
+            foreach ($kelasList as $kelas) {
+                Log::info('Calling syncStudents for class', [
+                    'dosen_id' => $dosen['pegawai_id'],
+                    'year' => $syncYear,
+                    'semester' => $semester,
+                    'kelas' => $kelas,
+                ]);
+                $this->studentSyncService->syncStudents($dosen['pegawai_id'], $syncYear, $semester, $kelas);
+            }
+
+            // Log the synced students
+            $syncedStudents = Mahasiswa::where('ID_Dosen', $dosen['pegawai_id'])->get();
+            Log::info('Students in mahasiswa table after sync', [
+                'dosen_id' => $dosen['pegawai_id'],
+                'student_count' => $syncedStudents->count(),
+                'students' => $syncedStudents->toArray(),
+            ]);
+
+            // Prepare the classes for the view
             foreach ($perwalianRecords as $record) {
                 $date = \Carbon\Carbon::parse($record->Tanggal);
                 $classes[] = [
@@ -46,8 +88,13 @@ class AbsensiController extends Controller
             usort($classes, function ($a, $b) {
                 return strcmp($a['date'] . $a['class'], $b['date'] . $b['class']);
             });
+
+            Log::info('Classes prepared for view', ['classes' => $classes]);
         } catch (\Exception $e) {
-            Log::error('Exception occurred in AbsensiController@index:', ['message' => $e->getMessage()]);
+            Log::error('Exception occurred in AbsensiController@index:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
         }
 
         return view('perwalian.absensi_mahasiswa', compact('classes'));
@@ -58,28 +105,65 @@ class AbsensiController extends Controller
         $studentData = [];
         $students = [];
         $dosen = session('user');
-        
+
+        if (!$dosen) {
+            Log::error('No user authenticated in AbsensiController@show');
+            return redirect()->route('login')->with('error', 'Please log in to access this page.');
+        }
+
+        $dosenData = $dosen instanceof \Illuminate\Database\Eloquent\Model ? $dosen->toArray() : (array) $dosen;
+        Log::info('AbsensiController@show called', [
+            'date' => $date,
+            'class' => $class,
+            'dosen' => $dosenData,
+            'nip' => $dosen['nip'] ?? 'not set',
+            'pegawai_id' => $dosen['pegawai_id'] ?? 'not set',
+        ]);
+
         $perwalian = Perwalian::where('Tanggal', $date)
             ->where('kelas', $class)
             ->first();
-
         if (!$perwalian) {
-            Log::error('Perwalian not found for date and class:', ['date' => $date, 'class' => $class]);
+            Log::error('Perwalian not found for date and class:', [
+                'date' => $date,
+                'class' => $class,
+            ]);
             return redirect()->route('absensi')
                 ->with('error', 'No perwalian session found for this date and class.');
         }
 
-        // Fetch students from the database (already synced in the index method)
-        $students = Mahasiswa::where('kelas', $class)
-            ->where('ID_Dosen', $dosen['pegawai_id'])
-            ->get()
-            ->map(function ($student) {
-                return [
-                    'nim' => $student->nim,
-                    'nama' => $student->nama,
-                ];
-            })
-            ->toArray();
+        Log::info('Perwalian record found', [
+            'perwalian_id' => $perwalian->ID_Perwalian,
+            'date' => $date,
+            'class' => $class,
+        ]);
+
+        // Fetch students directly from the API
+        $year = \Carbon\Carbon::parse($date)->year;
+        $syncYear = $year - 5;
+        $currentSem = 2; // Adjust based on your semester logic if needed
+        $students = $this->studentSyncService->fetchStudents($dosen['pegawai_id'], $syncYear, $currentSem, $class);
+        Log::info('Students fetched from API in AbsensiController@show', [
+            'date' => $date,
+            'class' => $class,
+            'student_count' => count($students),
+            'students' => $students,
+        ]);
+
+        // Map the API data to the required format
+        $students = array_map(function ($student) {
+            return [
+                'nim' => $student['nim'],
+                'nama' => $student['nama'],
+            ];
+        }, $students);
+
+        Log::info('Students after mapping in AbsensiController@show', [
+            'date' => $date,
+            'class' => $class,
+            'student_count' => count($students),
+            'students' => $students,
+        ]);
 
         usort($students, function ($a, $b) {
             return strcmp($a['nim'], $b['nim']);
@@ -88,14 +172,23 @@ class AbsensiController extends Controller
         $studentData = array_column($students, null, 'nim');
 
         if (empty($students)) {
-            Log::warning('No students found for class:', ['class' => $class, 'date' => $date]);
+            Log::warning('No students found for class:', [
+                'class' => $class,
+                'date' => $date,
+            ]);
             $students = [];
         }
 
-        // Attach students to the perwalian session by setting ID_Perwalian
+        // Sync students to the Mahasiswa table
         foreach ($students as $student) {
             $nim = $student['nim'];
             $username = 'ifs' . substr($nim, 3);
+
+            Log::info('Processing student', [
+                'nim' => $nim,
+                'username' => $username,
+                'class' => $class,
+            ]);
 
             $mahasiswa = Mahasiswa::firstOrCreate(
                 ['nim' => $nim],
@@ -110,7 +203,10 @@ class AbsensiController extends Controller
 
             if ($mahasiswa->ID_Perwalian != $perwalian->ID_Perwalian) {
                 $mahasiswa->update(['ID_Perwalian' => $perwalian->ID_Perwalian]);
-                Log::info('Updated student ID_Perwalian:', ['nim' => $mahasiswa->nim, 'perwalian_id' => $perwalian->ID_Perwalian]);
+                Log::info('Updated student ID_Perwalian:', [
+                    'nim' => $mahasiswa->nim,
+                    'perwalian_id' => $perwalian->ID_Perwalian,
+                ]);
             }
         }
 
@@ -119,6 +215,13 @@ class AbsensiController extends Controller
             ->whereDate('created_at', $date)
             ->get()
             ->keyBy('nim');
+
+        Log::info('Attendance records fetched', [
+            'perwalian_id' => $perwalian->ID_Perwalian,
+            'class' => $class,
+            'date' => $date,
+            'record_count' => $attendanceRecords->count(),
+        ]);
 
         foreach ($students as &$student) {
             $nim = $student['nim'] ?? null;
@@ -197,7 +300,10 @@ class AbsensiController extends Controller
             return redirect()->route('absensi')
                 ->with('success', 'Attendance data saved successfully, and perwalian session marked as completed.');
         } catch (\Exception $e) {
-            Log::error('Failed to save attendance data:', ['message' => $e->getMessage()]);
+            Log::error('Failed to save attendance data:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             return redirect()->route('absensi.show', ['date' => $date, 'class' => $class])
                 ->with('error', 'Failed to save attendance data.');
         }
@@ -225,7 +331,10 @@ class AbsensiController extends Controller
                 return strcmp($a['date'] . $a['class'], $b['date'] . $b['class']);
             });
         } catch (\Exception $e) {
-            Log::error('Exception occurred in AbsensiController@completed:', ['message' => $e->getMessage()]);
+            Log::error('Exception occurred in AbsensiController@completed:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
         }
 
         return view('perwalian.completed_absensi', compact('classes'));

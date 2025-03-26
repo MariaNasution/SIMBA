@@ -16,10 +16,10 @@ class Mahasiswa extends Model
 
     protected $fillable = ['nim', 'username', 'ID_Dosen', 'ID_Perwalian', 'nama', 'kelas'];
 
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'username', 'username');
-    }
+    // public function user()
+    // {
+    //     return $this->belongsTo(User::class, 'username', 'username');
+    // }
 
     public function dosen()
     {
