@@ -26,7 +26,7 @@ class RegisterController extends Controller
         $request->validate([
             'username' => 'required|unique:users,username',
             'password' => 'required', // No constraints on password length or confirmation
-            'jabatan' => 'required|in:mahasiswa,admin,keasramaan,dosen,orang_tua',
+            'jabatan' => 'required|in:mahasiswa,konselor,kemahasiswaan,keasramaan,dosen,orang_tua',
         ]);
 
         try {
@@ -88,6 +88,7 @@ class RegisterController extends Controller
                 'success' => true,
                 'message' => 'Akun berhasil dibuat. Silakan login.',
             ]);
+
         } catch (\Exception $e) {
             Log::error('Registrasi gagal: ' . $e->getMessage());
             return response()->json([

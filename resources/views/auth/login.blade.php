@@ -59,7 +59,7 @@
                 <button class="btn register-btn">Daftar</button>
                 <button class="btn login-btn">Masuk</button>
             </div>
-            <form action="{{ route('register.submit') }}" method="POST">
+            <form id ="register-form">
                 @csrf
                 <div class="input-box">
                     <label for="username">Nama Pengguna</label>
@@ -73,7 +73,7 @@
                 </div>
                 <div class="input-box">
                     <label for="role">Jabatan</label>
-                    <select id="role" required>
+                    <select id="role" name= "jabatan" required>
                       <option value="" disabled selected>Pilih Jabatan</option>
                       <option value="kemahasiswaan">Kemahasiswaan</option>
                       <option value="konselor">Konselor</option>
@@ -130,6 +130,54 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 </script>
+
+<!-- Script alert registrasi -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const registerForm = document.getElementById("register-form");
+    
+        registerForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+    
+            const formData = new FormData(registerForm);
+    
+            fetch("{{ route('register.submit') }}", {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value,
+                    "Accept": "application/json"
+                },
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) return response.json().then(err => { throw err; });
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Sukses',
+                        text: data.message
+                    }).then(() => {
+                        // Arahkan ke form login
+                        document.querySelector('.login-btn').click();
+                        registerForm.reset();
+                    });
+                }
+            })
+            .catch(error => {
+                let errorMsg = error?.errors?.username?.[0] || error.message || 'Registrasi gagal. Coba lagi.';
+    
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: errorMsg
+                });
+            });
+        });
+    });
+    </script>
 
 </body>
 
