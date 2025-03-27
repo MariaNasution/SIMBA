@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use App\Models\User;
-use App\Models\Admin;
+use App\Models\Konselor;
+use App\Models\Kemahasiswaan;
 use App\Models\Mahasiswa;
 use App\Models\Dosen;
 use App\Models\Keasramaan;
@@ -45,10 +46,17 @@ class RegisterController extends Controller
                     ]);
                     break;
 
-                case 'admin':
-                    Admin::create([
+                case 'konselor':
+                    Konselor::create([
                         'username' => $user->username,
-                        'nip' => $request->nip ?? null, // Optional NIP for admin
+                        'nip' => $request->nip ?? null, // Optional NIP for konselor
+                    ]);
+                    break;
+
+                case 'kemahasiswaan':
+                    Kemahasiswaan::create([
+                        'username' => $user->username,
+                        'nip' => $request->nip ?? null, // Optional NIP for kemahasiswaan
                     ]);
                     break;
 

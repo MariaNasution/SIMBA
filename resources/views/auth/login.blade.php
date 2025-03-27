@@ -75,7 +75,8 @@
                     <label for="role">Jabatan</label>
                     <select id="role" required>
                       <option value="" disabled selected>Pilih Jabatan</option>
-                      <option value="admin">Admin (Kemahasiswaan dan DIRDIK Konselor)</option>
+                      <option value="kemahasiswaan">Kemahasiswaan</option>
+                      <option value="konselor">Konselor</option>
                       <option value="keasramaan">Keasramaan</option>
                       <option value="dosen">Dosen Wali</option>
                       <option value="mahasiswa">Mahasiswa</option>
