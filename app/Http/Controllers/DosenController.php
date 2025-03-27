@@ -13,7 +13,6 @@ class DosenController extends Controller
 {
     public function beranda()
     {
-        // Increase PHP execution time to 120 seconds
         ini_set('max_execution_time', 120);
 
         if (!session('user') || session('user')['role'] !== 'dosen') {
@@ -29,11 +28,12 @@ class DosenController extends Controller
 
         if ($apiToken) {
             try {
-                // Step 1: Fetch dosen details
+                // Fetch dosen details
                 $dosenResponse = Http::withToken($apiToken)
                     ->withOptions(['verify' => false])
                     ->timeout(15)
                     ->get("{$baseUrl}/api/library-api/dosen", ['nip' => $nip]);
+                
                 if (!$dosenResponse->successful()) {
                     Log::error('Failed to fetch dosen data', [
                         'status' => $dosenResponse->status(),
@@ -41,42 +41,42 @@ class DosenController extends Controller
                     ]);
                     return back()->with('error', 'Failed to fetch lecturer data.');
                 }
+
                 $dosenData = $dosenResponse->json();
                 $dosenSession = $dosenData['data']['dosen'][0];
                 session()->forget('user');
 
-                session([
-                    'user' => [
-                        "username"                  => $nip,
-                        "role"                      => 'dosen',
-                        "pegawai_id"                => $dosenSession['pegawai_id'],
-                        "dosen_id"                  => $dosenSession['dosen_id'],
-                        "nip"                       => $dosenSession['nip'],
-                        "nama"                      => $dosenSession['nama'],
-                        "email"                     => $dosenSession['email'],
-                        "prodi_id"                  => $dosenSession['prodi_id'],
-                        "prodi"                     => $dosenSession['prodi'],
-                        "jabatan_akademik"          => $dosenSession['jabatan_akademik'],
-                        "jabatan_akademik_desc"     => $dosenSession['jabatan_akademik_desc'],
-                        "jenjang_pendidikan"        => $dosenSession['jenjang_pendidikan'],
-                        "nidn"                      => $dosenSession['nidn'],
-                        "user_id"                   => $dosenSession['user_id'],
-                    ],
-                ]);
+                session(['user' => [
+                    "username" => $nip,
+                    "role" => 'dosen',
+                    "pegawai_id" => $dosenSession['pegawai_id'],
+                    "dosen_id" => $dosenSession['dosen_id'],
+                    "nip" => $dosenSession['nip'],
+                    "nama" => $dosenSession['nama'],
+                    "email" => $dosenSession['email'],
+                    "prodi_id" => $dosenSession['prodi_id'],
+                    "prodi" => $dosenSession['prodi'],
+                    "jabatan_akademik" => $dosenSession['jabatan_akademik'],
+                    "jabatan_akademik_desc" => $dosenSession['jabatan_akademik_desc'],
+                    "jenjang_pendidikan" => $dosenSession['jenjang_pendidikan'],
+                    "nidn" => $dosenSession['nidn'],
+                    "user_id" => $dosenSession['user_id'],
+                ]]);
+
                 $dosenId = $dosenData['data']['dosen'][0]['pegawai_id'] ?? null;
                 if (!$dosenId) {
                     return back()->with('error', 'Dosen ID not found.');
                 }
 
-                // Step 2: Fetch anak wali for each year separately
+                // Fetch anak wali for each year
                 foreach ($academicYears as $year) {
                     $mahasiswaResponse = Http::withToken($apiToken)
                         ->withOptions(['verify' => false])
                         ->timeout(15)
                         ->get("{$baseUrl}/api/library-api/get-all-students-by-dosen-wali", [
                             'dosen_id' => $dosenId,
-                            'ta'       => $year,
-                            'sem_ta'   => $currentSem,
+                            'ta' => $year,
+                            'sem_ta' => $currentSem,
                         ]);
 
                     $studentsByYear[$year] = [];
@@ -101,7 +101,7 @@ class DosenController extends Controller
                                     continue;
                                 }
 
-                                // Batch fetch penilaian data for all students in this class
+                                // Batch fetch penilaian data
                                 $penilaianDataBatch = $this->batchFetchPenilaian($students, $apiToken, $baseUrl, $year, $currentSem);
 
                                 foreach ($students as $student) {
@@ -124,23 +124,15 @@ class DosenController extends Controller
                                     // Use batched penilaian data
                                     $penilaianData = $penilaianDataBatch[$nim] ?? [
                                         'IP' => '0.00',
-                                        'IP Semester' => [
-                                            '2020_2' => [
-                                                'ta' => '2020',
-                                                'sem_ta' => 2,
-                                                'sem' => 4,
-                                                'ip_semester' => 'Belum di-generate',
-                                            ],
-                                        ],
+                                        'IP Semester' => [],
                                         'status_krs' => 'Approved',
                                     ];
 
-                                    // Get IPK directly from the "IP" field
+                                    // Calculate IPK and IPS
                                     $ipk = isset($penilaianData['IP']) && is_numeric($penilaianData['IP'])
                                         ? number_format(floatval($penilaianData['IP']), 2)
                                         : null;
 
-                                    // Get IPS (most recent semester GPA) from "IP Semester"
                                     $ipSemesterData = $penilaianData['IP Semester'] ?? [];
                                     if (!is_array($ipSemesterData)) {
                                         Log::warning("IP Semester data is not an array for student {$nim}", ['ipSemesterData' => $ipSemesterData]);
@@ -148,30 +140,21 @@ class DosenController extends Controller
                                     }
 
                                     $validIps = [];
-                                    foreach ($ipSemesterData as $key => $entry) {
+                                    foreach ($ipSemesterData as $entry) {
                                         if (!is_array($entry)) {
                                             Log::warning("IP Semester entry is not an array for student {$nim}", ['entry' => $entry]);
                                             continue;
                                         }
-
-                                        if (isset($entry['ip_semester']) && isset($entry['sem'])) {
-                                            if (!is_numeric($entry['sem'])) {
-                                                Log::warning("Invalid semester value for student {$nim}, sem = {$entry['sem']}");
-                                                continue;
-                                            }
-                                            if ($entry['ip_semester'] === "Belum di-generate") {
-                                                Log::info("IP Semester not generated for student {$nim}, semester {$entry['sem']}");
-                                                continue;
-                                            }
-                                            if (is_numeric($entry['ip_semester'])) {
-                                                $validIps[] = $entry;
-                                            }
+                                        if (isset($entry['ip_semester']) && isset($entry['sem']) && 
+                                            is_numeric($entry['ip_semester']) && 
+                                            $entry['ip_semester'] !== "Belum di-generate") {
+                                            $validIps[] = $entry;
                                         }
                                     }
 
                                     $ips = null;
                                     if (!empty($validIps)) {
-                                        usort($validIps, function($a, $b) {
+                                        usort($validIps, function ($a, $b) {
                                             return $b['sem'] - $a['sem'];
                                         });
                                         $ips = $validIps[0]['ip_semester'];
@@ -181,16 +164,15 @@ class DosenController extends Controller
                                     $semester = !empty($validIps) ? $validIps[0]['sem'] : $currentSem;
 
                                     $studentData = array_merge($student, [
-                                        'ipk'         => $ipk,
-                                        'ips'         => $ips,
-                                        'status_krs'  => $statusKrs,
-                                        'semester'    => $semester,
-                                        'kelas'       => $kelas,
+                                        'ipk' => $ipk,
+                                        'ips' => $ips,
+                                        'status_krs' => $statusKrs,
+                                        'semester' => $semester,
+                                        'kelas' => $kelas,
                                     ]);
                                     $classStudents[] = $studentData;
                                 }
 
-                                // Store this class's students under the year
                                 $studentsByYear[$year][$kelas] = $classStudents;
                             }
                         }
@@ -202,7 +184,6 @@ class DosenController extends Controller
                     }
                 }
 
-                // Step 4: Check for perwalian schedules
                 $perwalianAnnouncement = $this->checkPerwalian($nip, $apiToken, $baseUrl);
             } catch (\Exception $e) {
                 Log::error('Error fetching data in beranda:', [
@@ -212,12 +193,12 @@ class DosenController extends Controller
                 return back()->with('error', 'An error occurred while fetching data: ' . $e->getMessage());
             }
         }
+
         return view('beranda.homeDosen', compact('studentsByYear', 'perwalianAnnouncement'));
     }
 
     public function showDetailedClass($year, $kelas)
     {
-        // Increase PHP execution time to 120 seconds
         ini_set('max_execution_time', 120);
 
         if (!session('user') || session('user')['role'] !== 'dosen') {
@@ -257,8 +238,8 @@ class DosenController extends Controller
                     ->timeout(15)
                     ->get("{$baseUrl}/api/library-api/get-all-students-by-dosen-wali", [
                         'dosen_id' => $dosenId,
-                        'ta'       => $currentTa,
-                        'sem_ta'   => $currentSem,
+                        'ta' => $currentTa,
+                        'sem_ta' => $currentSem,
                     ]);
 
                 if (!$mahasiswaResponse->successful()) {
@@ -275,10 +256,8 @@ class DosenController extends Controller
                     return back()->with('error', 'No class data found.');
                 }
 
-                // Find the specific class
-                $classes = $responseData['daftar_kelas'];
                 $targetClass = null;
-                foreach ($classes as $classData) {
+                foreach ($responseData['daftar_kelas'] as $classData) {
                     if ($classData['kelas'] === $kelas) {
                         $targetClass = $classData;
                         break;
@@ -290,8 +269,6 @@ class DosenController extends Controller
                 }
 
                 $studentsInClass = $targetClass['anak_wali'] ?? [];
-
-                // Batch fetch penilaian data for all students in this class
                 $penilaianDataBatch = $this->batchFetchPenilaian($studentsInClass, $apiToken, $baseUrl, $currentTa, $currentSem);
 
                 foreach ($studentsInClass as $student) {
@@ -314,23 +291,15 @@ class DosenController extends Controller
                     // Use batched penilaian data
                     $penilaianData = $penilaianDataBatch[$nim] ?? [
                         'IP' => '0.00',
-                        'IP Semester' => [
-                            '2020_2' => [
-                                'ta' => '2020',
-                                'sem_ta' => 2,
-                                'sem' => 4,
-                                'ip_semester' => 'Belum di-generate',
-                            ],
-                        ],
+                        'IP Semester' => [],
                         'status_krs' => 'Approved',
                     ];
 
-                    // Get IPK directly from the "IP" field
+                    // Calculate IPK and IPS
                     $ipk = isset($penilaianData['IP']) && is_numeric($penilaianData['IP'])
                         ? number_format(floatval($penilaianData['IP']), 2)
                         : null;
 
-                    // Get IPS (most recent semester GPA) from "IP Semester"
                     $ipSemesterData = $penilaianData['IP Semester'] ?? [];
                     if (!is_array($ipSemesterData)) {
                         Log::warning("IP Semester data is not an array for student {$nim}", ['ipSemesterData' => $ipSemesterData]);
@@ -338,30 +307,21 @@ class DosenController extends Controller
                     }
 
                     $validIps = [];
-                    foreach ($ipSemesterData as $key => $entry) {
+                    foreach ($ipSemesterData as $entry) {
                         if (!is_array($entry)) {
                             Log::warning("IP Semester entry is not an array for student {$nim}", ['entry' => $entry]);
                             continue;
                         }
-
-                        if (isset($entry['ip_semester']) && isset($entry['sem'])) {
-                            if (!is_numeric($entry['sem'])) {
-                                Log::warning("Invalid semester value for student {$nim}, sem = {$entry['sem']}");
-                                continue;
-                            }
-                            if ($entry['ip_semester'] === "Belum di-generate") {
-                                Log::info("IP Semester not generated for student {$nim}, semester {$entry['sem']}");
-                                continue;
-                            }
-                            if (is_numeric($entry['ip_semester'])) {
-                                $validIps[] = $entry;
-                            }
+                        if (isset($entry['ip_semester']) && isset($entry['sem']) && 
+                            is_numeric($entry['ip_semester']) && 
+                            $entry['ip_semester'] !== "Belum di-generate") {
+                            $validIps[] = $entry;
                         }
                     }
 
                     $ips = null;
                     if (!empty($validIps)) {
-                        usort($validIps, function($a, $b) {
+                        usort($validIps, function ($a, $b) {
                             return $b['sem'] - $a['sem'];
                         });
                         $ips = $validIps[0]['ip_semester'];
@@ -371,11 +331,11 @@ class DosenController extends Controller
                     $semester = !empty($validIps) ? $validIps[0]['sem'] : $currentSem;
 
                     $studentData = array_merge($student, [
-                        'ipk'         => $ipk,
-                        'ips'         => $ips,
-                        'status_krs'  => $statusKrs,
-                        'semester'    => $semester,
-                        'kelas'       => $kelas,
+                        'ipk' => $ipk,
+                        'ips' => $ips,
+                        'status_krs' => $statusKrs,
+                        'semester' => $semester,
+                        'kelas' => $kelas,
                     ]);
 
                     $students[] = $studentData;
@@ -394,16 +354,6 @@ class DosenController extends Controller
         return view('dosen.detailedClass', compact('students', 'year', 'kelas', 'perwalianAnnouncement'));
     }
 
-    /**
-     * Batch fetch penilaian data for multiple students.
-     *
-     * @param array $students
-     * @param string $apiToken
-     * @param string $baseUrl
-     * @param int $year
-     * @param int $semester
-     * @return array
-     */
     private function batchFetchPenilaian($students, $apiToken, $baseUrl, $year, $semester)
     {
         $penilaianDataBatch = [];
@@ -415,8 +365,6 @@ class DosenController extends Controller
             return $penilaianDataBatch;
         }
 
-        // Check if we can batch fetch via a single API call (if the API supports it)
-        // For now, we'll simulate batching by making individual calls in parallel
         $promises = [];
         foreach ($nims as $nim) {
             $cacheKey = "penilaian_{$nim}_{$year}_{$semester}";
@@ -432,9 +380,9 @@ class DosenController extends Controller
                 ->timeout(15)
                 ->async()
                 ->get("{$baseUrl}/api/library-api/get-penilaian", [
-                    'nim'     => $nim,
-                    'ta'      => $year,
-                    'sem_ta'  => $semester,
+                    'nim' => $nim,
+                    'ta' => $year,
+                    'sem_ta' => $semester,
                 ]);
         }
 
@@ -444,7 +392,6 @@ class DosenController extends Controller
                 if ($response->successful()) {
                     $penilaianData = $response->json();
                     $penilaianDataBatch[$nim] = $penilaianData;
-                    // Cache the response for 1 hour
                     Cache::put("penilaian_{$nim}_{$year}_{$semester}", $penilaianData, now()->addHour());
                 } else {
                     Log::warning("Failed to fetch penilaian data for student {$nim}", [
@@ -453,14 +400,7 @@ class DosenController extends Controller
                     ]);
                     $penilaianDataBatch[$nim] = [
                         'IP' => '0.00',
-                        'IP Semester' => [
-                            '2020_2' => [
-                                'ta' => '2020',
-                                'sem_ta' => 2,
-                                'sem' => 4,
-                                'ip_semester' => 'Belum di-generate',
-                            ],
-                        ],
+                        'IP Semester' => [],
                         'status_krs' => 'Approved',
                     ];
                 }
@@ -473,14 +413,7 @@ class DosenController extends Controller
                 ]);
                 $penilaianDataBatch[$nim] = [
                     'IP' => '0.00',
-                    'IP Semester' => [
-                        '2020_2' => [
-                            'ta' => '2020',
-                            'sem_ta' => 2,
-                            'sem' => 4,
-                            'ip_semester' => 'Belum di-generate',
-                        ],
-                    ],
+                    'IP Semester' => [],
                     'status_krs' => 'Approved',
                 ];
             }
