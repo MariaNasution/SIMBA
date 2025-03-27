@@ -20,57 +20,99 @@ class BeritaAcaraController extends Controller
             return redirect()->route('login')->withErrors(['error' => 'Anda harus login untuk mengakses berita acara.']);
         }
 
-        // Fetch classes associated with the user (e.g., from a dosen_wali table)
+        // Fetch classes associated with the user
         $classes = [];
         $dosenRecord = DB::table('dosen_wali')
             ->where('username', $user['username'])
             ->first();
-
         if ($dosenRecord && !empty($dosenRecord->kelas)) {
             $classes = array_map('trim', explode(',', $dosenRecord->kelas));
+        }
+        Log::info('Classes fetched for user', ['username' => $user['username'], 'classes' => $classes]);
+
+        // Fetch all completed perwalians for these classes
+        $completedPerwalians = Perwalian::whereIn('kelas', $classes)
+            ->where('ID_Dosen_Wali', $user['nip'])
+            ->where('Status', 'Completed')
+            ->where('Tanggal', '<=', now()->format('Y-m-d'))
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('absensi')
+                    ->whereColumn('absensi.ID_Perwalian', 'perwalian.ID_Perwalian');
+            })
+            ->whereNotExists(function ($query) use ($user) {
+                $query->select(DB::raw(1))
+                    ->from('berita_acaras')
+                    ->whereColumn('berita_acaras.tanggal_perwalian', 'perwalian.Tanggal')
+                    ->whereColumn('berita_acaras.kelas', 'perwalian.kelas')
+                    ->where('berita_acaras.user_id', $user['user_id']);
+            })
+            ->get()
+            ->map(function ($perwalian) {
+                return [
+                    'class' => $perwalian->kelas,
+                    'date' => $perwalian->Tanggal,
+                    'display' => "Kelas {$perwalian->kelas} - " . Carbon::parse($perwalian->Tanggal)->translatedFormat('l, d F Y'),
+                ];
+            })->toArray();
+
+        Log::info('Completed perwalians fetched', [
+            'count' => count($completedPerwalians),
+            'data' => $completedPerwalians
+        ]);
+
+        return view('perwalian.berita_acara_select_class', compact('completedPerwalians'));
+    }
+
+    public function create(Request $request)
+    {
+        $user = session('user');
+        if (!$user) {
+            return redirect()->route('login')->withErrors(['error' => 'Anda harus login untuk mengakses berita acara.']);
         }
 
         $selectedClass = $request->query('kelas');
         $selectedDate = $request->query('tanggal_perwalian');
 
-        // Fetch available finished perwalian sessions for the selected class
-        $availablePerwalians = [];
-        if ($selectedClass) {
-            $availablePerwalians = Perwalian::where('kelas', $selectedClass)
-                ->where('ID_Dosen_Wali', $user['nip'])
-                ->where('Status', 'Completed') // Only completed perwalian sessions
-                ->where('Tanggal', '<=', now()->format('Y-m-d')) // Only past or today
-                ->whereHas('absensi') // Ensure absensi records exist
-                // ->whereDoesntHave('beritaAcara', function ($query) use ($user) {
-                //     $query->where('user_id', $user['user_id']);
-                // }) // Exclude perwalian sessions that already have a Berita Acara
-                ->get();
+        if (!$selectedClass || !$selectedDate) {
+            return redirect()->route('berita_acara.select_class')->withErrors(['error' => 'Kelas dan tanggal perwalian harus dipilih.']);
         }
 
-        // Fetch absensi records for the selected perwalian session
-        $absensiRecords = [];
-        $perwalian = null;
+        // Fetch the perwalian to ensure it exists and meets criteria
+        $perwalian = Perwalian::where('kelas', $selectedClass)
+            ->where('Tanggal', $selectedDate)
+            ->where('ID_Dosen_Wali', $user['nip'])
+            ->where('Status', 'Completed')
+            ->where('Tanggal', '<=', now()->format('Y-m-d'))
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('absensi')
+                    ->whereColumn('absensi.ID_Perwalian', 'perwalian.ID_Perwalian');
+            })
+            ->whereNotExists(function ($query) use ($user) {
+                $query->select(DB::raw(1))
+                    ->from('berita_acaras')
+                    ->whereColumn('berita_acaras.tanggal_perwalian', 'perwalian.Tanggal')
+                    ->whereColumn('berita_acaras.kelas', 'perwalian.kelas')
+                    ->where('berita_acaras.user_id', $user['user_id']);
+            })
+            ->first();
 
-        if ($selectedClass && $selectedDate) {
-            $perwalian = Perwalian::where('kelas', $selectedClass)
-                ->where('Tanggal', $selectedDate)
-                ->where('ID_Dosen_Wali', $user['nip'])
-                ->where('Status', 'Completed')
-                ->where('Tanggal', '<=', now()->format('Y-m-d'))
-                ->whereHas('absensi')
-                ->whereDoesntHave('beritaAcara', function ($query) use ($user) {
-                    $query->where('user_id', $user['user_id']);
-                })
-                ->first();
-
-            if ($perwalian) {
-                $absensiRecords = Absensi::where('ID_Perwalian', $perwalian->ID_Perwalian)
-                    ->with('mahasiswa')
-                    ->get();
-            }
+        if (!$perwalian) {
+            return redirect()->route('berita_acara.select_class')->withErrors(['error' => 'Perwalian ini tidak valid atau sudah memiliki berita acara.']);
         }
 
-        return view('perwalian.berita_acara', compact('classes', 'selectedClass', 'selectedDate', 'absensiRecords', 'availablePerwalians', 'perwalian'));
+        // Fetch absensi records
+        $absensiRecords = Absensi::where('ID_Perwalian', $perwalian->ID_Perwalian)
+            ->with('mahasiswa')
+            ->get();
+
+        Log::info('Absensi records fetched for form', [
+            'ID_Perwalian' => $perwalian->ID_Perwalian,
+            'count' => $absensiRecords->count()
+        ]);
+
+        return view('perwalian.berita_acara', compact('selectedClass', 'selectedDate', 'absensiRecords', 'perwalian'));
     }
 
     public function store(Request $request)
@@ -83,15 +125,23 @@ class BeritaAcaraController extends Controller
         $selectedClass = $request->kelas;
         $selectedDate = $request->tanggal_perwalian;
 
-        // Verify the perwalian session is completed and has absensi records
+        // Verify the perwalian session
         $perwalian = Perwalian::where('kelas', $selectedClass)
             ->where('Tanggal', $selectedDate)
             ->where('ID_Dosen_Wali', $user['nip'])
             ->where('Status', 'Completed')
             ->where('Tanggal', '<=', now()->format('Y-m-d'))
-            ->whereHas('absensi')
-            ->whereDoesntHave('beritaAcara', function ($query) use ($user) {
-                $query->where('user_id', $user['user_id']);
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('absensi')
+                    ->whereColumn('absensi.ID_Perwalian', 'perwalian.ID_Perwalian');
+            })
+            ->whereNotExists(function ($query) use ($user) {
+                $query->select(DB::raw(1))
+                    ->from('berita_acaras')
+                    ->whereColumn('berita_acaras.tanggal_perwalian', 'perwalian.Tanggal')
+                    ->whereColumn('berita_acaras.kelas', 'perwalian.kelas')
+                    ->where('berita_acaras.user_id', $user['user_id']);
             })
             ->first();
 
@@ -109,7 +159,7 @@ class BeritaAcaraController extends Controller
                 'required',
                 'date',
                 'date_format:Y-m-d',
-                'before_or_equal:' . now()->format('Y-m-d'), // Must be in the past or today
+                'before_or_equal:' . now()->format('Y-m-d'),
             ],
             'perihal_perwalian' => 'required|string|max:255',
             'agenda' => 'required|string',
@@ -167,10 +217,10 @@ class BeritaAcaraController extends Controller
                 'tanggal_perwalian' => $request->tanggal_perwalian,
             ]);
         } catch (\Exception $e) {
-            Log::error('Failed to create Berita Acara: ' . $e->getMessage());
+            Log::error('Failed to create Berita Acara: ' . $e->getMessage(), ['exception' => $e->getTraceAsString()]);
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal menyimpan berita acara. Silakan coba lagi.',
+                'message' => 'Gagal menyimpan berita acara: ' . $e->getMessage(),
             ], 500);
         }
     }

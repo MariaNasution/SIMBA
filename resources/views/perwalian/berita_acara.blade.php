@@ -1,116 +1,110 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="d-flex align-items-center mb-4 border-bottom-line">
-        <h3 class="me-auto" style="font-size: 24px; font-weight: 700; color: #333;">Buat Berita Acara</h3>
-        <a href="#" onclick="confirmLogout()">
-            <i class="fas fa-sign-out-alt fs-5 cursor-pointer" style="color: #333; font-size: 24px;" title="Logout"></i>
-        </a>
-    </div>
-
-    <!-- Back Button -->
-    <div class="mb-4">
-        <a href="{{ route('dosen') }}" class="btn btn-outline-primary">
-            <i class="fas fa-arrow-left"></i> Back
-        </a>
-    </div>
-
-    <!-- Feedback Messages -->
-    <div id="feedbackMessage" class="alert alert-dismissible fade show d-none" role="alert">
-        <span id="feedbackText"></span>
-        <button type="button" class="btn-close" onclick="hideFeedback()"></button>
-    </div>
-
-    <!-- Class Selection (Buttons) -->
-    <div class="mb-4">
-        <h4 style="font-size: 18px; font-weight: 600; color: #333;">Pilih Kelas:</h4>
-        <div class="d-flex flex-wrap gap-2">
-            @if (empty($classes))
-                <p class="text-muted">Tidak ada kelas yang ditugaskan untuk Anda.</p>
-            @else
-                @foreach ($classes as $class)
-                    <a href="{{ route('berita_acara.select_class', ['kelas' => $class]) }}"
-                       class="btn {{ $selectedClass === $class ? 'btn-primary' : 'btn-outline-primary' }}">
-                        Kelas {{ $class }}
-                    </a>
-                @endforeach
-            @endif
+    <div class="container">
+        <div class="d-flex align-items-center mb-4 border-bottom-line">
+            <h3 class="me-auto" style="font-size: 24px; font-weight: 700; color: #333;">Buat Berita Acara</h3>
+            <a href="#" onclick="confirmLogout()">
+                <i class="fas fa-sign-out-alt fs-5 cursor-pointer" style="color: #333; font-size: 24px;" title="Logout"></i>
+            </a>
         </div>
-    </div>
 
-    <!-- Perwalian Selection (Dropdown) -->
-    @if ($selectedClass)
+        <!-- Back Button -->
         <div class="mb-4">
-            <form id="perwalianSelectForm" onsubmit="updateSelection(event)">
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label for="perwalianSelect" style="font-size: 16px; font-weight: 500; color: #333;">Pilih Perwalian:</label>
-                        <select id="perwalianSelect" name="tanggal_perwalian" class="form-select" onchange="this.form.submit()">
-                            <option value="" disabled {{ !$selectedDate ? 'selected' : '' }}>Pilih perwalian</option>
-                            @if ($availablePerwalians->isEmpty())
-                                <option value="" disabled>Tidak ada perwalian selesai untuk kelas ini</option>
-                            @else
-                                @foreach ($availablePerwalians as $perwalianItem)
-                                    <option value="{{ $perwalianItem->Tanggal }}" {{ $selectedDate === $perwalianItem->Tanggal ? 'selected' : '' }}>
-                                        {{ \Carbon\Carbon::parse($perwalianItem->Tanggal)->translatedFormat('l, d F Y') }}
-                                    </option>
-                                @endforeach
-                            @endif
-                        </select>
-                    </div>
-                </div>
-            </form>
+            <a href="{{ route('berita_acara.select_class') }}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
         </div>
-    @endif
 
-    <!-- Absensi Table and Berita Acara Form -->
-    @if($selectedClass && $selectedDate && $perwalian)
+        <!-- Feedback Messages -->
+        <div id="feedbackMessage" class="alert alert-dismissible fade show d-none" role="alert">
+            <span id="feedbackText"></span>
+            <button type="button" class="btn-close" onclick="hideFeedback()"></button>
+        </div>
+
         <!-- Absensi Table -->
         <div class="mb-4">
-            <h4 style="font-size: 18px; font-weight: 600; color: #333;">Absensi Kelas {{ $selectedClass }} pada {{ \Carbon\Carbon::parse($selectedDate)->translatedFormat('l, d F Y') }}</h4>
-            @if($absensiRecords->isNotEmpty())
-                <table class="table table-bordered">
-                    <thead>
+            <h4 style="font-size: 18px; font-weight: 600; color: #333;">
+                Absensi Kelas {{ $selectedClass }} pada {{ \Carbon\Carbon::parse($selectedDate)->translatedFormat('l, d F Y') }}
+            </h4>
+
+            <style>
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 20px;
+                }
+
+                th, td {
+                    border: 1px solid #ddd;
+                    padding: 8px;
+                    text-align: left;
+                }
+
+                th {
+                    background-color: #f2f2f2;
+                }
+
+                .status-display {
+                    display: block;
+                }
+
+                .status-desc {
+                    position: relative;
+                }
+            </style>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>NIM</th>
+                        <th>Nama</th>
+                        <th>Status Kehadiran</th>
+                        <th>Keterangan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($absensiRecords as $record)
                         <tr>
-                            <th>Nama Mahasiswa</th>
-                            <th>Status Kehadiran</th>
+                            <td>{{ $record->nim ?? 'N/A' }}</td>
+                            <td>{{ $record->mahasiswa->nama ?? 'Unknown' }}</td>
+                            <td>
+                                <div class="status-display">
+                                    <span class="selected-status">
+                                        @if ($record->status_kehadiran === 'hadir')
+                                            ✅ Hadir
+                                        @elseif ($record->status_kehadiran === 'alpa')
+                                            ❌ Alpa
+                                        @elseif ($record->status_kehadiran === 'izin')
+                                            📝 Izin
+                                        @else
+                                            Tidak Diketahui
+                                        @endif
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="status-desc">
+                                <span class="keterangan-text">
+                                    {{ $record->keterangan ?? '' }}
+                                </span>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($absensiRecords as $record)
-                            <tr>
-                                <td>{{ $record->mahasiswa->nama ?? 'Nama Tidak Ditemukan' }}</td>
-                                <td>
-                                    @if($record->status_kehadiran === 'hadir')
-                                        <span class="text-success"><i class="fas fa-check"></i> Hadir</span>
-                                    @elseif($record->status_kehadiran === 'alpa')
-                                        <span class="text-danger"><i class="fas fa-times"></i> Alpa</span>
-                                    @elseif($record->status_kehadiran === 'izin')
-                                        <span class="text-warning"><i class="fas fa-exclamation-circle"></i> Izin</span>
-                                    @endif
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            @else
-                <p class="text-muted">Tidak ada data absensi untuk perwalian ini.</p>
-            @endif
+                    @empty
+                        <tr>
+                            <td colspan="4">Tidak ada data absensi untuk perwalian ini.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
 
         <!-- Berita Acara Form -->
         <div class="text-center">
-            <!-- Logo Kampus -->
             <img src="{{ asset('assets/img/Logo Institut Teknologi Del.png') }}" alt="Logo IT Del" class="mb-4" style="max-width: 150px;">
-
-            <!-- Judul Halaman -->
             <h3 class="fw-bold title-centered">AGENDA PERWALIAN</h3>
 
             <form id="beritaAcaraForm" onsubmit="handleFormSubmit(event)">
                 @csrf
-
-                <!-- Informasi Perwalian -->
                 <div class="text-start mt-4">
                     <div class="info-container">
                         <div class="info-row">
@@ -128,7 +122,6 @@
                     </div>
                 </div>
 
-                <!-- Box Berita Acara -->
                 <div class="berita-acara-box">
                     <div class="info-container">
                         <div class="info-row">
@@ -146,7 +139,6 @@
                     </div>
                 </div>
 
-                <!-- Footer Informasi Halaman -->
                 <div class="footer-info">
                     <span class="left">IT Del/Berita Acara Perwalian</span>
                     <span class="right">Halaman 1 dari 2</span>
@@ -154,19 +146,15 @@
 
                 <div class="page-break"></div>
 
-                <!-- Halaman 2 -->
                 <img src="{{ asset('assets/img/Logo Institut Teknologi Del.png') }}" alt="Logo IT Del" class="mb-4" style="max-width: 150px;">
-
                 <h3 class="fw-bold title-centered">BERITA ACARA PERWALIAN</h3>
                 <h5 class="sub-title">( Feedback dari mahasiswa selama perwalian )</h5>
 
-                <!-- Box Berita Acara Kedua -->
                 <div class="berita-acara-box">
                     <div class="info-container">
                         <div class="info-row">
                             <span class="info-label">Hari/Tanggal</span><span>:</span>
-                            <input type="date" name="hari_tanggal" value="{{ old('hari_tanggal') }}" class="editable-input"
-                                   min="2025-01-01" max="2027-12-31" required oninput="showFieldFeedback('Hari/Tanggal Feedback', this)">
+                            <input type="date" name="hari_tanggal" value="{{ old('hari_tanggal') }}" class="editable-input" min="2025-01-01" max="2027-12-31" required oninput="showFieldFeedback('Hari/Tanggal Feedback', this)">
                         </div>
                         <div class="info-row">
                             <span class="info-label">Perihal Feedback</span><span>:</span>
@@ -179,24 +167,19 @@
                     </div>
                 </div>
 
-                <!-- Tanda Tangan -->
                 <div class="signature-box">
                     <p>
-                        Sitoluama, <input type="date" name="tanggal_ttd" value="{{ old('tanggal_ttd') }}" class="editable-input"
-                                         min="2025-01-01" max="2027-12-31" required oninput="showFieldFeedback('Tanggal Tanda Tangan', this)">
+                        Sitoluama, <input type="date" name="tanggal_ttd" value="{{ old('tanggal_ttd') }}" class="editable-input" min="2025-01-01" max="2027-12-31" required oninput="showFieldFeedback('Tanggal Tanda Tangan', this)">
                     </p>
                     <br><br><br>
-                    <p><input type="text" name="dosen_wali_ttd" value="({{ session('user')['username'] ?? 'Nama Tidak Ditemukan' }})"
-                              class="editable-input" required oninput="showFieldFeedback('Dosen Wali TTD', this)"></p>
+                    <p><input type="text" name="dosen_wali_ttd" value="({{ session('user')['username'] ?? 'Nama Tidak Ditemukan' }})" class="editable-input" required oninput="showFieldFeedback('Dosen Wali TTD', this)"></p>
                 </div>
 
-                <!-- Footer Halaman 2 -->
                 <div class="footer-info">
                     <span class="left">IT Del/Berita Acara Perwalian</span>
                     <span class="right">Halaman 2 dari 2</span>
                 </div>
 
-                <!-- Tombol Submit -->
                 <div class="submit-container">
                     <button type="submit" class="btn btn-success" id="submitButton">
                         <span id="buttonText">Submit</span>
@@ -223,152 +206,30 @@
                 </div>
             </div>
         </div>
-    @elseif($selectedClass && $selectedDate)
-        <p class="text-muted">Perwalian ini belum selesai, tidak memiliki absensi, atau sudah memiliki berita acara.</p>
-    @endif
+    </div>
 
     <style>
-        .border-bottom-line {
-            border-bottom: 1px solid #E5E5E5;
-            padding-bottom: 10px;
-        }
-
-        #feedbackMessage.alert-success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        #feedbackMessage.alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-
-        .editable {
-            display: inline-block;
-            min-width: 50px;
-            max-width: 100%;
-            cursor: text;
-            padding: 2px 5px;
-            white-space: pre-wrap;
-            word-break: break-word;
-            overflow-wrap: break-word;
-            text-align: left;
-        }
-
-        .editable:focus {
-            outline: none;
-            border-bottom: 1px solid #007bff;
-        }
-
-        .berita-acara-box {
-            min-height: 700px;
-            border: 2px solid #333;
-            border-radius: 5px;
-            padding: 15px;
-            background-color: #f9f9f9;
-        }
-
-        .info-container {
-            display: grid;
-            grid-template-columns: max-content 10px auto;
-            gap: 5px;
-        }
-
-        .info-row {
-            display: contents;
-        }
-
-        .info-label-large {
-            font-size: 1.2rem;
-            font-weight: bold;
-            text-align: left;
-            white-space: nowrap;
-        }
-
-        .info-label {
-            font-size: 1rem;
-            font-weight: normal;
-            text-align: left;
-            white-space: nowrap;
-        }
-
-        .info-row span {
-            align-self: start;
-        }
-
-        .title-centered {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100px;
-        }
-
-        .footer-info {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-            font-size: 0.9rem;
-            font-weight: bold;
-        }
-
-        .footer-info .left {
-            text-align: left;
-        }
-
-        .footer-info .right {
-            text-align: right;
-        }
-
-        .page-break {
-            page-break-before: always;
-            margin-top: 100px;
-        }
-
-        .signature-box {
-            margin-top: 40px;
-            text-align: left;
-        }
-
-        .signature-box p {
-            margin: 5px 0;
-            font-size: 1rem;
-            font-weight: bold;
-        }
-
-        .submit-container {
-            display: flex;
-            justify-content: flex-end;
-            padding-right: 50px;
-            margin-top: 50px;
-        }
-
-        .editable-input,
-        .editable-textarea {
-            border: none;
-            background: transparent;
-            outline: none;
-            width: 100%;
-            font-size: inherit;
-            font-family: inherit;
-        }
-
-        .editable-textarea {
-            min-height: 50px;
-            resize: none;
-        }
-
-        .btn-outline-primary {
-            transition: all 0.3s ease;
-        }
-
-        .btn-outline-primary:hover {
-            background-color: #e9ecef;
-        }
-
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-        }
+        .border-bottom-line { border-bottom: 1px solid #E5E5E5; padding-bottom: 10px; }
+        #feedbackMessage.alert-success { background-color: #d4edda; color: #155724; }
+        #feedbackMessage.alert-danger { background-color: #f8d7da; color: #721c24; }
+        .berita-acara-box { min-height: 700px; border: 2px solid #333; border-radius: 5px; padding: 15px; background-color: #f9f9f9; }
+        .info-container { display: grid; grid-template-columns: max-content 10px auto; gap: 5px; }
+        .info-row { display: contents; }
+        .info-label-large { font-size: 1.2rem; font-weight: bold; text-align: left; white-space: nowrap; }
+        .info-label { font-size: 1rem; font-weight: normal; text-align: left; white-space: nowrap; }
+        .info-row span { align-self: start; }
+        .title-centered { display: flex; justify-content: center; align-items: center; min-height: 100px; }
+        .footer-info { display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.9rem; font-weight: bold; }
+        .footer-info .left { text-align: left; }
+        .footer-info .right { text-align: right; }
+        .page-break { page-break-before: always; margin-top: 100px; }
+        .signature-box { margin-top: 40px; text-align: left; }
+        .signature-box p { margin: 5px 0; font-size: 1rem; font-weight: bold; }
+        .submit-container { display: flex; justify-content: flex-end; padding-right: 50px; margin-top: 50px; }
+        .editable-input, .editable-textarea { border: none; background: transparent; outline: none; width: 100%; font-size: inherit; font-family: inherit; }
+        .editable-textarea { min-height: 50px; resize: none; }
+        .btn-outline-primary { transition: all 0.3s ease; }
+        .btn-outline-primary:hover { background-color: #e9ecef; }
     </style>
 
     <script>
@@ -396,26 +257,6 @@
             }
         }
 
-        function updateSelection(event) {
-            event.preventDefault();
-            const form = document.getElementById('perwalianSelectForm');
-            const kelas = "{{ $selectedClass }}";
-            const tanggal = document.getElementById('perwalianSelect').value;
-
-            if (tanggal) {
-                showFeedback(`Perwalian dipilih: ${new Date(tanggal).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}`, 'success');
-            }
-
-            const url = new URL(window.location.href);
-            url.searchParams.set('kelas', kelas);
-            if (tanggal) {
-                url.searchParams.set('tanggal_perwalian', tanggal);
-            } else {
-                url.searchParams.delete('tanggal_perwalian');
-            }
-            window.location.href = url.toString();
-        }
-
         function handleFormSubmit(event) {
             event.preventDefault();
             const form = document.getElementById('beritaAcaraForm');
@@ -423,7 +264,6 @@
             const buttonText = document.getElementById('buttonText');
             const buttonLoading = document.getElementById('buttonLoading');
 
-            // Show loading state
             submitButton.disabled = true;
             buttonText.classList.add('d-none');
             buttonLoading.classList.remove('d-none');
@@ -436,17 +276,16 @@
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                 },
             })
             .then(response => response.json())
             .then(data => {
-                // Reset button state
                 submitButton.disabled = false;
                 buttonText.classList.remove('d-none');
                 buttonLoading.classList.add('d-none');
 
                 if (data.success) {
-                    // Show success modal
                     const modal = new bootstrap.Modal(document.getElementById('beritaAcaraModal'));
                     document.getElementById('modalLabel').textContent = `Berita Acara ${data.kelas}`;
                     document.getElementById('modalMessage').textContent = `Terima kasih telah mengisi berita acara kelas ${data.kelas} pada perwalian`;
@@ -457,9 +296,6 @@
                         year: 'numeric'
                     });
                     modal.show();
-
-                    // Reset form
-                    form.reset();
                 } else {
                     showFeedback(data.message, 'danger');
                 }
@@ -469,7 +305,7 @@
                 submitButton.disabled = false;
                 buttonText.classList.remove('d-none');
                 buttonLoading.classList.add('d-none');
-                showFeedback('Gagal mengirimkan form. Silakan coba lagi.', 'danger');
+                showFeedback('Gagal mengirimkan form: ' + error.message, 'danger');
             });
         }
 
@@ -479,5 +315,4 @@
             }
         }
     </script>
-</div>
 @endsection

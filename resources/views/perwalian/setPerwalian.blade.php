@@ -8,13 +8,11 @@
         </a>
     </div>
     <div class="main-content flex-grow-1 p-4">
-        <!-- Feedback Messages -->
         <div id="feedbackMessage" class="alert alert-dismissible fade show d-none" role="alert">
             <span id="feedbackText"></span>
             <button type="button" class="btn-close" onclick="hideFeedback()"></button>
         </div>
 
-        <!-- Class Selection Dropdown -->
         <div class="mb-4">
             <label for="classSelect" style="font-size: 16px; font-weight: 500; color: #333;">Select Class for Perwalian:</label>
             <select id="classSelect" name="selectedClass" class="form-select" style="max-width: 200px;" onchange="updateSelectedClass()">
@@ -29,7 +27,6 @@
             </select>
         </div>
 
-        <!-- Calendar Container -->
         <div class="calendar-container mb-5 mx-auto position-relative" style="max-width: 500px; background: #fff;">
             <div class="d-flex justify-content-between align-items-center mb-2 p-3 border-bottom">
                 <button onclick="changeMonth('{{ $currentDate->copy()->subMonth()->format('Y-m') }}')" class="btn btn-outline-secondary" style="border-radius: 4px;" id="prevMonthBtn"><</button>
@@ -43,7 +40,6 @@
             </div>
         </div>
 
-        <!-- Request/Edit Button -->
         <div class="d-flex justify-content-end mt-4">
             <form id="requestForm" onsubmit="handleFormSubmit(event)">
                 @csrf
@@ -60,10 +56,8 @@
                 </button>
             </form>
         </div>
-        <p class="text-muted mt-2" style="font-size: 12px;" id="noteText">
-        </p>
+        <p class="text-muted mt-2" style="font-size: 12px;" id="noteText"></p>
 
-        <!-- Dosen Notifications (Optional Display) -->
         @if(!empty($dosenNotifications) && $dosenNotifications->count() > 0)
             <div class="mt-4">
                 <h5 style="font-size: 18px; font-weight: 600; color: #333;">Related Dosen</h5>
@@ -79,142 +73,37 @@
     </div>
 
     <style>
-        .border-bottom-line {
-            border-bottom: 1px solid #E5E5E5;
-            padding-bottom: 10px;
-        }
-
-        .calendar-container {
-            width: 100%;
-            border: none;
-        }
-
-        .calendar-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: #fff;
-            border: none;
-            font-weight: bold;
-        }
-
-        .calendar-table thead th {
-            border: none;
-            text-align: center;
-            padding: 12px;
-            color: #13946D;
-            font-size: 14px;
-            font-weight: bold;
-            transition: background-color 0.2s;
-        }
-
-        .calendar-table th,
-        .calendar-table td {
-            border: none;
-            text-align: center;
-            padding: 12px;
-            font-size: 18px;
-            transition: background-color 0.2s;
-        }
-
-        .calendar-table th {
-            color: #666;
-            text-transform: uppercase;
-            font-weight: 500;
-        }
-
-        .day {
-            position: relative;
-        }
-
-        .day.clickable {
-            cursor: pointer;
-        }
-
-        .day.clickable:hover {
-            background-color: #f0f0f0;
-        }
-
-        .day:not(.clickable) {
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
-        .day.past {
-            background-color: #f8f8f8;
-            color: #ccc;
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-
-        .today {
-            background-color: #e9ecef;
-            font-weight: 600;
-        }
-
-        .weekend .date-number {
-            color: #DC3545;
-        }
-
-        .dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            display: block;
-            margin: 2px auto;
-        }
-
-        .holiday-dot {
-            background-color: #DC3545;
-        }
-
-        .scheduled-dot {
-            background-color: #28A745; /* Green dot for scheduled Perwalian */
-        }
-
-        .date-number {
-            display: block;
-            margin-bottom: 2px;
-        }
-
-        .btn:hover {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .selected-date {
-            position: relative;
-        }
-
-        .selected-date::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 30px;
-            height: 30px;
-            border: 2px solid #28A745;
-            border-radius: 50%;
-            z-index: 1;
-        }
-
-        #feedbackMessage.alert-success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        #feedbackMessage.alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
+        .border-bottom-line { border-bottom: 1px solid #E5E5E5; padding-bottom: 10px; }
+        .calendar-container { width: 100%; border: none; }
+        .calendar-table { width: 100%; border-collapse: collapse; background: #fff; border: none; font-weight: bold; }
+        .calendar-table thead th { border: none; text-align: center; padding: 12px; color: #13946D; font-size: 14px; font-weight: bold; transition: background-color 0.2s; }
+        .calendar-table th, .calendar-table td { border: none; text-align: center; padding: 12px; font-size: 18px; transition: background-color 0.2s; }
+        .calendar-table th { color: #666; text-transform: uppercase; font-weight: 500; }
+        .day { position: relative; }
+        .day.clickable { cursor: pointer; }
+        .day.clickable:hover { background-color: #f0f0f0; }
+        .day:not(.clickable) { cursor: not-allowed; opacity: 0.6; }
+        .day.past { background-color: #f8f8f8; color: #ccc; cursor: not-allowed; opacity: 0.5; }
+        .today { background-color: #e9ecef; font-weight: 600; }
+        .weekend .date-number { color: #DC3545; }
+        .dot { width: 6px; height: 6px; border-radius: 50%; display: block; margin: 2px auto; }
+        .holiday-dot { background-color: #DC3545; }
+        .scheduled-dot { background-color: #28A745; }
+        .date-number { display: block; margin-bottom: 2px; }
+        .btn:hover { box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
+        .selected-date { position: relative; }
+        .selected-date::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 30px; height: 30px; border: 2px solid #28A745; border-radius: 50%; z-index: 1; }
+        #feedbackMessage.alert-success { background-color: #d4edda; color: #155724; }
+        #feedbackMessage.alert-danger { background-color: #f8d7da; color: #721c24; }
     </style>
 
     <script>
-        // Pass the scheduled classes and dates to JavaScript
         let scheduledClasses = @json($scheduledClasses);
         let scheduledDatesByClass = @json($scheduledDatesByClass);
         const storeRoute = "{{ route('set.perwalian.store') }}";
         const destroyRoute = "{{ route('set.perwalian.destroy') }}";
         const calendarRoute = "{{ route('set.perwalian.calendar') }}";
+        const csrfToken = "{{ csrf_token() }}";
 
         let currentlySelectedDay = null;
         let currentMonth = "{{ $currentDate->format('Y-m') }}";
@@ -235,6 +124,23 @@
             feedbackMessage.classList.add('d-none');
         }
 
+        function updateScheduledMarkers() {
+            const classSelect = document.getElementById('classSelect');
+            const selectedClass = classSelect.value;
+            const scheduledDates = scheduledDatesByClass[selectedClass] || [];
+
+            document.querySelectorAll('.scheduled-dot').forEach(dot => {
+                dot.style.display = 'none';
+            });
+
+            document.querySelectorAll('.day').forEach(day => {
+                const date = day.getAttribute('data-date');
+                if (date && scheduledDates.includes(date)) {
+                    day.querySelector('.scheduled-dot').style.display = 'block';
+                }
+            });
+        }
+
         function updateSelectedClass() {
             const classSelect = document.getElementById('classSelect');
             const selectedClassInput = document.getElementById('selectedClass');
@@ -245,32 +151,28 @@
             const noteText = document.getElementById('noteText');
 
             selectedClassInput.value = classSelect.value;
-
-            // Check if the selected class has a scheduled Perwalian
             const isScheduled = scheduledClasses.includes(classSelect.value);
 
             if (isScheduled) {
-                // Set to Edit mode
                 actionButton.style.backgroundColor = '#DC3545';
                 buttonText.textContent = 'Edit';
                 requestForm.action = destroyRoute;
                 methodField.value = 'DELETE';
                 noteText.style.display = 'none';
+                actionButton.disabled = !classSelect.value;
             } else {
-                // Set to Request mode
                 actionButton.style.backgroundColor = '#28A745';
                 buttonText.textContent = 'Request';
                 requestForm.action = storeRoute;
                 methodField.value = '';
                 noteText.style.display = 'block';
+                const selectedDate = document.getElementById('selectedDate').value;
+                actionButton.disabled = !(classSelect.value && selectedDate);
             }
 
-            // Update scheduled date markers
             updateScheduledMarkers();
-
-            // Enable or disable calendar clicking based on class selection
             const days = document.querySelectorAll('.day');
-            if (classSelect.value) {
+            if (classSelect.value && !isScheduled) {
                 days.forEach(day => {
                     if (!day.classList.contains('past')) {
                         day.classList.add('clickable');
@@ -279,46 +181,25 @@
                 showFeedback('Class selected: ' + classSelect.value, 'success');
             } else {
                 days.forEach(day => {
-                    day.classList.remove('clickable');
-                    if (day === currentlySelectedDay) {
+                    if (!isScheduled) {
+                        day.classList.remove('clickable');
+                    }
+                    if (day === currentlySelectedDay && !isScheduled) {
                         day.classList.remove('selected-date');
                         currentlySelectedDay = null;
                         document.getElementById('selectedDate').value = '';
-                        actionButton.disabled = true;
                     }
                 });
-                showFeedback('Please select a class to interact with the calendar.', 'danger');
-            }
-
-            // Enable the button if both a class and a date are selected
-            const selectedDate = document.getElementById('selectedDate').value;
-            actionButton.disabled = !(classSelect.value && selectedDate);
-        }
-
-        function updateScheduledMarkers() {
-            const classSelect = document.getElementById('classSelect');
-            const selectedClass = classSelect.value;
-            const scheduledDates = scheduledDatesByClass[selectedClass] || [];
-
-            // Reset all scheduled dots
-            document.querySelectorAll('.scheduled-dot').forEach(dot => {
-                dot.style.display = 'none';
-            });
-
-            // Show dots for scheduled dates
-            document.querySelectorAll('.day').forEach(day => {
-                const date = day.getAttribute('data-date');
-                if (date && scheduledDates.includes(date)) {
-                    day.querySelector('.scheduled-dot').style.display = 'block';
+                if (!classSelect.value) {
+                    showFeedback('Please select a class to interact with the calendar.', 'danger');
                 }
-            });
+            }
         }
 
         function selectDate(date, element) {
             const classSelect = document.getElementById('classSelect');
-            if (!classSelect.value) {
-                return; // Prevent date selection if no class is selected
-            }
+            const isScheduled = scheduledClasses.includes(classSelect.value);
+            if (!classSelect.value || isScheduled) return;
 
             const selectedDateInput = document.getElementById('selectedDate');
             const selectedClassInput = document.getElementById('selectedClass');
@@ -326,16 +207,13 @@
 
             selectedDateInput.value = date;
 
-            // Remove the selected-date class from the previously selected day
             if (currentlySelectedDay) {
                 currentlySelectedDay.classList.remove('selected-date');
             }
 
-            // Add the selected-date class to the newly selected day
             element.classList.add('selected-date');
             currentlySelectedDay = element;
 
-            // Enable the button if both a class and a date are selected
             if (selectedClassInput.value) {
                 actionButton.disabled = false;
             }
@@ -358,27 +236,17 @@
             })
             .then(response => response.json())
             .then(data => {
-                // Update the calendar body
                 calendarBody.innerHTML = data.calendarHtml;
-
-                // Update the month label
                 document.getElementById('monthLabel').textContent = data.monthLabel;
-
-                // Update the navigation buttons
                 prevMonth = data.prevMonth;
                 nextMonth = data.nextMonth;
                 document.getElementById('prevMonthBtn').setAttribute('onclick', `changeMonth('${prevMonth}')`);
                 document.getElementById('nextMonthBtn').setAttribute('onclick', `changeMonth('${nextMonth}')`);
                 document.getElementById('prevMonthBtn').disabled = prevMonth === '2024-12';
                 document.getElementById('nextMonthBtn').disabled = nextMonth === '2028-01';
-
-                // Update the current month
                 currentMonth = month;
-
-                // Reapply scheduled markers and clickability
                 updateSelectedClass();
 
-                // Clear the selected date if it’s not in the new month
                 const selectedDateInput = document.getElementById('selectedDate');
                 const selectedDate = selectedDateInput.value;
                 if (selectedDate && !selectedDate.startsWith(month)) {
@@ -387,7 +255,6 @@
                     document.getElementById('actionButton').disabled = true;
                     showFeedback('Selected date cleared as it is not in the current month.', 'danger');
                 }
-
             })
             .catch(error => {
                 console.error('Error fetching calendar:', error);
@@ -402,48 +269,64 @@
             const actionButton = document.getElementById('actionButton');
             const buttonText = document.getElementById('buttonText');
             const buttonLoading = document.getElementById('buttonLoading');
+            const method = form.querySelector('#methodField').value || 'POST';
+            const url = method === 'DELETE' ? destroyRoute : storeRoute;
 
-            // Show loading state
             actionButton.disabled = true;
             buttonText.classList.add('d-none');
             buttonLoading.classList.remove('d-none');
 
-            const formData = new FormData(form);
-            const method = form.querySelector('#methodField').value || 'POST';
-            const url = method === 'DELETE' ? destroyRoute : storeRoute;
+            const data = {
+                selectedDate: document.getElementById('selectedDate').value,
+                selectedClass: document.getElementById('selectedClass').value,
+                _method: method === 'DELETE' ? 'DELETE' : undefined,
+            };
+
+            console.log('Submitting to:', url);
+            console.log('Method:', method);
+            console.log('CSRF Token:', csrfToken);
+            console.log('Request Data:', data);
 
             fetch(url, {
                 method: method,
-                body: formData,
                 headers: {
+                    'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
                     'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
                 },
+                body: JSON.stringify(data),
             })
-            .then(response => response.json())
-            .then(data => {
-                // Reset button state
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', [...response.headers.entries()]);
+                return response.text().then(text => ({ status: response.status, text }));
+            })
+            .then(({ status, text }) => {
+                console.log('Response text:', text);
+                let json;
+                try {
+                    json = JSON.parse(text);
+                } catch (e) {
+                    throw new Error(`Failed to parse response as JSON: ${e.message}. Response: ${text}`);
+                }
+
                 actionButton.disabled = false;
                 buttonText.classList.remove('d-none');
                 buttonLoading.classList.add('d-none');
 
-                if (data.success) {
-                    // Update scheduled data
-                    scheduledClasses = data.scheduledClasses;
-                    scheduledDatesByClass = data.scheduledDatesByClass;
-
-                    // Update UI
+                if (status === 200 && json.success) {
+                    scheduledClasses = json.scheduledClasses;
+                    scheduledDatesByClass = json.scheduledDatesByClass;
                     updateSelectedClass();
                     document.getElementById('selectedDate').value = '';
                     if (currentlySelectedDay) {
                         currentlySelectedDay.classList.remove('selected-date');
                         currentlySelectedDay = null;
                     }
-                    actionButton.disabled = true;
-
-                    showFeedback(data.message, 'success');
+                    showFeedback(json.message, 'success');
                 } else {
-                    showFeedback(data.message, 'danger');
+                    showFeedback(json.message || 'Unknown error occurred', 'danger');
                 }
             })
             .catch(error => {
@@ -451,7 +334,7 @@
                 actionButton.disabled = false;
                 buttonText.classList.remove('d-none');
                 buttonLoading.classList.add('d-none');
-                showFeedback('Failed to process the request. Please try again.', 'danger');
+                showFeedback('Failed to process the request: ' + error.message, 'danger');
             });
         }
 
@@ -461,7 +344,6 @@
             }
         }
 
-        // Initialize the button state and markers on page load
         document.addEventListener('DOMContentLoaded', function() {
             updateSelectedClass();
             document.getElementById('prevMonthBtn').disabled = prevMonth === '2024-12';

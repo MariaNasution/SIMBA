@@ -17,24 +17,33 @@ class SetPerwalianController extends Controller
     public function index(Request $request)
     {
         $username = session('user')['username'] ?? null;
-        $user = Dosen::where('username', $username)->first();
+        Log::info('Attempting to access setPerwalian index', ['username' => $username]);
 
-        // Fetch classes associated with the dosen from the dosen_wali table
-        $classes = [];
-        if ($username) {
-            $dosenRecord = DB::table('dosen_wali')
-                ->where('username', $username)
-                ->first();
-
-            if ($dosenRecord && !empty($dosenRecord->kelas)) {
-                $classes = array_map('trim', explode(',', $dosenRecord->kelas));
-            }
+        if (!$username) {
+            Log::warning('No username found in session', ['session' => session()->all()]);
+            return redirect()->route('login')->with('error', 'Please log in to access this page.');
         }
 
-        // Determine the default class if there's only one class
+        $user = Dosen::where('username', $username)->first();
+
+        if (!$user) {
+            Log::error('No Dosen found for username', ['username' => $username]);
+            return redirect()->route('login')->with('error', 'User not found or not authorized.');
+        }
+
+        $classes = [];
+        $dosenRecord = DB::table('dosen_wali')
+            ->where('username', $username)
+            ->first();
+
+        if ($dosenRecord && !empty($dosenRecord->kelas)) {
+            $classes = array_map('trim', explode(',', $dosenRecord->kelas));
+        } else {
+            Log::warning('No classes found for dosen', ['username' => $username]);
+        }
+
         $defaultClass = count($classes) === 1 ? $classes[0] : null;
 
-        // Fetch scheduled Perwalian dates for each class
         $scheduledDatesByClass = [];
         $scheduledClasses = [];
         if ($user) {
@@ -44,18 +53,15 @@ class SetPerwalianController extends Controller
 
             $scheduledClasses = $perwalianRecords->pluck('kelas')->toArray();
 
-            // Group scheduled dates by class
             foreach ($perwalianRecords as $record) {
                 $date = Carbon::parse($record->Tanggal)->format('Y-m-d');
                 $scheduledDatesByClass[$record->kelas][] = $date;
             }
         }
 
-        // Handle month navigation
-        $month = $request->query('month', now()->format('Y-m')); // Default to current month
+        $month = $request->query('month', now()->format('Y-m'));
         $currentDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
 
-        // Restrict to January 2025 - December 2027
         if ($currentDate->lt(Carbon::create(2025, 1, 1))) {
             $currentDate = Carbon::create(2025, 1, 1);
         }
@@ -63,22 +69,29 @@ class SetPerwalianController extends Controller
             $currentDate = Carbon::create(2027, 12, 1);
         }
 
-        // Prepare calendar data
         $calendarData = $this->prepareCalendarData($currentDate);
 
-        // Fetch notifications
         $notifications = Notifikasi::with('perwalian')->get();
 
-        // Fetch dosen data from API
         $apiToken = env('API_TOKEN');
+        if (!$apiToken) {
+            Log::warning('API_TOKEN not set in .env');
+        }
+
         $dosenResponse = Http::withToken($apiToken)
             ->withOptions(['verify' => false])
             ->asForm()
             ->get('https://cis-dev.del.ac.id/api/library-api/dosen');
 
+        if (!$dosenResponse->successful()) {
+            Log::error('Failed to fetch dosen data from API', [
+                'status' => $dosenResponse->status(),
+                'body' => $dosenResponse->body()
+            ]);
+        }
+
         $dosenData = $dosenResponse->json();
 
-        // Filter dosen where their NIP matches ID_Dosen_Wali in notifications
         $dosenNotifications = collect();
         if ($dosenData && $notifications->isNotEmpty()) {
             $dosenWaliIds = $notifications->pluck('perwalian.ID_Dosen_Wali')->unique()->filter();
@@ -101,7 +114,6 @@ class SetPerwalianController extends Controller
         $month = $request->query('month', now()->format('Y-m'));
         $currentDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
 
-        // Restrict to January 2025 - December 2027
         if ($currentDate->lt(Carbon::create(2025, 1, 1))) {
             $currentDate = Carbon::create(2025, 1, 1);
         }
@@ -109,10 +121,8 @@ class SetPerwalianController extends Controller
             $currentDate = Carbon::create(2027, 12, 1);
         }
 
-        // Prepare calendar data
         $calendarData = $this->prepareCalendarData($currentDate);
 
-        // Render the calendar partial
         $calendarHtml = view('perwalian.partials.calendar', [
             'currentDate' => $currentDate,
             'calendarData' => $calendarData,
@@ -165,6 +175,15 @@ class SetPerwalianController extends Controller
 
     public function store(Request $request)
     {
+        Log::info('Store request received', ['request' => $request->all(), 'headers' => $request->headers->all()]);
+        if (!$request->hasHeader('X-CSRF-TOKEN') || $request->session()->token() !== $request->header('X-CSRF-TOKEN')) {
+            Log::error('CSRF token mismatch in store', [
+                'session_token' => $request->session()->token(),
+                'request_token' => $request->header('X-CSRF-TOKEN'),
+            ]);
+            return response()->json(['success' => false, 'message' => 'Invalid CSRF token'], 419);
+        }
+
         $validatedData = $request->validate([
             'selectedDate' => [
                 'required',
@@ -190,7 +209,6 @@ class SetPerwalianController extends Controller
                 return response()->json(['success' => false, 'message' => 'You must be logged in to set a perwalian date.'], 401);
             }
 
-            // Check for existing perwalian with Status = 'Scheduled' for this class
             $existingPerwalian = Perwalian::where('ID_Dosen_Wali', $user->nip)
                 ->where('Status', 'Scheduled')
                 ->where('kelas', $validatedData['selectedClass'])
@@ -200,7 +218,6 @@ class SetPerwalianController extends Controller
                 return response()->json(['success' => false, 'message' => 'You already have a scheduled perwalian request for this class. Use the Edit option to delete and request again.'], 400);
             }
 
-            // Create new perwalian
             $perwalian = Perwalian::create([
                 'ID_Dosen_Wali' => $user->nip,
                 'Tanggal' => Carbon::parse($validatedData['selectedDate'])->format('Y-m-d'),
@@ -226,7 +243,6 @@ class SetPerwalianController extends Controller
 
             Log::info('Perwalian date set for: ' . $validatedData['selectedDate'] . ' by dosen NIP: ' . $user->nip . ' for class: ' . $validatedData['selectedClass']);
 
-            // Update the scheduled dates for the client
             $scheduledDatesByClass = [];
             $perwalianRecords = Perwalian::where('ID_Dosen_Wali', $user->nip)
                 ->where('Status', 'Scheduled')
@@ -244,12 +260,25 @@ class SetPerwalianController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to set Perwalian date: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Failed to set Perwalian date. Please try again.'], 500);
+            return response()->json(['success' => false, 'message' => 'Failed to set Perwalian date: ' . $e->getMessage()], 500);
         }
     }
 
     public function destroy(Request $request)
     {
+        Log::info('Destroy request received', [
+            'request' => $request->all(),
+            'headers' => $request->headers->all()
+        ]);
+        if (!$request->hasHeader('X-CSRF-TOKEN') || $request->session()->token() !== $request->header('X-CSRF-TOKEN')) {
+            Log::error('CSRF token mismatch in destroy', [
+                'session_token' => $request->session()->token(),
+                'request_token' => $request->header('X-CSRF-TOKEN'),
+                'request_headers' => $request->headers->all()
+            ]);
+            return response()->json(['success' => false, 'message' => 'Invalid CSRF token'], 419);
+        }
+
         try {
             $username = session('user')['username'] ?? null;
             $user = Dosen::where('username', $username)->first();
@@ -258,7 +287,6 @@ class SetPerwalianController extends Controller
                 return response()->json(['success' => false, 'message' => 'You must be logged in to delete a perwalian.'], 401);
             }
 
-            // Delete the perwalian for the selected class
             $selectedClass = $request->input('selectedClass');
             if (!$selectedClass) {
                 return response()->json(['success' => false, 'message' => 'No class selected for deletion.'], 400);
@@ -269,31 +297,34 @@ class SetPerwalianController extends Controller
                 ->where('kelas', $selectedClass)
                 ->first();
 
-            if ($existingPerwalian) {
-                Notifikasi::where('Id_Perwalian', $existingPerwalian->getKey())->delete();
-                $existingPerwalian->delete();
-                Log::info('Perwalian deleted for dosen NIP: ' . $user->nip . ' for class: ' . $selectedClass);
+            if (!$existingPerwalian) {
+                return response()->json(['success' => false, 'message' => 'No scheduled perwalian found for this class.'], 404);
             }
 
-            // Update the scheduled dates for the client
+            Notifikasi::where('Id_Perwalian', $existingPerwalian->getKey())->delete();
+            $existingPerwalian->delete();
+            Log::info('Perwalian deleted for dosen NIP: ' . $user->nip . ' for class: ' . $selectedClass);
+
             $scheduledDatesByClass = [];
+            $scheduledClasses = [];
             $perwalianRecords = Perwalian::where('ID_Dosen_Wali', $user->nip)
                 ->where('Status', 'Scheduled')
                 ->get(['kelas', 'Tanggal']);
             foreach ($perwalianRecords as $record) {
                 $date = Carbon::parse($record->Tanggal)->format('Y-m-d');
                 $scheduledDatesByClass[$record->kelas][] = $date;
+                $scheduledClasses[] = $record->kelas;
             }
 
             return response()->json([
                 'success' => true,
                 'message' => 'Perwalian request deleted for class ' . $selectedClass . '. You can now create a new request.',
                 'scheduledDatesByClass' => $scheduledDatesByClass,
-                'scheduledClasses' => array_keys($scheduledDatesByClass),
+                'scheduledClasses' => array_unique($scheduledClasses),
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to delete Perwalian: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Failed to delete Perwalian. Please try again.'], 500);
+            return response()->json(['success' => false, 'message' => 'Failed to delete Perwalian: ' . $e->getMessage()], 500);
         }
     }
 }
