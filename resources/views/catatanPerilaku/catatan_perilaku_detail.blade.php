@@ -188,7 +188,7 @@
                 <input type="text" name="unit" class="form-control" value="{{ old('unit', $pelanggaran['unit']) }}">
             </td>
             <td>
-                <input type="date" name="tanggal" class="form-control" value="{{ old('tanggal', $pelanggaran['tanggal']) }}">
+              <input type="date" name="tanggal" class="form-control tanggal" value="{{ old('tanggal', $pelanggaran['tanggal']) }}">
             </td>
             <td style="width: 70px;">
                 <input type="number" name="poin" class="form-control" value="{{ old('poin', $pelanggaran['poin']) }}" min="1" max="100">
@@ -234,11 +234,15 @@
                         <input type="text" name="unit" class="form-control text-center" value="Keasramaan" style="width: 115px;" readonly>
                       </td>
                       <td>
-                        <input type="date" name="tanggal" class="form-control" required>
+                        <input type="date" name="tanggal" class="form-control tanggal" required>
                       </td>
                       <td style="width: 70px;">
-                        <input type="number" name="poin" class="form-control text-center" placeholder="Poin" style="width: 70px;" min="1" max="100" required onblur="if(this.value < 1){this.value = 1;} else if(this.value > 100){this.value = 100;}">
+                        <input type="number" name="poin" class="form-control text-center" placeholder="Poin" 
+                          style="width: 70px;" min="1" max="99" required 
+                          oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,2);" 
+                          onblur="if(this.value < 1){this.value = 1;} else if(this.value > 99){this.value = 99;}">
                       </td>
+
                       <td>
                         <textarea name="tindakan" class="form-control auto-expand" placeholder="Tindakan" rows="1" required></textarea>
                       </td>
@@ -325,7 +329,7 @@
                 <input type="text" name="unit" class="form-control" value="{{ old('unit', $perbuatan['unit']) }}">
             </td>
             <td>
-                <input type="date" name="tanggal" class="form-control" value="{{ old('tanggal', $perbuatan['tanggal']) }}">
+              <input type="date" name="tanggal" class="form-control tanggal" value="{{ old('tanggal', $perbuatan['tanggal']) }}">
             </td>
             <td>
                 <button type="submit" class="btn btn-success btn-sm" title="Simpan"><i class="fas fa-save"></i></button>
@@ -365,15 +369,19 @@
                       <td>
                         <textarea name="keterangan" class="form-control auto-expand" placeholder="Keterangan" rows="1"></textarea>
                       </td>
-                      <td style="width: 50px;">
-                        <input type="number" name="kredit_poin" class="form-control" placeholder="Poin" style="width: 70px;" min="1" max="100" onblur="if(this.value < 1){this.value = 1;} else if(this.value > 100){this.value = 100;}">
+                      <td style="width: 70px;">
+                        <input type="number" name="poin" class="form-control text-center" placeholder="Poin" 
+                          style="width: 70px;" min="1" max="99" required 
+                          oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,2);" 
+                          onblur="if(this.value < 1){this.value = 1;} else if(this.value > 99){this.value = 99;}">
                       </td>
                       <td>
                         <input type="text" name="unit" class="form-control" value="Keasramaan" style="width: 115px;" readonly>
                       </td>
                       <td>
-                        <input type="date" name="tanggal" class="form-control">
+                        <input type="date" name="tanggal" class="form-control tanggal" required>
                       </td>
+
                       @if($hasPerbuatanBaik)
                         <td></td>
                       @endif
@@ -417,6 +425,16 @@
   document.querySelectorAll('.auto-expand').forEach(function(textarea) {
     textarea.addEventListener('input', function() {
       autoExpand(textarea);
+    });
+  });
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    let today = new Date().toISOString().split("T")[0];
+
+    document.querySelectorAll(".tanggal").forEach(function (input) {
+      input.setAttribute("max", today);
     });
   });
 </script>
