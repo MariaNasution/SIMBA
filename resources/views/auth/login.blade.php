@@ -55,6 +55,11 @@
             <label for="password">Kata Sandi</label>
             <input class="log" type="password" id="password" name="password" required>
           </div>
+          @if ($errors->has('login2'))
+          <div style="font-size: 12px; color: red; margin: 0 !important; padding: 0 !important; line-height: 1;">
+            {{ $errors->first('login2') }}
+          </div>
+          @endif
           <p>Belum Punya Akun? <a href="#" class="register-link"
               onclick="document.querySelector('.register-btn').click(); return false;">Daftar Disini</a></p>
           <button type="submit" class="btn">Masuk</button>

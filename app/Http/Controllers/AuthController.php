@@ -126,7 +126,7 @@ class AuthController extends Controller
                 }
 
                 // If authentication fails
-                return back()->withErrors(['login' => 'Username atau Password salah.']);
+                return back()->withErrors(['login2' => 'Password salah.']);
         }
 
         public function logout()
