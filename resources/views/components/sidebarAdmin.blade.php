@@ -54,7 +54,7 @@
             </li>
             <li class="submenu-item">
                 <a href="{{ route('riwayat_daftar_request') }}">
-                    <i class="fas fa-book-open"></i> Riwayat Daftar Request
+                    <i class="fas fa-clock"></i> Riwayat Daftar Request
                 </a>
             </li>
         </ul>
