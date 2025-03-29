@@ -26,7 +26,8 @@ class AuthController extends Controller
                 // Find the user by username
                 $user = User::where('username', $request->username)->first();
                 if (!$user) {
-                        return back()->withErrors(['login' => 'Username tidak ditemukan.']);
+                        return redirect()->route('login')->withErrors(['login' => 'Nama pengguna tidak valid.']);
+
                 }
 
                 // Log password details for debugging
