@@ -26,6 +26,7 @@ class UserSeeder extends Seeder
         DB::table('keasramaan')->truncate();
         DB::table('dosen')->truncate();
         DB::table('orang_tua')->truncate();
+        DB::table('dosen_wali')->truncate();
 
         // Re-enable foreign key checks
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
@@ -39,7 +40,7 @@ class UserSeeder extends Seeder
      */
     private function seedUsersAndRoles()
     {
-        // Define users with roles and unique NIMs for mahasiswa
+        // Define users with roles
         $users = [
             [
                 'username' => 'kemahasiswaan',
@@ -53,111 +54,79 @@ class UserSeeder extends Seeder
                 'role' => 'konselor',
                 'anak_wali' => null, // No anak wali for admin
             ],
-            [
-                'username' => 'ifs19001', // Added second student
-                'password' => Hash::make('mahasiswa'),
-                'role' => 'mahasiswa',
-                'anak_wali' => 'dosen',
-            ],
-            [
-                'username' => 'ifs19002', // Added second student
-                'password' => Hash::make('mahasiswa'),
-                'role' => 'mahasiswa',
-                'anak_wali' => 'dosen',
-            ],
-            [
-                'username' => 'ifs19003', // Added second student
-                'password' => Hash::make('mahasiswa'),
-                'role' => 'mahasiswa',
-                'anak_wali' => 'dosen',
-            ],
-            [
-                'username' => 'ifs19004', // Added second student
-                'password' => Hash::make('mahasiswa'),
-                'role' => 'mahasiswa',
-                'anak_wali' => 'dosen',
-            ],
-            [
-                'username' => 'ifs19005', // Added second student
-                'password' => Hash::make('mahasiswa'),
-                'role' => 'mahasiswa',
-                'anak_wali' => 'dosen',
-            ],
-            [
-                'username' => 'ifs19031', // Added second student
-                'password' => Hash::make('mahasiswa'),
-                'role' => 'mahasiswa',
-                'anak_wali' => 'dosen',
-            ],
-            [
-                'username' => 'ifs19032', // Added second student
-                'password' => Hash::make('mahasiswa'),
-                'role' => 'mahasiswa',
-                'anak_wali' => 'dosen',
-            ],
-            [
-                'username' => 'ifs19033', // Added second student
-                'password' => Hash::make('mahasiswa'),
-                'role' => 'mahasiswa',
-                'anak_wali' => 'dosen',
-            ],
-            [
-                'username' => 'ifs19034', // Added second student
-                'password' => Hash::make('mahasiswa'),
-                'role' => 'mahasiswa',
-                'anak_wali' => 'dosen',
-            ],
-            [
-                'username' => 'ifs19035', // Added second student
-                'password' => Hash::make('mahasiswa'),
-                'role' => 'mahasiswa',
-                'anak_wali' => 'dosen', // Mahasiswa is under dosen wali 1
-            ],
-            [
-                'username' => 'dosen',
-                'password' => Hash::make('dosen'),
-                'role' => 'dosen',
-                'anak_wali' => null, // Dosen as wali, no anak wali
-            ],
-            [
-                'username' => 'keasramaan',
-                'password' => Hash::make('keasramaan'),
-                'role' => 'keasramaan',
-                'anak_wali' => null, // No anak wali for keasramaan
-            ],
-            [
-                'username' => 'orangtua',
-                'password' => Hash::make('orangtua'),
-                'role' => 'orang_tua',
-                'anak_wali' => null, // No anak wali for orang tua
-            ],
+            // Mahasiswa users (12IF1 - 5 students)
+            ['username' => 'ifs19001', 'password' => Hash::make('mahasiswa'), 'role' => 'mahasiswa', 'anak_wali' => '0309020008'],
+            ['username' => 'ifs19002', 'password' => Hash::make('mahasiswa'), 'role' => 'mahasiswa', 'anak_wali' => '0309020008'],
+            ['username' => 'ifs19003', 'password' => Hash::make('mahasiswa'), 'role' => 'mahasiswa', 'anak_wali' => '0309020008'],
+            ['username' => 'ifs19004', 'password' => Hash::make('mahasiswa'), 'role' => 'mahasiswa', 'anak_wali' => '0309020008'],
+            ['username' => 'ifs19005', 'password' => Hash::make('mahasiswa'), 'role' => 'mahasiswa', 'anak_wali' => '0309020008'],
+            // Mahasiswa users (12IF2 - 5 students)
+            ['username' => 'ifs19035', 'password' => Hash::make('mahasiswa'), 'role' => 'mahasiswa', 'anak_wali' => '0309020008'],
+            ['username' => 'ifs19036', 'password' => Hash::make('mahasiswa'), 'role' => 'mahasiswa', 'anak_wali' => '0309020008'],
+            ['username' => 'ifs19037', 'password' => Hash::make('mahasiswa'), 'role' => 'mahasiswa', 'anak_wali' => '0309020008'],
+            ['username' => 'ifs19038', 'password' => Hash::make('mahasiswa'), 'role' => 'mahasiswa', 'anak_wali' => '0309020008'],
+            ['username' => 'ifs19039', 'password' => Hash::make('mahasiswa'), 'role' => 'mahasiswa', 'anak_wali' => '0309020008'],
+            // Dosen users
+            ['username' => 'dosen', 'password' => Hash::make('dosen'), 'role' => 'dosen', 'anak_wali' => null],
+            ['username' => '0308190348', 'password' => Hash::make('dosen'), 'role' => 'dosen', 'anak_wali' => null],
+            ['username' => '0311020009', 'password' => Hash::make('dosen'), 'role' => 'dosen', 'anak_wali' => null],
+            ['username' => '0309020008', 'password' => Hash::make('dosen'), 'role' => 'dosen', 'anak_wali' => null],
+            // Other roles
+            ['username' => 'keasramaan', 'password' => Hash::make('keasramaan'), 'role' => 'keasramaan', 'anak_wali' => null],
+            ['username' => 'orangtua', 'password' => Hash::make('orangtua'), 'role' => 'orang_tua', 'anak_wali' => null],
         ];
 
-        // Array of unique NIMs for mahasiswa (must match the number of mahasiswa users)
+        // Array of unique NIMs for mahasiswa
         $nims = [
-            '11S19001',
-            '11S19002',
-            '11S19003',
-            '11S19004',
-            '11S19005',
-            '11S19031',
-            '11S19032',
-            '11S19033',
-            '11S19034',
-            '11S19035'
+            // 12IF1 (5 students)
+            '11S19001', '11S19002', '11S19003', '11S19004', '11S19005',
+            // 12IF2 (5 students)
+            '11S19035', '11S19036', '11S19037', '11S19038', '11S19039',
         ];
 
-        // Counter for assigning NIMs
+        $kelas = [
+            // 12IF1 (5 students)
+            '12IF1', '12IF1', '12IF1', '12IF1', '12IF1',
+            // 12IF2 (5 students)
+            '12IF2', '12IF2', '12IF2', '12IF2', '12IF2',
+        ];
+
+        $names = [
+            // 12IF1 (5 students)
+            'Bungaran Martua Pakpahan', 'Hans Mayson Pranajaya Situmeang', 'Rafelli Simangunsong',
+            'Sophian Kalam Nainggolan', 'Jhonatan Edward Sitorus',
+            // 12IF2 (5 students)
+            'Rahmad Joko Susilo Situmorang', 'Wybren Agung manik', 'Rio Efraim Simanjuntak',
+            'Jogi Arif Guruh Sitinjak', 'Albert Samuel Sormin',
+        ];
+
+        // Array for dosen
+        $nips = [
+            'dosen', '0308190348', '0311020009', '0309020008'
+        ];
+
+        $dosenNames = [
+            'Dosen', 'Iustisia Natalia Simbolon, S.Kom., M.T.',
+            'Dr. Arlinta Christy Barus, ST., M.InfoTech.',
+            'Dr. Johannes Harungguan Sianipar, S.T., M.T.'
+        ];
+
+        $dosenClasses = [
+            '12IF2', '12IF2', '14IF1', '12IF1,12IF2',
+        ];
+
+        // Counter for assigning NIMs and NIPs
+        $nipIndex = 0;
         $nimIndex = 0;
 
         // Insert users and populate role-specific tables
         foreach ($users as $user) {
             // Insert into the users table
-            DB::table('users')->insert([
+            $userId = DB::table('users')->insertGetId([
                 'username' => $user['username'],
                 'password' => $user['password'],
                 'role' => $user['role'],
-                'anak_wali' => $user['anak_wali'], // Add anak_wali column
+                'anak_wali' => $user['anak_wali'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -183,19 +152,34 @@ class UserSeeder extends Seeder
                 case 'mahasiswa':
                     DB::table('mahasiswa')->insert([
                         'username' => $user['username'],
-                        'nim' => $nims[$nimIndex], // Assign unique NIM
+                        'nim' => $nims[$nimIndex],
+                        'nama' => $names[$nimIndex],
+                        'kelas' => $kelas[$nimIndex],
+                        'ID_Dosen' => '0309020008', // Set the ID_Dosen to match the dosen user
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
-                    $nimIndex++; // Increment to get the next NIM
+                    $nimIndex++;
                     break;
 
                 case 'dosen':
                     DB::table('dosen')->insert([
                         'username' => $user['username'],
+                        'nip' => $nips[$nipIndex],
+                        'nama' => $dosenNames[$nipIndex],
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
+
+                    DB::table('dosen_wali')->insert([
+                        'username' => $user['username'],
+                        'kelas' => $dosenClasses[$nipIndex],
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+
+
+                    $nipIndex++;
                     break;
 
                 case 'keasramaan':

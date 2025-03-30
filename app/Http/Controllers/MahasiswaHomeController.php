@@ -4,19 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Models\Calendar;
 use App\Models\Pengumuman;
-use App\Models\Mahasiswa;
-use App\Models\Notifikasi; // Pastikan sudah import model Notifikasi
+use App\Models\Notifikasi;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use App\Models\Absensi;
+use App\Models\Perwalian;
+use App\Models\Mahasiswa;
+use App\Models\Dosen;
 
 class MahasiswaHomeController extends Controller
 {
     public function index()
     {
-        // Ambil user dari session (menyesuaikan dengan session-based auth)
+        // Get the authenticated user from session
         $user = session('user');
+        $student = Mahasiswa::where('nim', session('user')['nim'] ?? null)->first();
 
-        // Validasi bahwa user terautentikasi dan berperan sebagai mahasiswa
+        // Check if the user exists and has a mahasiswa role
         if (!$user || !isset($user['role']) || $user['role'] !== 'mahasiswa') {
             Log::error('User not authenticated or not a mahasiswa', ['user' => $user]);
             return redirect()->route('login')->withErrors(['error' => 'Please log in as a mahasiswa.']);
@@ -31,14 +35,7 @@ class MahasiswaHomeController extends Controller
         $nim = $mahasiswa->nim;
         $apiToken = session('api_token');
 
-        // Inisialisasi nilai default untuk API
-        $studentData = [];
-        $data = [];
-        $ipSemester = [];
-        $labels = [];
-        $values = [];
-
-        // Ambil data student (jika memungkinkan)
+        // --- Fetch student data from API ---
         try {
             $studentResponse = Http::withToken($apiToken)
                 ->withOptions(['verify' => false])
@@ -52,7 +49,7 @@ class MahasiswaHomeController extends Controller
                 // Simpan sem_ta dan ta ke session jika ada
                 session([
                     'sem_ta' => $studentData['sem_ta'] ?? null,
-                    'ta' => $studentData['ta'] ?? null,
+                    'ta'     => $studentData['ta'] ?? null,
                 ]);
             } else {
                 Log::error('Student API request failed', ['status' => $studentResponse->status()]);
@@ -61,7 +58,7 @@ class MahasiswaHomeController extends Controller
             Log::error('Exception on fetching student data:', ['message' => $e->getMessage()]);
         }
 
-        // Ambil data penilaian
+        // --- Fetch academic performance data (penilaian) from API ---
         try {
             $response = Http::withToken($apiToken)
                 ->withOptions(['verify' => false])
@@ -69,13 +66,14 @@ class MahasiswaHomeController extends Controller
                 ->get('https://cis-dev.del.ac.id/api/library-api/get-penilaian', [
                     'nim' => $nim,
                 ]);
+
             Log::info('Respons API mentah:', ['body' => $response->body()]);
 
             if ($response->successful()) {
                 $data = $response->json();
                 $ipSemester = $data['IP Semester'] ?? [];
 
-                // Urutkan IP Semester berdasarkan tahun akademik (ta) dan semester (sem)
+                // Sort by academic year (ta) and semester (sem)
                 uasort($ipSemester, function ($a, $b) {
                     if ($a['ta'] === $b['ta']) {
                         return $a['sem'] <=> $b['sem'];
@@ -83,38 +81,97 @@ class MahasiswaHomeController extends Controller
                     return $a['ta'] <=> $b['ta'];
                 });
 
-                // Siapkan label dan nilai untuk chart
-                foreach ($ipSemester as $details) {
+                $labels = [];
+                $values = [];
+
+                foreach ($ipSemester as $semester => $details) {
                     $labels[] = "TA {$details['ta']} - Semester {$details['sem']}";
                     $values[] = is_numeric($details['ip_semester']) ? (float) $details['ip_semester'] : 0;
                 }
+
+                Log::info('Data labels:', $labels);
+                Log::info('Data values:', $values);
+
+                // Fetch the perwalian record for the student (only scheduled ones)
+                $perwalian = Perwalian::where('ID_Perwalian', $mahasiswa->ID_Perwalian)
+                    ->where('Status', 'Scheduled')
+                    ->first();
+
+                // Initialize variables to avoid undefined errors
+                $dosen = null;
+                $notifications = collect();
+                $dosenNotifications = collect();
+                $notificationCount = 0;
+                $noPerwalianMessage = null;
+
+                if ($perwalian) {
+                    // Fetch the dosen for the perwalian
+                    $dosen = Dosen::where('nip', $perwalian->ID_Dosen_Wali)->first();
+
+                    // Fetch notifications for the perwalian
+                    $notifications = Notifikasi::where('Id_Perwalian', $perwalian->ID_Perwalian)
+                        ->where('nim', $mahasiswa->nim)
+                        ->get();
+
+                    // Get all ID_Dosen_Wali values from notifications
+                    $dosenWaliIds = $notifications->map(function ($notification) {
+                        return optional($notification->perwalian)->ID_Dosen_Wali;
+                    })->filter()->unique();
+
+                    // Fetch dosen data for notifications
+                    $dosenNotifications = $dosenWaliIds->isNotEmpty() ? Dosen::whereIn('nip', $dosenWaliIds)->get() : collect();
+
+                    // Get notification count
+                    $notificationCount = $notifications->count();
+                } else {
+                    // Set a message to display in the view
+                    $noPerwalianMessage = 'No scheduled perwalian sessions at this time.';
+                    Log::info('No scheduled perwalian found for student', ['nim' => $nim]);
+                }
+
+                // Fetch absensi record (if needed, though it seems unused in the view)
+                $absensi = Absensi::where('nim', $mahasiswa->nim)
+                    ->where('ID_Perwalian', $mahasiswa->ID_Perwalian)
+                    ->first();
+
+                // Fetch announcements and calendar events
+                $pengumuman = Pengumuman::orderBy('created_at', 'desc')->get();
+                $akademik = Calendar::where('type', 'akademik')->latest()->first();
+                $bem = Calendar::where('type', 'bem')->latest()->first();
+
+                return view('beranda.homeMahasiswa', compact(
+                    'labels',
+                    'values',
+                    'pengumuman',
+                    'akademik',
+                    'bem',
+                    'notifications',
+                    'notificationCount',
+                    'dosenNotifications',
+                    'noPerwalianMessage'
+                ));
             } else {
-                Log::error('Penilaian API request failed', ['status' => $response->status(), 'body' => $response->body()]);
+                Log::error('Gagal mengambil data API', ['response' => $response->body()]);
+                return redirect()->route('beranda')->withErrors(['error' => 'Gagal mengambil data kemajuan studi.']);
             }
         } catch (\Exception $e) {
             Log::error('Exception on fetching penilaian data:', ['message' => $e->getMessage()]);
         }
 
-        // Ambil data pengumuman dan kalender akademik
+        // --- Fallback: Render halaman dengan data yang ada ---
         $pengumuman = Pengumuman::orderBy('created_at', 'desc')->get();
         $akademik = Calendar::where('type', 'akademik')->latest()->first();
         $bem = Calendar::where('type', 'bem')->latest()->first();
-
-        // --- Ambil data notifikasi untuk mahasiswa ---
         $notifications = Notifikasi::where('nim', $nim)
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Tetap render halaman dengan data yang ada (meski mungkin data chart kosong)
         return view('beranda.homeMahasiswa', compact('labels', 'values', 'pengumuman', 'akademik', 'bem', 'notifications', 'mahasiswa'));
     }
 
     public function show($id)
     {
-        // Ambil pengumuman berdasarkan ID
         $pengumuman = Pengumuman::findOrFail($id);
-
-        // Kembalikan ke view detail pengumuman
         return view('beranda.detailpengumuman', compact('pengumuman'));
     }
 }

@@ -4,23 +4,31 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateDosenTable extends Migration
+return new class extends Migration
 {
     public function up()
     {
-        Schema::create('dosen', function (Blueprint $table) {
-            $table->string('username')->primary(); // Foreign key to users table
-            $table->string('nip')->unique() -> nullable(); // Employee ID
-            $table->string('nama')->nullable(); // Name
+        Schema::create('dosen_wali', function (Blueprint $table) {
+            $table->string('username')->primary(); // Foreign key to users tableS
+            $table->string('kelas')->nullable();
             $table->timestamps();
 
             // Define the foreign key constraint
             $table->foreign('username')->references('username')->on('users')->onDelete('cascade');
+            
         });
     }
 
     public function down()
     {
-        Schema::dropIfExists('dosen');
+        Schema::dropIfExists('dosen_wali');
     }
-}
+
+
+};
+
+
+
+
+
+    
