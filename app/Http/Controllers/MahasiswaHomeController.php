@@ -26,7 +26,7 @@ class MahasiswaHomeController extends Controller
             return redirect()->route('login')->withErrors(['error' => 'Please log in as a mahasiswa.']);
         }
 
-        // Get the NIM from the mahasiswa table using the username from session
+        // Cari data mahasiswa berdasarkan username dari session
         $mahasiswa = Mahasiswa::where('username', $user['username'])->first();
         if (!$mahasiswa) {
             Log::error('No mahasiswa record found for user', ['username' => $user['username']]);
@@ -46,11 +46,17 @@ class MahasiswaHomeController extends Controller
 
             if ($studentResponse->successful()) {
                 $studentData = $studentResponse->json()['data'] ?? [];
+                // Simpan sem_ta dan ta ke session jika ada
                 session([
                     'sem_ta' => $studentData['sem_ta'] ?? null,
                     'ta' => $studentData['ta'] ?? null,
                 ]);
+            } else {
+                Log::error('Student API request failed', ['status' => $studentResponse->status()]);
             }
+        } catch (\Exception $e) {
+            Log::error('Exception on fetching student data:', ['message' => $e->getMessage()]);
+        }
 
             // Fetch academic performance data from API
             $response = Http::withToken($apiToken)
@@ -69,7 +75,9 @@ class MahasiswaHomeController extends Controller
                 uasort($ipSemester, function ($a, $b) {
                     if ($a['ta'] === $b['ta']) {
                         return $a['sem'] <=> $b['sem'];
+                        return $a['sem'] <=> $b['sem'];
                     }
+                    return $a['ta'] <=> $b['ta'];
                     return $a['ta'] <=> $b['ta'];
                 });
 
@@ -147,9 +155,21 @@ class MahasiswaHomeController extends Controller
             Log::error('Gagal mengambil data API', ['response' => $response->body()]);
             return redirect()->route('beranda')->withErrors(['error' => 'Gagal mengambil data kemajuan studi.']);
         } catch (\Exception $e) {
-            Log::error('Kesalahan API:', ['message' => $e->getMessage()]);
-            return redirect()->route('beranda')->withErrors(['error' => 'Terjadi kesalahan saat memuat data.']);
+            Log::error('Exception on fetching penilaian data:', ['message' => $e->getMessage()]);
         }
+
+        // Ambil data pengumuman dan kalender akademik
+        $pengumuman = Pengumuman::orderBy('created_at', 'desc')->get();
+        $akademik = Calendar::where('type', 'akademik')->latest()->first();
+        $bem = Calendar::where('type', 'bem')->latest()->first();
+
+        // --- Ambil data notifikasi untuk mahasiswa ---
+        $notifications = Notifikasi::where('nim', $nim)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Tetap render halaman dengan data yang ada (meski mungkin data chart kosong)
+        return view('beranda.homeMahasiswa', compact('labels', 'values', 'pengumuman', 'akademik', 'bem', 'notifications', 'mahasiswa'));
     }
 
     public function show($id)

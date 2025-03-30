@@ -3,11 +3,11 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAdminTable extends Migration
+class CreateKemahasiswaanTable extends Migration
 {
     public function up()
     {
-        Schema::create('admin', function (Blueprint $table) {
+        Schema::create('kemahasiswaan', function (Blueprint $table) {
             $table->string('username')->primary(); // Foreign key to users table
             $table->string('nip')->unique() -> nullable(); // Employee ID
             $table->timestamps();
@@ -19,6 +19,6 @@ class CreateAdminTable extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('admin');
+        Schema::dropIfExists('kemahasiswaan');
     }
 }

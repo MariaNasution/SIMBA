@@ -1,4 +1,4 @@
-@extends('layouts.app') <!-- Assuming this is your main layout -->
+@extends('layouts.app')
 
 @section('content')
     <!-- Header with Notification and Logout -->
@@ -10,22 +10,29 @@
         <div class="dropdown position-relative me-3">
             <a href="#" class="text-decoration-none" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="fas fa-bell fs-5 cursor-pointer" title="Notifications"></i>
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                    {{ $notificationCount }} <!-- Dynamic notification count -->
-                    <span class="visually-hidden">unread notifications</span>
-                </span>
+                @php
+                    // Count only unread notifications
+                    $unreadCount = $notifications->where('is_read', false)->count();
+                @endphp
+                @if($unreadCount > 0)
+                    <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {{ $unreadCount }}
+                        <span class="visually-hidden">unread notifications</span>
+                    </span>
+                @endif
             </a>
             <ul class="dropdown-menu" aria-labelledby="notificationDropdown">
                 <li><h6 class="dropdown-header">Notifications</h6></li>
-                <!-- Dynamic Perwalian Notifications -->
-                @forelse ($dosenNotifications as $notification)
+                @forelse ($notifications as $notification)
                     <li>
                         <a class="dropdown-item" href="#">
-                            {{ $notification->Pesan }} by Dosen Nama: {{ $notification->nama ?? 'Unknown' }}
+                            {{ $notification->Pesan }}
+                            <br>
+                            <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
                         </a>
                     </li>
                 @empty
-                    <li><a class="dropdown-item text-muted">No notifications available.</a></li>
+                    <li><a class="dropdown-item" href="#">Tidak ada notifikasi</a></li>
                 @endforelse
             </ul>
         </div>
@@ -35,7 +42,7 @@
         </a>
     </div>
 
-    <!-- Main Content -->
+    <!-- Main Content Header -->
     <div class="app-content-header">
         <div class="container-fluid">
             <!-- Current Date and Time -->
@@ -63,13 +70,13 @@
                                     <a href="{{ route('pengumuman.detail', $item->id) }}" class="text-decoration-none">
                                         <strong
                                             class="@switch($item->sumber)
-                                            @case('BEM') text-primary @break
-                                            @case('INFO') text-danger @break
-                                            @case('BURSAR') text-info @break
-                                            @case('KEASRAMAAN') text-success @break
-                                            @case('KEMAHASISWAAN') text-purple @break
-                                            @default text-dark
-                                        @endswitch">
+                                                @case('BEM') text-primary @break
+                                                @case('INFO') text-danger @break
+                                                @case('BURSAR') text-info @break
+                                                @case('KEASRAMAAN') text-success @break
+                                                @case('KEMAHASISWAAN') text-purple @break
+                                                @default text-dark
+                                            @endswitch">
                                             [{{ strtoupper($item->sumber) }}]
                                         </strong>
                                         {{ $item->judul }}
@@ -88,8 +95,8 @@
                 <div class="col-md-12 text-center">
                     @if ($akademik)
                         <a href="{{ asset('storage/' . $akademik->file_path) }}" target="_blank"
-                            class="btn btn-primary me-2">
-                            Unduh Kalender Akademik!
+                           class="btn btn-primary me-2">
+                           Unduh Kalender Akademik!
                         </a>
                     @else
                         <button class="btn btn-secondary me-2" disabled>Kalender Akademik Belum Tersedia</button>
@@ -97,7 +104,7 @@
 
                     @if ($bem)
                         <a href="{{ asset('storage/' . $bem->file_path) }}" target="_blank" class="btn btn-primary">
-                            Unduh Kalender NonAkademik!
+                           Unduh Kalender NonAkademik!
                         </a>
                     @else
                         <button class="btn btn-secondary" disabled>Kalender BEM Belum Tersedia</button>
@@ -108,7 +115,7 @@
     </div>                
 
 
-    <!-- Announcement Modal (Unchanged) -->
+    <!-- Announcement Modal -->
     <div class="modal fade" id="pengumumanModal" tabindex="-1" aria-labelledby="pengumumanModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -123,4 +130,35 @@
             </div>
         </div>
     </div>
+@endsection
+
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const notificationDropdown = document.getElementById('notificationDropdown');
+    const notificationBadge = document.getElementById('notificationBadge');
+
+    notificationDropdown.addEventListener('click', function() {
+        // Hide the badge visually
+        if (notificationBadge) {
+            notificationBadge.style.display = 'none';
+        }
+
+        // Send AJAX request to mark notifications as read
+        fetch("{{ route('notifications.markRead') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': "{{ csrf_token() }}"
+            },
+            body: JSON.stringify({ nim: "{{ $mahasiswa->nim }}" })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data.message);
+        })
+        .catch(error => console.error('Error:', error));
+    });
+});
+</script>
 @endsection

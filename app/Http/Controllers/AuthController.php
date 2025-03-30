@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use GuzzleHttp\Client;
 use App\Models\User;
 use App\Models\Mahasiswa;
 
@@ -31,7 +30,8 @@ class AuthController extends Controller
                 // Find the user by username
                 $user = User::where('username', $request->username)->first();
                 if (!$user) {
-                        return back()->withErrors(['login' => 'Username tidak ditemukan.']);
+                        return redirect()->route('login')->withErrors(['login' => 'Nama pengguna tidak valid.']);
+
                 }
                 
 
@@ -44,6 +44,8 @@ class AuthController extends Controller
                         Log::info('Password match');
                         Log::info('Login berhasil untuk user:', ['username' => $user->username, 'role' => $user->role]);
 
+                        $apiToken = null; // fallback value if API call fails
+
                         try {
 
 
@@ -54,8 +56,8 @@ class AuthController extends Controller
 
                                 $response = $client->post('https://cis-dev.del.ac.id/api/jwt-api/do-auth', [
                                         'form_params' => [
-                                                'username' => 'johannes', // Use the logged-in user's username
-                                                'password' => 'Del@2022', // Use the provided password
+                                                'username' => 'johannes', // Use the logged-in user's username if applicable
+                                                'password' => 'Del@2022',  // Use the provided password if needed
                                         ],
                                         'headers' => [
                                                 'Accept' => 'application/json',
@@ -70,54 +72,60 @@ class AuthController extends Controller
                                 $data = json_decode($body, true);
                                 Log::info('Respons API setelah diuraikan:', ['parsed_response' => $data]);
                                 if ($data && isset($data['result']) && $data['result'] === true) {
-                                // if (true) {
-                                        // Fetch nim based on user role
-                                        $nim = null;
-                                        if ($user->role === 'mahasiswa') {
-                                            $mahasiswa = Mahasiswa::where('username', $user->username)->first();
-                                            $nim = $mahasiswa ? $mahasiswa->nim : null;
-                                        } else if ($user->role == 'orang_tua') {
-                                            // Use optional chaining to get nim for orang_tua
-                                            $nim = $user->orangTua?->nim;
-                                        }
-                                    
+                                        $apiToken = $data['token'];
+                                        Log::info('Token API diterima:', ['token' => $apiToken]);
+                                } else {
+                                        Log::error('API login gagal, response tidak valid, melanjutkan dengan login lokal', ['response_parsed' => $data]);
+                                }
+                        } catch (\Exception $e) {
+                                Log::error('API Error, melanjutkan dengan login lokal:', ['message' => $e->getMessage()]);
+                        }
 
-                                                // Store API token and user data in the session
-                                        session([
-                                                'api_token' => $data['token'],
-                                                'user_api'  => ' ',
-                                                'user'      => [
-                                                    'username' => $user->username,
-                                                    'role'     => $user->role,
-                                                    'nim'      => $nim, // Now correctly handles both roles
-                                                ],
-                                            ]);
-                                                
-                                        
-                                        
-                                        // Log::info('Token API diterima:', ['token' => $data['token']]);
-                                        // Redirect based on the user's role
-                                        switch ($user->role) {
-                                                case 'mahasiswa':
-                                                        Log::info('Redirecting to mahasiswa route...');
-                                                        return redirect()->route('beranda')->with('success', 'Login sebagai mahasiswa berhasil!');
+                        // Fetch nim based on user role
+                        $nim = null;
+                        if ($user->role === 'mahasiswa') {
+                                $mahasiswa = Mahasiswa::where('username', $user->username)->first();
+                                $nim = $mahasiswa ? $mahasiswa->nim : null;
+                        } else if ($user->role == 'orang_tua') {
+                                $nim = $user->orangTua?->nim;
+                        }
 
-                                                case 'dosen':
+                        // Store API token (if available) and user data in the session
+                        session([
+                                'api_token' => $apiToken,
+                                'user_api' => $data['user'] ?? null,
+                                'user' => [
+                                        'username' => $user->username,
+                                        'role' => $user->role,
+                                        'nim' => $nim,
+                                ],
+                        ]);
 
-                                                        Log::info('Redirecting to dosen route...');
-                                                        return redirect()->route('dosen')->with('success', 'Login sebagai dosen berhasil!');
+                        // Redirect based on the user's role
+                        switch ($user->role) {
+                                case 'mahasiswa':
+                                        Log::info('Redirecting to mahasiswa route...');
+                                        return redirect()->route('beranda')->with('success', 'Login sebagai mahasiswa berhasil!');
 
-                                                case 'keasramaan':
-                                                        Log::info('Redirecting to keasramaan route...');
-                                                        return redirect()->route('keasramaan')->with('success', 'Login sebagai keasramaan berhasil!');
+                                case 'dosen':
+                                        Log::info('Redirecting to dosen route...');
+                                        return redirect()->route('dosen')->with('success', 'Login sebagai dosen berhasil!');
 
-                                                case 'orang_tua':
-                                                        Log::info('Redirecting to orang_tua route...');
-                                                        return redirect()->route('orang_tua')->with('success', 'Login sebagai orang tua berhasil!');
+                                case 'keasramaan':
+                                        Log::info('Redirecting to keasramaan route...');
+                                        return redirect()->route('keasramaan')->with('success', 'Login sebagai keasramaan berhasil!');
 
-                                                case 'admin':
-                                                        Log::info('Redirecting to admin route...');
-                                                        return redirect()->route('admin')->with('success', 'Login sebagai admin berhasil!');
+                                case 'orang_tua':
+                                        Log::info('Redirecting to orang_tua route...');
+                                        return redirect()->route('orang_tua')->with('success', 'Login sebagai orang tua berhasil!');
+
+                                case 'kemahasiswaan':
+                                        Log::info('Redirecting to kemahasiswaan route...');
+                                        return redirect()->route('kemahasiswaan')->with('success', 'Login sebagai kemahasiswaan berhasil!');
+                                
+                                case 'konselor':
+                                        Log::info('Redirecting to konselor route...');
+                                        return redirect()->route('konselor')->with('success', 'Login sebagai konselor berhasil!');
 
                                                 default:
                                                         Log::warning('Unknown role detected:', ['role' => $user->role]);
@@ -134,7 +142,7 @@ class AuthController extends Controller
                 }
 
                 // If authentication fails
-                return back()->withErrors(['login' => 'Username atau Password salah.']);
+                return back()->withErrors(['login2' => 'Password salah.']);
         }
 
         public function logout()

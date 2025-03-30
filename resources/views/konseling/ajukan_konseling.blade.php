@@ -5,8 +5,13 @@
         {{-- Header dan Logout --}}
         <div class="d-flex align-items-center mb-4 border-bottom-line">
             <h3 class="me-auto">
-                <a href="{{ route('admin') }}"><i class="fas fa-user-friends me-3"></i>Home</a> /
-                <a href="{{ route('riwayat_konseling') }}">Ajukan Konseling</a>
+                @if(session('user.role') == 'kemahasiswaan')
+                <a href="{{ route('kemahasiswaan') }}"> <i class="fas fa-list me-3"></i>Home</a> /
+                <a href="{{ route('riwayat_konseling_kemahasiswaan') }}">Daftar Pelanggaran</a>
+            @elseif(session('user.role') == 'konselor')
+                <a href="{{ route('konselor') }}"> <i class="fas fa-list me-3"></i>Home</a> /
+                <a href="{{ route('riwayat_konseling_konselor') }}">Daftar Pelanggaran</a>
+            @endif
             </h3>
             <a href="#" onclick="confirmLogout()">
                 <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
@@ -90,7 +95,7 @@
             {{-- Tombol Konfirmasi --}}
             <div class="d-flex justify-content-center mt-4">
                 <button type="submit" class="btn btn-custom-blue btn-lg px-4 me-2">Buat</button>
-                <a href="{{ route('beranda') }}" class="btn btn-secondary btn-lg px-4">Batal</a>
+                <a href="{{ route('') }}" class="btn btn-secondary btn-lg px-4">Batal</a>
             </div>
         </form>
     </div>

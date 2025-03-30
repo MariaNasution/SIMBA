@@ -1,31 +1,64 @@
-@extends('layouts.app') <!-- Layout utama -->
+@extends('layouts.app')
+
 @section('content')
     <!-- Header -->
     <div class="d-flex align-items-center mb-4 border-bottom-line">
         <h3 class="me-auto">
-            <a href="{{ route('beranda') }}"><i class ="fas fa-home"></i> Beranda</a>
+            <a href="{{ route('keasramaan') }}"><i class ="fas fa-home"></i> Beranda</a>
         </h3>
         <a href="#" onclick="confirmLogout()">
             <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
         </a>
     </div>
-    <!-- Konten Utama -->
-    <div class="app-content-header">
-        <div class="container-fluid">
-            <!-- Waktu di bagian atas -->
-            <div class="d-flex justify-content-start align-items-center">
-                <p class="text-muted mb-3">{{ now()->addHours(7)->isoFormat('dddd, D MMMM YYYY HH:mm') }}</p>
-            </div>
-            <!-- Kontainer untuk Komponen -->
-            <div class="row">
-                <!-- Grafik Kemajuan Studi -->
-                <div class="col-md-12">
-                    <div class="card p-3 shadow-sm">
-                        <h5 class="card-title">Kemajuan Studi</h5>
-                        <canvas id="kemajuanStudiChart" height="400"></canvas>
-                    </div>
-                </div>
+
+    <!-- Main Content: Pengumuman -->
+    <div class="container-fluid p-4">
+        <div class="col-md-6">
+            <div class="cards p-3">
+                <h5 class="border-bottom-line text-start">PENGUMUMAN</h5>
+                <ul class="list-unstyled text-start pengumuman">
+                    @forelse ($pengumuman as $item)
+                        <li class="d-flex justify-content-between align-items-center mb-2">
+                            <a href="{{ route('pengumuman.detail', $item->id) }}" class="text-decoration-none">
+                                <span>
+                                    <strong class="
+                                        @switch($item->sumber)
+                                            @case('BEM') text-primary @break
+                                            @case('INFO') text-danger @break
+                                            @case('BURSAR') text-info @break
+                                            @case('KEASRAMAAN') text-success @break
+                                            @case('KEMAHASISWAAN') text-purple @break
+                                            @default text-dark
+                                        @endswitch">
+                                        [{{ strtoupper($item->sumber) }}]
+                                    </strong>
+                                    {{ $item->judul }}
+                                </span>
+                            </a>
+                        </li>
+                    @empty
+                        <li class="text-muted">Belum ada pengumuman.</li>
+                    @endforelse
+                </ul>
             </div>
         </div>
     </div>
+@endsection
+
+@section('styles')
+    <style>
+        /* Example styles for the announcement card */
+        .cards {
+            background: #fff;
+            border: 1px solid #eaeaea;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .border-bottom-line {
+            border-bottom: 2px solid #ddd;
+        }
+        .pengumuman li a:hover {
+            text-decoration: underline;
+        }
+    </style>
 @endsection
