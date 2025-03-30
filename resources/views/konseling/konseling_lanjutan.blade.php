@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-  <div class="container">
-    {{-- Header dan Logout --}}
+ 
+    {{-- Header --}}
     <div class="d-flex align-items-center mb-4 border-bottom-line">
     <h3 class="me-auto">
       @if(session('user.role') == 'kemahasiswaan')
@@ -19,178 +19,77 @@
     </div>
 
     {{-- Judul --}}
-    <h5 class="header-title text-primary mb-4">Mahasiswa Aktif TA 2024</h5>
+    <h5 class="header-title text-primary mb-4 text-start" >Mahasiswa Konseling Lanjutan</h5>
 
-    {{-- Form Pencarian --}}
-    <form>
-    <div class="row">
-      {{-- Kolom Kiri --}}
+    {{-- Form Pencarian Mahasiswa --}}
+    <form action="{{ route('konseling_lanjutan') }}" method="GET">
       <div class="col-md-6">
-      <div class="mb-2 row">
-        <label class="col-sm-2 col-form-label fw-bold">NIM</label>
-        <div class="col-sm-9">
-        <input type="text" class="form-control" placeholder="NIM">
+        <div class="mb-2 row">
+          <label class="col-sm-2 col-form-label fw-bold">NIM</label>
+          <div class="col-sm-9">
+            <input type="text" class="form-control" name="nim" value="{{ request('nim') }}" placeholder="">
+          </div>
         </div>
-      </div>
-      <div class="mb-2 row">
-        <label class="col-sm-2 col-form-label fw-bold">Nama</label>
-        <div class="col-sm-9">
-        <input type="text" class="form-control" placeholder="Nama">
+        <div class="mb-2 row">
+          <label class="col-sm-2 col-form-label fw-bold">Nama</label>
+          <div class="col-sm-9">
+            <input type="text" class="form-control" name="nama" value="{{ request('nama') }}" placeholder="">
+          </div>
         </div>
-      </div>
-      <div class="mb-2 row">
-        <label class="col-sm-2 col-form-label fw-bold">Angkatan</label>
-        <div class="col-sm-9">
-        <select class="form-select">
-          <option>Angkatan</option>
-          @for ($i = 2019; $i <= 2024; $i++)
-        <option>{{ $i }}</option>
-      @endfor
-        </select>
-        </div>
-      </div>
       </div>
 
-      {{-- Kolom Kanan --}}
-      <div class="col-md-6">
-      <div class="mb-2 row">
-        <label class="col-sm-2 col-form-label fw-bold">Prodi</label>
-        <div class="col-sm-9">
-        <select class="form-select">
-          <option>Program Studi</option>
-          <option>Informatika</option>
-          <option>Sistem Informasi</option>
-          <option>Teknik Elektro</option>
-          <option>Teknologi Informasi</option>
-          <option>Teknik Komputer</option>
-          <option>Teknologi Rekayasa Perangkat Lunak</option>
-          <option>Manajemen Rekayasa</option>
-          <option>Metalurgi</option>
-          <option>Bioproses</option>
-        </select>
-        </div>
+      {{-- Tombol --}}
+      <div class="text-center mt-3">
+        <button type="submit" class="btn btn-custom-blue">Cari</button>
+        <a href="{{ route('konseling_lanjutan') }}" class="btn btn-secondary">Reset</a>
       </div>
-      <div class="mb-2 row">
-        <label class="col-sm-2 col-form-label fw-bold">Kelas</label>
-        <div class="col-sm-9">
-        <input type="text" class="form-control" placeholder="Kelas">
-        </div>
-      </div>
-      <div class="mb-2 row">
-        <label class="col-sm-2 col-form-label fw-bold">Wali</label>
-        <div class="col-sm-9">
-        <select class="form-select">
-          <option>Wali</option>
-        </select>
-        </div>
-      </div>
-      </div>
-    </div>
-    <br />
-    {{-- Tombol --}}
-    <div class="text-center">
-      <button type="submit" class="btn btn-custom-blue">Cari</button>
-      <button type="reset" class="btn btn-secondary">Hapus</button>
-    </div>
     </form>
 
-    {{-- Tabel Data Mahasiswa --}}
-    @if (!empty($dataMahasiswa))
-    <div class="mt-4">
-    <h4>Data Mahasiswa</h4>
-    <table class="table table-bordered table-striped">
-      <thead>
-      <tr>
-      <th>NIM</th>
-      <th>Nama</th>
-      <th>Tahun Masuk</th>
-      <th>Program Studi</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-      <td>{{ $dataMahasiswa['nim'] ?? '-' }}</td>
-      <td>{{ $dataMahasiswa['nama'] ?? '-' }}</td>
-      <td>{{ $dataMahasiswa['tahun_masuk'] ?? '-' }}</td>
-      <td>{{ $dataMahasiswa['prodi'] ?? '-' }}</td>
-      </tr>
-      </tbody>
-    </table>
-    </div>
-  @endif
+    
+    {{-- Menampilkan Error --}}
+    @if ($errors->any())
+        <div class="alert alert-danger mt-3">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-    {{-- Tabel Mahasiswa --}}
-    <div class="container">
+    {{-- Tabel Data Mahasiswa Konseling Lanjutan --}}
+    @if ($mahasiswas->isNotEmpty())
+      <div class="mt-4">
+        <h4 class="text-start">Data Mahasiswa</h4>
+        <table class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>NIM</th>
+              <th>Nama</th>
+            </tr>
+          </thead>
+          <tbody>
+            @php
+              // Group students by NIM and name to avoid duplicates
+              $uniqueMahasiswa = $mahasiswas->unique(function($item) {
+                return $item->nim . $item->nama;
+              });
+            @endphp
+            @foreach($uniqueMahasiswa as $mahasiswa)
+              <tr>
+                <td>{{ $mahasiswa->nim }}</td>
+                <td>
+                  <a href="{{ route('konseling.lanjutan.detail', $mahasiswa->nim) }}">
+                    {{ $mahasiswa->nama }}
+                  </a>
+              </tr>
+            @endforeach
+          </tbody>
+        </table>
+      </div>
 
-    @if(session('error'))
-    <div class="alert alert-danger">{{ session('error') }}</div>
-  @endif
+  @else
+        <div class="alert alert-info mt-3">Tidak ada data mahasiswa yang ditemukan.</div>
+    @endif
 
-    @if (!empty($mahasiswas))
-    <div class="mt-4">
-      <h4>Daftar Mahasiswa</h4>
-      <table class="table table-bordered table-striped">
-      <thead>
-      <tr>
-      <th>NIM</th>
-      <th>Nama</th>
-      <th>Tahun Masuk</th>
-      <th>Program Studi</th>
-      </tr>
-      </thead>
-      <tbody>
-      @forelse($mahasiswas as $mahasiswa)
-      <tr>
-      <td>{{ $mahasiswa['nim'] }}</td>
-      <td>{{ $mahasiswa['nama'] }}</td>
-      <td>{{ $mahasiswa['angkatan'] }}</td>
-      <td>{{ $mahasiswa['prodi_name'] }}</td>
-      </tr>
-    @empty
-      <tr>
-      <td colspan="4" class="text-center">Tidak ada data mahasiswa.</td>
-      </tr>
-    @endforelse
-      </tbody>
-      </table>
-    </div>
-  @endif
-
-    {{-- Pagination Dummy --}}
-    <nav>
-      <ul class="pagination justify-content-center">
-      <li class="page-item disabled">
-        <a class="page-link" href="#" tabindex="-1">&laquo;</a>
-      </li>
-      <li class="page-item active"><a class="page-link" href="#">1</a></li>
-      <li class="page-item"><a class="page-link" href="#">2</a></li>
-      <li class="page-item"><a class="page-link" href="#">3</a></li>
-      <li class="page-item"><a class="page-link" href="#">4</a></li>
-      <li class="page-item"><a class="page-link" href="#">5</a></li>
-      <li class="page-item">
-        <a class="page-link" href="#">&raquo;</a>
-      </li>
-      </ul>
-    </nav>
-    </div>
-
-    {{-- Logout Confirmation --}}
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-    function confirmLogout() {
-      Swal.fire({
-      title: 'Konfirmasi Keluar',
-      text: "Anda yakin ingin keluar?",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Ya, Keluar',
-      cancelButtonText: 'Batal',
-      reverseButtons: true
-      }).then((result) => {
-      if (result.isConfirmed) {
-        window.location.href = '{{ route('logout') }}';
-      }
-      });
-    }
-    </script>
-  @endsection
+@endsection

@@ -31,7 +31,7 @@ use App\Http\Controllers\SmsController;
 use App\Http\Controllers\NotifikasiController;
 
 Route::post('/notifications/mark-read', [NotifikasiController::class, 'markAllRead'])->name('notifications.markRead');
-
+use App\Http\Controllers\KonselingLanjutanController;
 use App\Http\Controllers\BeritaAcaraController;
 
 // Login dan Logout
@@ -65,6 +65,11 @@ Route::middleware(['auth.session', 'ensure.student.data', 'role:mahasiswa'])->gr
     Route::get('/mahasiswa_konseling', [MahasiswaKonselingController::class, 'index'])->name('mahasiswa_konseling');
     Route::get('/mahasiswa_perwalian', [MahasiswaPerwalianController::class, 'index'])->name('mahasiswa_perwalian');
     Route::get('/mahasiswa/konseling/request', [MahasiswaRequestKonselingController::class, 'create'])->name('mhs_konseling_request');
+    Route::get('/mahasiswa/request-konseling', [MahasiswaRequestKonselingController::class, 'create'])->name('mhs_konseling_request');
+    Route::post('/mahasiswa/request-konseling', [MahasiswaRequestKonselingController::class, 'store'])->name('mhs_konseling_request.store');
+    Route::get('/mahasiswa/konseling/request', [MahasiswaRequestKonselingController::class, 'create'])->name('mhs_konseling_request');
+    Route::post('/mahasiswa/konseling/store', [MahasiswaRequestKonselingController::class, 'store'])->name('mhs_konseling_store');
+
 });
 
 // Middleware untuk konselor
