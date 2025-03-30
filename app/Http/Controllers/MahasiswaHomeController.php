@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Http;
 use App\Models\Absensi;
 use App\Models\Perwalian;
 use App\Models\Mahasiswa;
-use App\Models\Notifikasi;
 use App\Models\Dosen;
 
 class MahasiswaHomeController extends Controller
