@@ -6,15 +6,15 @@ use App\Models\Pengumuman;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\RequestKonseling;
-use App\Models\KonselingLanjutan;
+use Illuminate\Support\Facades\Log;
 
-class adminController extends Controller
+class KemahasiswaanController extends Controller
 {
     public function index()
     {
         $pengumuman = Pengumuman::orderBy('created_at', 'desc')->get();
 
-        return view('beranda.homeAdmin', compact('pengumuman'));
+        return view('beranda.homeKemahasiswaan', compact('pengumuman'));
     }
 
     public function store(Request $request)
@@ -31,7 +31,7 @@ class adminController extends Controller
             'deskripsi' => $request->deskripsi,
         ]);
 
-        return redirect()->route('admin')->with('success', 'Data berhasil disimpan!');
+        return redirect()->route('kemahasiswaan')->with('success', 'Data berhasil disimpan!');
     }
 
     public function destroy($id)
@@ -56,8 +56,6 @@ class adminController extends Controller
         return view('beranda.detailpengumuman', compact('pengumuman'));
     }
 
-
-
     public function hasilKonseling()
     {
         return view('konseling.hasil_konseling');
@@ -68,28 +66,32 @@ class adminController extends Controller
         return view('konseling.riwayat_konseling');
     }
 
-    public function konselingLanjutan(Request $request)
+    public function konselingLanjutan()
     {
-        try {
-            // Ambil parameter pencarian
-            $nim = $request->input('nim');
-            $nama = $request->input('nama');
+        $apiToken = session('api_token');
 
-            // Query untuk mencari data berdasarkan NIM atau nama
-            $mahasiswas = KonselingLanjutan::query()
-                ->when($nim, function ($query, $nim) {
-                    return $query->where('nim', 'like', "%$nim%");
-                })
-                ->when($nama, function ($query, $nama) {
-                    return $query->where('nama', 'like', "%$nama%");
-                })
-                ->get();
-            return view('konseling.konseling_lanjutan', compact('mahasiswas'));
+        if (!$apiToken) {
+            return redirect()->back()->withErrors(['error' => 'API token tidak tersedia']);
+        }
+
+        try {
+            // Ambil data mahasiswa dari API
+            $mahasiswaResponse = Http::withToken($apiToken)
+                ->withOptions(['verify' => false])
+                ->get('https://cis-dev.del.ac.id/api/library-api/mahasiswa');
+
+            if ($mahasiswaResponse->successful()) {
+                $mahasiswas = $mahasiswaResponse->json()['data']['mahasiswa'];
+
+                return view('konseling.konseling_lanjutan', compact('mahasiswas'));
+            }
+
+            return redirect()->back()->withErrors(['error' => 'Gagal mengambil data mahasiswa dari API.']);
         } catch (\Exception $e) {
+            Log::error('Exception terjadi:', ['message' => $e->getMessage()]);
             return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
     }
-
 
     public function ajukanKonseling()
     {
@@ -104,22 +106,6 @@ class adminController extends Controller
         // Kirim ke view
         return view('konseling.daftar_request', compact('requests'));
     }
-    public function detail($nim)
-    {
-        // Ambil data hasil konseling berdasarkan NIM dengan pagination (5 per halaman)
-        $mahasiswas = KonselingLanjutan::where('nim', $nim)->paginate(7);
-    
-        // Ambil nama mahasiswa dari hasil konseling pertama (jika ada data)
-        $nama = $mahasiswas->first()->nama ?? 'Nama tidak ditemukan';
-    
-        return view('konseling.konseling_lanjutan_detail', compact('nama', 'nim', 'mahasiswas'));
-    }
 
-    public function riwayatDaftarRequest()
-    {
-        return view('konseling.riwayat_daftar_request');
-    }
-    
+
 }
-
-

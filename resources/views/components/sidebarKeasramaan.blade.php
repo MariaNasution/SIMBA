@@ -6,7 +6,6 @@
             <p>Keasramaan</p>
         </div>
     </div>
-    
     <ul class="menu">
         <li class="menu-item">
             <a href="{{ route('keasramaan') }}">

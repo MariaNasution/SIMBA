@@ -13,7 +13,7 @@ class EnsureStudentData
 {
     $userRole = $request->session()->get('user.role');
     
-    if (in_array($userRole, ['mahasiswa', 'orang_tua'])) {
+    if (in_array($userRole, ['mahasiswa'])) {
         if (!$request->session()->has('student_data')) {
             $apiToken = $request->session()->get('api_token');
             $user = $request->session()->get('user');
@@ -31,15 +31,15 @@ class EnsureStudentData
                         $request->session()->put('student_data', $data['data']);
                     } else {
                         Log::error('API request failed:', ['status' => $response->status()]);
-                        return redirect()->route('beranda', 'orang_tua')->withErrors(['error' => 'Gagal mengambil data.']);
+                        return redirect()->route('beranda')->withErrors(['error' => 'Gagal mengambil data.']);
                     }
                 } catch (\Exception $e) {
                     Log::error('Failed to fetch student data:', ['message' => $e->getMessage()]);
-                    return redirect()->route('beranda', 'orang_tua')->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+                    return redirect()->route('beranda')->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
                 }
             } else {
                 Log::error('Missing API token or NIM in session.');
-                return redirect()->route('beranda', 'orang_tua')->withErrors(['error' => 'Session data tidak lengkap.']);
+                return redirect()->route('beranda')->withErrors(['error' => 'Session data tidak lengkap.']);
             }
         }
     }

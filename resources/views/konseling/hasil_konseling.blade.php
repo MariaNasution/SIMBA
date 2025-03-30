@@ -1,12 +1,18 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="d-flex align-items-center mb-4 border-bottom-line">
-  <h3 class="me-auto">
-    <a href="{{ route('admin') }}"><i class="fas fa-book me-3"></i>Home</a> /
-    <a href="{{ route('hasil_konseling') }}">Hasil Konseling</a>
-  </h3>
-  <a href="#" onclick="confirmLogout()">
+
+  <div class="d-flex align-items-center mb-4 border-bottom-line">
+    <h3 class="me-auto">
+      @if(session('user.role') == 'kemahasiswaan')
+      <a href="{{ route('kemahasiswaan') }}"> <i class="fas fa-list me-3"></i>Home</a> /
+      <a href="{{ route('hasil_konseling_kemahasiswaan') }}">Hasil Konseling</a>
+  @elseif(session('user.role') == 'konselor')
+      <a href="{{ route('konselor') }}"> <i class="fas fa-list me-3"></i>Home</a> /
+      <a href="{{ route('hasil_konseling_konselor') }}">Hasil Konseling</a>
+  @endif
+    </h3>
+    <a href="#" onclick="confirmLogout()">
     <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
   </a>
 </div>

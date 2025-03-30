@@ -11,7 +11,7 @@ class OrangTua extends Model
     public $incrementing = false; // Disable auto-increment
 
     // Define fillable fields
-    protected $fillable = ['username'];
+    protected $fillable = ['username', 'nim', 'no_hp'];
 
     /**
      * Define the inverse relationship with the User model.

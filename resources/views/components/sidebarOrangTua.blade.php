@@ -11,10 +11,10 @@
       <a href="{{ route('profil') }}">
         <img src="{{ asset('assets/img/profil.jpg') }}" alt="Profile Picture" class="profile-picture">
         <h4 class="profile-name">
-          {{ session('student_data.nama') ?? 'Nama Tidak Ditemukan' }}
+          {{ session('student_data_ortu.nama') ?? 'Nama Tidak Ditemukan' }}
         </h4>
         <p class="profile-id">
-          {{ session('student_data.nim') ?? 'NIM Tidak Ditemukan' }}
+          {{ session('student_data_ortu.nim') ?? 'NIM Tidak Ditemukan' }}
         </p>
       </a>
     </div>

@@ -1,17 +1,22 @@
 @extends('layouts.app')
 
 @section('content')
-
-    {{-- Header dan Logout --}}
-    <div class="d-flex align-items-center mb-4 border-bottom-line">
-        <h3 class="me-auto">
-            <a href="{{ route('admin') }}"><i class="fas fa-history me-3"></i>Home</a> /
-            <a href="{{ route('riwayat.konseling') }}">Riwayat Konseling</a>
-        </h3>
-        <a href="#" onclick="confirmLogout()">
-            <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
-        </a>
-    </div>
+    <div class="container">
+        {{-- Header dan Logout --}}
+        <div class="d-flex align-items-center mb-4 border-bottom-line">
+            <h3 class="me-auto">
+                @if(session('user.role') == 'kemahasiswaan')
+                <a href="{{ route('kemahasiswaan') }}"> <i class="fas fa-list me-3"></i>Home</a> /
+                <a href="{{ route('riwayat.konseling.kemahasiswaan') }}">Daftar Pelanggaran</a>
+            @elseif(session('user.role') == 'konselor')
+                <a href="{{ route('konselor') }}"> <i class="fas fa-list me-3"></i>Home</a> /
+                <a href="{{ route('riwayat.konseling.konselor') }}">Daftar Pelanggaran</a>
+            @endif
+            </h3>
+            <a href="#" onclick="confirmLogout()">
+                <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
+            </a>
+        </div>
 
     {{-- Judul --}}
     <h5 class="header-title text-primary mb-4 text-start">Mahasiswa Aktif TA 2024</h5>

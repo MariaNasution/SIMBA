@@ -17,7 +17,6 @@
           {{ session('student_data.nim') ?? 'NIM Tidak Ditemukan' }}
         </p>
       </a>
-
     </div>
   </div>
   <ul class="menu">
@@ -36,6 +35,10 @@
         <i class="fas fa-list-alt"></i> Perwalian
       </a>
     </li>
-
+    <li class="menu-item">
+      <a href="{{ route('catatan_perilaku') }}">
+          <i class="fas fa-user-edit"></i> Catatan perilaku
+      </a>
+  </li>
   </ul>
 </div>
