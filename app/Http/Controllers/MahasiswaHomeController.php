@@ -35,8 +35,8 @@ class MahasiswaHomeController extends Controller
         $nim = $mahasiswa->nim;
         $apiToken = session('api_token');
 
+        // --- Fetch student data from API ---
         try {
-            // Fetch student data from API
             $studentResponse = Http::withToken($apiToken)
                 ->withOptions(['verify' => false])
                 ->asForm()
@@ -49,7 +49,7 @@ class MahasiswaHomeController extends Controller
                 // Simpan sem_ta dan ta ke session jika ada
                 session([
                     'sem_ta' => $studentData['sem_ta'] ?? null,
-                    'ta' => $studentData['ta'] ?? null,
+                    'ta'     => $studentData['ta'] ?? null,
                 ]);
             } else {
                 Log::error('Student API request failed', ['status' => $studentResponse->status()]);
@@ -58,13 +58,15 @@ class MahasiswaHomeController extends Controller
             Log::error('Exception on fetching student data:', ['message' => $e->getMessage()]);
         }
 
-            // Fetch academic performance data from API
+        // --- Fetch academic performance data (penilaian) from API ---
+        try {
             $response = Http::withToken($apiToken)
                 ->withOptions(['verify' => false])
                 ->asForm()
                 ->get('https://cis-dev.del.ac.id/api/library-api/get-penilaian', [
                     'nim' => $nim,
                 ]);
+
             Log::info('Respons API mentah:', ['body' => $response->body()]);
 
             if ($response->successful()) {
@@ -75,15 +77,13 @@ class MahasiswaHomeController extends Controller
                 uasort($ipSemester, function ($a, $b) {
                     if ($a['ta'] === $b['ta']) {
                         return $a['sem'] <=> $b['sem'];
-                        return $a['sem'] <=> $b['sem'];
                     }
-                    return $a['ta'] <=> $b['ta'];
                     return $a['ta'] <=> $b['ta'];
                 });
 
                 $labels = [];
                 $values = [];
-                
+
                 foreach ($ipSemester as $semester => $details) {
                     $labels[] = "TA {$details['ta']} - Semester {$details['sem']}";
                     $values[] = is_numeric($details['ip_semester']) ? (float) $details['ip_semester'] : 0;
@@ -150,25 +150,22 @@ class MahasiswaHomeController extends Controller
                     'dosenNotifications',
                     'noPerwalianMessage'
                 ));
+            } else {
+                Log::error('Gagal mengambil data API', ['response' => $response->body()]);
+                return redirect()->route('beranda')->withErrors(['error' => 'Gagal mengambil data kemajuan studi.']);
             }
-
-            Log::error('Gagal mengambil data API', ['response' => $response->body()]);
-            return redirect()->route('beranda')->withErrors(['error' => 'Gagal mengambil data kemajuan studi.']);
         } catch (\Exception $e) {
             Log::error('Exception on fetching penilaian data:', ['message' => $e->getMessage()]);
         }
 
-        // Ambil data pengumuman dan kalender akademik
+        // --- Fallback: Render halaman dengan data yang ada ---
         $pengumuman = Pengumuman::orderBy('created_at', 'desc')->get();
         $akademik = Calendar::where('type', 'akademik')->latest()->first();
         $bem = Calendar::where('type', 'bem')->latest()->first();
-
-        // --- Ambil data notifikasi untuk mahasiswa ---
         $notifications = Notifikasi::where('nim', $nim)
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Tetap render halaman dengan data yang ada (meski mungkin data chart kosong)
         return view('beranda.homeMahasiswa', compact('labels', 'values', 'pengumuman', 'akademik', 'bem', 'notifications', 'mahasiswa'));
     }
 

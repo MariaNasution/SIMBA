@@ -10,30 +10,17 @@
         <div class="dropdown position-relative me-3">
             <a href="#" class="text-decoration-none" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="fas fa-bell fs-5 cursor-pointer" title="Notifications"></i>
-                @php
-                    // Count only unread notifications
-                    $unreadCount = $notifications->where('is_read', false)->count();
-                @endphp
-                @if($unreadCount > 0)
-                    <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                        {{ $unreadCount }}
-                        <span class="visually-hidden">unread notifications</span>
-                    </span>
-                @endif
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    3 <!-- Placeholder for notification count -->
+                    <span class="visually-hidden">unread notifications</span>
+                </span>
             </a>
             <ul class="dropdown-menu" aria-labelledby="notificationDropdown">
                 <li><h6 class="dropdown-header">Notifications</h6></li>
-                @forelse ($notifications as $notification)
-                    <li>
-                        <a class="dropdown-item" href="#">
-                            {{ $notification->Pesan }}
-                            <br>
-                            <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
-                        </a>
-                    </li>
-                @empty
-                    <li><a class="dropdown-item" href="#">Tidak ada notifikasi</a></li>
-                @endforelse
+                <!-- Placeholder Perwalian Notifications -->
+                @for ($i = 0; $i < 3; $i++)
+                    <li><a class="dropdown-item" href="#">Perwalian on 2025-02-27 by Dosen NIP: 123456</a></li>
+                @endfor
             </ul>
         </div>
         <!-- Logout Button -->
