@@ -11,7 +11,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <style>
         #kemajuanStudiChart {
@@ -25,6 +24,8 @@
             overflow: hidden;
         }
     </style>
+    <!-- Yield additional styles from child views -->
+    @yield('styles')
 </head>
 
 <body>
@@ -57,7 +58,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Check if the kemajuanStudiChart element exists before initializing Chart.js
             const chartElement = document.getElementById('kemajuanStudiChart');
             if (chartElement) {
                 const ctx = chartElement.getContext('2d');
@@ -136,7 +136,7 @@
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = '{{ route('logout') }}'; // Arahkan ke route logout jika 'Ya' dipilih
+                    window.location.href = '{{ route('logout') }}';
                 }
             });
         }
@@ -144,25 +144,17 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Check if the pengumumanModal element exists before adding the event listener
             const pengumumanModal = document.getElementById('pengumumanModal');
             if (pengumumanModal) {
-                const modalTitle = document.getElementById('pengumumanModalLabel'); // Elemen judul modal
-                const modalBody = document.getElementById('pengumumanDeskripsi'); // Elemen deskripsi modal
+                const modalTitle = document.getElementById('pengumumanModalLabel');
+                const modalBody = document.getElementById('pengumumanDeskripsi');
 
                 pengumumanModal.addEventListener('show.bs.modal', function (event) {
-                    // Elemen yang memicu modal
                     const button = event.relatedTarget;
-
-                    // Ambil data dari atribut tombol
                     const judul = button.getAttribute('data-judul');
                     const deskripsi = button.getAttribute('data-deskripsi');
-
-                    // Cetak nilai ke console setelah didefinisikan
                     console.log('Judul:', judul);
                     console.log('Deskripsi:', deskripsi);
-
-                    // Masukkan data ke modal
                     modalTitle.textContent = judul;
                     modalBody.textContent = deskripsi;
                 });
