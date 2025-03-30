@@ -26,7 +26,7 @@ class MahasiswaHomeController extends Controller
             return redirect()->route('login')->withErrors(['error' => 'Please log in as a mahasiswa.']);
         }
 
-        // Get the NIM from the mahasiswa table using the username from session
+        // Cari data mahasiswa berdasarkan username dari session
         $mahasiswa = Mahasiswa::where('username', $user['username'])->first();
         if (!$mahasiswa) {
             Log::error('No mahasiswa record found for user', ['username' => $user['username']]);
@@ -35,8 +35,8 @@ class MahasiswaHomeController extends Controller
         $nim = $mahasiswa->nim;
         $apiToken = session('api_token');
 
+        // --- Fetch student data from API ---
         try {
-            // Fetch student data from API
             $studentResponse = Http::withToken($apiToken)
                 ->withOptions(['verify' => false])
                 ->asForm()
@@ -46,19 +46,27 @@ class MahasiswaHomeController extends Controller
 
             if ($studentResponse->successful()) {
                 $studentData = $studentResponse->json()['data'] ?? [];
+                // Simpan sem_ta dan ta ke session jika ada
                 session([
                     'sem_ta' => $studentData['sem_ta'] ?? null,
-                    'ta' => $studentData['ta'] ?? null,
+                    'ta'     => $studentData['ta'] ?? null,
                 ]);
+            } else {
+                Log::error('Student API request failed', ['status' => $studentResponse->status()]);
             }
+        } catch (\Exception $e) {
+            Log::error('Exception on fetching student data:', ['message' => $e->getMessage()]);
+        }
 
-            // Fetch academic performance data from API
+        // --- Fetch academic performance data (penilaian) from API ---
+        try {
             $response = Http::withToken($apiToken)
                 ->withOptions(['verify' => false])
                 ->asForm()
                 ->get('https://cis-dev.del.ac.id/api/library-api/get-penilaian', [
                     'nim' => $nim,
                 ]);
+
             Log::info('Respons API mentah:', ['body' => $response->body()]);
 
             if ($response->successful()) {
@@ -75,7 +83,7 @@ class MahasiswaHomeController extends Controller
 
                 $labels = [];
                 $values = [];
-                
+
                 foreach ($ipSemester as $semester => $details) {
                     $labels[] = "TA {$details['ta']} - Semester {$details['sem']}";
                     $values[] = is_numeric($details['ip_semester']) ? (float) $details['ip_semester'] : 0;
@@ -142,14 +150,23 @@ class MahasiswaHomeController extends Controller
                     'dosenNotifications',
                     'noPerwalianMessage'
                 ));
+            } else {
+                Log::error('Gagal mengambil data API', ['response' => $response->body()]);
+                return redirect()->route('beranda')->withErrors(['error' => 'Gagal mengambil data kemajuan studi.']);
             }
-
-            Log::error('Gagal mengambil data API', ['response' => $response->body()]);
-            return redirect()->route('beranda')->withErrors(['error' => 'Gagal mengambil data kemajuan studi.']);
         } catch (\Exception $e) {
-            Log::error('Kesalahan API:', ['message' => $e->getMessage()]);
-            return redirect()->route('beranda')->withErrors(['error' => 'Terjadi kesalahan saat memuat data.']);
+            Log::error('Exception on fetching penilaian data:', ['message' => $e->getMessage()]);
         }
+
+        // --- Fallback: Render halaman dengan data yang ada ---
+        $pengumuman = Pengumuman::orderBy('created_at', 'desc')->get();
+        $akademik = Calendar::where('type', 'akademik')->latest()->first();
+        $bem = Calendar::where('type', 'bem')->latest()->first();
+        $notifications = Notifikasi::where('nim', $nim)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('beranda.homeMahasiswa', compact('labels', 'values', 'pengumuman', 'akademik', 'bem', 'notifications', 'mahasiswa'));
     }
 
     public function show($id)

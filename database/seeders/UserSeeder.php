@@ -20,7 +20,8 @@ class UserSeeder extends Seeder
 
         // Truncate all tables to start fresh
         DB::table('users')->truncate();
-        DB::table('admin')->truncate();
+        DB::table('kemahasiswaan')->truncate();
+        DB::table('konselor')->truncate();
         DB::table('mahasiswa')->truncate();
         DB::table('keasramaan')->truncate();
         DB::table('dosen')->truncate();
@@ -42,10 +43,16 @@ class UserSeeder extends Seeder
         // Define users with roles
         $users = [
             [
-                'username' => 'admin',
+                'username' => 'kemahasiswaan',
                 'password' => Hash::make('admin'),
-                'role' => 'admin',
-                'anak_wali' => null,
+                'role' => 'kemahasiswaan',
+                'anak_wali' => null, // No anak wali for admin
+            ],
+            [
+                'username' => 'konselor',
+                'password' => Hash::make('admin'),
+                'role' => 'konselor',
+                'anak_wali' => null, // No anak wali for admin
             ],
             // Mahasiswa users (12IF1 - 5 students)
             ['username' => 'ifs19001', 'password' => Hash::make('mahasiswa'), 'role' => 'mahasiswa', 'anak_wali' => '0309020008'],
@@ -126,8 +133,16 @@ class UserSeeder extends Seeder
 
             // Insert into the role-specific table
             switch ($user['role']) {
-                case 'admin':
-                    DB::table('admin')->insert([
+                case 'kemahasiswaan':
+                    DB::table('kemahasiswaan')->insert([
+                        'username' => $user['username'],
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                    break;
+
+                case 'konselor':
+                    DB::table('konselor')->insert([
                         'username' => $user['username'],
                         'created_at' => now(),
                         'updated_at' => now(),
@@ -178,12 +193,13 @@ class UserSeeder extends Seeder
                 case 'orang_tua':
                     DB::table('orang_tua')->insert([
                         'username' => $user['username'],
-                        'nim' => '11S19001',
-                        'created_at' => now(),
+                        'nim' => '11S19001', // Fixed: Assign a default NIM for orang tua
+                        'no_hp' => '+6281377385300',
+                          'created_at' => now(),
                         'updated_at' => now(),
                     ]);
                     break;
             }
         }
-    }
+    }   
 }

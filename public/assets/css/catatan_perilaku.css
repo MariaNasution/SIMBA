@@ -71,6 +71,15 @@ hr.mb-4 {
   color: #007bff;
 }
 
+/* Animasi rotasi ikon dropdown */
+.dropdown-icon i {
+  transition: transform 0.3s ease-in-out;
+}
+
+.dropdown-icon i.rotated {
+  transform: rotate(90deg);
+}
+
 /* Custom Box Container for Pelanggaran and Perbuatan Baik */
 .custom-box-container {
   display: flex;
@@ -105,12 +114,47 @@ hr.mb-4 {
   width: 30% !important;
 }
 
-/* Collapse header for the Pembinaan section */
-.collapse h5 {
-  font-size: 1rem;  /* Approximately 16px */
-}
+
+
+
 
 /* Padding for container inside collapse */
 .p-3 {
   background-color: #f8f9fa;
+}
+
+
+/* Memastikan elemen .collapse tertutup rapat dan menerapkan transisi */
+.collapse {
+  overflow: hidden;
+  /* Sembunyikan isi saat tertutup */
+  max-height: 0;
+  /* Mulai dari tinggi 0 */
+  opacity: 0;
+  /* Mulai transparan */
+  transition: max-height 0.4s ease, opacity 0.4s ease;
+}
+
+/* Saat .collapse dibuka (show), atur tinggi dan opacity */
+.collapse.show {
+  max-height: 1000px;
+  /* Sesuaikan dengan tinggi konten */
+  opacity: 1;
+}
+
+/* Efek tambahan fade+slide pada konten detail */
+.collapse-content {
+  transform: translateY(-10px);
+  opacity: 0;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+.collapse.show .collapse-content {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Rotasi icon panah jika ingin pakai pendekatan .rotated (opsional) */
+.dropdown-icon i.rotated {
+  transform: rotate(90deg);
 }
