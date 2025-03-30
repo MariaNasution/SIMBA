@@ -57,7 +57,7 @@
         <td colspan="7">
           <!-- Bungkus isi detail di dalam .collapse-content untuk efek fade+slide -->
           <div class="collapse-content p-3">
-            <h5 style="font-size: 1rem; text-align: left;">Pembinaan: </h5>
+            <h5 style="font-size: 1.1rem; text-align: left;">Pembinaan: </h5>
 
             <!-- Container untuk Kotak Pelanggaran dan Perbuatan Baik -->
             <div class="custom-box-container">

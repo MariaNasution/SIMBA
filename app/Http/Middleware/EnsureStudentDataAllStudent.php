@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Middleware;
 
 use Closure;
@@ -18,7 +17,6 @@ class EnsureStudentDataAllStudent
                 $apiToken = $request->session()->get('api_token');
                 $user = $request->session()->get('user');
 
-                // Removed the check for 'nim' and parameters for the API call.
                 if ($apiToken && $user) {
                     try {
                         $response = Http::withToken($apiToken)
@@ -30,15 +28,48 @@ class EnsureStudentDataAllStudent
                             $request->session()->put('student_data_all_student', $data['data']);
                         } else {
                             Log::error('API request failed:', ['status' => $response->status()]);
-                            return redirect()->route('keasramaan')->withErrors(['error' => 'Gagal mengambil data.']);
+                            // Jika API gagal, set dummy data dengan satu mahasiswa
+                            $dummyData = [
+                                'mahasiswa' => [
+                                    [
+                                        'nim'         => '11S19001',
+                                        'nama'        => 'Budi Santoso',
+                                        'angkatan'    => '2024',
+                                        'prodi_name'  => 'Teknik Informatika',
+                                    ],
+                                ],
+                            ];
+                            $request->session()->put('student_data_all_student', $dummyData);
                         }
                     } catch (\Exception $e) {
                         Log::error('Failed to fetch student data:', ['message' => $e->getMessage()]);
-                        return redirect()->route('keasramaan')->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+                        // Jika terjadi exception, set dummy data
+                        $dummyData = [
+                            'mahasiswa' => [
+                                [
+                                    'nim'         => '11S19001',
+                                    'nama'        => 'Budi Santoso',
+                                    'angkatan'    => '2024',
+                                    'prodi_name'  => 'Teknik Informatika',
+                                ],
+                            ],
+                        ];
+                        $request->session()->put('student_data_all_student', $dummyData);
                     }
                 } else {
                     Log::error('Missing API token or user data in session.');
-                    return redirect()->route('keasramaan')->withErrors(['error' => 'Session data tidak lengkap.']);
+                    // Jika data session tidak lengkap, set dummy data
+                    $dummyData = [
+                        'mahasiswa' => [
+                            [
+                                'nim'         => '11S19001',
+                                'nama'        => 'Budi Santoso',
+                                'angkatan'    => '2024',
+                                'prodi_name'  => 'Teknik Informatika',
+                            ],
+                        ],
+                    ];
+                    $request->session()->put('student_data_all_student', $dummyData);
                 }
             }
         }

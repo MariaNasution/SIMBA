@@ -20,7 +20,8 @@ class UserSeeder extends Seeder
 
         // Truncate all tables to start fresh
         DB::table('users')->truncate();
-        DB::table('admin')->truncate();
+        DB::table('kemahasiswaan')->truncate();
+        DB::table('konselor')->truncate();
         DB::table('mahasiswa')->truncate();
         DB::table('keasramaan')->truncate();
         DB::table('dosen')->truncate();
@@ -41,9 +42,15 @@ class UserSeeder extends Seeder
         // Define users with roles and unique NIMs for mahasiswa
         $users = [
             [
-                'username' => 'admin',
+                'username' => 'kemahasiswaan',
                 'password' => Hash::make('admin'),
-                'role' => 'admin',
+                'role' => 'kemahasiswaan',
+                'anak_wali' => null, // No anak wali for admin
+            ],
+            [
+                'username' => 'konselor',
+                'password' => Hash::make('admin'),
+                'role' => 'konselor',
                 'anak_wali' => null, // No anak wali for admin
             ],
             [
@@ -125,12 +132,19 @@ class UserSeeder extends Seeder
                 'anak_wali' => null, // No anak wali for orang tua
             ],
         ];
- 
+
         // Array of unique NIMs for mahasiswa (must match the number of mahasiswa users)
         $nims = [
-            '11S19001', '11S19002', '11S19003', '11S19004',
-            '11S19005', '11S19031', '11S19032', '11S19033',
-            '11S19034', '11S19035'
+            '11S19001',
+            '11S19002',
+            '11S19003',
+            '11S19004',
+            '11S19005',
+            '11S19031',
+            '11S19032',
+            '11S19033',
+            '11S19034',
+            '11S19035'
         ];
 
         // Counter for assigning NIMs
@@ -150,8 +164,16 @@ class UserSeeder extends Seeder
 
             // Insert into the role-specific table
             switch ($user['role']) {
-                case 'admin':
-                    DB::table('admin')->insert([
+                case 'kemahasiswaan':
+                    DB::table('kemahasiswaan')->insert([
+                        'username' => $user['username'],
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                    break;
+
+                case 'konselor':
+                    DB::table('konselor')->insert([
                         'username' => $user['username'],
                         'created_at' => now(),
                         'updated_at' => now(),
@@ -188,11 +210,12 @@ class UserSeeder extends Seeder
                     DB::table('orang_tua')->insert([
                         'username' => $user['username'],
                         'nim' => '11S19001', // Fixed: Assign a default NIM for orang tua
-                        'created_at' => now(),
+                        'no_hp' => '+6281377385300',
+                          'created_at' => now(),
                         'updated_at' => now(),
                     ]);
                     break;
             }
         }
-    }
+    }   
 }

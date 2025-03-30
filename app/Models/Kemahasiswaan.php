@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Admin extends Model
+class Kemahasiswaan extends Model
 {
-    protected $table = 'admin'; // Specify the correct table name
+    protected $table = 'kemahasiswaan'; // Specify the correct table name
     protected $primaryKey = 'username'; // Set primary key
     public $incrementing = false; // Disable auto-increment
 
