@@ -27,22 +27,22 @@
                 </a>
             </li>
             <li class="submenu-item">
-                <a href="{{ route('hasil_konseling') }}">
+                <a href="{{ route('hasil_konseling_konselor') }}">
                     <i class="fas fa-book"></i> Hasil Konseling
                 </a>
             </li>
             <li class="submenu-item">
-                <a href="{{ route('riwayat_konseling') }}">
+                <a href="{{ route('riwayat_konseling_konselor') }}">
                     <i class="fas fa-history"></i> Riwayat Konseling
                 </a>
             </li>
             <li class="submenu-item">
-                <a href="{{ route('konseling_lanjutan') }}">
+                <a href="{{ route('konseling_lanjutan_konselor') }}">
                     <i class="fas fa-forward"></i> Konseling Lanjutan
                 </a>
             </li>
             <li class="submenu-item">
-                <a href="{{ route('ajukan_konseling') }}">
+                <a href="{{ route('ajukan_konseling_konselor') }}">
                     <i class="fas fa-user-friends"></i> Ajukan Konseling
 
                 </a>

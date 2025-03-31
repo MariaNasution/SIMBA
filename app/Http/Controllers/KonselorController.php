@@ -120,5 +120,3 @@ class KonselorController extends Controller
     }
     
 }
-
-

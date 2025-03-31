@@ -72,12 +72,12 @@ Route::middleware(['auth.session', 'ensure.student.data', 'role:mahasiswa'])->gr
 
 });
 
-// Middleware untuk konselor
-Route::middleware(['auth.session', 'role:konselor'])->group(function () {
-    Route::get('/konselor/beranda', [KonselorController::class, 'index'])->name('konselor');
-    Route::post('/konselor/beranda/store', [KonselorController::class, 'store'])->name('pengumuman.store');
-    Route::delete('/konselor/beranda/{id}', [KonselorController::class, 'destroy'])->name('pengumuman.destroy');
-    Route::get('/konselor/pengumuman/{id}', [KonselorController::class, 'show'])->name('pengumunankonselor.detail');
+// Middleware untuk kemahasiswaan
+Route::middleware(['auth.session', 'role:kemahasiswaan'])->group(function () {
+    Route::get('/kemahasiswaan/beranda', [KemahasiswaanController::class, 'index'])->name('kemahasiswaan');
+    Route::post('/kemahasiswaan/beranda/store', [KemahasiswaanController::class, 'store'])->name('pengumuman.store');
+    Route::delete('/kemahasiswaan/beranda/{id}', [KemahasiswaanController::class, 'destroy'])->name('pengumuman.destroy');
+    Route::get('/kemahasiswaan/pengumuman/{id}', [KemahasiswaanController::class, 'show'])->name('pengumunankonselor.detail');
     Route::post('/calendar/upload', [CalendarController::class, 'upload'])->name('calendar.upload');
 
     // Konseling
