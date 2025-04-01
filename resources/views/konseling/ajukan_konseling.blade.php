@@ -6,11 +6,11 @@
         <div class="d-flex align-items-center mb-4 border-bottom-line">
             <h3 class="me-auto">
                 @if(session('user.role') == 'kemahasiswaan')
-                <a href="{{ route('kemahasiswaan') }}"> <i class="fas fa-list me-3"></i>Home</a> /
-                <a href="{{ route('riwayat_konseling_kemahasiswaan') }}">Daftar Pelanggaran</a>
+                <a href="{{ route('kemahasiswaan_beranda') }}"> <i class="fas fa-list me-3"></i>Konseling</a> /
+                <a href="{{ route('kemahasiswaan_riwayat_konseling') }}">Ajukan Konseling</a>
             @elseif(session('user.role') == 'konselor')
-                <a href="{{ route('konselor') }}"> <i class="fas fa-list me-3"></i>Home</a> /
-                <a href="{{ route('riwayat_konseling_konselor') }}">Daftar Pelanggaran</a>
+                <a href="{{ route('konselor_beranda') }}"> <i class="fas fa-list me-3"></i>Konseling</a> /
+                <a href="{{ route('konselor_riwayat_konseling') }}">Ajukan Konseling</a>
             @endif
             </h3>
             <a href="#" onclick="confirmLogout()">
@@ -25,9 +25,14 @@
 
         {{-- Judul --}}
         <h5 class="header-title text-primary mb-4 text-start">Mahasiswa Aktif TA 2024</h5>
-
         {{-- Form Pencarian Mahasiswa --}}
-        <form action="{{ route('konseling.cari') }}" method="GET">
+        @if(session('user.role') == 'kemahasiswaan')
+        {{-- For Kemahasiswaan, the route names are prefixed with "kemahasiswaan_" --}}
+        <form action="{{ route('kemahasiswaan_konseling.cari') }}" method="GET">
+        @elseif(session('user.role') == 'konselor')
+        {{-- For Konselor, the route names are prefixed with "konselor_" --}}
+        <form action="{{ route('konselor_konseling.cari') }}" method="GET">
+        @endif
             @csrf
             <div class="col-md-6">
                 <div class="mb-2 row">
@@ -47,7 +52,11 @@
             {{-- Tombol --}}
             <div class="text-center">
                 <button type="submit" class="btn btn-custom-blue">Cari</button>
-                <a href="{{ route('ajukan_konseling') }}" class="btn btn-secondary">Reset</a>
+                @if(session('user.role') == 'kemahasiswaan')
+                <a href="{{ route('kemahasiswaan_ajukan_konseling') }}" class="btn btn-secondary">Reset</a>
+                @elseif(session('user.role') == 'konselor')
+                <a href="{{ route('konselor_ajukan_konseling') }}" class="btn btn-secondary">Reset</a>
+                @endif
             </div>
         </form>
 
@@ -84,7 +93,11 @@
                                 <td>{{ $mahasiswa['tahun_masuk'] ?? '-' }}</td>
                                 <td>{{ $mahasiswa['prodi'] ?? '-' }}</td>
                                 <td>
-                                    <form action="{{ route('konseling.pilih') }}" method="GET">
+                                    @if(session('user.role') == 'kemahasiswaan')
+        <form action="{{ route('kemahasiswaan_konseling.pilih') }}" method="GET">
+        @elseif(session('user.role') == 'konselor')
+        <form action="{{ route('konselor_konseling.pilih') }}" method="GET">
+        @endif
                                         @csrf
                                         <input type="hidden" name="nim" value="{{ $mahasiswa['nim'] }}">
                                         <input type="hidden" name="nama" value="{{ $mahasiswa['nama'] }}">
@@ -129,7 +142,11 @@
             </div>
 
             {{-- Form untuk mengajukan konseling --}}
-            <form action="{{ route('konseling.ajukan') }}" method="POST">
+        @if(session('user.role') == 'kemahasiswaan')
+        <form action="{{ route('kemahasiswaan_konseling.ajukan') }}" method="POST">
+        @elseif(session('user.role') == 'konselor')
+        <form action="{{ route('konselor_konseling.ajukan') }}" method="POST">
+        @endif
                 @csrf
                 <input type="hidden" name="nim" value="{{ $dataMahasiswa['nim'] ?? '' }}">
                 <input type="hidden" name="nama" value="{{ $dataMahasiswa['nama'] ?? '' }}">
@@ -151,7 +168,11 @@
                 {{-- Tombol Konfirmasi --}}
                 <div class="d-flex justify-content-center mt-4">
                     <button type="submit" class="btn btn-custom-blue btn-lg px-4 me-2">Buat</button>
-                    <a href="{{ route('admin') }}" class="btn btn-secondary btn-lg px-4">Batal</a>
+                    @if(session('user.role') == 'kemahasiswaan')
+        <form action="{{ route('kemahasiswaan_beranda') }}" method="GET">
+        @elseif(session('user.role') == 'konselor')
+        <form action="{{ route('konselor_beranda') }}" method="GET">
+        @endif
                 </div>
             </form>
         @endif

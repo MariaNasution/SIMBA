@@ -114,6 +114,8 @@ class AjukanKonselingController extends Controller
                 'Pesan' => "Anda telah diajukan untuk mengadakan konseling pada " . $request->input('tanggal_pengajuan'),
                 'nim' => $request->input('nim'),
                 'Id_Konseling' => $konseling->id,
+                'Id_Perwalian' => null,
+                'nama' => null,
             ]);
 
             return redirect()->route('konseling.index')->with('success', 'Berhasil mengajukan konseling');

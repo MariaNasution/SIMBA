@@ -5,11 +5,11 @@
   <div class="d-flex align-items-center mb-4 border-bottom-line">
     <h3 class="me-auto">
       @if(session('user.role') == 'kemahasiswaan')
-      <a href="{{ route('kemahasiswaan') }}"> <i class="fas fa-list me-3"></i>Home</a> /
-      <a href="{{ route('hasil_konseling_kemahasiswaan') }}">Hasil Konseling</a>
+      <a href="{{ route('kemahasiswaan_beranda') }}"> <i class="fas fa-list me-3"></i>Konseling</a> /
+      <a href="{{ route('kemahasiswaan_hasil_konseling') }}">Hasil Konseling</a>
   @elseif(session('user.role') == 'konselor')
-      <a href="{{ route('konselor') }}"> <i class="fas fa-list me-3"></i>Home</a> /
-      <a href="{{ route('hasil_konseling_konselor') }}">Hasil Konseling</a>
+      <a href="{{ route('konselor_beranda') }}"> <i class="fas fa-list me-3"></i>Konseling</a> /
+      <a href="{{ route('konselor_hasil_konseling') }}">Hasil Konseling</a>
   @endif
     </h3>
     <a href="#" onclick="confirmLogout()">
@@ -30,7 +30,11 @@ $mahasiswaDenganHasil = HasilKonseling::pluck('request_konseling_id')->toArray()
 $mahasiswa = $approvedMahasiswa->reject(fn($mhs) => in_array($mhs->id, $mahasiswaDenganHasil));
 @endphp
 
-<form action="{{ route('hasil_konseling.store') }}" method="POST" enctype="multipart/form-data">
+@if(session('user.role') == 'kemahasiswaan')
+<form action="{{ route('kemahasiswaan_hasil_konseling.store') }}" method="POST" enctype="multipart/form-data">
+@elseif(session('user.role') == 'konselor')
+<form action="{{ route('konselor_hasil_konseling.store') }}" method="POST" enctype="multipart/form-data">
+@endif
   @csrf
   <div class="mb-3 col-md-4">
     <label class="form-label text-start">Nama Mahasiswa</label>

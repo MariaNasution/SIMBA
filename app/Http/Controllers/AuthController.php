@@ -113,11 +113,11 @@ class AuthController extends Controller
         
                     case 'kemahasiswaan':
                         Log::info('Redirecting to kemahasiswaan route...');
-                        return redirect()->route('kemahasiswaan')->with('success', 'Login sebagai kemahasiswaan berhasil!');
+                        return redirect()->route('kemahasiswaan_beranda')->with('success', 'Login sebagai kemahasiswaan berhasil!');
         
                     case 'konselor':
                         Log::info('Redirecting to konselor route...');
-                        return redirect()->route('konselor')->with('success', 'Login sebagai konselor berhasil!');
+                        return redirect()->route('konselor_beranda')->with('success', 'Login sebagai konselor berhasil!');
         
                     default:
                         Log::warning('Unknown role detected:', ['role' => $user->role]);

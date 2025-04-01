@@ -38,7 +38,6 @@
   </p>
 </div>
 
-    
 
     @if ($hasilKonseling->isNotEmpty())
     

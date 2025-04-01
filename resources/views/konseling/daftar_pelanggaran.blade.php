@@ -4,11 +4,11 @@
     <div class="d-flex align-items-center mb-4 border-bottom-line">
         <h3 class="me-auto">
             @if(session('user.role') == 'kemahasiswaan')
-                <a href="{{ route('kemahasiswaan') }}"> <i class="fas fa-list me-3"></i>Home</a> /
-                <a href="{{ route('daftar_pelanggaran_kemahasiswaan') }}">Daftar Pelanggaran</a>
+                <a href="{{ route('kemahasiswaan_beranda') }}"> <i class="fas fa-list me-3"></i>Konseling</a> /
+                <a href="{{ route('kemahasiswaan_daftar_pelanggaran') }}">Daftar Pelanggaran</a>
             @elseif(session('user.role') == 'konselor')
-                <a href="{{ route('konselor') }}"> <i class="fas fa-list me-3"></i>Home</a> /
-                <a href="{{ route('daftar_pelanggaran_konselor') }}">Daftar Pelanggaran</a>
+                <a href="{{ route('konselor_beranda') }}"> <i class="fas fa-list me-3"></i>Konselinge</a> /
+                <a href="{{ route('konselor_daftar_pelanggaran') }}">Daftar Pelanggaran</a>
             @endif
         </h3>
         <a href="#" onclick="confirmLogout()">
@@ -44,7 +44,11 @@
                         <td>{{ $dataMahasiswa['pelanggaran'] ?? '-' }}</td>
                         <td>{{ $dataMahasiswa['tingkat'] ?? '-' }}</td>
                         <td>
-                            <form action="{{ route('konseling.pilih') }}" method="GET">
+                            @if(session('user.role') == 'kemahasiswaan')
+                            <form action="{{ route('kemahasiswaan_konseling.pilih') }}" method="GET">
+                            @elseif(session('user.role') == 'konselor')
+                            <form action="{{ route('konselor_konseling.pilih') }}" method="GET">
+                            @endif
                                 @csrf
                                 <input type="hidden" name="nim" value="{{ $dataMahasiswa['nim'] }}">
                                 <input type="hidden" name="nama" value="{{ $dataMahasiswa['nama'] }}">

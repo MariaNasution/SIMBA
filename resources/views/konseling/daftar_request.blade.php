@@ -5,11 +5,15 @@
     <div class="d-flex align-items-center mb-4 border-bottom-line">
         <h3 class="me-auto">
             @if(session('user.role') == 'kemahasiswaan')
-                <a href="{{ route('kemahasiswaan') }}"> <i class="fas fa-list me-3"></i>Home</a> /
-                <a href="{{ route('daftar_request_kemahasiswaan') }}">Daftar Request Konseling</a>
+                <a href="{{ route('kemahasiswaan_beranda') }}">
+                    <i class="fas fa-list me-3"></i>Konseling
+                </a> /
+                <a href="{{ route('kemahasiswaan_daftar_request') }}">Daftar Request Konseling</a>
             @elseif(session('user.role') == 'konselor')
-                <a href="{{ route('konselor') }}"> <i class="fas fa-list me-3"></i>Home</a> /
-                <a href="{{ route('daftar_request_konselor') }}">Daftar Request Konseling</a>
+                <a href="{{ route('konselor_beranda') }}">
+                    <i class="fas fa-list me-3"></i>Konseling
+                </a> /
+                <a href="{{ route('konselor_daftar_request') }}">Daftar Request Konseling</a>
             @endif
         </h3>
         <a href="#" onclick="confirmLogout()">
@@ -41,17 +45,21 @@
             <span class="fw-bold">{{ $requests->total() }}</span> Entri data
         </p>
 
+        {{-- Filter Sorting --}}
+        <div class="d-flex justify-content-start mb-3">
+            @if(session('user.role') == 'kemahasiswaan')
+                <form action="{{ route('kemahasiswaan_daftar_request') }}" method="GET">
+            @elseif(session('user.role') == 'konselor')
+                <form action="{{ route('konselor_daftar_request') }}" method="GET">
+            @endif
+                    <label for="sort" class="me-2">Urutkan:</label>
+                    <select name="sort" id="sort" class="form-select w-auto d-inline" onchange="this.form.submit()">
+                        <option value="terbaru" {{ request('sort') == 'terbaru' ? 'selected' : '' }}>Terbaru</option>
+                        <option value="terlama" {{ request('sort') == 'terlama' ? 'selected' : '' }}>Terlama</option>
+                    </select>
+                </form>
+        </div>
 
-                      {{-- Filter Sorting --}}
-<div class="d-flex justify-content-start mb-3">
-  <form action="{{ route('daftar_request') }}" method="GET">
-    <label for="sort" class="me-2">Urutkan:</label>
-    <select name="sort" id="sort" class="form-select w-auto d-inline" onchange="this.form.submit()">
-      <option value="terbaru" {{ request('sort') == 'terbaru' ? 'selected' : '' }}>Terbaru</option>
-      <option value="terlama" {{ request('sort') == 'terlama' ? 'selected' : '' }}>Terlama</option>
-    </select>
-  </form>
-</div>
         <table id="requestTable" class="table table-bordered">
             <thead class="table-secondary">
                 <tr>
@@ -73,17 +81,30 @@
                         <td>{{ $request->deskripsi_pengajuan }}</td>
                         <td>{{ $request->tanggal_pengajuan }}</td>
                         <td>
-                            <form action="{{ route('approve_konseling', $request->id) }}" method="POST" class="d-inline">
-                                @csrf
-                                @method('PUT')
-                                <button class="btn btn-success btn-sm">
-                                    <i class="fas fa-check"></i>
+                            {{-- Approve Form --}}
+                            @if(session('user.role') == 'kemahasiswaan')
+                                <form action="{{ route('kemahasiswaan_approve_konseling', $request->id) }}" method="POST" class="d-inline">
+                            @elseif(session('user.role') == 'konselor')
+                                <form action="{{ route('konselor_approve_konseling', $request->id) }}" method="POST" class="d-inline">
+                            @endif
+                                    @csrf
+                                    @method('PUT')
+                                    <button class="btn btn-success btn-sm">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                            {{-- Reject Button --}}
+                            @if(session('user.role') == 'kemahasiswaan')
+                                <button class="btn btn-danger btn-sm reject-btn"
+                                    data-url="{{ route('kemahasiswaan_reject_konseling', $request->id) }}">
+                                    <i class="fas fa-times"></i>
                                 </button>
-                            </form>
-                            <button class="btn btn-danger btn-sm reject-btn"
-                                data-url="{{ route('reject_konseling', $request->id) }}">
-                                <i class="fas fa-times"></i>
-                            </button>
+                            @elseif(session('user.role') == 'konselor')
+                                <button class="btn btn-danger btn-sm reject-btn"
+                                    data-url="{{ route('konselor_reject_konseling', $request->id) }}">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            @endif
                         </td>
                     </tr>
                 @endforeach
@@ -97,7 +118,7 @@
 
     <!-- Modal untuk alasan penolakan -->
     <div class="modal fade" id="rejectReasonModal" tabindex="-1" aria-labelledby="rejectReasonModalLabel"
-        aria-hidden="true">
+         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -135,22 +156,22 @@
         });
     </script>
 
-<script>
-    function confirmLogout() {
-        Swal.fire({
-            title: 'Apakah anda yakin ingin keluar?',
-            text: "Anda akan keluar dari akun ini.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Ya, keluar!',
-            cancelButtonText: 'Tidak',
-            reverseButtons: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = '{{ route('logout') }}';
-            }
-        });
-    }
-</script>
+    <script>
+        function confirmLogout() {
+            Swal.fire({
+                title: 'Apakah anda yakin ingin keluar?',
+                text: "Anda akan keluar dari akun ini.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, keluar!',
+                cancelButtonText: 'Tidak',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '{{ route('logout') }}';
+                }
+            });
+        }
+    </script>
 
 @endsection
