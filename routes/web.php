@@ -217,10 +217,10 @@ Route::middleware(['auth.session', 'role:dosen'])->group(function () {
     Route::delete('/set-perwalian/destroy', [SetPerwalianController::class, 'destroy'])->name('set.perwalian.destroy');
     Route::get('/set-perwalian/calendar', [SetPerwalianController::class, 'getCalendar'])->name('set.perwalian.calendar');
     Route::get('/dosen/detailed-class/{year}/{kelas}', [DosenController::class, 'showDetailedClass'])->name('dosen.detailedClass');
+    Route::get('/set-perwalian/histori', [SetPerwalianController::class, 'histori'])->name('dosen.histori');
 
     Route::get('/perwalian/berita-acara', [BeritaAcaraController::class, 'index'])->name('perwalian.berita_acara');
     Route::post('/perwalian/berita-acara', [BeritaAcaraController::class, 'store'])->name('perwalian.berita_acara.store');
-    Route::get('/dosen/histori', [DosenController::class, 'histori'])->name('dosen.histori');
 
     Route::get('/berita-acara/select-class', [BeritaAcaraController::class, 'selectClass'])->name('berita_acara.select_class');
     Route::get('/berita-acara', [BeritaAcaraController::class, 'index'])->name('berita_acara.index');
