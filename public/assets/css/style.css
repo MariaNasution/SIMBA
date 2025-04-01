@@ -858,3 +858,8 @@ Perwalian CSS
     text-decoration: none;
 }
 
+/**Konseling**/
+   /* Agar teks yang dipilih di Select2 tetap rata kiri */
+   .select2-container .select2-selection--single .select2-selection__rendered {
+    text-align: left !important;
+}

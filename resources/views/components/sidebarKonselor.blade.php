@@ -22,7 +22,7 @@
         </li>
         <ul class="submenu" id="konseling-submenu" style="display: none;">
             <li class="submenu-item">
-                <a href="{{ route('daftar_pelanggaran_konselor') }}">
+                <a href="{{ route('daftar_pelanggaran') }}">
                     <i class="fas fa-list"></i> Daftar Pelanggaran
                 </a>
             </li>
@@ -50,6 +50,11 @@
             <li class="submenu-item">
                 <a href="{{ route('daftar_request') }}">
                     <i class="fas fa-book-open"></i> Daftar Request
+                </a>
+            </li>
+            <li class="submenu-item">
+                <a href="{{ route('riwayat_daftar_request') }}">
+                    <i class="fas fa-clock"></i> Riwayat Daftar Request
                 </a>
             </li>
         </ul>

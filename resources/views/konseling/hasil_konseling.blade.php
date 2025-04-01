@@ -5,118 +5,95 @@
   <div class="d-flex align-items-center mb-4 border-bottom-line">
     <h3 class="me-auto">
       @if(session('user.role') == 'kemahasiswaan')
-      <a href="{{ route('kemahasiswaan') }}"> <i class="fas fa-list me-3"></i>Home</a> /
-      <a href="{{ route('hasil_konseling_kemahasiswaan') }}">Hasil Konseling</a>
+      <a href="{{ route('kemahasiswaan_beranda') }}"> <i class="fas fa-list me-3"></i>Konseling</a> /
+      <a href="{{ route('kemahasiswaan_hasil_konseling') }}">Hasil Konseling</a>
   @elseif(session('user.role') == 'konselor')
-      <a href="{{ route('konselor') }}"> <i class="fas fa-list me-3"></i>Home</a> /
-      <a href="{{ route('hasil_konseling_konselor') }}">Hasil Konseling</a>
+      <a href="{{ route('konselor_beranda') }}"> <i class="fas fa-list me-3"></i>Konseling</a> /
+      <a href="{{ route('konselor_hasil_konseling') }}">Hasil Konseling</a>
   @endif
     </h3>
     <a href="#" onclick="confirmLogout()">
     <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
-    </a>
-  </div>
+  </a>
+</div>
 
+@if(session('success'))
+<div class="alert alert-success">{{ session('success') }}</div>
+@endif
+
+@php
+use App\Models\RequestKonseling;
+use App\Models\HasilKonseling;
+
+$approvedMahasiswa = RequestKonseling::where('status', 'approved')->get();
+$mahasiswaDenganHasil = HasilKonseling::pluck('request_konseling_id')->toArray();
+$mahasiswa = $approvedMahasiswa->reject(fn($mhs) => in_array($mhs->id, $mahasiswaDenganHasil));
+@endphp
+
+@if(session('user.role') == 'kemahasiswaan')
+<form action="{{ route('kemahasiswaan_hasil_konseling.store') }}" method="POST" enctype="multipart/form-data">
+@elseif(session('user.role') == 'konselor')
+<form action="{{ route('konselor_hasil_konseling.store') }}" method="POST" enctype="multipart/form-data">
+@endif
+  @csrf
+  <div class="mb-3 col-md-4">
+    <label class="form-label text-start">Nama Mahasiswa</label>
+    <select name="request_konseling_id" id="nama_mahasiswa" class="form-control" required>
+      <option value="">Cari dan Pilih Mahasiswa</option>
+      @foreach ($mahasiswa as $mhs)
+      <option value="{{ $mhs->id }}" data-nama="{{ $mhs->nama_mahasiswa }}" data-nim="{{ $mhs->nim }}">
+        {{ $mhs->nama_mahasiswa }} - {{ $mhs->tanggal_pengajuan }}
+      </option>
+      @endforeach
+    </select>
+  </div>
 
   <div class="mb-3 col-md-4">
-    <label class="form-label text-start ">Nama Mahasiswa</label>
-    <input type="text" class="form-control" id="nama_mahasiswa">
+    <label class="form-label text-start">Nama Mahasiswa</label>
+    <input type="text" class="form-control" name="nama" id="nama_mahasiswa_input" required readonly>
   </div>
 
   <div class="mb-3 col-md-4">
-    <label class="form-label text-start ">NIM Mahasiswa</label>
-    <input type="text" class="form-control" id="nim_mahasiswa">
+    <label class="form-label text-start">NIM Mahasiswa</label>
+    <input type="text" class="form-control" name="nim" id="nim_mahasiswa" required readonly>
   </div>
-
 
   <div class="mb-3">
     <label class="form-label text-start d-block">Hasil Konseling</label>
-    <div id="upload-section" class="border p-3 bg-light d-flex flex-column">
-    <!-- Tombol Upload File -->
-    <button class="btn btn-custom-blue mb-2 align-self-end" onclick="showDropzone()">Upload File</button>
-
-    <!-- Dropzone untuk upload file -->
-    <div id="dropzone-section" class="d-none">
-      <form action="{{ url('/upload-file') }}" class="dropzone" id="file-upload">
-      @csrf
-      </form>
-    </div>
-
-    <!-- Tampilkan nama file yang telah diupload -->
-    <div id="uploaded-file" class="mt-2 d-none" style="max-width: 300px; font-size: 14px;">
-      <strong>File:</strong> <span id="file-name"></span>
-    </div>
-
-    <table class="table table-bordered">
-      <tbody>
-      <tr>
-        <td class="text-start">Keterangan Konseling:</td>
-      </tr>
-      <tr>
-        <td>
-        <textarea class="form-control" id="alasan" rows="3"></textarea>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-
-    </div>
+    <input type="file" class="form-control" name="file" required>
   </div>
 
-  <!-- Menjadikan tombol sejajar -->
+  <div class="mb-3">
+    <label class="form-label text-start">Keterangan Konseling</label>
+    <textarea class="form-control" name="keterangan" rows="3"></textarea>
+  </div>
+
   <div class="d-flex justify-content-center">
-    <td><a href="{{ route('riwayat_konseling') }}" class="btn btn-custom-blue">Buat</a></td>
-    <button class="btn btn-secondary">Batal</button>
+    <button type="submit" class="btn btn-custom-blue">Buat</button>
+    <button type="reset" class="btn btn-secondary">Batal</button>
   </div>
+</form>
 
-  <!-- SweetAlert & Dropzone -->
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.css">
-
-  <script>
-    function confirmLogout() {
-    Swal.fire({
-      title: 'Apakah anda yakin ingin keluar?',
-      text: "Anda akan keluar dari akun ini.",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Ya, keluar!',
-      cancelButtonText: 'Tidak',
-      reverseButtons: true
-    }).then((result) => {
-      if (result.isConfirmed) {
-      window.location.href = '{{ route('logout') }}';
-      }
+<!-- Script untuk Select2 dan Auto-fill NIM -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $('#nama_mahasiswa').select2({
+      placeholder: "Cari Mahasiswa...",
+      allowClear: true,
+      width: '100%'
     });
-    }
 
-    function showDropzone() {
-    document.getElementById('dropzone-section').classList.remove('d-none');
-    }
+    $('#nama_mahasiswa').on('change', function() {
+      const selectedOption = $(this).find('option:selected');
+      const nama = selectedOption.data('nama');
+      const nim = selectedOption.data('nim');
 
-    Dropzone.options.fileUpload = {
-    paramName: "file",
-    maxFilesize: 50, // MB
-    acceptedFiles: ".pdf,.doc,.docx",
-    headers: {
-      "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
-    },
-    success: function (file, response) {
-      Swal.fire("Berhasil!", "File berhasil diunggah.", "success");
-
-      // Sembunyikan Dropzone setelah upload sukses
-      document.getElementById('dropzone-section').classList.add('d-none');
-      document.getElementById('uploaded-file').classList.remove('d-none');
-      document.getElementById('file-name').textContent = file.name;
-
-      // Masukkan nama file ke dalam textarea alasan
-      document.getElementById('alasan').value = "File yang diunggah: " + file.name;
-    },
-    error: function () {
-      Swal.fire("Gagal!", "File gagal diunggah.", "error");
-    }
-    };
-  </script>
-
+      $('#nama_mahasiswa_input').val(nama || '');
+      $('#nim_mahasiswa').val(nim || '');
+    });
+  });
+</script>
 @endsection

@@ -32,7 +32,12 @@ class MahasiswaHomeController extends Controller
             Log::error('No mahasiswa record found for user', ['username' => $user['username']]);
             return redirect()->route('login')->withErrors(['error' => 'Mahasiswa data not found.']);
         }
+
         $nim = $mahasiswa->nim;
+
+        // Ambil notifikasi untuk mahasiswa berdasarkan NIM
+        $notifications = Notifikasi::where('nim', $nim)->latest()->get();
+
         $apiToken = session('api_token');
 
         // --- Fetch student data from API ---
@@ -64,6 +69,7 @@ class MahasiswaHomeController extends Controller
                 ->withOptions(['verify' => false])
                 ->asForm()
                 ->get('https://cis-dev.del.ac.id/api/library-api/get-penilaian', [
+
                     'nim' => $nim,
                 ]);
 

@@ -9,7 +9,7 @@
 
     <ul class="menu">
         <li class="menu-item">
-            <a href="{{ route('kemahasiswaan') }}">
+            <a href="{{ route('kemahasiswaan_beranda') }}">
                 <i class="fas fa-home"></i> Beranda
             </a>
         </li>
@@ -22,34 +22,39 @@
         </li>
         <ul class="submenu" id="konseling-submenu" style="display: none;">
             <li class="submenu-item">
-                <a href="{{ route('daftar_pelanggaran_kemahasiswaan') }}">
+                <a href="{{ route('kemahasiswaan_daftar_pelanggaran') }}">
                     <i class="fas fa-list"></i> Daftar Pelanggaran
                 </a>
             </li>
             <li class="submenu-item">
-                <a href="{{ route('hasil_konseling') }}">
+                <a href="{{ route('kemahasiswaan_hasil_konseling') }}">
                     <i class="fas fa-book"></i> Hasil Konseling
                 </a>
             </li>
             <li class="submenu-item">
-                <a href="{{ route('riwayat_konseling') }}">
+                <a href="{{ route('kemahasiswaan_riwayat_konseling') }}">
                     <i class="fas fa-history"></i> Riwayat Konseling
                 </a>
             </li>
             <li class="submenu-item">
-                <a href="{{ route('konseling_lanjutan') }}">
+                <a href="{{ route('kemahasiswaan_konseling_lanjutan') }}">
                     <i class="fas fa-forward"></i> Konseling Lanjutan
                 </a>
             </li>
             <li class="submenu-item">
-                <a href="{{ route('ajukan_konseling') }}">
+                <a href="{{ route('kemahasiswaan_ajukan_konseling') }}">
                     <i class="fas fa-user-friends"></i> Ajukan Konseling
 
                 </a>
             </li>
             <li class="submenu-item">
-                <a href="{{ route('daftar_request') }}">
+                <a href="{{ route('kemahasiswaan_daftar_request') }}">
                     <i class="fas fa-book-open"></i> Daftar Request
+                </a>
+            </li>
+            <li class="submenu-item">
+                <a href="{{ route('kemahasiswaan_riwayat_daftar_request') }}">
+                    <i class="fas fa-book-open"></i> Riwayat Daftar Request
                 </a>
             </li>
         </ul>

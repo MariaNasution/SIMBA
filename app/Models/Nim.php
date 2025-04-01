@@ -11,6 +11,6 @@ class Nim extends Model
 
   protected $table = 'nim'; // Sesuai dengan nama tabel di database
 
-  protected $fillable = ['nim', 'nama']; // Pastikan hanya kolom 'nim' yang dapat diisi
+  protected $fillable = ['nim']; // Pastikan hanya kolom 'nim' yang dapat diisi
 }
 
