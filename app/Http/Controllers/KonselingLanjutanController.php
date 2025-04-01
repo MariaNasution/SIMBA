@@ -14,7 +14,7 @@ class KonselingLanjutanController extends Controller
         $hasilKonseling = HasilKonseling::all();
         
         $mahasiswas = KonselingLanjutan::all();
-        // Kirim data ke view
+        // Kirim data ke view 
         return view('laporan.konseling', compact('hasilKonseling', 'mahasiswas'));
     }
 

@@ -6,11 +6,11 @@
         <div class="d-flex align-items-center mb-4 border-bottom-line">
             <h3 class="me-auto">
                 @if(session('user.role') == 'kemahasiswaan')
-                <a href="{{ route('kemahasiswaan') }}"> <i class="fas fa-list me-3"></i>Home</a> /
-                <a href="{{ route('riwayat.konseling.kemahasiswaan') }}">Daftar Pelanggaran</a>
+                <a href="{{ route('kemahasiswaan_beranda') }}"> <i class="fas fa-list me-3"></i>Konseling</a> /
+                <a href="{{ route('kemahasiswaan_hasil_konseling') }}">Riwayat Konseling</a>
             @elseif(session('user.role') == 'konselor')
-                <a href="{{ route('konselor') }}"> <i class="fas fa-list me-3"></i>Home</a> /
-                <a href="{{ route('riwayat.konseling.konselor') }}">Daftar Pelanggaran</a>
+                <a href="{{ route('konselor_beranda') }}"> <i class="fas fa-list me-3"></i>Konseling</a> /
+                <a href="{{ route('konselor_hasil_konseling') }}">Riwayat Konseling</a>
             @endif
             </h3>
             <a href="#" onclick="confirmLogout()">
@@ -22,7 +22,11 @@
     <h5 class="header-title text-primary mb-4 text-start">Mahasiswa Aktif TA 2024</h5>
 
     {{-- Form Pencarian Mahasiswa --}}
-    <form action="{{ route('riwayat.konseling.cari') }}" method="GET">
+    @if(session('user.role') == 'kemahasiswaan')
+    <form action="{{ route('kemahasiswaan_riwayat.konseling.cari') }}" method="GET">
+    @elseif(session('user.role') == 'konselor')
+    <form action="{{ route('konselor_riwayat.konseling.cari') }}" method="GET">
+    @endif
         @csrf
         <div class="col-md-6">
             <div class="mb-2 row">
@@ -42,7 +46,11 @@
         {{-- Tombol --}}
         <div class="text-center mt-3">
             <button type="submit" class="btn btn-custom-blue">Cari</button>
-            <a href="{{ route('riwayat.konseling') }}" class="btn btn-secondary">Reset</a>
+            @if(session('user.role')=='kemahasiswaan')
+            <a href="{{ route('kemahasiswaan_riwayat.konseling') }}" class="btn btn-secondary">Reset</a>
+            @elseif(session('user.role')=='konselor')
+            <a href="{{ route('konselor_riwayat.konseling') }}" class="btn btn-secondary">Reset</a>
+            @endif
         </div>
     </form>
 

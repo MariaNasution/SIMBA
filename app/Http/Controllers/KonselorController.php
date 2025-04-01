@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\RequestKonseling;
 use App\Models\KonselingLanjutan;
-use Illuminate\Support\Facades\Log;
 
 class KonselorController extends Controller
 {
@@ -46,7 +45,6 @@ class KonselorController extends Controller
             return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan saat menghapus pengumuman.']);
         }
     }
-
 
     public function show($id)
     {
@@ -120,5 +118,3 @@ class KonselorController extends Controller
     }
     
 }
-
-

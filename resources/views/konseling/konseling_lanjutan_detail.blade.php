@@ -5,7 +5,7 @@
     {{-- Header dan Logout --}}
     <div class="d-flex align-items-center mb-4 border-bottom-line">
         <h3 class="me-auto">
-            <a href="{{ route('admin') }}"><i class="fas fa-history me-3"></i>Home</a> /
+            <a href="{{ route('admin') }}"><i class="fas fa-history me-3"></i>Konseling</a> /
             <a href="{{ route('konseling_lanjutan') }}">Konseling Lanjutan</a> /
             <a href="#">Konseling Lanjutan Detail</a>
         </h3>
