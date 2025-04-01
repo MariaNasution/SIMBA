@@ -8,7 +8,7 @@
         <div class="container-fluid p-4">
             <div class="d-flex align-items-center mb-4 border-bottom-line">
                 <h3 class="me-auto">
-                    <a href="{{ route('konselor') }}">Home</a>
+                    <a href="{{ route('konselor_beranda') }}">Home</a>
                 </h3>
                 <a href="#" onclick="confirmLogout()">
                     <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
@@ -21,16 +21,16 @@
                     <ul class="list-unstyled text-start pengumuman">
                         @forelse ($pengumuman as $item)
                             <li class="d-flex justify-content-between align-items-center mb-2">
-                                <a href="{{ route('pengumumanadmin.detail', $item->id) }}" class="text-decoration-none">
+                                <a href="{{ route('konselor_pengumunankonselor.detail', $item->id) }}" class="text-decoration-none">
                                     <span>
                                         <strong
                                             class="@switch($item->sumber)
                                               @case('BEM') text-primary @break
-                                            @case('INFO') text-danger @break
-                                            @case('BURSAR') text-info @break
-                                            @case('KEASRAMAAN') text-success @break
-                                            @case('KEMAHASISWAAN') text-purple @break
-                                            @default text-dark
+                                              @case('INFO') text-danger @break
+                                              @case('BURSAR') text-info @break
+                                              @case('KEASRAMAAN') text-success @break
+                                              @case('KEMAHASISWAAN') text-purple @break
+                                              @default text-dark
                                         @endswitch">
                                             [{{ strtoupper($item->sumber) }}]
                                         </strong>
@@ -38,7 +38,7 @@
                                     </span>
                                 </a>
                                 <div class="ms-3">
-                                    <form method="POST" action="{{ route('pengumuman.destroy', $item->id) }}"
+                                    <form method="POST" action="{{ route('konselor_pengumuman.destroy', $item->id) }}"
                                         class="d-inline">
                                         @csrf
                                         @method('DELETE')
@@ -57,14 +57,10 @@
                 </div>
             </div>
 
-
             <div class="mt-4">
-                <button class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#modalKalenderAkademik">Unggah
-                    Kalender Akademik</button>
-                <button class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#modalKalenderBEM">Unggah
-                    Kalender NonAkademik</button>
-                <button class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#modalPengumuman">Unggah
-                    Pengumuman</button>
+                <button class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#modalKalenderAkademik">Unggah Kalender Akademik</button>
+                <button class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#modalKalenderBEM">Unggah Kalender NonAkademik</button>
+                <button class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#modalPengumuman">Unggah Pengumuman</button>
             </div>
 
             <div class="mt-3">
@@ -74,29 +70,25 @@
                 @endphp
 
                 @if ($akademik)
-                    <p><a href="{{ asset('storage/' . $akademik->file_path) }}" target="_blank">Lihat Kalender Akademik</a>
-                    </p>
+                    <p><a href="{{ asset('storage/' . $akademik->file_path) }}" target="_blank">Lihat Kalender Akademik</a></p>
                 @endif
 
                 @if ($bem)
-                    <p><a href="{{ asset('storage/' . $bem->file_path) }}" target="_blank">Lihat Kalender NonAkademik</a>
-                    </p>
+                    <p><a href="{{ asset('storage/' . $bem->file_path) }}" target="_blank">Lihat Kalender NonAkademik</a></p>
                 @endif
             </div>
-
         </div>
     </div>
 
     <!-- Modal Kalender Akademik -->
-    <div class="modal fade" id="modalKalenderAkademik" tabindex="-1" aria-labelledby="modalKalenderAkademikLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="modalKalenderAkademik" tabindex="-1" aria-labelledby="modalKalenderAkademikLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalKalenderAkademikLabel">Unggah Kalender Akademik</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form method="POST" action="{{ route('calendar.upload') }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ route('konselor_calendar.upload') }}" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
                         <input type="hidden" name="type" value="akademik">
@@ -114,16 +106,15 @@
         </div>
     </div>
 
-
     <!-- Modal Kalender BEM -->
     <div class="modal fade" id="modalKalenderBEM" tabindex="-1" aria-labelledby="modalKalenderBEMLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalKalenderBEMLabel">Unggah Kalender NonAdemik</h5>
+                    <h5 class="modal-title" id="modalKalenderBEMLabel">Unggah Kalender NonAkademik</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form method="POST" action="{{ route('calendar.upload') }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ route('konselor_calendar.upload') }}" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
                         <input type="hidden" name="type" value="bem">
@@ -142,15 +133,14 @@
     </div>
 
     <!-- Modal Unggah Pengumuman -->
-    <div class="modal fade" id="modalPengumuman" tabindex="-1" aria-labelledby="modalPengumumanLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="modalPengumuman" tabindex="-1" aria-labelledby="modalPengumumanLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title" id="modalPengumumanLabel">Unggah Pengumuman</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="formPengumuman" method="POST" action="{{ route('pengumuman.store') }}">
+                <form id="formPengumuman" method="POST" action="{{ route('konselor_pengumuman.store') }}">
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
@@ -185,8 +175,7 @@
     </div>
 
     <!-- Modal untuk Deskripsi Pengumuman -->
-    <div class="modal fade" id="pengumumanModal" tabindex="-1" aria-labelledby="pengumumanModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="pengumumanModal" tabindex="-1" aria-labelledby="pengumumanModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -204,7 +193,6 @@
 
 @section('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const pengumumanModal = document.getElementById('pengumumanModal');
@@ -214,15 +202,11 @@
             pengumumanModal.addEventListener('show.bs.modal', function(event) {
                 // Elemen yang memicu modal
                 const button = event.relatedTarget;
-
                 // Ambil data dari atribut tombol
                 const judul = button.getAttribute('data-judul');
                 const deskripsi = button.getAttribute('data-deskripsi');
-
-                // Cetak nilai ke console setelah didefinisikan
                 console.log('Judul:', judul);
                 console.log('Deskripsi:', deskripsi);
-
                 // Masukkan data ke modal
                 modalTitle.textContent = judul;
                 modalBody.textContent = deskripsi;
@@ -240,12 +224,12 @@
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = '{{ route('logout') }}'; // Arahkan ke route logout jika 'Ya' dipilih
+                    window.location.href = '{{ route('logout') }}';
                 }
             });
         }
     </script>
-
+    
 @section('styles')
     <style>
         #pengumumanModal .modal-content {
@@ -254,5 +238,4 @@
         }
     </style>
 @endsection
-</style>
 @endsection
