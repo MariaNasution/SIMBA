@@ -4,19 +4,18 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('hasil_konseling', function (Blueprint $table) {
+        Schema::create('konseling_lanjutans', function (Blueprint $table) {
             $table->id();
-            $table->string('nama');
-            $table->string('nim')->unique();
-            $table->string('file'); // Menyimpan path file
+            $table->string('nama')->nullable();
+            $table->string('nim');
             $table->text('keterangan')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('mahasiswa_konseling');
+        Schema::dropIfExists('konseling_lanjutans');
     }
 };

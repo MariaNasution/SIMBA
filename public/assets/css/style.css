@@ -846,8 +846,7 @@ Perwalian CSS
 }
 
 .am-class-btn {
-    background-color: #3498db;
-    color: #fff;
+    background-color: #007bff; /* Make the background transparent */    color: #fff;
     border: none;
     padding: 12px 20px;
     border-radius: 4px;
@@ -859,3 +858,8 @@ Perwalian CSS
     text-decoration: none;
 }
 
+/**Konseling**/
+   /* Agar teks yang dipilih di Select2 tetap rata kiri */
+   .select2-container .select2-selection--single .select2-selection__rendered {
+    text-align: left !important;
+}

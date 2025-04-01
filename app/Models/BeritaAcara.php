@@ -2,13 +2,32 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User;
 
 class BeritaAcara extends Model
 {
-    
-    protected $table = 'berita_acara'; // Explicitly specify the table name
-    protected $primaryKey = 'ID_BeritaAcara'; // Integer primary key (auto-incrementing)
+    use HasFactory;
 
-    protected $fillable = ['ID_BeritaAcara', 'PesanBeritaAcara', 'nama'];
+    protected $fillable = [
+        'kelas',
+        'angkatan',
+        'dosen_wali',
+        'tanggal_perwalian',
+        'perihal_perwalian',
+        'agenda_perwalian',
+        'hari_tanggal_feedback',
+        'perihal_feedback', // ✅ Tambahkan ini jika belum ada
+        'catatan_feedback',
+        'tanggal_ttd',
+        'dosen_wali_ttd',
+        'user_id'
+    ];
+
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

@@ -4,11 +4,11 @@
     <div class="d-flex align-items-center mb-4 border-bottom-line">
         <h3 class="me-auto">
             @if(session('user.role') == 'kemahasiswaan')
-                <a href="{{ route('kemahasiswaan') }}"> <i class="fas fa-list me-3"></i>Home</a> /
-                <a href="{{ route('daftar_pelanggaran_kemahasiswaan') }}">Daftar Pelanggaran</a>
+                <a href="{{ route('kemahasiswaan_beranda') }}"> <i class="fas fa-list me-3"></i>Konseling</a> /
+                <a href="{{ route('kemahasiswaan_daftar_pelanggaran') }}">Daftar Pelanggaran</a>
             @elseif(session('user.role') == 'konselor')
-                <a href="{{ route('konselor') }}"> <i class="fas fa-list me-3"></i>Home</a> /
-                <a href="{{ route('daftar_pelanggaran_konselor') }}">Daftar Pelanggaran</a>
+                <a href="{{ route('konselor_beranda') }}"> <i class="fas fa-list me-3"></i>Konselinge</a> /
+                <a href="{{ route('konselor_daftar_pelanggaran') }}">Daftar Pelanggaran</a>
             @endif
         </h3>
         <a href="#" onclick="confirmLogout()">
@@ -17,8 +17,15 @@
     </div>
 
     <div class="card-body">
+              {{-- Menampilkan jumlah data yang sedang ditampilkan --}}
+              <p class="mt-3 text-end">
+                Halaman <span class="fw-bold ">{{ $pelanggaranList->currentPage() }}</span> dari 
+                <span class="fw-bold">{{ $pelanggaranList->lastPage() }}</span> | 
+                Menampilkan <span class="fw-bold ">{{ $pelanggaranList->count() }}</span> dari
+                <span class="fw-bold ">{{ $pelanggaranList->total() }}</span> Entri data
+            </p>
         <table class="table table-bordered">
-            <thead class="table table-secondary">
+            <thead class="table-secondary">
                 <tr>
                     <th class="no-column">No</th>
                     <th>NIM Mahasiswa</th>
@@ -29,46 +36,41 @@
                 </tr>
             </thead>
             <tbody>
-                @if(isset($pelanggaranList) && count($pelanggaranList) > 0)
-                    @foreach($pelanggaranList as $index => $pelanggaran)
-                        <tr>
-                            <td class="no-column">{{ $index + 1 }}</td>
-                            <td>{{ $pelanggaran['nim'] ?? '-' }}</td>
-                            <td>{{ $pelanggaran['nama'] ?? '-' }}</td>
-                            <td>{{ $pelanggaran['pelanggaran'] ?? '-' }}</td>
-                            <td>{{ $pelanggaran['tingkat'] ?? '-' }}</td>
-                            <td>
-                                <a href="{{ route('konseling_lanjutan') }}" class="btn btn-custom-blue">
-                                    Ajukan Konseling
-                                </a>
-                            </td>
-                        </tr>
-                    @endforeach
-                @else
+                @forelse($pelanggaranList as $dataMahasiswa)
+                    <tr>
+                        <td class="no-column">{{ ($pelanggaranList->currentPage() - 1) * $pelanggaranList->perPage() + $loop->iteration }}</td>
+                        <td>{{ $dataMahasiswa['nim'] ?? '-' }}</td>
+                        <td>{{ $dataMahasiswa['nama'] ?? '-' }}</td>
+                        <td>{{ $dataMahasiswa['pelanggaran'] ?? '-' }}</td>
+                        <td>{{ $dataMahasiswa['tingkat'] ?? '-' }}</td>
+                        <td>
+                            @if(session('user.role') == 'kemahasiswaan')
+                            <form action="{{ route('kemahasiswaan_konseling.pilih') }}" method="GET">
+                            @elseif(session('user.role') == 'konselor')
+                            <form action="{{ route('konselor_konseling.pilih') }}" method="GET">
+                            @endif
+                                @csrf
+                                <input type="hidden" name="nim" value="{{ $dataMahasiswa['nim'] }}">
+                                <input type="hidden" name="nama" value="{{ $dataMahasiswa['nama'] }}">
+                                <input type="hidden" name="tahun_masuk" value="{{ $dataMahasiswa['tahun_masuk'] }}">
+                                <input type="hidden" name="prodi" value="{{ $dataMahasiswa['prodi'] }}">
+                                <button type="submit" class="btn btn-sm btn-primary">Ajukan Konseling</button>
+                            </form>
+                        </td>
+                    </tr>
+                @empty
                     <tr>
                         <td colspan="6" class="text-center">Tidak ada data pelanggaran.</td>
                     </tr>
-                @endif
+                @endforelse
             </tbody>
         </table>
-    </div>    
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        function confirmLogout() {
-            Swal.fire({
-                title: 'Apakah anda yakin ingin keluar?',
-                text: "Anda akan keluar dari akun ini.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, keluar!',
-                cancelButtonText: 'Tidak',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = '{{ route('logout') }}';
-                }
-            });
-        }
-    </script>
+        {{-- Tampilkan pagination hanya jika ada lebih dari 1 halaman --}}
+        @if($pelanggaranList->hasPages())
+            <div class="d-flex justify-content-center mt-3">
+                {{ $pelanggaranList->links('pagination::bootstrap-4') }}
+            </div>
+        @endif
+    </div>
 @endsection

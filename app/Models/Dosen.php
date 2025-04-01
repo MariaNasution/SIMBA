@@ -11,7 +11,7 @@ class Dosen extends Model
     public $incrementing = false; // Disable auto-increment
 
     // Define fillable fields
-    protected $fillable = ['username', 'nip'];
+    protected $fillable = ['username', 'nip', 'nama'];
 
     /**
      * Define the inverse relationship with the User model.

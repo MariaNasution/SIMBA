@@ -8,7 +8,7 @@
         <div class="container-fluid p-4">
             <div class="d-flex align-items-center mb-4 border-bottom-line">
                 <h3 class="me-auto">
-                    <a href="{{ route('kemahasiswaan') }}">Home</a>
+                    <a href="{{ route('kemahasiswaan_beranda') }}">Home</a>
                 </h3>
                 <a href="#" onclick="confirmLogout()">
                     <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
@@ -21,7 +21,7 @@
                     <ul class="list-unstyled text-start pengumuman">
                         @forelse ($pengumuman as $item)
                             <li class="d-flex justify-content-between align-items-center mb-2">
-                                <a href="{{ route('pengumumanadmin.detail', $item->id) }}" class="text-decoration-none">
+                                <a href="{{ route('kemahasiswaan_pengumumanadmin.detail', $item->id) }}" class="text-decoration-none">
                                     <span>
                                         <strong
                                             class="@switch($item->sumber)
@@ -38,7 +38,7 @@
                                     </span>
                                 </a>
                                 <div class="ms-3">
-                                    <form method="POST" action="{{ route('pengumuman.destroy', $item->id) }}"
+                                    <form method="POST" action="{{ route('kemahasiswaan_pengumuman.destroy', $item->id) }}"
                                         class="d-inline">
                                         @csrf
                                         @method('DELETE')
@@ -96,7 +96,7 @@
                     <h5 class="modal-title" id="modalKalenderAkademikLabel">Unggah Kalender Akademik</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form method="POST" action="{{ route('calendar.upload') }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ route('kemahasiswaan_calendar.upload') }}" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
                         <input type="hidden" name="type" value="akademik">
@@ -123,7 +123,7 @@
                     <h5 class="modal-title" id="modalKalenderBEMLabel">Unggah Kalender NonAdemik</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form method="POST" action="{{ route('calendar.upload') }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ route('kemahasiswaan_calendar.upload') }}" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
                         <input type="hidden" name="type" value="bem">
@@ -150,7 +150,7 @@
                     <h5 class="modal-title" id="modalPengumumanLabel">Unggah Pengumuman</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="formPengumuman" method="POST" action="{{ route('pengumuman.store') }}">
+                <form id="formPengumuman" method="POST" action="{{ route('kemahasiswaan_pengumuman.store') }}">
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
