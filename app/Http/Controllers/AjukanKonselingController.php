@@ -118,7 +118,7 @@ class AjukanKonselingController extends Controller
                 'nama' => null,
             ]);
 
-            return redirect()->route('konseling.index')->with('success', 'Berhasil mengajukan konseling');
+            return redirect()->route('konselor_konseling.ajukan')->with('success', 'Berhasil mengajukan konseling');
         } catch (Exception $e) {
             Log::error('Exception saat mengajukan konseling:', ['message' => $e->getMessage()]);
             return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);

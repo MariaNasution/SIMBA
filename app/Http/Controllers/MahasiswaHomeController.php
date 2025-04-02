@@ -154,7 +154,8 @@ class MahasiswaHomeController extends Controller
                     'notifications',
                     'notificationCount',
                     'dosenNotifications',
-                    'noPerwalianMessage'
+                    'noPerwalianMessage',
+                    'mahasiswa'
                 ));
             } else {
                 Log::error('Gagal mengambil data API', ['response' => $response->body()]);

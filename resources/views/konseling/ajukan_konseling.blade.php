@@ -173,7 +173,12 @@
         @elseif(session('user.role') == 'konselor')
         <form action="{{ route('konselor_beranda') }}" method="GET">
         @endif
-                </div>
+        @if(session('user.role') == 'kemahasiswaan')
+            <a href="{{ route('kemahasiswaan_ajukan_konseling') }}" class="btn btn-secondary">Reset</a>
+        @elseif(session('user.role') == 'konselor')
+            <a href="{{ route('konselor_ajukan_konseling') }}" class="btn btn-secondary">Reset</a>
+        @endif
+        </div>
             </form>
         @endif
     

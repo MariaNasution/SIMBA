@@ -29,14 +29,25 @@
   <div class="row">
     <div class="col-md-12 d-flex justify-content-end">
       <div class="dropdown">
-        <button class="btn btn-light border dropdown-toggle d-flex align-items-center" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-          <i class="bi bi-funnel fas fa-filter"></i> <span id="selectedStatus">Filter Approve</span>
+        <button class="btn btn-light border dropdown-toggle" type="button" data-bs-toggle="dropdown">
+          <i class="fas fa-filter"></i> 
+          <span>
+            @if(request()->get('status') == 'pending')
+              Menunggu Persetujuan
+            @elseif(request()->get('status') == 'approved')
+              Disetujui
+            @elseif(request()->get('status') == 'rejected')
+              Ditolak
+            @else
+              Filter Approve
+            @endif
+          </span>
         </button>
-        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-          <li><a class="dropdown-item text-dark" href="#" onclick="setStatusFilter('Filter Approve', '')">Semua</a></li>
-          <li><a class="dropdown-item text-primary" href="#" onclick="setStatusFilter('Menunggu Persetujuan', 'pending')">Menunggu Persetujuan</a></li>
-          <li><a class="dropdown-item text-success" href="#" onclick="setStatusFilter('Disetujui', 'approved')">Disetujui</a></li>
-          <li><a class="dropdown-item text-danger" href="#" onclick="setStatusFilter('Ditolak', 'rejected')">Ditolak</a></li>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="{{ route('mahasiswa_konseling') }}">Semua</a></li>
+          <li><a class="dropdown-item text-primary" href="{{ route('mahasiswa_konseling', ['status' => 'pending']) }}">Menunggu Persetujuan</a></li>
+          <li><a class="dropdown-item text-success" href="{{ route('mahasiswa_konseling', ['status' => 'approved']) }}">Disetujui</a></li>
+          <li><a class="dropdown-item text-danger" href="{{ route('mahasiswa_konseling', ['status' => 'rejected']) }}">Ditolak</a></li>
         </ul>
       </div>
     </div>
@@ -85,24 +96,28 @@
 </div>
 
 <!-- Script Filtering -->
-<script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js">
   function setStatusFilter(text, value) {
+    console.log("Filter clicked:", text, value); // Add this for debugging
     document.getElementById("selectedStatus").innerText = text;
     
-    // Redirect dengan filter yang dipilih
-    let url = new URL(window.location.href);
-    if (value) {
-      url.searchParams.set('status', value);
-    } else {
-      url.searchParams.delete('status');
+    // Use window.location directly to avoid URL manipulation issues
+    let currentUrl = window.location.origin + window.location.pathname;
+    let newUrl = currentUrl;
+    
+    if (value && value !== '') {
+      newUrl += '?status=' + value;
     }
-    window.location.href = url.toString();
+    
+    console.log("Redirecting to:", newUrl); // Debugging
+    window.location.href = newUrl;
   }
 
-  // Saat halaman dimuat, atur teks tombol sesuai dengan filter yang aktif
-  window.onload = function () {
-    let urlParams = new URLSearchParams(window.location.search);
-    let status = urlParams.get("status");
+  // When the page loads, set the button text according to the active filter
+  document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get("status");
+    
     if (status === "pending") {
       document.getElementById("selectedStatus").innerText = "Menunggu Persetujuan";
     } else if (status === "approved") {
@@ -112,7 +127,7 @@
     } else {
       document.getElementById("selectedStatus").innerText = "Filter Approve";
     }
-  };
+  });
 </script>
 
 @endsection

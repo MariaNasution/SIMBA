@@ -157,9 +157,9 @@ Route::middleware(['auth.session', 'role:konselor'])
             Route::post('/hasil-konseling/upload', [HasilKonselingController::class, 'upload'])->name('hasil_konseling.upload');
             
             // Konselor request konseling
-            Route::get('/ajukan', [AjukanKonselingController::class, 'index'])->name('konseling.ajukan');
+            Route::get('/ajukan', [AjukanKonselingController::class, 'index'])->name('konseling.form');
             Route::get('/cari', [AjukanKonselingController::class, 'cariMahasiswa'])->name('konseling.cari');
-            Route::post('/konseling/ajukan', [AjukanKonselingController::class, 'ajukanKonseling'])->name('konseling.ajukan');
+            Route::post('/ajukan', [AjukanKonselingController::class, 'ajukanKonseling'])->name('konseling.ajukan');
             Route::get('/caririwayat', [RiwayatkonselingController::class, 'CariRiwayatMahasiswa'])->name('konseling.caririwayat');
             Route::get('/konseling', [AjukanKonselingController::class, 'index'])->name('konseling.index');
             Route::get('/konseling/pilih', [AjukanKonselingController::class, 'pilihMahasiswa'])->name('konseling.pilih');
