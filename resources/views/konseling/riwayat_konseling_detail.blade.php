@@ -5,9 +5,15 @@
     {{-- Header dan Logout --}}
     <div class="d-flex align-items-center mb-4 border-bottom-line">
         <h3 class="me-auto">
-            <a href="{{ route('admin') }}"><i class="fas fa-history me-3"></i>Home</a> /
-            <a href="{{ route('riwayat.konseling') }}">Riwayat Konseling</a> /
-            <a href="#">Riwayat Konseling Detail</a>
+            @if(session('user.role') == 'kemahasiswaan')
+                <a href="{{ route('kemahasiswaan_beranda') }}"> <i class="fas fa-list me-3"></i>Konseling</a> /
+                <a href="{{ route('kemahasiswaan_riwayat_konseling') }}">Riwayat Konseling</a> /
+                <a href="#">Riwayat Konseling Detail</a>
+            @elseif(session('user.role') == 'konselor')
+                <a href="{{ route('konselor_beranda') }}"> <i class="fas fa-list me-3"></i>Konseling</a> /
+                <a href="{{ route('konselor_riwayat_konseling') }}">Riwayat Konseling</a> /
+                <a href="#">Riwayat Konseling Detail</a>
+            @endif
         </h3>
         <a href="#" onclick="confirmLogout()">
             <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
@@ -27,20 +33,20 @@
     @endif
 
     <div>
-  <h5 class="text-start">Hasil Konseling:</h5>
+        <h5 class="text-start">Hasil Konseling:</h5>
 
-  {{-- Menampilkan jumlah data yang sedang ditampilkan --}}
-  <p class="mt-3 text-end">
-    Halaman <span class="fw-bold ">{{ $hasilKonseling->currentPage() }}</span> dari
-    <span class="fw-bold">{{ $hasilKonseling->lastPage() }}</span> | 
-    Menampilkan <span class="fw-bold ">{{ $hasilKonseling->count() }}</span> dari
-    <span class="fw-bold">{{ $hasilKonseling->total() }}</span> Entri data
-  </p>
-</div>
+        {{-- Menampilkan jumlah data yang sedang ditampilkan --}}
+        <p class="mt-3 text-end">
+            Halaman <span class="fw-bold ">{{ $hasilKonseling->currentPage() }}</span> dari
+            <span class="fw-bold">{{ $hasilKonseling->lastPage() }}</span> |
+            Menampilkan <span class="fw-bold ">{{ $hasilKonseling->count() }}</span> dari
+            <span class="fw-bold">{{ $hasilKonseling->total() }}</span> Entri data
+        </p>
+    </div>
 
 
     @if ($hasilKonseling->isNotEmpty())
-    
+
         <table class="table table-bordered">
             <thead class="table-secondary text-center">
                 <tr>
@@ -53,45 +59,54 @@
             </thead>
             <tbody>
                 @foreach ($hasilKonseling as $index => $konseling)
-                    <tr>
-                        <td class="text-center">{{ ($hasilKonseling->currentPage() - 1) * $hasilKonseling->perPage() + $loop->iteration }}</td>
-                        <td>{{ \Carbon\Carbon::parse($konseling->created_at)->translatedFormat('d F Y') }}</td>
-                        <td>{{ $konseling->keterangan }}</td>
-                        <td class="text-center">
-                            @if ($konseling->file)
-                                <a href="{{ Storage::url('konseling_files/' . $konseling->file) }}" target="_blank">
-                                    Lihat File
-                                </a>
-                            @else
-                                <span class="text-muted">No file found.</span>
-                            @endif
-                        </td>
-                        <td class="text-center">
-                            @if ($konseling->status == 'continued')
-                                <button type="button" class="btn btn-secondary btn-sm" disabled>
-                                    <i class="fas fa-check"></i> Berhasil Dilanjutkan
-                                </button>
-                            @else
-                                <form action="{{ route('konseling.lanjutan.store') }}" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="nama" value="{{ $nama }}">
-                                    <input type="hidden" name="nim" value="{{ $nim }}">
-                                    <input type="hidden" name="request_konseling_id" value="{{ $konseling->id }}">
-                                    <button type="submit" class="btn btn-success btn-sm">
-                                        <i class="fas fa-check"></i> Lanjutkan
-                                    </button>
-                                </form>
-                            @endif
-                        </td>
-                    </tr>
+                            <tr>
+                                <td class="text-center">
+                                    {{ ($hasilKonseling->currentPage() - 1) * $hasilKonseling->perPage() + $loop->iteration }}
+                                </td>
+                                <td>{{ \Carbon\Carbon::parse($konseling->created_at)->translatedFormat('d F Y') }}</td>
+                                <td>{{ $konseling->keterangan }}</td>
+                                <td class="text-center">
+                                    @if ($konseling->file)
+                                        <a href="{{ Storage::url('konseling_files/' . $konseling->file) }}" target="_blank">
+                                            Lihat File
+                                        </a>
+                                    @else
+                                        <span class="text-muted">No file found.</span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    @if ($konseling->status == 'continued')
+                                        <button type="button" class="btn btn-secondary btn-sm" disabled>
+                                            <i class="fas fa-check"></i> Berhasil Dilanjutkan
+                                        </button>
+                                    @else
+                                                        <form action="
+                                            @if(session('user.role') == 'kemahasiswaan')
+                                                {{ route('kemahasiswaan_konseling.lanjutan.store') }}
+                                            @elseif(session('user.role') == 'konselor')
+                                                {{ route('konselor_konseling.lanjutan.store') }}
+                                            @endif
+                                        " method="POST">
+                                                            @csrf
+                                                            <input type="hidden" name="nama" value="{{ $nama }}">
+                                                            <input type="hidden" name="nim" value="{{ $nim }}">
+                                                            <input type="hidden" name="request_konseling_id" value="{{ $konseling->id }}">
+                                                            <button type="submit" class="btn btn-success btn-sm">
+                                                                <i class="fas fa-check"></i> Lanjutkan
+                                                            </button>
+                                                        </form>
+
+                                    @endif
+                                </td>
+                            </tr>
                 @endforeach
             </tbody>
         </table>
 
         {{-- Pagination di tengah --}}
         <div class="d-flex justify-content-center w-100 mt-3">
-        {{ $hasilKonseling->links('pagination::bootstrap-4') }}
-    </div>  
+            {{ $hasilKonseling->links('pagination::bootstrap-4') }}
+        </div>
     @else
         <p class="text-muted">Belum ada hasil konseling.</p>
     @endif

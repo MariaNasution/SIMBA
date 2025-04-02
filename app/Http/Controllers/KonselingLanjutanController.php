@@ -46,7 +46,13 @@ class KonselingLanjutanController extends Controller
             'keterangan' => $hasilKonseling->keterangan ?? 'Tidak ada keterangan',
         ]);
 
-        return redirect()->route('konseling_lanjutan')
-                     ->with('success', 'Data konseling lanjutan berhasil disimpan.');
+        // Redirect berdasarkan role pengguna
+        if (session('user.role') == 'kemahasiswaan') {
+            return redirect()->route('kemahasiswaan_konseling_lanjutan')->with('success', 'Data konseling lanjutan berhasil disimpan.');
+        } elseif (session('user.role') == 'konselor') {
+            return redirect()->route('konselor_konseling_lanjutan')->with('success', 'Data konseling lanjutan berhasil disimpan.');
+        }
+
+        return redirect()->back()->with('success', 'Data konseling lanjutan berhasil disimpan.');
     }
 }
