@@ -1,13 +1,19 @@
 @extends('layouts.app')
 
 @section('content')
-  
+
     {{-- Header dan Logout --}}
     <div class="d-flex align-items-center mb-4 border-bottom-line">
         <h3 class="me-auto">
-            <a href="{{ route('admin') }}"><i class="fas fa-history me-3"></i>Konseling</a> /
-            <a href="{{ route('konseling_lanjutan') }}">Konseling Lanjutan</a> /
-            <a href="#">Konseling Lanjutan Detail</a>
+            @if(session('user.role') == 'kemahasiswaan')
+                <a href="{{ route('kemahasiswaan_beranda') }}"> <i class="fas fa-list me-3"></i>Konseling</a> /
+                <a href="{{ route('kemahasiswaan_konseling_lanjutan') }}">Konseling Lanjutan</a> /
+                <a href="#">Konseling Lanjutan Detail</a>
+            @elseif(session('user.role') == 'konselor')
+                <a href="{{ route('konselor_beranda') }}"> <i class="fas fa-list me-3"></i>Konseling</a> /
+                <a href="{{ route('konselor_konseling_lanjutan') }}">Konseling Lanjutan</a> /
+                <a href="#">Konseling Lanjutan Detail</a>
+            @endif
         </h3>
         <a href="#" onclick="confirmLogout()">
             <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
@@ -30,10 +36,10 @@
     <h5 class="text-start">Hasil Konseling:</h5>
     <p class="mt-3 text-end">
         Halaman <span class="fw-bold ">{{ $mahasiswas->currentPage() }}</span> dari
-        <span class="fw-bold ">{{ $mahasiswas->lastPage() }}</span> | 
+        <span class="fw-bold ">{{ $mahasiswas->lastPage() }}</span> |
         Menampilkan <span class="fw-bold ">{{$mahasiswas->count() }}</span> dari
         <span class="fw-bold">{{ $mahasiswas->total() }}</span> Entri data
-  </p>
+    </p>
     @if ($mahasiswas->isNotEmpty())
         <table class="table table-bordered">
             <thead>
