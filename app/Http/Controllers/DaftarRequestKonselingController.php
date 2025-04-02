@@ -79,7 +79,8 @@ class DaftarRequestKonselingController extends Controller
             'status' => 'rejected'
         ]);
 
-        $data->delete();
+        // Update status di tabel request_konseling menjadi rejected
+        $data->update(['status' => 'rejected']);
 
         
         // Redirect berdasarkan role pengguna
