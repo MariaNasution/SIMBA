@@ -89,22 +89,22 @@
                             @endif
                                     @csrf
                                     @method('PUT')
-                                    <button class="btn btn-success btn-sm">
+                                    <button type="submit" class="btn btn-success btn-sm">
                                         <i class="fas fa-check"></i>
                                     </button>
                                 </form>
-                            {{-- Reject Button --}}
-                            @if(session('user.role') == 'kemahasiswaan')
-                                <button class="btn btn-danger btn-sm reject-btn"
-                                    data-url="{{ route('kemahasiswaan_reject_konseling', $request->id) }}">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            @elseif(session('user.role') == 'konselor')
-                                <button class="btn btn-danger btn-sm reject-btn"
-                                    data-url="{{ route('konselor_reject_konseling', $request->id) }}">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            @endif
+                                {{-- Reject Button --}}
+                                @if(session('user.role') == 'kemahasiswaan')
+                                    <button class="btn btn-danger btn-sm reject-btn"
+                                        data-url="{{ route('kemahasiswaan_reject_konseling', $request->id) }}">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                @elseif(session('user.role') == 'konselor')
+                                    <button class="btn btn-danger btn-sm reject-btn"
+                                        data-url="{{ route('konselor_reject_konseling', $request->id) }}">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                @endif
                         </td>
                     </tr>
                 @endforeach
@@ -118,7 +118,7 @@
 
     <!-- Modal untuk alasan penolakan -->
     <div class="modal fade" id="rejectReasonModal" tabindex="-1" aria-labelledby="rejectReasonModalLabel"
-         aria-hidden="true">
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">

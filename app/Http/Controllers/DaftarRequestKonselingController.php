@@ -8,20 +8,20 @@ use App\Models\RiwayatDaftarRequestKonseling;
 
 class DaftarRequestKonselingController extends Controller
 {
-  public function daftarRequest(Request $request)
-  {
-    // Ambil nilai filter sorting dari query string (default: terbaru)
-    $sortOrder = $request->query('sort', 'terbaru'); 
+    public function daftarRequest(Request $request)
+    {
+        // Ambil nilai filter sorting dari query string (default: terbaru)
+        $sortOrder = $request->query('sort', 'terbaru');
 
-    // Ambil request konseling dengan status pending dan sorting berdasarkan waktu request dibuat
-    $requests = RequestKonseling::where('status', 'pending')
-      ->orderBy('created_at', $sortOrder === 'terbaru' ? 'desc' : 'asc')
-      ->paginate(7)
-      ->appends(['sort' => $sortOrder]); // Menyimpan filter sorting saat berpindah halaman
+        // Ambil request konseling dengan status pending dan sorting berdasarkan waktu request dibuat
+        $requests = RequestKonseling::where('status', 'pending')
+            ->orderBy('created_at', $sortOrder === 'terbaru' ? 'desc' : 'asc')
+            ->paginate(7)
+            ->appends(['sort' => $sortOrder]); // Menyimpan filter sorting saat berpindah halaman
 
-    // Kirim data ke view
-    return view('konseling.daftar_request', compact('requests', 'sortOrder'));
-  }
+        // Kirim data ke view
+        return view('konseling.daftar_request', compact('requests', 'sortOrder'));
+    }
 
     public function riwayatDaftarRequestKonseling()
     {
@@ -50,7 +50,14 @@ class DaftarRequestKonselingController extends Controller
         // Hapus dari tabel request_konseling
         $request->update(['status' => 'approved']);
 
-        return redirect()->route('hasil_konseling')->with('success', 'Request berhasil disetujui.');
+        // Redirect berdasarkan role pengguna
+        if (session('user.role') == 'kemahasiswaan') {
+            return redirect()->route('kemahasiswaan_hasil_konseling')->with('success', 'Request berhasil disetujui.');
+        } elseif (session('user.role') == 'konselor') {
+            return redirect()->route('konselor_hasil_konseling')->with('success', 'Request berhasil disetujui.');
+        }
+
+        return redirect()->back()->with('success', 'Request berhasil disetujui.');
     }
 
     public function reject(Request $request, $id)
@@ -74,6 +81,14 @@ class DaftarRequestKonselingController extends Controller
 
         $data->delete();
 
-        return redirect()->route('daftar_request')->with('error', 'Request berhasil ditolak.');
+        
+        // Redirect berdasarkan role pengguna
+        if (session('user.role') == 'kemahasiswaan') {
+            return redirect()->route('kemahasiswaan_daftar_request')->with('error', 'Request berhasil ditolak.');
+        } elseif (session('user.role') == 'konselor') {
+            return redirect()->route('konselor_daftar_request')->with('error', 'Request berhasil ditolak.');
+        }
+
+        return redirect()->back()->with('error', 'Request berhasil ditolak.');
     }
 }
