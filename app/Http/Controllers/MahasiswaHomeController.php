@@ -154,7 +154,8 @@ class MahasiswaHomeController extends Controller
                     'notifications',
                     'notificationCount',
                     'dosenNotifications',
-                    'noPerwalianMessage'
+                    'noPerwalianMessage',
+                    'mahasiswa'
                 ));
             } else {
                 Log::error('Gagal mengambil data API', ['response' => $response->body()]);
@@ -172,7 +173,7 @@ class MahasiswaHomeController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('beranda.homeMahasiswa', compact('labels', 'values', 'pengumuman', 'akademik', 'bem', 'notifications', 'mahasiswa'));
+            return view('beranda.homeMahasiswa', compact('labels', 'values', 'pengumuman', 'akademik', 'bem', 'notifications', 'mahasiswa'));
     }
 
     public function show($id)

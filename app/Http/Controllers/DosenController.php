@@ -83,7 +83,7 @@ class DosenController extends Controller
                         ]);
 
                     $studentsByYear[$year] = [];
-                    $classesByYear[$year] = []; // Initialize an array for this year
+                    $classesByYear[$year] = [];
                     $prodisByYear[$year] = [];
 
                     if ($mahasiswaResponse->successful()) {
@@ -100,9 +100,6 @@ class DosenController extends Controller
                                     Log::warning("Class name missing for year {$year}", ['classData' => $classData]);
                                     continue;
                                 }
-
-                                // Add the class to classesByYear for this year
-                              
 
                                 $classStudents = [];
 
@@ -184,7 +181,6 @@ class DosenController extends Controller
                                 }
 
                                 $studentsByYear[$year][$kelas] = $classStudents;
-
                                 $prodisByYear[$year][$kelas] = $this->kelasToProdi($kelas) ?? null;
                             }
                         }
@@ -197,6 +193,7 @@ class DosenController extends Controller
                 }
 
                 $perwalianAnnouncement = $this->checkPerwalian($nip, $apiToken, $baseUrl);
+                
             } catch (\Exception $e) {
                 Log::error('Error fetching data in beranda:', [
                     'message' => $e->getMessage(),
@@ -206,8 +203,7 @@ class DosenController extends Controller
             }
         }
 
-        // Debug output to check the structure of classesByYear
-
+        // Removed: $breadcrumbs = DosenBreadcrumbController::getBreadcrumbs();
         return view('beranda.homeDosen', compact('studentsByYear', 'prodisByYear', 'perwalianAnnouncement'));
     }
 
@@ -365,6 +361,7 @@ class DosenController extends Controller
             }
         }
 
+        // Removed: $breadcrumbs = DosenBreadcrumbController::getBreadcrumbs([...]);
         return view('dosen.detailedClass', compact('students', 'year', 'kelas', 'perwalianAnnouncement'));
     }
 
@@ -450,6 +447,7 @@ class DosenController extends Controller
             ->get()
             ->toArray();
 
+        // Removed: $breadcrumbs = DosenBreadcrumbController::getBreadcrumbs();
         return view('dosen.index', compact('anakWali'));
     }
 
@@ -466,7 +464,8 @@ class DosenController extends Controller
             ->select('username', 'name', 'semester', 'ipk', 'ips', 'status_krs')
             ->get();
 
-        return view('dosen.presensi', compact('anak_wali'));
+        // Removed: $breadcrumbs = DosenBreadcrumbController::getBreadcrumbs();
+        return view('dosen.presensi', compact('anakWali'));
     }
 
     public function setPerwalian()
@@ -483,16 +482,17 @@ class DosenController extends Controller
             ->get()
             ->toArray();
 
+        // Removed: $breadcrumbs = DosenBreadcrumbController::getBreadcrumbs();
         return view('perwalian.setPerwalian', compact('anakWali'));
     }
 
     private function checkPerwalian($dosenId, $apiToken, $baseUrl)
     {
-        $user = session(('user'));
+        $user = session('user');
         try {
             $perwalian = Perwalian::where('ID_Dosen_Wali', $user['nip'])
-            ->where('Status', 'Scheduled')
-            ->get();
+                ->where('Status', 'Scheduled')
+                ->get();
 
             if ($perwalian->isNotEmpty()) {
                 $announcements = [];
@@ -510,14 +510,11 @@ class DosenController extends Controller
         }
     }
 
-    private function kelasToProdi($kelas) {
-        // Step 1: Remove the first 2 characters (e.g., "11" in "11TRPL2")
+    private function kelasToProdi($kelas)
+    {
         $prodi = substr($kelas, 2);
-    
-        // Step 2: Remove any trailing numbers (e.g., "2" in "TRPL2")
         $prodi = preg_replace('/\d+$/', '', $prodi);
-    
-        // Step 3: Map the prodi code to its full name
+
         $prodiMap = [
             'IF' => 'Informatika',
             'TRPL' => 'Teknik Rekayasa Perangkat Lunak',
@@ -529,8 +526,7 @@ class DosenController extends Controller
             'TE' => 'Teknik Elektro',
             'MR' => 'Manajemen Rekayasa',
         ];
-    
-        // Return the full name if the prodi code exists in the map, otherwise return the code as-is
+
         return $prodiMap[$prodi] ?? $prodi;
     }
 }

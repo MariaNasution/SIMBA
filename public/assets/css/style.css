@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;400&display=swap');
+
 * {
     margin: 0;
     padding: 0;
@@ -90,19 +92,6 @@
     cursor: pointer;
 }
 
-.navbar {
-
-    color: white;
-    background-color: #3282B8;
-    padding-left: 20px;
-    padding-right: 20px;
-    
-}
-
-.navbar a {
-    color: white; /* Warna Putih */
-    text-decoration: none; /* Menghapus garis bawah */
-}
 
 .sidebar {
     width: 300px;
@@ -602,18 +591,44 @@ ul li {
     border: 1px solid #dee2e6;
 }
 
-/* Mengatur posisi judul 'Absensi Mahasiswa' ke kiri */
-h3 {
-    text-align: left; /* Mengatur teks agar rata kiri */
-    margin-top: 20px;
+.navbar {
+
+    color: white;
+    background-color: #3282B8;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 10px;
+    padding-top: 10;
 }
 
-/* Mengatur warna tautan menjadi hitam dan menghapus garis bawah */
-h3.me-auto a {
+.navbar a {
     color: white; /* Warna Putih */
     text-decoration: none; /* Menghapus garis bawah */
 }
 
+/* Mengatur posisi judul 'Absensi Mahasiswa' ke kiri */
+h3 {
+    text-align: left; /* Mengatur teks agar rata kiri */
+    padding-top: 5px;
+
+}
+
+/* Mengatur warna tautan menjadi hitam dan menghapus garis bawah */
+h3.me-auto a {
+    font-family: 'Poppins', sans-serif; /* Use Poppins, with a fallback to sans-serif */    
+    font-weight: 200;
+    font-size: 18px;
+    color: white; /* Warna Putih */
+    text-decoration: none; /* Menghapus garis bawah */
+    padding-left: 20px;
+    
+}
+/* Mengatur warna tautan menjadi hitam dan menghapus garis bawah */
+h3.me-auto i {
+   
+    margin-right: 10px;
+    
+}
 
 
 /* Efek hover opsional untuk tautan */

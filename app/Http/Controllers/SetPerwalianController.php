@@ -38,7 +38,7 @@ class SetPerwalianController extends Controller
 
         // 2. Retrieve all scheduled Perwalian for this dosen
         $perwalianRecords = Perwalian::where('ID_Dosen_Wali', $user->nip)
-            ->where('Status', 'Scheduled')
+            ->where('Status', 'Completed')
             ->get();
 
         // 3. Filter by search text (if any)

@@ -21,18 +21,6 @@
         .card {
             overflow: hidden;
         }
-        .navbar-custom {
-            background-color: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
-            padding: 15px 20px;
-        }
-        .navbar-custom a {
-            text-decoration: none;
-            color: #333;
-        }
-        .navbar-custom a:hover {
-            color: #007bff;
-        }
 
         .content {
             position: relative;
@@ -51,9 +39,8 @@
             background-repeat: no-repeat;
             background-attachment: fixed;
             opacity: 0.12;
-            z-index: 0;
+            z-index: -5;
         }
-        
     </style>
     @yield('styles')
 </head>
@@ -78,8 +65,8 @@
                 <p class="text-center text-danger">Role tidak dikenali.</p>
             @endif
 
-            <main>
-                @include('components.navbar')
+            <main class="flex-grow-1">
+                <x-navbar />
                 <div class="content">
                     @yield('content')
                 </div>
@@ -180,5 +167,6 @@
             }
         });
     </script>
+    @yield('scripts')
 </body>
 </html>
