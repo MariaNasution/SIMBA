@@ -46,7 +46,7 @@
         </p>
 
         {{-- Filter Sorting --}}
-        <div class="d-flex justify-content-start mb-3">
+        <div class="d-flex justify-content-end mb-3">
             @if(session('user.role') == 'kemahasiswaan')
                 <form action="{{ route('kemahasiswaan_daftar_request') }}" method="GET">
             @elseif(session('user.role') == 'konselor')
