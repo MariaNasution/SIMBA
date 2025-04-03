@@ -7,14 +7,20 @@ use App\Models\Perwalian;
 use App\Models\Dosen;
 use App\Models\Dosen_Wali;
 use App\Models\Notifikasi;
+use App\Models\Mahasiswa;
+use App\Models\Absensi;
+use App\Models\BeritaAcara;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use PDF; // Make sure to install barryvdh/laravel-dompdf and set alias in config/app.php
 
 class SetPerwalianController extends Controller
 {
+    // -------------------------------------------
     // Existing methods...
+    // -------------------------------------------
 
     /**
      * Display the History page.
@@ -36,7 +42,7 @@ class SetPerwalianController extends Controller
             return redirect()->route('login')->with('error', 'User not found or not authorized.');
         }
 
-        // 2. Retrieve all scheduled Perwalian for this dosen
+        // 2. Retrieve all completed Perwalian for this dosen
         $perwalianRecords = Perwalian::where('ID_Dosen_Wali', $user->nip)
             ->where('Status', 'Completed')
             ->get();
@@ -49,8 +55,7 @@ class SetPerwalianController extends Controller
                 // Match search against the 'kelas', 'nama', or the raw date string
                 $kelas = mb_strtolower($item->kelas);
                 $nama = mb_strtolower($item->nama);
-                $tanggal = $item->Tanggal; // e.g. '2025-01-20'
-
+                $tanggal = $item->Tanggal;
                 return (str_contains($kelas, $lowerSearch) ||
                         str_contains($nama, $lowerSearch) ||
                         str_contains($tanggal, $lowerSearch));
@@ -58,7 +63,7 @@ class SetPerwalianController extends Controller
         }
 
         // 4. Categorize each date into Semester Baru, Sebelum UTS, or Sebelum UAS
-        //    based on your new date rules:
+        //    based on new date rules:
         //    Semester Genap:
         //      - Semester Baru: 1 Januari – 1 Februari
         //      - Sebelum UTS: 2 Februari – 10 Maret
@@ -67,7 +72,6 @@ class SetPerwalianController extends Controller
         //      - Semester Baru: 1 Agustus – 1 September
         //      - Sebelum UTS: 2 September – 14 Oktober
         //      - Sebelum UAS: 15 Oktober – 11 Desember
-
         $semesterBaru = [];
         $sebelumUts   = [];
         $sebelumUas   = [];
@@ -76,10 +80,7 @@ class SetPerwalianController extends Controller
             $dateObj = Carbon::parse($record->Tanggal);
             $month   = $dateObj->month;
             $day     = $dateObj->day;
-
-            // Decide category based on new ranges
             $category = $this->determineCategory($month, $day);
-
             if ($category === 'semester_baru') {
                 $semesterBaru[] = $record;
             } elseif ($category === 'sebelum_uts') {
@@ -87,7 +88,6 @@ class SetPerwalianController extends Controller
             } elseif ($category === 'sebelum_uas') {
                 $sebelumUas[] = $record;
             } else {
-                // Default assignment
                 $semesterBaru[] = $record;
             }
         }
@@ -117,20 +117,19 @@ class SetPerwalianController extends Controller
 
     /**
      * Determine which category a given date (month/day) belongs to
-     * based on the new rules provided.
+     * based on the new rules.
      */
     private function determineCategory($month, $day)
     {
         // Semester Genap: (months 1 to 5)
         if ($month == 1) {
-            // Semester Baru: 1 Januari – 31 Januari
             return 'semester_baru';
         }
         if ($month == 2) {
             if ($day == 1) {
                 return 'semester_baru';
             }
-            if ($day >= 2 && $day <= 29) { // assume February days (leap-year friendly)
+            if ($day >= 2 && $day <= 29) {
                 return 'sebelum_uts';
             }
         }
@@ -143,13 +142,11 @@ class SetPerwalianController extends Controller
             }
         }
         if ($month == 4 || $month == 5) {
-            // For April and for May up to 19
             if ($month == 5 && $day > 19) {
                 return 'semester_baru';
             }
             return 'sebelum_uas';
         }
-
         // Semester Ganjil: (months 8 to 12)
         if ($month == 8) {
             return 'semester_baru';
@@ -178,18 +175,14 @@ class SetPerwalianController extends Controller
                 return 'sebelum_uas';
             }
         }
-
-        // For any date not matching the above rules, default to 'semester_baru'
         return 'semester_baru';
     }
 
-    // -------------------------------------------
-    // The rest of your existing methods below
-    // (index, getCalendar, store, destroy, etc.)
-    // -------------------------------------------
+    // ... (Other existing methods: index, getCalendar, store, destroy, etc.)
 
     public function index(Request $request)
     {
+        // [Existing index method code remains unchanged]
         $username = session('user')['username'] ?? null;
         Log::info('Attempting to access setPerwalian index', ['username' => $username]);
 
@@ -199,7 +192,6 @@ class SetPerwalianController extends Controller
         }
 
         $user = Dosen::where('username', $username)->first();
-
         if (!$user) {
             Log::error('No Dosen found for username', ['username' => $username]);
             return redirect()->route('login')->with('error', 'User not found or not authorized.');
@@ -209,13 +201,11 @@ class SetPerwalianController extends Controller
         $dosenRecord = DB::table('dosen_wali')
             ->where('username', $username)
             ->first();
-
         if ($dosenRecord && !empty($dosenRecord->kelas)) {
             $classes = array_map('trim', explode(',', $dosenRecord->kelas));
         } else {
             Log::warning('No classes found for dosen', ['username' => $username]);
         }
-
         $defaultClass = count($classes) === 1 ? $classes[0] : null;
 
         $scheduledDatesByClass = [];
@@ -224,9 +214,7 @@ class SetPerwalianController extends Controller
             $perwalianRecords = Perwalian::where('ID_Dosen_Wali', $user->nip)
                 ->where('Status', 'Scheduled')
                 ->get(['kelas', 'Tanggal']);
-
             $scheduledClasses = $perwalianRecords->pluck('kelas')->toArray();
-
             foreach ($perwalianRecords as $record) {
                 $date = Carbon::parse($record->Tanggal)->format('Y-m-d');
                 $scheduledDatesByClass[$record->kelas][] = $date;
@@ -235,43 +223,34 @@ class SetPerwalianController extends Controller
 
         $month = $request->query('month', now()->format('Y-m'));
         $currentDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
-
         if ($currentDate->lt(Carbon::create(2025, 1, 1))) {
             $currentDate = Carbon::create(2025, 1, 1);
         }
         if ($currentDate->gt(Carbon::create(2027, 12, 1))) {
             $currentDate = Carbon::create(2027, 12, 1);
         }
-
         $calendarData = $this->prepareCalendarData($currentDate);
-
         $notifications = Notifikasi::with('perwalian')->get();
-
         $apiToken = env('API_TOKEN');
         if (!$apiToken) {
             Log::warning('API_TOKEN not set in .env');
         }
-
         $dosenResponse = Http::withToken($apiToken)
             ->withOptions(['verify' => false])
             ->asForm()
             ->get('https://cis-dev.del.ac.id/api/library-api/dosen');
-
         if (!$dosenResponse->successful()) {
             Log::error('Failed to fetch dosen data from API', [
                 'status' => $dosenResponse->status(),
                 'body' => $dosenResponse->body()
             ]);
         }
-
         $dosenData = $dosenResponse->json();
-
         $dosenNotifications = collect();
         if ($dosenData && $notifications->isNotEmpty()) {
             $dosenWaliIds = $notifications->pluck('perwalian.ID_Dosen_Wali')->unique()->filter();
             $dosenNotifications = collect($dosenData)->whereIn('nip', $dosenWaliIds)->values();
         }
-
         return view('perwalian.setPerwalian', [
             'scheduledClasses' => $scheduledClasses,
             'scheduledDatesByClass' => $scheduledDatesByClass,
@@ -287,21 +266,17 @@ class SetPerwalianController extends Controller
     {
         $month = $request->query('month', now()->format('Y-m'));
         $currentDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
-
         if ($currentDate->lt(Carbon::create(2025, 1, 1))) {
             $currentDate = Carbon::create(2025, 1, 1);
         }
         if ($currentDate->gt(Carbon::create(2027, 12, 1))) {
             $currentDate = Carbon::create(2027, 12, 1);
         }
-
         $calendarData = $this->prepareCalendarData($currentDate);
-
         $calendarHtml = view('perwalian.partials.calendar', [
             'currentDate' => $currentDate,
             'calendarData' => $calendarData,
         ])->render();
-
         return response()->json([
             'calendarHtml' => $calendarHtml,
             'monthLabel' => $currentDate->format('F Y'),
@@ -316,14 +291,12 @@ class SetPerwalianController extends Controller
         $lastDay = $currentDate->copy()->endOfMonth();
         $daysInMonth = $lastDay->day;
         $startingDay = $firstDay->dayOfWeek;
-
         $markedDates = [
             '2025-01-13' => true, '2025-01-14' => true, '2025-01-15' => true, '2025-01-16' => true,
             '2025-01-17' => true, '2025-01-18' => true, '2025-01-21' => true, '2025-01-24' => true,
             '2025-01-25' => true, '2025-02-09' => true, '2025-02-10' => true, '2025-02-11' => true,
             '2025-02-13' => true,
         ];
-
         $calendarDays = array_fill(0, 42, '');
         $calendarData = [];
         $date = 1;
@@ -331,12 +304,10 @@ class SetPerwalianController extends Controller
             $calendarDays[$i] = $date;
             $date++;
         }
-
         for ($i = 0; $i < 42; $i++) {
             $currentDateStr = $calendarDays[$i]
                 ? $currentDate->copy()->setDay($calendarDays[$i])->format('Y-m-d')
                 : '';
-
             $calendarData[$i] = [
                 'day' => $calendarDays[$i],
                 'dateStr' => $currentDateStr,
@@ -346,13 +317,11 @@ class SetPerwalianController extends Controller
                 'isPast' => $currentDateStr && Carbon::parse($currentDateStr)->isBefore(now()->startOfDay()),
             ];
         }
-
         return $calendarData;
     }
 
     public function store(Request $request)
     {
-        
         Log::info('Store request received', ['request' => $request->all(), 'headers' => $request->headers->all()]);
         if (!$request->hasHeader('X-CSRF-TOKEN') || $request->session()->token() !== $request->header('X-CSRF-TOKEN')) {
             Log::error('CSRF token mismatch in store', [
@@ -377,32 +346,27 @@ class SetPerwalianController extends Controller
             ],
             'selectedClass' => 'required|string',
         ]);
-
         try {
             $username = session('user')['username'] ?? null;
             $user = Dosen::where('username', $username)->first();
-
             if (!$user) {
                 return response()->json([
                     'success' => false,
                     'message' => 'You must be logged in to set a perwalian date.'
                 ], 401);
             }
-
             $existingPerwalian = Perwalian::where('ID_Dosen_Wali', $user->nip)
                 ->where('Status', 'Scheduled')
                 ->where('kelas', $validatedData['selectedClass'])
                 ->first();
-
             if ($existingPerwalian) {
                 return response()->json([
                     'success' => false,
                     'message' => 'You already have a scheduled perwalian request for this class. Use the Edit option to delete and request again.'
                 ], 400);
             }
-
+            // Example for 'angkatan' field calculation:
             $year = 2021 - substr($validatedData['selectedClass'], 1, 1);
-            
             $perwalian = Perwalian::create([
                 'ID_Dosen_Wali' => $user->nip,
                 'Tanggal' => Carbon::parse($validatedData['selectedDate'])->format('Y-m-d'),
@@ -411,9 +375,6 @@ class SetPerwalianController extends Controller
                 'kelas' => $validatedData['selectedClass'],
                 'angkatan' => $year,
             ]);
-
-           
-
             if (!$perwalian) {
                 Log::error('Failed to create Perwalian record');
                 return response()->json([
@@ -421,12 +382,10 @@ class SetPerwalianController extends Controller
                     'message' => 'Failed to create Perwalian record.'
                 ], 500);
             }
-
             Log::info('Perwalian created:', [
                 'perwalian' => $perwalian->toArray(),
                 'ID_Perwalian' => $perwalian->getKey()
             ]);
-
             $nim = session('user')['nim'] ?? null;
             Notifikasi::create([
                 'Pesan' => "Perwalian scheduled for " . $validatedData['selectedDate'] . " (Class: " . $validatedData['selectedClass'] . ")",
@@ -434,21 +393,17 @@ class SetPerwalianController extends Controller
                 'Id_Perwalian' => $perwalian->getKey(),
                 'nama' => $user->nama,
             ]);
-
             Log::info('Perwalian date set for: ' . $validatedData['selectedDate'] .
                 ' by dosen NIP: ' . $user->nip .
                 ' for class: ' . $validatedData['selectedClass']);
-
             $scheduledDatesByClass = [];
             $perwalianRecords = Perwalian::where('ID_Dosen_Wali', $user->nip)
                 ->where('Status', 'Scheduled')
                 ->get(['kelas', 'Tanggal']);
-
             foreach ($perwalianRecords as $record) {
                 $date = Carbon::parse($record->Tanggal)->format('Y-m-d');
                 $scheduledDatesByClass[$record->kelas][] = $date;
             }
-
             return response()->json([
                 'success' => true,
                 'message' => 'Perwalian date set successfully for ' .
@@ -480,18 +435,15 @@ class SetPerwalianController extends Controller
             ]);
             return response()->json(['success' => false, 'message' => 'Invalid CSRF token'], 419);
         }
-
         try {
             $username = session('user')['username'] ?? null;
             $user = Dosen::where('username', $username)->first();
-
             if (!$user) {
                 return response()->json([
                     'success' => false,
                     'message' => 'You must be logged in to delete a perwalian.'
                 ], 401);
             }
-
             $selectedClass = $request->input('selectedClass');
             if (!$selectedClass) {
                 return response()->json([
@@ -499,23 +451,19 @@ class SetPerwalianController extends Controller
                     'message' => 'No class selected for deletion.'
                 ], 400);
             }
-
             $existingPerwalian = Perwalian::where('ID_Dosen_Wali', $user->nip)
                 ->where('Status', 'Scheduled')
                 ->where('kelas', $selectedClass)
                 ->first();
-
             if (!$existingPerwalian) {
                 return response()->json([
                     'success' => false,
                     'message' => 'No scheduled perwalian found for this class.'
                 ], 404);
             }
-
             Notifikasi::where('Id_Perwalian', $existingPerwalian->getKey())->delete();
             $existingPerwalian->delete();
             Log::info('Perwalian deleted for dosen NIP: ' . $user->nip . ' for class: ' . $selectedClass);
-
             $scheduledDatesByClass = [];
             $scheduledClasses = [];
             $perwalianRecords = Perwalian::where('ID_Dosen_Wali', $user->nip)
@@ -526,7 +474,6 @@ class SetPerwalianController extends Controller
                 $scheduledDatesByClass[$record->kelas][] = $date;
                 $scheduledClasses[] = $record->kelas;
             }
-
             return response()->json([
                 'success' => true,
                 'message' => 'Perwalian request deleted for class ' . $selectedClass . '. You can now create a new request.',
@@ -540,5 +487,98 @@ class SetPerwalianController extends Controller
                 'message' => 'Failed to delete Perwalian: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Show detailed histori of a completed Perwalian.
+     */
+    public function detailedHistori($id)
+    {
+        // 1. Find the Perwalian record by ID
+        $perwalian = Perwalian::find($id);
+        if (!$perwalian) {
+            return redirect()->route('dosen.histori')->with('error', 'Perwalian not found.');
+        }
+        // 2. Get all students for this Perwalian
+        $mahasiswaRecords = DB::table('mahasiswa')
+            ->where('ID_Perwalian', $perwalian->ID_Perwalian)
+            ->orderBy('nama')
+            ->get();
+        // 3. Fetch Absensi records for these students
+        $absensiRecords = DB::table('absensi')
+            ->where('ID_Perwalian', $perwalian->ID_Perwalian)
+            ->get()
+            ->keyBy('nim');
+        // Build students array with status
+        $students = [];
+        foreach ($mahasiswaRecords as $m) {
+            $status = $absensiRecords->has($m->nim) ? 'Selesai' : 'Belum';
+            $students[] = [
+                'nim' => $m->nim,
+                'nama' => $m->nama,
+                'status' => $status,
+            ];
+        }
+        // 4. Get Berita Acara record for catatan (from dosen wali)
+        $beritaAcara = DB::table('berita_acaras')
+            ->where('kelas', $perwalian->kelas)
+            ->where('tanggal_perwalian', $perwalian->Tanggal)
+            ->first();
+        $catatan = $beritaAcara->catatan_feedback ?? null;
+        // 5. Return the detailed histori blade
+        return view('dosen.detailed_histori', [
+            'perwalian' => $perwalian,
+            'students' => $students,
+            'catatan' => $catatan,
+        ]);
+    }
+
+    /**
+     * Generate and download the Perwalian PDF.
+     * The PDF will have:
+     *   - Page 1: Agenda Perwalian (details & agenda_perwalian)
+     *   - Page 2: Berita Acara Perwalian (dosen wali's report/catatan)
+     *   - Page 3 and onward: Daftar Mahasiswa Absensi
+     */
+    public function printBeritaAcara($id)
+    {
+        // 1. Find the Perwalian record by ID
+        $perwalian = Perwalian::find($id);
+        if (!$perwalian) {
+            return redirect()->route('dosen.histori')->with('error', 'Perwalian not found.');
+        }
+        // 2. Get Mahasiswa records for this Perwalian
+        $mahasiswaRecords = DB::table('mahasiswa')
+            ->where('ID_Perwalian', $perwalian->ID_Perwalian)
+            ->orderBy('nama')
+            ->get();
+        $students = [];
+        foreach ($mahasiswaRecords as $m) {
+            $students[] = [
+                'nim' => $m->nim,
+                'nama' => $m->nama,
+            ];
+        }
+        // 3. Get BeritaAcara record (dosen wali's report) if exists
+        $beritaAcara = DB::table('berita_acaras')
+            ->where('kelas', $perwalian->kelas)
+            ->where('tanggal_perwalian', $perwalian->Tanggal)
+            ->first();
+        // 4. Get Absensi records for mahasiswa (for the attendance table)
+        $absensiRecords = DB::table('absensi')
+            ->where('ID_Perwalian', $perwalian->ID_Perwalian)
+            ->get()
+            ->keyBy('nim');
+        // 5. Prepare data for the PDF view
+        $pdfData = [
+            'perwalian' => $perwalian,
+            'students'  => $students,
+            'absensi'   => $absensiRecords,
+            'beritaAcara' => $beritaAcara, // contains catatan_feedback and other info
+        ];
+        // 6. Load the PDF view (the view handles page breaks)
+        $pdf = PDF::loadView('dosen.berita_acara_pdf', $pdfData)
+            ->setPaper('a4', 'portrait');
+        return $pdf->download('Perwalian_' . $perwalian->kelas . '_' . $perwalian->Tanggal . '.pdf');
     }
 }
