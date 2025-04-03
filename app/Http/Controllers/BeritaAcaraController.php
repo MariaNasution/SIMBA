@@ -34,7 +34,6 @@ class BeritaAcaraController extends Controller
         $completedPerwalians = Perwalian::whereIn('kelas', $classes)
             ->where('ID_Dosen_Wali', $user['nip'])
             ->where('Status', 'Completed')
-            ->where('Tanggal', '<=', now()->format('Y-m-d'))
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
                     ->from('absensi')
@@ -52,6 +51,7 @@ class BeritaAcaraController extends Controller
                 return [
                     'class' => $perwalian->kelas,
                     'date' => $perwalian->Tanggal,
+                    'angkatan' => $perwalian->angkatan,
                     'display' => "Kelas {$perwalian->kelas} - " . Carbon::parse($perwalian->Tanggal)->translatedFormat('l, d F Y'),
                 ];
             })->toArray();
@@ -60,7 +60,6 @@ class BeritaAcaraController extends Controller
             'count' => count($completedPerwalians),
             'data' => $completedPerwalians
         ]);
-
         return view('perwalian.berita_acara_select_class', compact('completedPerwalians'));
     }
 
@@ -70,9 +69,9 @@ class BeritaAcaraController extends Controller
         if (!$user) {
             return redirect()->route('login')->withErrors(['error' => 'Anda harus login untuk mengakses berita acara.']);
         }
-
         $selectedClass = $request->query('kelas');
         $selectedDate = $request->query('tanggal_perwalian');
+        $selectedAngkatan = $request->query('angkatan');
 
         if (!$selectedClass || !$selectedDate) {
             return redirect()->route('berita_acara.select_class')->withErrors(['error' => 'Kelas dan tanggal perwalian harus dipilih.']);
@@ -83,7 +82,6 @@ class BeritaAcaraController extends Controller
             ->where('Tanggal', $selectedDate)
             ->where('ID_Dosen_Wali', $user['nip'])
             ->where('Status', 'Completed')
-            ->where('Tanggal', '<=', now()->format('Y-m-d'))
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
                     ->from('absensi')
@@ -97,7 +95,6 @@ class BeritaAcaraController extends Controller
                     ->where('berita_acaras.user_id', $user['user_id']);
             })
             ->first();
-
         if (!$perwalian) {
             return redirect()->route('berita_acara.select_class')->withErrors(['error' => 'Perwalian ini tidak valid atau sudah memiliki berita acara.']);
         }
@@ -112,7 +109,7 @@ class BeritaAcaraController extends Controller
             'count' => $absensiRecords->count()
         ]);
 
-        return view('perwalian.berita_acara', compact('selectedClass', 'selectedDate', 'absensiRecords', 'perwalian'));
+        return view('perwalian.berita_acara', compact('selectedClass', 'selectedDate', 'selectedAngkatan', 'absensiRecords', 'perwalian'));
     }
 
     public function store(Request $request)
@@ -122,6 +119,12 @@ class BeritaAcaraController extends Controller
             return response()->json(['success' => false, 'message' => 'Anda harus login untuk membuat berita acara.'], 401);
         }
 
+        // Log the incoming request data
+        Log::info('Store request received in BeritaAcaraController', [
+            'request_data' => $request->all(),
+            'user' => $user,
+        ]);
+
         $selectedClass = $request->kelas;
         $selectedDate = $request->tanggal_perwalian;
 
@@ -130,7 +133,6 @@ class BeritaAcaraController extends Controller
             ->where('Tanggal', $selectedDate)
             ->where('ID_Dosen_Wali', $user['nip'])
             ->where('Status', 'Completed')
-            ->where('Tanggal', '<=', now()->format('Y-m-d'))
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
                     ->from('absensi')
@@ -144,6 +146,15 @@ class BeritaAcaraController extends Controller
                     ->where('berita_acaras.user_id', $user['user_id']);
             })
             ->first();
+
+        // Log the result of the Perwalian query
+        Log::info('Perwalian check in store method', [
+            'selectedClass' => $selectedClass,
+            'selectedDate' => $selectedDate,
+            'user_nip' => $user['nip'],
+            'perwalian_found' => $perwalian ? true : false,
+            'perwalian_data' => $perwalian ? $perwalian->toArray() : null,
+        ]);
 
         if (!$perwalian) {
             return response()->json([
@@ -159,7 +170,6 @@ class BeritaAcaraController extends Controller
                 'required',
                 'date',
                 'date_format:Y-m-d',
-                'before_or_equal:' . now()->format('Y-m-d'),
             ],
             'perihal_perwalian' => 'required|string|max:255',
             'agenda' => 'required|string',
@@ -167,14 +177,6 @@ class BeritaAcaraController extends Controller
                 'required',
                 'date',
                 'date_format:Y-m-d',
-                'after_or_equal:2025-01-01',
-                'before_or_equal:2027-12-31',
-                function ($attribute, $value, $fail) {
-                    $selectedDate = Carbon::parse($value);
-                    if ($selectedDate->isBefore(now()->startOfDay())) {
-                        $fail('Hari/tanggal feedback tidak boleh di masa lalu.');
-                    }
-                },
             ],
             'perihal2' => 'nullable|string|max:255',
             'catatan' => 'nullable|string',
@@ -182,14 +184,6 @@ class BeritaAcaraController extends Controller
                 'required',
                 'date',
                 'date_format:Y-m-d',
-                'after_or_equal:2025-01-01',
-                'before_or_equal:2027-12-31',
-                function ($attribute, $value, $fail) {
-                    $selectedDate = Carbon::parse($value);
-                    if ($selectedDate->isBefore(now()->startOfDay())) {
-                        $fail('Tanggal tanda tangan tidak boleh di masa lalu.');
-                    }
-                },
             ],
             'dosen_wali_ttd' => 'required|string|max:255',
         ]);
@@ -209,7 +203,7 @@ class BeritaAcaraController extends Controller
                 'dosen_wali_ttd' => $request->dosen_wali_ttd,
                 'user_id' => $user['user_id'],
             ]);
-
+            Log::info("Value of berita acara", ['berita_acara' => $beritaAcara->toArray()]);
             return response()->json([
                 'success' => true,
                 'message' => 'Berita acara berhasil disimpan.',

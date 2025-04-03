@@ -23,6 +23,9 @@ class DosenController extends Controller
         $nip = session('user')['username'];
         $baseUrl = 'https://cis-dev.del.ac.id';
         $studentsByYear = [];
+        $classesByYear = [];
+        $prodisByYear = [];
+
         $academicYears = [2020];
         $currentSem = 2;
 
@@ -80,6 +83,9 @@ class DosenController extends Controller
                         ]);
 
                     $studentsByYear[$year] = [];
+                    $classesByYear[$year] = []; // Initialize an array for this year
+                    $prodisByYear[$year] = [];
+
                     if ($mahasiswaResponse->successful()) {
                         $responseData = $mahasiswaResponse->json();
 
@@ -89,12 +95,16 @@ class DosenController extends Controller
                             foreach ($classes as $classData) {
                                 $kelas = $classData['kelas'] ?? null;
                                 $students = $classData['anak_wali'] ?? [];
-                                $classStudents = [];
 
                                 if (is_null($kelas) || empty($kelas)) {
                                     Log::warning("Class name missing for year {$year}", ['classData' => $classData]);
                                     continue;
                                 }
+
+                                // Add the class to classesByYear for this year
+                              
+
+                                $classStudents = [];
 
                                 if (!is_array($students)) {
                                     Log::error("anak_wali is not an array for class {$kelas} in year {$year}", ['anak_wali' => $students]);
@@ -174,6 +184,8 @@ class DosenController extends Controller
                                 }
 
                                 $studentsByYear[$year][$kelas] = $classStudents;
+
+                                $prodisByYear[$year][$kelas] = $this->kelasToProdi($kelas) ?? null;
                             }
                         }
                     } else {
@@ -194,7 +206,9 @@ class DosenController extends Controller
             }
         }
 
-        return view('beranda.homeDosen', compact('studentsByYear', 'perwalianAnnouncement'));
+        // Debug output to check the structure of classesByYear
+
+        return view('beranda.homeDosen', compact('studentsByYear', 'prodisByYear', 'perwalianAnnouncement'));
     }
 
     public function showDetailedClass($year, $kelas)
@@ -474,17 +488,17 @@ class DosenController extends Controller
 
     private function checkPerwalian($dosenId, $apiToken, $baseUrl)
     {
+        $user = session(('user'));
         try {
-            $perwalian = Perwalian::where('ID_Dosen_Wali', $dosenId)
-                ->where('Status', 'ongoing')
-                ->orWhere('Tanggal', '>=', now()->toDateString())
-                ->get();
+            $perwalian = Perwalian::where('ID_Dosen_Wali', $user['nip'])
+            ->where('Status', 'Scheduled')
+            ->get();
 
             if ($perwalian->isNotEmpty()) {
                 $announcements = [];
                 foreach ($perwalian as $p) {
                     $date = \Carbon\Carbon::parse($p->Tanggal)->format('D, d/m/Y');
-                    $announcements[] = "Jadwal Perwalian classes 13 IF 1 ({$date})";
+                    $announcements[] = "Jadwal Perwalian untuk kelas {$p->kelas}({$date})";
                 }
                 return implode("\n", $announcements);
             }
@@ -494,5 +508,29 @@ class DosenController extends Controller
             Log::error('Error checking perwalian:', ['message' => $e->getMessage()]);
             return null;
         }
+    }
+
+    private function kelasToProdi($kelas) {
+        // Step 1: Remove the first 2 characters (e.g., "11" in "11TRPL2")
+        $prodi = substr($kelas, 2);
+    
+        // Step 2: Remove any trailing numbers (e.g., "2" in "TRPL2")
+        $prodi = preg_replace('/\d+$/', '', $prodi);
+    
+        // Step 3: Map the prodi code to its full name
+        $prodiMap = [
+            'IF' => 'Informatika',
+            'TRPL' => 'Teknik Rekayasa Perangkat Lunak',
+            'TK' => 'Teknik Komputer',
+            'TI' => 'Teknik Informasi',
+            'TB' => 'Teknik Bioproses',
+            'TM' => 'Teknik Metalurgi',
+            'SI' => 'Sistem Informasi',
+            'TE' => 'Teknik Elektro',
+            'MR' => 'Manajemen Rekayasa',
+        ];
+    
+        // Return the full name if the prodi code exists in the map, otherwise return the code as-is
+        return $prodiMap[$prodi] ?? $prodi;
     }
 }

@@ -26,7 +26,7 @@
         <!-- Class and Perwalian Buttons -->
         <div class="am-class-buttons">
             @forelse ($completedPerwalians as $perwalian)
-                <a href="{{ route('berita_acara.create', ['kelas' => $perwalian['class'], 'tanggal_perwalian' => $perwalian['date']]) }}"
+                <a href="{{ route('berita_acara.create', ['kelas' => $perwalian['class'], 'tanggal_perwalian' => $perwalian['date'], 'angkatan' => $perwalian['angkatan'] ]) }}"
                    class="am-class-btn">
                     {{ $perwalian['display'] }}
                 </a>

@@ -14,6 +14,7 @@ class CreatePerwalianTable extends Migration
             $table->enum('Status', ['Scheduled', 'Completed', 'Canceled']);
             $table->string('nama');
             $table->string('kelas');
+            $table->string('angkatan');
             $table->date('Tanggal');
             $table->timestamps();
 

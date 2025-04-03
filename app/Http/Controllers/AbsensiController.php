@@ -42,7 +42,10 @@ class AbsensiController extends Controller
 
         // Fetch Perwalian records to get the list of classes
         try {
-            $perwalianRecords = Perwalian::where('Status', 'Scheduled')->get();
+            
+            $perwalianRecords = Perwalian::where('ID_Dosen_Wali', $dosen['nip'])
+            ->where('Status', 'Scheduled')
+            ->get();
             Log::info('Perwalian records fetched', [
                 'count' => $perwalianRecords->count(),
                 'records' => $perwalianRecords->toArray(),

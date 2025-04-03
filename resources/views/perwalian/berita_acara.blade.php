@@ -104,7 +104,7 @@
             <h3 class="fw-bold title-centered">AGENDA PERWALIAN</h3>
 
             <form id="beritaAcaraForm" onsubmit="handleFormSubmit(event)">
-                @csrf
+            @csrf
                 <div class="text-start mt-4">
                     <div class="info-container">
                         <div class="info-row">
@@ -113,7 +113,7 @@
                         </div>
                         <div class="info-row">
                             <strong class="info-label-large">Angkatan</strong><span>:</span>
-                            <input type="number" name="angkatan" value="{{ old('angkatan') }}" class="editable-input" required oninput="showFieldFeedback('Angkatan', this)">
+                            <input type="number" name="angkatan" value="{{ $selectedAngkatan ?? '' }}" class="editable-input" required oninput="showFieldFeedback('Angkatan', this)">
                         </div>
                         <div class="info-row">
                             <strong class="info-label-large">Dosen Wali</strong><span>:</span>
@@ -121,7 +121,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="berita-acara-box">
                     <div class="info-container">
                         <div class="info-row">
@@ -154,7 +153,7 @@
                     <div class="info-container">
                         <div class="info-row">
                             <span class="info-label">Hari/Tanggal</span><span>:</span>
-                            <input type="date" name="hari_tanggal" value="{{ old('hari_tanggal') }}" class="editable-input" min="2025-01-01" max="2027-12-31" required oninput="showFieldFeedback('Hari/Tanggal Feedback', this)">
+                            <input type="date" name="hari_tanggal" value="{{ old('hari_tanggal') }}" class="editable-input" required oninput="showFieldFeedback('Hari/Tanggal Feedback', this)">
                         </div>
                         <div class="info-row">
                             <span class="info-label">Perihal Feedback</span><span>:</span>
@@ -169,7 +168,7 @@
 
                 <div class="signature-box">
                     <p>
-                        Sitoluama, <input type="date" name="tanggal_ttd" value="{{ old('tanggal_ttd') }}" class="editable-input" min="2025-01-01" max="2027-12-31" required oninput="showFieldFeedback('Tanggal Tanda Tangan', this)">
+                        Sitoluama, <input type="date" name="tanggal_ttd" value="{{ old('tanggal_ttd') }}" class="editable-input" required oninput="showFieldFeedback('Tanggal Tanda Tangan', this)">
                     </p>
                     <br><br><br>
                     <p><input type="text" name="dosen_wali_ttd" value="({{ session('user')['username'] ?? 'Nama Tidak Ditemukan' }})" class="editable-input" required oninput="showFieldFeedback('Dosen Wali TTD', this)"></p>
@@ -251,7 +250,10 @@
 
         function showFieldFeedback(fieldName, element) {
             if (element.value.trim()) {
-                showFeedback(`${fieldName} diisi: ${element.value}`, 'success');
+                const message = element.type === 'date'
+                    ? `${fieldName} diisi: ${new Date(element.value).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}`
+                    : `${fieldName} diisi: ${element.value}`;
+                showFeedback(message, 'success');
             } else {
                 showFeedback(`${fieldName} dikosongkan.`, 'danger');
             }
@@ -270,6 +272,11 @@
 
             const formData = new FormData(form);
 
+            // Log the form data for debugging
+            for (let [key, value] of formData.entries()) {
+                console.log(`${key}: ${value}`);
+            }
+
             fetch(storeRoute, {
                 method: 'POST',
                 body: formData,
@@ -279,8 +286,12 @@
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                 },
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json();
+            })
             .then(data => {
+                console.log('Response data:', data);
                 submitButton.disabled = false;
                 buttonText.classList.remove('d-none');
                 buttonLoading.classList.add('d-none');

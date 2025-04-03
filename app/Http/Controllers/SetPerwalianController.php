@@ -352,6 +352,7 @@ class SetPerwalianController extends Controller
 
     public function store(Request $request)
     {
+        
         Log::info('Store request received', ['request' => $request->all(), 'headers' => $request->headers->all()]);
         if (!$request->hasHeader('X-CSRF-TOKEN') || $request->session()->token() !== $request->header('X-CSRF-TOKEN')) {
             Log::error('CSRF token mismatch in store', [
@@ -360,7 +361,6 @@ class SetPerwalianController extends Controller
             ]);
             return response()->json(['success' => false, 'message' => 'Invalid CSRF token'], 419);
         }
-
         $validatedData = $request->validate([
             'selectedDate' => [
                 'required',
@@ -401,13 +401,18 @@ class SetPerwalianController extends Controller
                 ], 400);
             }
 
+            $year = 2021 - substr($validatedData['selectedClass'], 1, 1);
+            
             $perwalian = Perwalian::create([
                 'ID_Dosen_Wali' => $user->nip,
                 'Tanggal' => Carbon::parse($validatedData['selectedDate'])->format('Y-m-d'),
                 'Status' => 'Scheduled',
                 'nama' => $user->nama,
                 'kelas' => $validatedData['selectedClass'],
+                'angkatan' => $year,
             ]);
+
+           
 
             if (!$perwalian) {
                 Log::error('Failed to create Perwalian record');
