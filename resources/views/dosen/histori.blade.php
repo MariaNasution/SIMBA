@@ -27,8 +27,9 @@
       <h2>Semester Baru</h2>
       @forelse ($semesterBaru as $item)
         <div class="item">
-          {{-- Example: "Senin, 20 Februari 2025 (13 IF1)" --}}
-          {{ \Carbon\Carbon::parse($item->Tanggal)->translatedFormat('l, d F Y') }} ({{ $item->kelas }})
+          <a href="{{ route('dosen.histori.detailed', $item->ID_Perwalian) }}" class="text-decoration-none">
+            {{ \Carbon\Carbon::parse($item->Tanggal)->translatedFormat('l, d F Y') }} ({{ $item->kelas }})
+          </a>
         </div>
       @empty
         <div class="item">No data</div>
@@ -40,7 +41,9 @@
       <h2>Sebelum UTS</h2>
       @forelse ($sebelumUts as $item)
         <div class="item">
-          {{ \Carbon\Carbon::parse($item->Tanggal)->translatedFormat('l, d F Y') }} ({{ $item->kelas }})
+          <a href="{{ route('dosen.histori.detailed', $item->ID_Perwalian) }}" class="text-decoration-none">
+            {{ \Carbon\Carbon::parse($item->Tanggal)->translatedFormat('l, d F Y') }} ({{ $item->kelas }})
+          </a>
         </div>
       @empty
         <div class="item">No data</div>
@@ -52,7 +55,9 @@
       <h2>Sebelum UAS</h2>
       @forelse ($sebelumUas as $item)
         <div class="item">
-          {{ \Carbon\Carbon::parse($item->Tanggal)->translatedFormat('l, d F Y') }} ({{ $item->kelas }})
+          <a href="{{ route('dosen.histori.detailed', $item->ID_Perwalian) }}" class="text-decoration-none">
+            {{ \Carbon\Carbon::parse($item->Tanggal)->translatedFormat('l, d F Y') }} ({{ $item->kelas }})
+          </a>
         </div>
       @empty
         <div class="item">No data</div>
@@ -72,11 +77,9 @@
 
     body {
       font-family: sans-serif;
-      /* Light background to mimic the wavy pattern (replace with an actual image/SVG if needed) */
       background: linear-gradient(135deg, #f6f9fc 0%, #eef4fb 100%);
     }
 
-    /* Top Header / Navigation */
     .header {
       display: flex;
       justify-content: space-between;
@@ -90,7 +93,6 @@
       font-size: 1.5rem;
     }
 
-    /* Search container (right side) */
     .search-container {
       display: flex;
       align-items: center;
@@ -143,6 +145,11 @@
       font-size: 0.95rem;
       color: #333;
       text-align: center;
+    }
+
+    /* Optional: style links inside .item */
+    .item a {
+      color: #333;
     }
   </style>
 @endsection

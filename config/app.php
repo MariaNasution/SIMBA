@@ -95,6 +95,7 @@ return [
     |
     */
 
+
     'cipher' => 'AES-256-CBC',
 
     'key' => env('APP_KEY'),
@@ -185,6 +186,7 @@ return [
     */
 
     'aliases' => [
+        'PDF' => Barryvdh\DomPDF\Facade\Pdf::class,
         'App' => Illuminate\Support\Facades\App::class,
         'Arr' => Illuminate\Support\Arr::class,
         'Artisan' => Illuminate\Support\Facades\Artisan::class,
