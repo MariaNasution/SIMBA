@@ -4,25 +4,21 @@
 
 <!-- Tambahan CSS untuk animasi dropdown, perbaikan tampilan "Pembinaan:" dan animasi isi tabel -->
 <style>
-  /* Animasi transisi untuk container collapse (dropdown) */
-  .collapse {
+  /* Animasi transisi untuk container collapse (dropdown) dengan wrapper .collapse-content */
+  .collapse-content {
     overflow: hidden;
     transition: max-height 0.5s ease;
-  }
-  .collapse.show {
-    max-height: 1000px; /* Sesuaikan nilai sesuai kebutuhan */
-  }
-  .collapse:not(.show) {
     max-height: 0;
   }
-
-  /* Animasi untuk isi konten tabel (fade in dan slide down) */
-  .collapse .p-3 {
+  .collapse.show .collapse-content {
+    max-height: 1000px; /* Sesuaikan nilai sesuai kebutuhan */
+  }
+  .collapse-content.p-3 {
     opacity: 0;
     transform: translateY(-10px);
     transition: opacity 0.5s ease, transform 0.5s ease;
   }
-  .collapse.show .p-3 {
+  .collapse.show .collapse-content.p-3 {
     opacity: 1;
     transform: translateY(0);
   }
@@ -109,9 +105,9 @@
       
       <!-- Collapsible Detail Row -->
       <tr class="collapse" id="details{{ $key }}">
-        <td colspan="7">
-          <div class="p-3">
-            <!-- Header Pembinaan dengan styling -->
+        <td colspan="7" class="p-0 border-0">
+          <div class="collapse-content p-3">
+            <!-- Header Pembinaan -->
             <div class="pembinaan-header">
               <span>Pembinaan:</span>
             </div>
@@ -127,7 +123,7 @@
               </div>
             </div>
             
-            <!-- Pelanggaran Section -->
+            <!-- Section Pelanggaran -->
             @php
               $hasPelanggaran = count($perilaku['pelanggaran'] ?? []) > 0;
               $pelanggaranColspan = $hasPelanggaran ? 7 : 6;
@@ -149,64 +145,67 @@
                 </thead>
                 <tbody>
                   @php $pelanggaranIndex = 1; @endphp
-@forelse ($perilaku['pelanggaran'] ?? [] as $pelanggaran)
-    <!-- Display Row -->
-    <tr id="displayRowPelanggaran{{ $pelanggaran['id'] }}">
-        <td style="width: 5%;">{{ $pelanggaranIndex++ }}</td>
-        <td>{{ $pelanggaran['pelanggaran'] ?? '-' }}</td>
-        <td style="width: 115px;">{{ $pelanggaran['unit'] ?? '-' }}</td>
-        <td>{{ $pelanggaran['tanggal'] ?? '-' }}</td>
-        <td style="width: 70px;">{{ $pelanggaran['poin'] ?? 0 }}</td>
-        <td>{{ $pelanggaran['tindakan'] ?? '-' }}</td>
-        <td>
-            @if (isset($pelanggaran['id']))
-                <!-- Tombol Edit -->
-                <button type="button" class="btn btn-outline-primary btn-sm" title="Edit" onclick="toggleEditForm('Pelanggaran', {{ $pelanggaran['id'] }})">
-                    <i class="fas fa-pencil-alt"></i>
-                </button>
-                <!-- Tombol Delete -->
-                <button type="button" class="btn btn-outline-danger btn-sm delete-btn" 
-                    data-id="{{ $pelanggaran['id'] }}" 
-                    data-url="{{ route('student_behaviors.destroy', $pelanggaran['id']) }}" 
-                    data-type="pelanggaran" 
-                    title="Delete">
-                    <i class="fas fa-trash"></i>
-                </button>
-            @endif
-        </td>
-    </tr>
+                  @foreach ($perilaku['pelanggaran'] ?? [] as $keyPelanggaran => $pelanggaran)
+                    @php
+                        $recordId = $pelanggaran['id'] ?? null;
+                        $uniqueId = $recordId ? $recordId : 'api_' . $keyPelanggaran;
+                    @endphp
 
-    <!-- Inline Edit Form Row (hidden secara default) -->
-    <tr id="editFormPelanggaran{{ $pelanggaran['id'] }}" style="display: none;">
-        <form action="{{ route('student_behaviors.update', $pelanggaran['id']) }}" method="POST">
-            @csrf
-            <td style="width: 5%;">{{ $pelanggaranIndex - 1 }}</td>
-            <td>
-                <textarea name="pelanggaran" class="form-control" required>{{ old('pelanggaran', $pelanggaran['pelanggaran']) }}</textarea>
-            </td>
-            <td style="width: 115px;">
-                <input type="text" name="unit" class="form-control" value="{{ old('unit', $pelanggaran['unit']) }}">
-            </td>
-            <td>
-              <input type="date" name="tanggal" class="form-control tanggal" value="{{ old('tanggal', $pelanggaran['tanggal']) }}">
-            </td>
-            <td style="width: 70px;">
-                <input type="number" name="poin" class="form-control" value="{{ old('poin', $pelanggaran['poin']) }}" min="1" max="100">
-            </td>
-            <td>
-                <textarea name="tindakan" class="form-control">{{ old('tindakan', $pelanggaran['tindakan']) }}</textarea>
-            </td>
-            <td>
-                <button type="submit" class="btn btn-success btn-sm" title="Simpan"><i class="fas fa-save"></i></button>
-                <button type="button" class="btn btn-secondary btn-sm" title="Batal" onclick="toggleEditForm('Pelanggaran', {{ $pelanggaran['id'] }})"><i class="fas fa-times"></i></button>
-            </td>
-        </form>
-    </tr>
-@empty
-    <tr>
-        <td colspan="{{ $pelanggaranColspan }}" class="no-results">No results found.</td>
-    </tr>
-@endforelse
+                    <!-- Display Row -->
+                    <tr id="displayRowPelanggaran{{ $uniqueId }}">
+                        <td style="width: 5%;">{{ $pelanggaranIndex++ }}</td>
+                        <td>{{ $pelanggaran['pelanggaran'] ?? '-' }}</td>
+                        <td style="width: 115px;">{{ $pelanggaran['unit'] ?? '-' }}</td>
+                        <td>{{ $pelanggaran['tanggal'] ?? '-' }}</td>
+                        <td style="width: 70px;">{{ $pelanggaran['poin'] ?? 0 }}</td>
+                        <td>{{ $pelanggaran['tindakan'] ?? '-' }}</td>
+                        <td>
+                            @if($recordId)
+                                <button type="button" class="btn btn-outline-primary btn-sm" title="Edit" onclick="toggleEditForm('Pelanggaran', {{ $recordId }})">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-danger btn-sm delete-btn" 
+                                    data-id="{{ $recordId }}" 
+                                    data-url="{{ route('student_behaviors.destroy', $recordId) }}" 
+                                    data-type="pelanggaran" 
+                                    title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            @endif
+                        </td>
+                    </tr>
+
+                    @if($recordId)
+                    <!-- Inline Edit Form Row -->
+                    <tr id="editFormPelanggaran{{ $recordId }}" style="display: none;">
+                        <form action="{{ route('student_behaviors.update', $recordId) }}" method="POST">
+                            @csrf
+                            <td style="width: 5%;">{{ $pelanggaranIndex - 1 }}</td>
+                            <td>
+                                <textarea name="pelanggaran" class="form-control" required>{{ old('pelanggaran', $pelanggaran['pelanggaran']) }}</textarea>
+                            </td>
+                            <td style="width: 115px;">
+                                <input type="text" name="unit" class="form-control" value="{{ old('unit', $pelanggaran['unit']) }}">
+                            </td>
+                            <td>
+                              <input type="date" name="tanggal" class="form-control tanggal" max="{{ date('Y-m-d') }}" value="{{ old('tanggal', $pelanggaran['tanggal']) }}">
+                            </td>
+                            <td style="width: 70px;">
+                              <input type="number" name="poin" class="form-control" value="{{ old('poin', $pelanggaran['poin']) }}" min="1" max="99"
+                                     oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,2);"
+                                     onblur="if(this.value < 1){this.value = 1;} else if(this.value > 99){this.value = 99;}">
+                            </td>
+                            <td>
+                                <textarea name="tindakan" class="form-control">{{ old('tindakan', $pelanggaran['tindakan']) }}</textarea>
+                            </td>
+                            <td>
+                                <button type="submit" class="btn btn-success btn-sm" title="Simpan"><i class="fas fa-save"></i></button>
+                                <button type="button" class="btn btn-secondary btn-sm" title="Batal" onclick="toggleEditForm('Pelanggaran', {{ $recordId }})"><i class="fas fa-times"></i></button>
+                            </td>
+                        </form>
+                    </tr>
+                    @endif
+                  @endforeach
                   
                   <!-- Plus Sign Row untuk Pelanggaran -->
                   <tr id="plusRow{{ $key }}">
@@ -264,7 +263,7 @@
               </table>
             </div>
             
-            <!-- Perbuatan Baik Section -->
+            <!-- Section Perbuatan Baik -->
             @php
               $hasPerbuatanBaik = count($perilaku['perbuatan_baik'] ?? []) > 0;
               $perbuatanBaikColspan = $hasPerbuatanBaik ? 7 : 6;
@@ -286,63 +285,64 @@
                 </thead>
                 <tbody>
                   @php $perbuatanBaikIndex = 1; @endphp
-@forelse ($perilaku['perbuatan_baik'] ?? [] as $perbuatan)
-    <!-- Display Row -->
-    <tr id="displayRowPerbuatanBaik{{ $perbuatan['id'] }}">
-        <td style="width: 5%;">{{ $perbuatanBaikIndex++ }}</td>
-        <td>{{ $perbuatan['perbuatan_baik'] ?? '-' }}</td>
-        <td>{{ $perbuatan['tindakan'] ?? '-' }}</td>
-        <td style="width: 50px;">{{ $perbuatan['poin'] ?? 0 }}</td>
-        <td style="width: 115px;">{{ $perbuatan['unit'] ?? '-' }}</td>
-        <td>{{ $perbuatan['tanggal'] ?? '-' }}</td>
-        <td>
-            @if (isset($perbuatan['id']))
-                <button type="button" class="btn btn-outline-primary btn-sm" title="Edit" onclick="toggleEditForm('PerbuatanBaik', {{ $perbuatan['id'] }})">
-                    <i class="fas fa-pencil-alt"></i>
-                </button>
-                <button type="button" class="btn btn-outline-danger btn-sm delete-btn" 
-                    data-id="{{ $perbuatan['id'] }}" 
-                    data-url="{{ route('student_behaviors.destroy', $perbuatan['id']) }}" 
-                    data-type="perbuatan_baik" 
-                    title="Delete">
-                    <i class="fas fa-trash"></i>
-                </button>
-            @endif
-        </td>
-    </tr>
+                  @forelse ($perilaku['perbuatan_baik'] ?? [] as $perbuatan)
+                    <!-- Display Row -->
+                    <tr id="displayRowPerbuatanBaik{{ $perbuatan['id'] }}">
+                      <td style="width: 5%;">{{ $perbuatanBaikIndex++ }}</td>
+                      <td>{{ $perbuatan['perbuatan_baik'] ?? '-' }}</td>
+                      <td>{{ $perbuatan['tindakan'] ?? '-' }}</td>
+                      <td style="width: 50px;">{{ $perbuatan['poin'] ?? 0 }}</td>
+                      <td style="width: 115px;">{{ $perbuatan['unit'] ?? '-' }}</td>
+                      <td>{{ $perbuatan['tanggal'] ?? '-' }}</td>
+                      <td>
+                          @if (isset($perbuatan['id']))
+                              <button type="button" class="btn btn-outline-primary btn-sm" title="Edit" onclick="toggleEditForm('PerbuatanBaik', {{ $perbuatan['id'] }})">
+                                  <i class="fas fa-pencil-alt"></i>
+                              </button>
+                              <button type="button" class="btn btn-outline-danger btn-sm delete-btn" 
+                                  data-id="{{ $perbuatan['id'] }}" 
+                                  data-url="{{ route('student_behaviors.destroy', $perbuatan['id']) }}" 
+                                  data-type="perbuatan_baik" 
+                                  title="Delete">
+                                  <i class="fas fa-trash"></i>
+                              </button>
+                          @endif
+                      </td>
+                    </tr>
 
-    <!-- Inline Edit Form Row (hidden secara default) -->
-    <tr id="editFormPerbuatanBaik{{ $perbuatan['id'] }}" style="display: none;">
-        <form action="{{ route('student_behaviors.update', $perbuatan['id']) }}" method="POST">
-            @csrf
-            <td style="width: 5%;">{{ $perbuatanBaikIndex - 1 }}</td>
-            <td>
-                <textarea name="perbuatan_baik" class="form-control" required>{{ old('perbuatan_baik', $perbuatan['perbuatan_baik']) }}</textarea>
-            </td>
-            <td>
-                <textarea name="keterangan" class="form-control">{{ old('keterangan', $perbuatan['keterangan'] ?? '') }}</textarea>
-            </td>
-            <td style="width: 50px;">
-                <input type="number" name="kredit_poin" class="form-control" value="{{ old('kredit_poin', $perbuatan['poin']) }}" min="1" max="100">
-            </td>
-            <td style="width: 115px;">
-                <input type="text" name="unit" class="form-control" value="{{ old('unit', $perbuatan['unit']) }}">
-            </td>
-            <td>
-              <input type="date" name="tanggal" class="form-control tanggal" value="{{ old('tanggal', $perbuatan['tanggal']) }}">
-            </td>
-            <td>
-                <button type="submit" class="btn btn-success btn-sm" title="Simpan"><i class="fas fa-save"></i></button>
-                <button type="button" class="btn btn-secondary btn-sm" title="Batal" onclick="toggleEditForm('PerbuatanBaik', {{ $perbuatan['id'] }})"><i class="fas fa-times"></i></button>
-            </td>
-        </form>
-    </tr>
-@empty
-    <tr>
-        <td colspan="{{ $perbuatanBaikColspan }}" class="no-results">No results found.</td>
-    </tr>
-@endforelse
-
+                    <!-- Inline Edit Form Row -->
+                    <tr id="editFormPerbuatanBaik{{ $perbuatan['id'] }}" style="display: none;">
+                        <form action="{{ route('student_behaviors.update', $perbuatan['id']) }}" method="POST">
+                            @csrf
+                            <td style="width: 5%;">{{ $perbuatanBaikIndex - 1 }}</td>
+                            <td>
+                                <textarea name="perbuatan_baik" class="form-control" required>{{ old('perbuatan_baik', $perbuatan['perbuatan_baik']) }}</textarea>
+                            </td>
+                            <td>
+                                <textarea name="keterangan" class="form-control">{{ old('keterangan', $perbuatan['keterangan'] ?? '') }}</textarea>
+                            </td>
+                            <td style="width: 50px;">
+                              <input type="number" name="kredit_poin" class="form-control" value="{{ old('kredit_poin', $perbuatan['poin']) }}" min="1" max="99"
+                              oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,2);"
+                              onblur="if(this.value < 1){this.value = 1;} else if(this.value > 99){this.value = 99;}">       
+                            </td>
+                            <td style="width: 115px;">
+                                <input type="text" name="unit" class="form-control" value="{{ old('unit', $perbuatan['unit']) }}">
+                            </td>
+                            <td>
+                              <input type="date" name="tanggal" class="form-control tanggal" max="{{ date('Y-m-d') }}" value="{{ old('tanggal', $perbuatan['tanggal']) }}">
+                            </td>
+                            <td>
+                                <button type="submit" class="btn btn-success btn-sm" title="Simpan"><i class="fas fa-save"></i></button>
+                                <button type="button" class="btn btn-secondary btn-sm" title="Batal" onclick="toggleEditForm('PerbuatanBaik', {{ $perbuatan['id'] }})"><i class="fas fa-times"></i></button>
+                            </td>
+                        </form>
+                    </tr>
+                  @empty
+                    <tr>
+                      <td colspan="{{ $perbuatanBaikColspan }}" class="no-results">No results found.</td>
+                    </tr>
+                  @endforelse
                   
                   <!-- Plus Sign Row untuk Perbuatan Baik -->
                   <tr id="plusRowPB{{ $key }}">
@@ -381,7 +381,6 @@
                       <td>
                         <input type="date" name="tanggal" class="form-control tanggal" required>
                       </td>
-
                       @if($hasPerbuatanBaik)
                         <td></td>
                       @endif
@@ -429,16 +428,6 @@
   });
 </script>
 
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    let today = new Date().toISOString().split("T")[0];
-
-    document.querySelectorAll(".tanggal").forEach(function (input) {
-      input.setAttribute("max", today);
-    });
-  });
-</script>
-
 <!-- Include SweetAlert2 dari CDN -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -467,94 +456,162 @@ function toggleForm(formRowId, plusRowId) {
   }
 }
 
-// Fungsi untuk menampilkan/menghilangkan tabel detail dan mengatur animasi arrow
-function showTable(tableId, activeBoxId, inactiveBoxId, dropdownIcon) {
-  // Sembunyikan semua tabel detail terlebih dahulu
-  document.querySelectorAll('[id^="pelanggaranTable"], [id^="perbuatanBaikTable"]').forEach(function(table) {
+function toggleEditForm(prefix, id) {
+  var displayRow = document.getElementById('displayRow' + prefix + id);
+  var editRow = document.getElementById('editForm' + prefix + id);
+  if (editRow.style.display === 'none' || editRow.style.display === '') {
+    editRow.style.display = 'table-row';
+    displayRow.style.display = 'none';
+    updateTanggalMax();
+  } else {
+    editRow.style.display = 'none';
+    displayRow.style.display = 'table-row';
+  }
+}
+
+function updateTanggalMax() {
+  let today = new Date().toISOString().split("T")[0];
+  document.querySelectorAll(".tanggal").forEach(function (input) {
+    input.setAttribute("max", today);
+    if (input.value && input.value > today) {
+      input.value = today;
+    }
+  });
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  updateTanggalMax();
+  document.addEventListener("change", function(e) {
+    if (e.target.classList.contains("tanggal")) {
+      let today = new Date().toISOString().split("T")[0];
+      if(e.target.value > today) {
+        alert("Tanggal tidak boleh melebihi hari ini.");
+        e.target.value = today;
+      }
+    }
+  });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Loop melalui semua tombol dropdown
+  document.querySelectorAll('.dropdown-icon').forEach(function(dropdown) {
+    const target = dropdown.getAttribute('data-bs-target');
+    const collapseElement = document.querySelector(target);
+
+    // Event listener saat dropdown dibuka
+    collapseElement.addEventListener('show.bs.collapse', function() {
+      toggleDropdownIcon(dropdown, true); // Ikon berubah saat dropdown dibuka
+
+      // Dapatkan key dari data-bs-target
+      const key = target.replace('#details', '');
+
+      // Tampilkan tabel pelanggaran secara otomatis saat dropdown dibuka
+      showTable(`pelanggaranTable${key}`, `pelanggaranBox${key}`, `perbuatanBaikBox${key}`);
+
+      // Tambahkan animasi fade-in saat tabel muncul
+      const table = document.getElementById(`pelanggaranTable${key}`);
+      if (table) {
+        table.style.opacity = '0';
+        table.style.transform = 'translateY(-10px)';
+        setTimeout(() => {
+          table.style.opacity = '1';
+          table.style.transform = 'translateY(0)';
+        }, 150);
+      }
+    });
+
+    // Event listener saat dropdown ditutup
+    collapseElement.addEventListener('hide.bs.collapse', function() {
+      toggleDropdownIcon(dropdown, false); // Ikon kembali saat dropdown ditutup
+
+      // Tambahkan animasi fade-out saat tabel menghilang
+      const key = target.replace('#details', '');
+      const table = document.getElementById(`pelanggaranTable${key}`);
+      if (table) {
+        table.style.opacity = '1';
+        table.style.transform = 'translateY(0)';
+        setTimeout(() => {
+          table.style.opacity = '0';
+          table.style.transform = 'translateY(-10px)';
+        }, 100);
+      }
+    });
+  });
+
+  // Pastikan ikon berubah jika dropdown dalam keadaan terbuka saat pertama dimuat
+  document.querySelectorAll('.collapse.show').forEach(function(collapse) {
+    const key = collapse.id.replace('details', '');
+    const dropdown = document.querySelector(`[data-bs-target="#details${key}"]`);
+    if (dropdown) {
+      toggleDropdownIcon(dropdown, true);
+    }
+    showTable(`pelanggaranTable${key}`, `pelanggaranBox${key}`, `perbuatanBaikBox${key}`);
+  });
+
+  // Tambahkan event listener untuk kotak Pelanggaran / Perbuatan Baik
+  document.querySelectorAll('.custom-box').forEach(function(box) {
+    box.addEventListener('click', function() {
+      const key = this.id.replace('pelanggaranBox', '').replace('perbuatanBaikBox', '');
+      if (this.id.startsWith('pelanggaranBox')) {
+        showTable(`pelanggaranTable${key}`, `pelanggaranBox${key}`, `perbuatanBaikBox${key}`);
+      } else if (this.id.startsWith('perbuatanBaikBox')) {
+        showTable(`perbuatanBaikTable${key}`, `perbuatanBaikBox${key}`, `pelanggaranBox${key}`);
+      }
+
+      // Tambahkan animasi fade-in saat tabel muncul
+      const activeTable = document.getElementById(this.id.startsWith('pelanggaranBox') ?
+        `pelanggaranTable${key}` : `perbuatanBaikTable${key}`);
+      if (activeTable) {
+        activeTable.style.opacity = '0';
+        activeTable.style.transform = 'translateY(-10px)';
+        setTimeout(() => {
+          activeTable.style.opacity = '1';
+          activeTable.style.transform = 'translateY(0)';
+        }, 150);
+      }
+    });
+  });
+});
+
+// Fungsi untuk menampilkan tabel dan mengatur kotak aktif
+function showTable(tableId, activeBoxId, inactiveBoxId) {
+  const currentDropdown = document.getElementById(activeBoxId).closest('.collapse');
+
+  // Sembunyikan semua tabel di dalam dropdown yang sedang aktif
+  currentDropdown.querySelectorAll('[id^="pelanggaranTable"], [id^="perbuatanBaikTable"]').forEach(function(
+    table) {
     table.style.display = 'none';
   });
-  // Tampilkan tabel yang dipilih
+
+  // Tampilkan tabel yang dipilih di dalam dropdown yang sedang aktif
   if (tableId) {
     document.getElementById(tableId).style.display = 'block';
   }
-  // Atur active/inactive box (tab)
+
+  // Tambahkan kelas 'active' ke kotak yang dipilih dan hapus dari kotak lain
   if (activeBoxId) {
     document.getElementById(activeBoxId).classList.add('active');
   }
   if (inactiveBoxId) {
     document.getElementById(inactiveBoxId).classList.remove('active');
   }
-  
-  // Jika dropdownIcon (arrow) disediakan, toggle kelas untuk animasi rotasi
-  if (dropdownIcon) {
-    dropdownIcon.classList.toggle('open');
-  }
 }
 
-// Event listener untuk dropdown icon (jika tidak menggunakan event Bootstrap)
-document.querySelectorAll('.dropdown-icon').forEach(function(iconWrapper) {
-  iconWrapper.addEventListener('click', function(e) {
-    const arrowIcon = this.querySelector('i');
-    arrowIcon.classList.toggle('open');
-  });
-});
-
-// Jika menggunakan Bootstrap collapse, atur event untuk rotasi arrow
-var collapseElements = document.querySelectorAll('.collapse');
-collapseElements.forEach(function(collapseEl) {
-  collapseEl.addEventListener('shown.bs.collapse', function () {
-    const icon = document.querySelector('[data-bs-target="#' + collapseEl.id + '"] .dropdown-icon i');
-    if (icon) {
-      icon.classList.add('open');
-    }
-  });
-  collapseEl.addEventListener('hidden.bs.collapse', function () {
-    const icon = document.querySelector('[data-bs-target="#' + collapseEl.id + '"] .dropdown-icon i');
-    if (icon) {
-      icon.classList.remove('open');
-    }
-  });
-});
-
-// Delete button handler menggunakan full form submission
-document.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('.delete-btn').forEach(function(button) {
-    button.addEventListener('click', function(e) {
-      e.preventDefault();
-      const url = this.dataset.url;
-      Swal.fire({
-        title: 'Yakin ingin menghapus data ini?',
-        text: "Data akan dihapus secara permanen.",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Ya, hapus!',
-        cancelButtonText: 'Tidak, batalkan!',
-        reverseButtons: true
-      }).then((result) => {
-        if (result.isConfirmed) {
-          const form = document.createElement('form');
-          form.method = 'POST';
-          form.action = url;
-          const tokenInput = document.createElement('input');
-          tokenInput.type = 'hidden';
-          tokenInput.name = '_token';
-          tokenInput.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-          form.appendChild(tokenInput);
-          const methodInput = document.createElement('input');
-          methodInput.type = 'hidden';
-          methodInput.name = '_method';
-          methodInput.value = 'DELETE';
-          form.appendChild(methodInput);
-          document.body.appendChild(form);
-          form.submit();
-        }
-      });
-    });
-  });
-});
+// Fungsi untuk mengubah ikon dropdown
+function toggleDropdownIcon(element, isOpen) {
+  const icon = element.querySelector('i');
+  if (isOpen) {
+    icon.classList.remove('fa-chevron-left');
+    icon.classList.add('fa-chevron-down');
+  } else {
+    icon.classList.remove('fa-chevron-down');
+    icon.classList.add('fa-chevron-left');
+  }
+}
 </script>
 
-<!-- Alert on successful addition atau delete -->
 @if(session('success'))
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -568,20 +625,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endif
-
-<script>
-function toggleEditForm(prefix, id) {
-    var displayRow = document.getElementById('displayRow' + prefix + id);
-    var editRow = document.getElementById('editForm' + prefix + id);
-    if (editRow.style.display === 'none' || editRow.style.display === '') {
-        editRow.style.display = 'table-row';
-        displayRow.style.display = 'none';
-    } else {
-        editRow.style.display = 'none';
-        displayRow.style.display = 'table-row';
-    }
-}
-</script>
-
 
 @endsection

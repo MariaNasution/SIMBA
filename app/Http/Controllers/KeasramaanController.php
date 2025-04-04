@@ -21,73 +21,14 @@ class KeasramaanController extends Controller
 
     public function detail($studentNim)
     {
+        // Hapus dummy data, sehingga API call dan pengolahan data dijalankan
 
-        // Contoh dummy data untuk nilai perilaku
-    $dummyNilaiPerilaku = [
-        [
-            'ta'          => '2024/2025',
-            'sem_ta'      => 1,
-            // Nilai ini nantinya akan dikonversi menjadi 'Gasal' melalui method convertSemester()
-            'pelanggaran' => [
-                [
-                    'pelanggaran' => 'Terlambat masuk asrama',
-                    'unit'        => 'Keasramaan',
-                    'tanggal'     => '2024-02-10',
-                    'poin'        => 5,
-                    'tindakan'    => 'Peringatan lisan',
-                    'id'    => 1,
-                ],
-                [
-                    'pelanggaran' => 'Tidak mengikuti peraturan asrama',
-                    'unit'        => 'Keasramaan',
-                    'tanggal'     => '2024-02-15',
-                    'poin'        => 3,
-                    'tindakan'    => 'Surat peringatan',
-                    'id'    => 2,
-                ],
-            ],
-            'perbuatan_baik' => [
-                [
-                    'perbuatan_baik' => 'Membantu kegiatan kebersihan asrama',
-                    'unit'           => 'Keasramaan',
-                    'tanggal'        => '2024-03-15',
-                    'poin'           => 10,
-                    'tindakan'       => 'Penghargaan',
-                    'id'       => 3,
-                ],
-            ],
-        ],
-        [
-            'ta'          => '2024/2025',
-            'sem_ta'      => 2,
-            'pelanggaran' => [],
-            'perbuatan_baik' => [
-                [
-                    'perbuatan_baik' => 'Aktif mengikuti kegiatan keasramaan',
-                    'unit'           => 'Keasramaan',
-                    'tanggal'        => '2024-09-05',
-                    'poin'           => 8,
-                    'tindakan'       => 'Apresiasi',
-                    'id'       => 4,
-                ],
-            ],
-        ],
-    ];
-
-    // Jika kamu ingin menggunakan dummy data, comment atau bypass API calls di bawah ini.
-    // Kembalikan dummy data ke view.
-    return view('catatanPerilaku.catatan_perilaku_detail', [
-        'nilaiPerilaku' => $dummyNilaiPerilaku,
-        'studentNim'    => $studentNim,
-    ]);
-
-    /*
         $apiToken = session('api_token');
         $user = session('user');
 
         if ($apiToken && $user && ($user['role'] === 'keasramaan' || isset($user['nim']))) {
             try {
-                // Get behavior score data from API
+                // Ambil data nilai perilaku dari API
                 $response = Http::withToken($apiToken)
                     ->withOptions(['verify' => false])
                     ->get('https://cis-dev.del.ac.id/api/library-api/get-penilaian', [
@@ -106,7 +47,7 @@ class KeasramaanController extends Controller
                     $nilaiPerilaku = array_values($nilaiPerilaku);
                 }
 
-                // Get violation data (pelanggaran API)
+                // Ambil data pelanggaran dari API
                 $pelanggaranResponse = Http::withToken($apiToken)
                     ->withOptions(['verify' => false])
                     ->get('https://cis-dev.del.ac.id/api/aktivitas-mhs-api/get-pelanggaran-mhs', [
@@ -125,36 +66,36 @@ class KeasramaanController extends Controller
                     $pelanggaranData = $pelanggaranResponse->json();
                 }
 
-                // Fetch local behavior records for the student and group by "TA-semester"
+                // Ambil data perilaku lokal dari database dan group berdasarkan "TA-semester"
                 $localBehaviors = \App\Models\StudentBehavior::where('student_nim', $studentNim)->get()
                     ->groupBy(function ($item) {
                         return $item->ta . '-' . $item->semester;
                     });
 
-                // Process API pelanggaran data and merge with local records
+                // Proses data pelanggaran dari API dan gabungkan dengan data lokal
                 $pelanggaranList = $pelanggaranData['data'] ?? [];
 
                 foreach ($nilaiPerilaku as &$perilaku) {
-                    // Convert numeric semester to text if needed.
+                    // Konversi semester numerik ke teks (misalnya 'Gasal', 'Genap', dll)
                     $perilaku['semester'] = $this->convertSemester($perilaku['sem_ta'] ?? 0);
 
-                    // Filter API pelanggaran data for this TA and semester.
+                    // Filter data pelanggaran API untuk TA dan semester yang sesuai
                     $filteredPelanggaran = array_filter($pelanggaranList, function ($pelanggaran) use ($perilaku) {
                         return (int)$pelanggaran['ta'] === (int)$perilaku['ta']
                             && (int)$pelanggaran['sem_ta'] === (int)$perilaku['sem_ta'];
                     });
 
-                    // Build a key to match local records grouping.
+                    // Buat key untuk mencocokkan data lokal
                     $semKey = $perilaku['ta'] . '-' . ($perilaku['sem_ta'] ?? 0);
 
-                    // Merge local pelanggaran records
+                    // Gabungkan data pelanggaran dari database lokal
                     if (isset($localBehaviors[$semKey])) {
                         $dbPelanggaran = $localBehaviors[$semKey]
                             ->where('type', 'pelanggaran')
                             ->map(function ($item) {
                                 return [
-                                    'local_id'    => $item->id,
-                                    'pelanggaran' => $item->description, // stored value
+                                    'id'    => $item->id,
+                                    'pelanggaran' => $item->description,
                                     'unit'        => $item->unit,
                                     'tanggal'     => $item->tanggal,
                                     'poin'        => $item->poin,
@@ -165,14 +106,14 @@ class KeasramaanController extends Controller
                     }
                     $perilaku['pelanggaran'] = array_values($filteredPelanggaran);
 
-                    // Merge local perbuatan_baik records (no API assumed for perbuatan_baik)
+                    // Gabungkan data perbuatan baik dari database lokal (tidak ada API untuk ini)
                     if (isset($localBehaviors[$semKey])) {
                         $dbPerbuatanBaik = $localBehaviors[$semKey]
                             ->where('type', 'perbuatan_baik')
                             ->map(function ($item) {
                                 return [
-                                    'local_id'       => $item->id,
-                                    'perbuatan_baik' => $item->description, // stored value
+                                    'id'       => $item->id,
+                                    'perbuatan_baik' => $item->description,
                                     'unit'           => $item->unit,
                                     'tanggal'        => $item->tanggal,
                                     'poin'           => $item->poin,
@@ -193,7 +134,6 @@ class KeasramaanController extends Controller
         } else {
             return redirect()->back()->withErrors(['error' => 'Session data tidak lengkap.']);
         }
-            */
     }
 
     private function convertSemester($sem_ta)
