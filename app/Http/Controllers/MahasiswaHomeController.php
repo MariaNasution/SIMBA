@@ -18,7 +18,8 @@ class MahasiswaHomeController extends Controller
     {
         // Get the authenticated user from session
         $user = session('user');
-        $student = Mahasiswa::where('nim', session('user')['nim'] ?? null)->first();
+
+        $student = Mahasiswa::where('nim', $user['nim'] ?? null)->first();
 
         // Check if the user exists and has a mahasiswa role
         if (!$user || !isset($user['role']) || $user['role'] !== 'mahasiswa') {

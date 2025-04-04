@@ -253,20 +253,42 @@ class AbsensiController extends Controller
         }
 
         try {
+            // Fetch the newest Perwalian record for the given date and class
             $perwalian = Perwalian::where('Tanggal', $date)
                 ->where('kelas', $class)
+                ->orderBy('created_at', 'desc') // Ensure the newest record is fetched
                 ->first();
 
             if (!$perwalian) {
+                Log::error('Perwalian not found for date and class in AbsensiController@store:', [
+                    'date' => $date,
+                    'class' => $class,
+                ]);
                 return redirect()->route('absensi.show', ['date' => $date, 'class' => $class])
                     ->with('error', 'No perwalian session found for this date and class.');
             }
 
+            // Check if the Perwalian is already Completed
+            if ($perwalian->Status === 'Completed') {
+                Log::warning('Perwalian session is already marked as Completed:', [
+                    'perwalian_id' => $perwalian->ID_Perwalian,
+                    'date' => $date,
+                    'class' => $class,
+                ]);
+                return redirect()->route('absensi')
+                    ->with('info', 'This perwalian session is already marked as completed.');
+            }
+
+            // Save attendance records
             foreach ($attendance as $nim => $data) {
                 $status = $data['status'] ?? null;
                 $keterangan = $data['keterangan'] ?? '';
 
                 if (!$status || !in_array(strtolower($status), ['hadir', 'alpa', 'izin'])) {
+                    Log::warning('Invalid or missing attendance status for student:', [
+                        'nim' => $nim,
+                        'status' => $status,
+                    ]);
                     continue;
                 }
 
@@ -284,6 +306,11 @@ class AbsensiController extends Controller
                         'keterangan' => $keterangan,
                         'updated_at' => now(),
                     ]);
+                    Log::info('Updated existing attendance record:', [
+                        'nim' => $nim,
+                        'perwalian_id' => $perwalian->ID_Perwalian,
+                        'status' => $status,
+                    ]);
                 } else {
                     Absensi::create([
                         'ID_Perwalian' => $perwalian->ID_Perwalian,
@@ -294,21 +321,31 @@ class AbsensiController extends Controller
                         'created_at' => $date,
                         'updated_at' => now(),
                     ]);
+                    Log::info('Created new attendance record:', [
+                        'nim' => $nim,
+                        'perwalian_id' => $perwalian->ID_Perwalian,
+                        'status' => $status,
+                    ]);
                 }
             }
 
+            // Update Perwalian status to Completed
             $perwalian->update(['Status' => 'Completed']);
-            Log::info('Perwalian status updated to Completed:', ['perwalian_id' => $perwalian->ID_Perwalian]);
+            Log::info('Perwalian status updated to Completed:', [
+                'perwalian_id' => $perwalian->ID_Perwalian,
+                'date' => $date,
+                'class' => $class,
+            ]);
 
             return redirect()->route('absensi')
                 ->with('success', 'Attendance data saved successfully, and perwalian session marked as completed.');
         } catch (\Exception $e) {
-            Log::error('Failed to save attendance data:', [
+            Log::error('Failed to save attendance data in AbsensiController@store:', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
             return redirect()->route('absensi.show', ['date' => $date, 'class' => $class])
-                ->with('error', 'Failed to save attendance data.');
+                ->with('error', 'Failed to save attendance data: ' . $e->getMessage());
         }
     }
 

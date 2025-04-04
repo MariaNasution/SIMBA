@@ -28,17 +28,19 @@ class BreadCrumbServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // Defer the View::composer registration until after all service providers are booted
         $this->app->booted(function () {
-            // Target the specific navbar component
             View::composer('components.navbar', function ($view) {
                 $breadcrumbService = app(BreadCrumbService::class);
-
-                // Pass route parameters to the breadcrumb service
                 $params = Route::current()->parameters();
                 $breadcrumbs = $breadcrumbService->generateBreadcrumbs($params);
+                $notifications = $breadcrumbService->generateNotifications();
 
-                $view->with('breadcrumbs', $breadcrumbs);
+                // Debug output
+
+                $view->with([
+                    'breadcrumbs' => $breadcrumbs,
+                    'notifications' => $notifications
+                ]);
             });
         });
     }

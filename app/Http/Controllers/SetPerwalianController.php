@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\Perwalian;
 use App\Models\Dosen;
 use App\Models\Dosen_Wali;
+use App\Models\Mahasiswa;
 use App\Models\Notifikasi;
+use App\Services\StudentSyncService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
@@ -14,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 
 class SetPerwalianController extends Controller
 {
+    protected $studentSyncService;
     // Existing methods...
 
     /**
@@ -21,6 +24,11 @@ class SetPerwalianController extends Controller
      *
      * @return \Illuminate\View\View
      */
+
+     public function __construct(StudentSyncService $studentSyncService)
+    {
+        $this->studentSyncService = $studentSyncService;
+    }
     public function histori(Request $request)
     {
         // 1. Identify the logged-in user
@@ -352,7 +360,6 @@ class SetPerwalianController extends Controller
 
     public function store(Request $request)
     {
-        
         Log::info('Store request received', ['request' => $request->all(), 'headers' => $request->headers->all()]);
         if (!$request->hasHeader('X-CSRF-TOKEN') || $request->session()->token() !== $request->header('X-CSRF-TOKEN')) {
             Log::error('CSRF token mismatch in store', [
@@ -361,6 +368,7 @@ class SetPerwalianController extends Controller
             ]);
             return response()->json(['success' => false, 'message' => 'Invalid CSRF token'], 419);
         }
+
         $validatedData = $request->validate([
             'selectedDate' => [
                 'required',
@@ -380,7 +388,7 @@ class SetPerwalianController extends Controller
 
         try {
             $username = session('user')['username'] ?? null;
-            $user = Dosen::where('username', $username)->first();
+            $user = session('user');
 
             if (!$user) {
                 return response()->json([
@@ -389,30 +397,32 @@ class SetPerwalianController extends Controller
                 ], 401);
             }
 
-            $existingPerwalian = Perwalian::where('ID_Dosen_Wali', $user->nip)
+            // Check for existing scheduled Perwalian for the same class and date
+            $existingPerwalian = Perwalian::where('ID_Dosen_Wali', $user['nip'])
                 ->where('Status', 'Scheduled')
                 ->where('kelas', $validatedData['selectedClass'])
+                ->where('Tanggal', Carbon::parse($validatedData['selectedDate'])->format('Y-m-d'))
                 ->first();
 
             if ($existingPerwalian) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'You already have a scheduled perwalian request for this class. Use the Edit option to delete and request again.'
+                    'message' => 'A perwalian session is already scheduled for this class on this date. Use the Edit option to delete and request again.'
                 ], 400);
             }
 
-            $year = 2021 - substr($validatedData['selectedClass'], 1, 1);
-            
+            $date = Carbon::parse($validatedData['selectedDate']);
+            // Create the Perwalian record
+            $year = \Carbon\Carbon::parse($date)->year;
+            $syncYear = $year - 5; // Adjust based on your logic
             $perwalian = Perwalian::create([
-                'ID_Dosen_Wali' => $user->nip,
+                'ID_Dosen_Wali' => $user['nip'],
                 'Tanggal' => Carbon::parse($validatedData['selectedDate'])->format('Y-m-d'),
                 'Status' => 'Scheduled',
-                'nama' => $user->nama,
+                'nama' => $user['nama'],
                 'kelas' => $validatedData['selectedClass'],
                 'angkatan' => $year,
             ]);
-
-           
 
             if (!$perwalian) {
                 Log::error('Failed to create Perwalian record');
@@ -424,23 +434,100 @@ class SetPerwalianController extends Controller
 
             Log::info('Perwalian created:', [
                 'perwalian' => $perwalian->toArray(),
-                'ID_Perwalian' => $perwalian->getKey()
+                'ID_Perwalian' => $perwalian->ID_Perwalian,
             ]);
 
+            // Fetch students for the class and update their ID_Perwalian
+            
+            $currentSem = 2; // Adjust based on your semester logic if needed
+            $students = $this->studentSyncService->fetchStudents($user['pegawai_id'], $syncYear, $currentSem, $validatedData['selectedClass']);
+
+            Log::info('Students fetched for Perwalian in SetPerwalianController@store', [
+                'class' => $validatedData['selectedClass'],
+                'student_count' => count($students),
+                'students' => $students,
+            ]);
+
+            if (empty($students)) {
+                Log::warning('No students fetched for class in SetPerwalianController@store', [
+                    'class' => $validatedData['selectedClass'],
+                    'dosen_id' => $user['pegawai_id'],
+                    'sync_year' => $syncYear,
+                    'semester' => $currentSem,
+                ]);
+            }
+
+            // Map the API data to the required format
+            $students = array_map(function ($student) {
+                return [
+                    'nim' => $student['nim'],
+                    'nama' => $student['nama'],
+                ];
+            }, $students);
+
+            // Sync students to the Mahasiswa table and set ID_Perwalian
+            foreach ($students as $student) {
+                $nim = $student['nim'];
+                $username = 'ifs' . substr($nim, 3);
+
+                Log::info('Processing student for Perwalian', [
+                    'nim' => $nim,
+                    'username' => $username,
+                    'class' => $validatedData['selectedClass'],
+                    'ID_Perwalian' => $perwalian->ID_Perwalian,
+                ]);
+
+                // Use firstOrNew to separate creation and updating logic
+                $mahasiswa = Mahasiswa::firstOrCreate(
+                    ['nim' => $nim],
+                    [
+                        'username' => $username,
+                        'nama' => $student['nama'],
+                        'kelas' => $validatedData['selectedClass'],
+                        'ID_Dosen' => $user['pegawai_id'],
+                        'ID_Perwalian' => $perwalian->ID_Perwalian,
+
+                    ]
+                    
+                );
+
+
+                // Log the current state of ID_Perwalian
+                Log::info('Mahasiswa record before update:', [
+                    'nim' => $mahasiswa->nim,
+                    'current_ID_Perwalian' => $mahasiswa->ID_Perwalian,
+                    'new_ID_Perwalian' => $perwalian->ID_Perwalian,
+                ]);
+
+                // Always set ID_Perwalian to the new value
+                $mahasiswa->ID_Perwalian = $perwalian->ID_Perwalian;
+
+                // Save the record (this will create or update as needed)
+                $mahasiswa->save();
+
+                // Log the updated state
+                Log::info('Mahasiswa record after update:', [
+                    'nim' => $mahasiswa->nim,
+                    'ID_Perwalian' => $mahasiswa->ID_Perwalian,
+                ]);
+            }
+
+            // Create a notification
             $nim = session('user')['nim'] ?? null;
             Notifikasi::create([
                 'Pesan' => "Perwalian scheduled for " . $validatedData['selectedDate'] . " (Class: " . $validatedData['selectedClass'] . ")",
                 'NIM' => $nim,
-                'Id_Perwalian' => $perwalian->getKey(),
-                'nama' => $user->nama,
+                'Id_Perwalian' => $perwalian->ID_Perwalian,
+                'nama' => $user['nama'],
             ]);
 
             Log::info('Perwalian date set for: ' . $validatedData['selectedDate'] .
-                ' by dosen NIP: ' . $user->nip .
+                ' by dosen NIP: ' . $user['nip'] .
                 ' for class: ' . $validatedData['selectedClass']);
 
+            // Fetch updated scheduled dates for response
             $scheduledDatesByClass = [];
-            $perwalianRecords = Perwalian::where('ID_Dosen_Wali', $user->nip)
+            $perwalianRecords = Perwalian::where('ID_Dosen_Wali', $user['nip'])
                 ->where('Status', 'Scheduled')
                 ->get(['kelas', 'Tanggal']);
 
@@ -458,7 +545,9 @@ class SetPerwalianController extends Controller
                 'scheduledClasses' => array_keys($scheduledDatesByClass),
             ]);
         } catch (\Exception $e) {
-            Log::error('Failed to set Perwalian date: ' . $e->getMessage());
+            Log::error('Failed to set Perwalian date: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to set Perwalian date: ' . $e->getMessage()
@@ -512,10 +601,23 @@ class SetPerwalianController extends Controller
                 ], 404);
             }
 
+            // Clear ID_Perwalian in Mahasiswa table for the affected class
+            $updatedCount = Mahasiswa::where('kelas', $selectedClass)
+                ->where('ID_Perwalian', $existingPerwalian->ID_Perwalian)
+                ->update(['ID_Perwalian' => null]);
+
+            Log::info('Cleared ID_Perwalian for students in class:', [
+                'class' => $selectedClass,
+                'perwalian_id' => $existingPerwalian->ID_Perwalian,
+                'updated_count' => $updatedCount,
+            ]);
+
+            // Delete associated notifications and the Perwalian record
             Notifikasi::where('Id_Perwalian', $existingPerwalian->getKey())->delete();
             $existingPerwalian->delete();
             Log::info('Perwalian deleted for dosen NIP: ' . $user->nip . ' for class: ' . $selectedClass);
 
+            // Fetch updated scheduled dates for response
             $scheduledDatesByClass = [];
             $scheduledClasses = [];
             $perwalianRecords = Perwalian::where('ID_Dosen_Wali', $user->nip)
