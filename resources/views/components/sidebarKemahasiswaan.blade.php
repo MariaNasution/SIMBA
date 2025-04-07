@@ -57,6 +57,33 @@
                     <i class="fas fa-book-open"></i> Riwayat Daftar Request
                 </a>
             </li>
+         <!-- Perwalian dengan submenu -->
+<li class="nav-item">
+    <a class="nav-link" data-bs-toggle="collapse" href="#perwalianMenu" role="button" aria-expanded="false" aria-controls="perwalianMenu">
+        <i class="bi bi-calendar3"></i> Perwalian
+    </a>
+    <div class="collapse {{ request()->is('kemahasiswaan/perwalian*') ? 'show' : '' }}" id="perwalianMenu">
+        <ul class="list-unstyled ps-3">
+            <li>
+                <a class="nav-link {{ request()->is('kemahasiswaan/perwalian/jadwal') ? 'active' : '' }}" href="{{ route('perwalian.jadwal') }}">
+                    Jadwalkan Perwalian
+                </a>
+            </li>
+            <li>
+                <a class="nav-link {{ request()->is('kemahasiswaan/perwalian/kelas') ? 'active' : '' }}" href="{{ route('perwalian.kelas') }}">
+                    Perwalian Kelas
+                </a>
+            </li>
+            <li>
+                <a class="nav-link {{ request()->is('kemahasiswaan/perwalian/berita-acara') ? 'active' : '' }}" href="{{ route('perwalian.berita_acara') }}">
+                    Berita Acara
+                </a>
+            </li>
+        </ul>
+    </div>
+</li>
+
+
         </ul>
     </ul>
 </div>
