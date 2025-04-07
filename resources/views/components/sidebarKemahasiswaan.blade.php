@@ -44,7 +44,6 @@
             <li class="submenu-item">
                 <a href="{{ route('kemahasiswaan_ajukan_konseling') }}">
                     <i class="fas fa-user-friends"></i> Ajukan Konseling
-
                 </a>
             </li>
             <li class="submenu-item">
@@ -57,33 +56,30 @@
                     <i class="fas fa-book-open"></i> Riwayat Daftar Request
                 </a>
             </li>
-         <!-- Perwalian dengan submenu -->
-<li class="nav-item">
-    <a class="nav-link" data-bs-toggle="collapse" href="#perwalianMenu" role="button" aria-expanded="false" aria-controls="perwalianMenu">
-        <i class="bi bi-calendar3"></i> Perwalian
-    </a>
-    <div class="collapse {{ request()->is('kemahasiswaan/perwalian*') ? 'show' : '' }}" id="perwalianMenu">
-        <ul class="list-unstyled ps-3">
-            <li>
-                <a class="nav-link {{ request()->is('kemahasiswaan/perwalian/jadwal') ? 'active' : '' }}" href="{{ route('perwalian.jadwal') }}">
-                    Jadwalkan Perwalian
-                </a>
-            </li>
-            <li>
-                <a class="nav-link {{ request()->is('kemahasiswaan/perwalian/kelas') ? 'active' : '' }}" href="{{ route('perwalian.kelas') }}">
-                    Perwalian Kelas
-                </a>
-            </li>
-            <li>
-                <a class="nav-link {{ request()->is('kemahasiswaan/perwalian/berita-acara') ? 'active' : '' }}" href="{{ route('perwalian.berita_acara') }}">
-                    Berita Acara
-                </a>
-            </li>
         </ul>
-    </div>
-</li>
-
-
-        </ul>
+        <!-- Perwalian dengan submenu -->
+        <li class="menu-item">
+            <a class="nav-link" data-bs-toggle="collapse" href="#perwalianMenu" role="button" aria-expanded="false" aria-controls="perwalianMenu">
+                <i class="bi bi-calendar3"></i> Perwalian
+                <i class="fas fa-chevron-down submenu-toggle" id="perwalian-toggle"></i>
+            </a>
+            <ul class="submenu {{ request()->is('kemahasiswaan/perwalian*') ? 'show' : '' }}" id="perwalianMenu">
+                <li class="submenu-item">
+                    <a class="nav-link {{ request()->is('kemahasiswaan/perwalian/jadwal') ? 'active' : '' }}" href="{{ route('kemahasiswaan_perwalian.jadwal') }}">
+                        Jadwalkan Perwalian
+                    </a>
+                </li>
+                <li class="submenu-item">
+                    <a class="nav-link {{ request()->is('kemahasiswaan/perwalian/kelas') ? 'active' : '' }}" href="{{ route('kemahasiswaan_perwalian.kelas') }}">
+                        Perwalian Kelas
+                    </a>
+                </li>
+                <li class="submenu-item">
+                    <a class="nav-link {{ request()->is('kemahasiswaan/perwalian/berita-acara') ? 'active' : '' }}" href="{{ route('kemahasiswaan_perwalian.berita_acara') }}">
+                        Berita Acara
+                    </a>
+                </li>
+            </ul>
+        </li>
     </ul>
 </div>
