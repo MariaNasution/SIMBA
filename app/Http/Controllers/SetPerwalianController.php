@@ -479,6 +479,7 @@ class SetPerwalianController extends Controller
                 'NIM' => $nim,
                 'Id_Perwalian' => $perwalian->ID_Perwalian,
                 'nama' => $user['nama'],
+                'role' => 'mahasiswa'
             ]);
             Log::info('Perwalian date set for: ' . $validatedData['selectedDate'] .
                 ' by dosen NIP: ' . $user['nip'] .

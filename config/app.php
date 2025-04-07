@@ -170,7 +170,8 @@ return [
          * Application Service Providers...
          */
         App\Providers\AppServiceProvider::class,
-  
+            Barryvdh\DomPDF\ServiceProvider::class,
+
         App\Providers\BreadCrumbServiceProvider::class,
     ],
 

@@ -15,6 +15,7 @@
                 @endforeach
             </ol>
         </div>
+
         <div class="nav-icons">
             <div class="dropdown position-relative me-3">
                 <a href="#" class="text-decoration-none" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -29,12 +30,17 @@
                 <ul class="dropdown-menu" aria-labelledby="notificationDropdown">
                     <li><h6 class="dropdown-header">Notifikasi</h6></li>
                     @forelse ($notifications ?? [] as $notif)
-                        <li><a class="dropdown-item" href="#">{{ $notif->Pesan ?? 'No message' }}</a></li>
+                        <li>
+                            <a class="dropdown-item" href="{{ route('mahasiswa_perwalian') }}">
+                                {{ $notif->Pesan ?? 'No message' }} by {{ $notif->nama }}
+                            </a>
+                        </li>
                     @empty
-                        <li><a class="dropdown-item" href="#">Tidak ada notifikasi</a></li>
+                        <li><a class="dropdown-item" href="{{ route('mahasiswa_perwalian') }}">Tidak ada notifikasi</a></li>
                     @endforelse
                 </ul>
             </div>
+
             <div class="logout">
                 <a href="{{ route('logout') }}" onclick="event.preventDefault(); confirmLogout();">
                     <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
@@ -42,42 +48,41 @@
             </div>
         </div>
     </nav>
-    
+
+    <!-- Styles remain unchanged -->
     <style>
         .breadcrumb-nav {
-            color: white;
-            background-color: #3282B8;
-            padding: 15px 30px;
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
-            flex-wrap: nowrap; /* Prevent wrapping unless necessary */
-            width: 100%;
-            gap: 20px; /* Add spacing between flex children */
+            flex-wrap: nowrap;
+            background-color: #3282B8;
+            color: white;
+            padding: 15px 30px;
+            gap: 10px;
         }
-
         .breadcrumb-container {
+            flex: 1 1 auto;
+            min-width: 0;
+            overflow: hidden;
             display: flex;
             align-items: center;
-            flex-wrap: wrap; /* Allow breadcrumbs to wrap if too long */
-            flex-grow: 1; /* Allow it to take available space */
-            min-width: 0; /* Prevent overflow issues */
         }
-
         .breadcrumb {
-            margin-bottom: 0;
-            background: transparent;
-            padding-left: 0;
             display: flex;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
             align-items: center;
+            margin-bottom: 0;
+            padding-left: 0;
+            background: transparent;
+            gap: 5px;
+            overflow-x: auto;
+            white-space: nowrap;
         }
-
         .breadcrumb-item {
             font-size: 18px;
-            white-space: nowrap; /* Prevent breadcrumb text from wrapping */
+            white-space: nowrap;
         }
-
         .breadcrumb-item a {
             color: white;
             text-decoration: none;
@@ -85,71 +90,58 @@
             font-family: 'Poppins', sans-serif;
             font-size: 18px;
         }
-
         .breadcrumb-item.active {
             color: #fff;
         }
-
         .breadcrumb-item a:hover {
             color: #fff;
         }
-
         .nav-icons {
             display: flex;
             align-items: center;
-            flex-shrink: 0; /* Prevent icons from shrinking */
-            gap: 15px; /* Consistent spacing between icons */
+            gap: 15px;
+            flex-shrink: 0;
+            white-space: nowrap;
         }
-
         .nav-icons i {
             color: #fff;
         }
-
         .logout {
             display: flex;
             align-items: center;
         }
-
         .logout a {
             color: white;
             text-decoration: none;
         }
-
         .logout i {
             font-size: 20px;
             cursor: pointer;
             transition: color 0.3s ease;
         }
-
         .logout a:hover i {
             color: #ddd;
         }
-
         .dropdown.me-3 {
             position: relative;
         }
-
         @media (max-width: 768px) {
             .breadcrumb-nav {
-                flex-direction: column;
-                align-items: flex-start; /* Align items to the start on mobile */
-                padding: 10px 20px; /* Reduce padding on smaller screens */
+                flex-direction: row;
+                align-items: center;
+                padding: 10px 20px;
+                overflow-x: auto;
             }
-
             .breadcrumb-container {
-                justify-content: center;
-                width: 100%;
-                margin-bottom: 10px;
+                flex: 1 1 auto;
+                min-width: 0;
             }
-
             .nav-icons {
-                justify-content: center;
-                width: 100%;
-                gap: 20px; /* Increase gap for better touch targets on mobile */
+                gap: 20px;
+                flex-shrink: 0;
             }
-
             .dropdown.me-3 {
-                margin-right: 0; /* Remove right margin on mobile */
+                margin-right: 15px;
             }
         }
     </style>
