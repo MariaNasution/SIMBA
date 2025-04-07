@@ -240,6 +240,7 @@ class BreadCrumbService
             case 'mahasiswa':
                 $notifications = $this->generateStudentNotifications($user);
                 break;
+            
             default:
                 Log::info('Unhandled role', ['role' => $user['role']]);
                 break;

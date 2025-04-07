@@ -10,7 +10,14 @@
 <div class="status-box">
     @if($perwalian)
         <p><strong>Hari:</strong> {{ \Carbon\Carbon::parse($perwalian->Tanggal)->translatedFormat('l, d F Y') }}</p>
+        
+        @if ($perwalian->Status == 'Scheduled')
         <p><strong>Status:</strong> <span class="status-{{ strtolower($perwalian->Status) }}">{{ $perwalian->Status }}</span></p>
+
+        @else 
+        <p><strong>Status:</strong> <span class="status-{{ strtolower($perwalian->Status) }}">{{ $absensi->status_kehadiran }}</span></p>
+        @endif
+
     @else
         <p><strong>Hari:</strong> Tidak tersedia</p>
         <p><strong>Status:</strong> <span class="status-unknown">Tidak diketahui</span></p>
