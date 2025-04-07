@@ -1,42 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<!-- Header with Notification and Logout -->
-<div class="d-flex align-items-center mb-4 border-bottom-line">
-    <h3 class="me-auto">
-        <a href="{{ route('beranda') }}">Home</a>
-    </h3>
 
-    <!-- Notification Dropdown -->
-    <div class="dropdown position-relative me-3">
-        <a href="#" class="text-decoration-none" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fas fa-bell fs-5 cursor-pointer" title="Notifications"></i>
-            @if ($notifications->count() > 0)
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                {{ $notifications->count() }}
-                <span class="visually-hidden">unread notifications</span>
-            </span>
-            @endif
-        </a>
-        <ul class="dropdown-menu" aria-labelledby="notificationDropdown">
-            <li>
-                <h6 class="dropdown-header">Notifikasi</h6>
-            </li>
-            @forelse ($notifications as $notif)
-            <li>
-                <a class="dropdown-item" href="#">{{ $notif->Pesan }}</a>
-            </li>
-            @empty
-            <li><a class="dropdown-item" href="#">Tidak ada notifikasi</a></li>
-            @endforelse
-        </ul>
-    </div>
-
-    <!-- Logout Button -->
-    <a href="#" onclick="confirmLogout()">
-        <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
-    </a>
-</div>
 
 <!-- Main Content -->
 <div class="app-content-header">

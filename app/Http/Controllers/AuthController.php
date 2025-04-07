@@ -92,7 +92,7 @@ class AuthController extends Controller
                         'nim' => $nim,
                     ],
                 ]);
-        
+
                 // Redirect based on the user's role
                 switch ($user->role) {
                     case 'mahasiswa':

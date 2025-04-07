@@ -11,7 +11,7 @@ class Perwalian extends Model
     public $incrementing = true;
     protected $keyType = 'int';
 
-    protected $fillable = ['ID_Perwalian', 'ID_Dosen_Wali', 'Status', 'Tanggal', 'nama', 'kelas'];
+    protected $fillable = ['ID_Perwalian', 'ID_Dosen_Wali', 'Status', 'Tanggal', 'nama', 'kelas', 'angkatan'];
 
     public function dosenWali()
     {

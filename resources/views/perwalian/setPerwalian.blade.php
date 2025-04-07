@@ -1,12 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="d-flex align-items-center mb-4 border-bottom-line">
-        <h3 class="me-auto" style="font-size: 24px; font-weight: 700; color: #333;">Set Perwalian</h3>
-        <a href="#" onclick="confirmLogout()">
-            <i class="fas fa-sign-out-alt fs-5 cursor-pointer" style="color: #333; font-size: 24px;" title="Logout"></i>
-        </a>
-    </div>
+    
+
     <div class="main-content flex-grow-1 p-4">
         <div id="feedbackMessage" class="alert alert-dismissible fade show d-none" role="alert">
             <span id="feedbackText"></span>

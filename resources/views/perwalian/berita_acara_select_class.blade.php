@@ -1,15 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <!-- Header -->
-    <div class="d-flex align-items-center mb-4 border-bottom-line">
-        <h3 class="me-auto" style="font-size: 24px; font-weight: 700; color: #333;">
-            <a href="{{ route('berita_acara.select_class') }}" style="text-decoration: none; color: inherit;">Buat Berita Acara</a>
-        </h3>
-        <a href="#" onclick="confirmLogout()">
-            <i class="fas fa-sign-out-alt fs-5 cursor-pointer" style="color: #333; font-size: 24px;" title="Logout"></i>
-        </a>
-    </div>
+    
 
     <div class="container">
         <!-- Back Button -->
@@ -26,7 +18,7 @@
         <!-- Class and Perwalian Buttons -->
         <div class="am-class-buttons">
             @forelse ($completedPerwalians as $perwalian)
-                <a href="{{ route('berita_acara.create', ['kelas' => $perwalian['class'], 'tanggal_perwalian' => $perwalian['date']]) }}"
+                <a href="{{ route('berita_acara.create', ['kelas' => $perwalian['class'], 'tanggal_perwalian' => $perwalian['date'], 'angkatan' => $perwalian['angkatan'] ]) }}"
                    class="am-class-btn">
                     {{ $perwalian['display'] }}
                 </a>
