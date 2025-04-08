@@ -17,7 +17,7 @@ class CreateNotifikasiTable extends Migration
             $table->foreignIdFor(RequestKonseling::class, 'Id_Konseling')->nullable(); // Foreign key to Konseling, renamed to 'Id_Konseling'
             $table->foreignIdFor(Perwalian::class, 'Id_Perwalian')->nullable(); // Foreign key to Perwalian, renamed to 'Id_Perwalian'
             $table->string('nama')->nullable(); // Student ID (foreign key to Mahasiswa), string type   
-            $table->string('role');
+            $table->string('role')->nullable();
             $table->timestamps();
 
             // Define foreign key constraint for NIM manually (since it's a string)
