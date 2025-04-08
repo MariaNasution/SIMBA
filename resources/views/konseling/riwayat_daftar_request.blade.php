@@ -2,21 +2,6 @@
 
 @section('content')
 
-  <div class="d-flex align-items-center mb-4 border-bottom-line">
-    <h3 class="me-auto">
-      @if(session('user.role') == 'kemahasiswaan')
-        <a href="{{ route('kemahasiswaan_beranda') }}"> <i class="fas fa-clock me-3"></i>Konseling</a> /
-        <a href="{{ route('kemahasiswaan_riwayat_daftar_request') }}">Riwayat Daftar Request</a>
-      @elseif(session('user.role') == 'konselor')
-        <a href="{{ route('konselor_beranda') }}"> <i class="fas fa-clock me-3"></i>Konseling</a> /
-        <a href="{{ route('konselor_riwayat_daftar_request') }}">Riwayat Daftar Request</a>
-      @endif
-    </h3>
-    <a href="#" onclick="confirmLogout()">
-      <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
-    </a>
-  </div>
-
   {{-- Alert Notifikasi --}}
   @if (session('success'))
     <div class="alert alert-success alert-dismissible fade show" role="alert">
