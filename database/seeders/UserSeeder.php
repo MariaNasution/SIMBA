@@ -102,18 +102,20 @@ class UserSeeder extends Seeder
 
         // Array for dosen
         $nips = [
-            'dosen', '0308190348', '0311020009', '0309020008'
+            'dosen', '0309130087', '0311020009', '0309020008'
         ];
 
         $dosenNames = [
-            'Dosen', 'Iustisia Natalia Simbolon, S.Kom., M.T.',
+            'Dosen', 'Arie Satia Dharma, S.T, M.Kom.',
             'Dr. Arlinta Christy Barus, ST., M.InfoTech.',
             'Dr. Johannes Harungguan Sianipar, S.T., M.T.'
         ];
 
         $dosenClasses = [
-            '12IF2', '12IF2', '14IF1', '12IF1,12IF2',
+            '12IF2', '11IF1,11IF2,14IF2', '14IF1', '12IF1,12IF2',
         ];
+
+        
 
         // Counter for assigning NIMs and NIPs
         $nipIndex = 0;

@@ -6,11 +6,11 @@ use Illuminate\Support\Facades\Schema;
 use App\Models\Mahasiswa; // Import Mahasiswa model
 use App\Models\Perwalian; // Import Perwalian model
 
-class CreateNotifikasiTable extends Migration
+class CreateNotifikasi2Table extends Migration
 {
     public function up()
     {
-        Schema::create('notifikasi', function (Blueprint $table) {
+        Schema::create('notifikasi2', function (Blueprint $table) {
             // Auto-incrementing primary key dengan nama kolom 'ID_Notifikasi'
             $table->id('ID_Notifikasi');
 

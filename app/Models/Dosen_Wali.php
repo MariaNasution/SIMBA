@@ -16,7 +16,7 @@ class Dosen_Wali extends Model
     public $incrementing = false; // Disable auto-increment
 
     // Define fillable fields
-    protected $fillable = ['username', 'kelas'];
+    protected $fillable = ['username', 'kelas', 'angkatan'];
 
     /**
      * Define the inverse relationship with the User model.

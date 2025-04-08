@@ -37,14 +37,14 @@
         </li>
         <li class="menu-item">
             <a href="{{ route('berita_acara.select_class') }}">
-                <i class="fas fa-check-square"></i> Berita Acara
+                <i class="fas fa-file-alt"></i> Berita Acara
             </a>
         </li>
-<!-- Tombol Histori -->
-<li class="menu-item">
-    <a href="{{ route('dosen.histori') }}">
-        <i class="fas fa-history"></i> Histori
-    </a>
-</li>
+        <!-- Tombol Histori -->
+        <li class="menu-item">
+            <a href="{{ route('dosen.histori') }}">
+                <i class="fas fa-history"></i> Histori
+            </a>
+        </li>
     </ul>
 </div>

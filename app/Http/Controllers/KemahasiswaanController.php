@@ -118,4 +118,18 @@ class KemahasiswaanController extends Controller
         return view('konseling.riwayat_daftar_request');
     }
     
+    public function jadwalPerwalian()
+{
+    return view('perwalian_jadwal'); // TANPA folder tambahan
+}
+
+public function kelasPerwalian()
+{
+    return view('perwalian_kelas');
+}
+
+public function beritaAcaraPerwalian()
+{
+    return view('perwalian_berita_acara');
+}
 }

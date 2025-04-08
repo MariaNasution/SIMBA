@@ -10,7 +10,7 @@ class Notifikasi extends Model
     protected $primaryKey = 'ID_Notifikasi'; // Set primary key
     public $incrementing = true; // Auto increment primary key
 
-    protected $fillable = ['ID_Notifikasi', 'Pesan', 'nim', 'Id_Konseling', 'Id_Perwalian', 'nama'];
+    protected $fillable = ['ID_Notifikasi', 'Pesan', 'nim', 'Id_Konseling', 'Id_Perwalian', 'nama', 'role'];
 
     /**
      * Relationship with Mahasiswa model.

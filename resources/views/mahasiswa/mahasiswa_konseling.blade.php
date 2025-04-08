@@ -6,15 +6,7 @@
   use Carbon\Carbon;
 @endphp
 
-<div class="d-flex align-items-center mb-4 border-bottom-line">
-  <h3 class="me-auto">
-    <a href="{{ route('beranda') }}"><i class="fas fa-user-friends me-3"></i>Home</a> /
-    <a href="{{ route('mahasiswa_konseling') }}">Konseling</a>
-  </h3>
-  <a href="#" onclick="confirmLogout()">
-    <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
-  </a>
-</div>
+
 
 <!-- Tombol Request Konseling -->
 <div class="mb-3 text-start">
