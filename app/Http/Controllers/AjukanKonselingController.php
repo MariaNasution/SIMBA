@@ -118,10 +118,15 @@ class AjukanKonselingController extends Controller
                 'nama' => null,
             ]);
 
+            // Redirect based on user role
+        if (session('user.role') == 'kemahasiswaan') {
+            return redirect()->route('kemahasiswaan_konseling.ajukan')->with('success', 'Berhasil mengajukan konseling');
+        } else {
             return redirect()->route('konselor_konseling.ajukan')->with('success', 'Berhasil mengajukan konseling');
-        } catch (Exception $e) {
-            Log::error('Exception saat mengajukan konseling:', ['message' => $e->getMessage()]);
-            return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
+    } catch (Exception $e) {
+        Log::error('Exception saat mengajukan konseling:', ['message' => $e->getMessage()]);
+        return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
     }
+}
 }
