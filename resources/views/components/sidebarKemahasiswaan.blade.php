@@ -57,28 +57,29 @@
                 </a>
             </li>
         </ul>
-        <!-- Perwalian dengan submenu -->
+        <!-- Perwalian dengan submenu-->
         <li class="menu-item">
-            <a class="nav-link" data-bs-toggle="collapse" href="#perwalianMenu" role="button" aria-expanded="false" aria-controls="perwalianMenu">
+            <a href="javascript:void(0);" onclick="toggleSubMenu('perwalian-submenu')">
                 <i class="bi bi-calendar3"></i> Perwalian
                 <i class="fas fa-chevron-down submenu-toggle" id="perwalian-toggle"></i>
             </a>
-            <ul class="submenu {{ request()->is('kemahasiswaan/perwalian*') ? 'show' : '' }}" id="perwalianMenu">
-                <li class="submenu-item">
-                    <a class="nav-link {{ request()->is('kemahasiswaan/perwalian/jadwal') ? 'active' : '' }}" href="{{ route('kemahasiswaan_perwalian.jadwal') }}">
-                        Jadwalkan Perwalian
-                    </a>
-                </li>
-                <li class="submenu-item">
-                    <a class="nav-link {{ request()->is('kemahasiswaan/perwalian/kelas') ? 'active' : '' }}" href="{{ route('kemahasiswaan_perwalian.kelas') }}">
-                        Perwalian Kelas
-                    </a>
-                </li>
-                <li class="submenu-item">
-                    <a class="nav-link {{ request()->is('kemahasiswaan/perwalian/berita-acara') ? 'active' : '' }}" href="{{ route('kemahasiswaan_perwalian.berita_acara') }}">
-                        Berita Acara
-                    </a>
-                </li>
+        </li>
+        <ul class="submenu" id="perwalian-submenu" style="display: none;">
+            <li class="submenu-item">
+                <a href="{{ route('kemahasiswaan_perwalian.jadwal') }}">
+                    Jadwalkan Perwalian
+                </a>
+            </li>
+            <li class="submenu-item">
+                <a href="{{ route('kemahasiswaan_perwalian.kelas') }}">
+                    Perwalian Kelas
+                </a>
+            </li>
+            <li class="submenu-item">
+                <a href="{{ route('kemahasiswaan_perwalian.berita_acara') }}">
+                    <i class="fas fa-book-open"></i> Berita Acara
+                </a>
+            </li>
             </ul>
         </li>
     </ul>
