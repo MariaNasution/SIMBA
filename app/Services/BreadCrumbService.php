@@ -29,6 +29,8 @@ class BreadCrumbService
                 return $this->generateMahasiswaBreadcrumbs($currentRoute, $params);
             case 'konselor':
                 return $this->generateKonselorBreadcrumbs($currentRoute, $params);
+            case 'kemahasiswaan':
+                return $this->generateKemahasiswaanBreadcrumbs($currentRoute, $params);
             default:
                 return [
                     ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => url('/')],
@@ -180,6 +182,13 @@ class BreadCrumbService
                 ];
                 break;
 
+            case 'konselor_riwayat.konseling.cari':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-history"></i> Konseling', 'url' => route('konselor_beranda')],
+                    ['name' => 'Riwayat Konseling', 'url' => null],
+                ];
+                break;
+
             case 'konselor_konseling_lanjutan':
                 $breadcrumbs = [
                     ['name' => '<i class="fas fa-forward"></i> Konseling', 'url' => route('konselor_beranda')],
@@ -189,6 +198,34 @@ class BreadCrumbService
 
             case 'konselor_ajukan_konseling':
             case 'konselor_konseling.ajukan.form':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-user-friends"></i> Konseling', 'url' => route('konselor_beranda')],
+                    ['name' => 'Ajukan Konseling', 'url' => null],
+                ];
+                break;
+
+            case 'konselor_konseling.form':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-user-friends"></i> Konseling', 'url' => route('konselor_beranda')],
+                    ['name' => 'Ajukan Konseling', 'url' => null],
+                ];
+                break;
+
+            case 'konselor_konseling.cari':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-user-friends"></i> Konseling', 'url' => route('konselor_beranda')],
+                    ['name' => 'Ajukan Konseling', 'url' => null],
+                ];
+                break;
+
+            case 'konselor_konseling.pilih':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-user-friends"></i> Konseling', 'url' => route('konselor_beranda')],
+                    ['name' => 'Ajukan Konseling', 'url' => null],
+                ];
+                break;
+
+            case 'konselor_konseling.ajukan':
                 $breadcrumbs = [
                     ['name' => '<i class="fas fa-user-friends"></i> Konseling', 'url' => route('konselor_beranda')],
                     ['name' => 'Ajukan Konseling', 'url' => null],
@@ -243,6 +280,152 @@ class BreadCrumbService
             default:
                 $breadcrumbs = [
                     ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('konselor_beranda')],
+                    ['name' => '<i class="fas fa-question-circle"></i> Halaman Tidak Dikenal', 'url' => null],
+                ];
+        }
+
+        return $breadcrumbs;
+    }
+
+    protected function generateKemahasiswaanBreadcrumbs($currentRoute, $params = [])
+    {
+        $breadcrumbs = [];
+
+        switch ($currentRoute) {
+            case 'kemahasiswaan_beranda':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => null],
+                ];
+                break;
+
+            case 'kemahasiswaan_pengumunankemahasiswaan.detail':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('kemahasiswaan_beranda')],
+                    ['name' => '<i class="fas fa-bullhorn"></i> Detail Pengumuman', 'url' => null],
+                ];
+                break;
+
+            // Grup Konseling
+            case 'kemahasiswaan_daftar_pelanggaran':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-list"></i> Konseling', 'url' => route('kemahasiswaan_beranda')],
+                    ['name' => 'Daftar Pelanggaran', 'url' => null],
+                ];
+                break;
+
+            case 'kemahasiswaan_hasil_konseling':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-book"></i> Konseling', 'url' => route('kemahasiswaan_beranda')],
+                    ['name' => 'Hasil Konseling', 'url' => null],
+                ];
+                break;
+
+            case 'kemahasiswaan_riwayat_konseling':
+            case 'kemahasiswaan_riwayat.konseling':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-history"></i> Konseling', 'url' => route('kemahasiswaan_beranda')],
+                    ['name' => 'Riwayat Konseling', 'url' => null],
+                ];
+                break;
+
+            case 'kemahasiswaan_riwayat.konseling.cari':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-history"></i> Konseling', 'url' => route('kemahasiswaan_beranda')],
+                    ['name' => 'Riwayat Konseling', 'url' => null],
+                ];
+                break;
+
+            case 'kemahasiswaan_konseling_lanjutan':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-forward"></i> Konseling', 'url' => route('kemahasiswaan_beranda')],
+                    ['name' => 'Konseling Lanjutan', 'url' => null],
+                ];
+                break;
+
+            case 'kemahasiswaan_ajukan_konseling':
+            case 'kemahasiswaan_konseling.ajukan.form':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-user-friends"></i> Konseling', 'url' => route('kemahasiswaan_beranda')],
+                    ['name' => 'Ajukan Konseling', 'url' => null],
+                ];
+                break;
+
+            case 'kemahasiswaan_konseling.form':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-user-friends"></i> Konseling', 'url' => route('kemahasiswaan_beranda')],
+                    ['name' => 'Ajukan Konseling', 'url' => null],
+                ];
+                break;
+
+            case 'kemahasiswaan_konseling.cari':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-user-friends"></i> Konseling', 'url' => route('kemahasiswaan_beranda')],
+                    ['name' => 'Ajukan Konseling', 'url' => null],
+                ];
+                break;
+
+            case 'kemahasiswaan_konseling.pilih':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-user-friends"></i> Konseling', 'url' => route('kemahasiswaan_beranda')],
+                    ['name' => 'Ajukan Konseling', 'url' => null],
+                ];
+                break;
+
+            case 'kemahasiswaan_konseling.ajukan':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-user-friends"></i> Konseling', 'url' => route('kemahasiswaan_beranda')],
+                    ['name' => 'Ajukan Konseling', 'url' => null],
+                ];
+                break;
+
+            case 'kemahasiswaan_daftar_request':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-book-open"></i> Konseling', 'url' => route('kemahasiswaan_beranda')],
+                    ['name' => 'Daftar Request', 'url' => null],
+                ];
+                break;
+
+            case 'kemahasiswaan_riwayat_daftar_request':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-clock"></i> Konseling', 'url' => route('kemahasiswaan_beranda')],
+                    ['name' => 'Riwayat Daftar Request', 'url' => null],
+                ];
+                break;
+
+            case 'kemahasiswaan_hasil.index':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-folder-open"></i> Data Hasil Konseling', 'url' => null],
+                ];
+                break;
+
+            case 'kemahasiswaan_hasil.show':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-folder-open"></i> Data Hasil Konseling', 'url' => route('kemahasiswaan_hasil.index')],
+                    ['name' => '<i class="fas fa-eye"></i> Detail Hasil', 'url' => null],
+                ];
+                break;
+
+            case 'kemahasiswaan_konseling.lanjutan.detail':
+                $nim = $params['nim'] ?? 'NIM Tidak Diketahui';
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-forward"></i> Konseling', 'url' => route('kemahasiswaan_beranda')],
+                    ['name' => 'Konseling Lanjutan', 'url' => route('kemahasiswaan_konseling_lanjutan')],
+                    ['name' => "Konseling Lanjutan Detail - $nim", 'url' => null],
+                ];
+                break;
+
+            case 'kemahasiswaan_riwayat.konseling.detail':
+                $nim = $params['nim'] ?? 'NIM Tidak Diketahui';
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-history"></i> Konseling', 'url' => route('kemahasiswaan_beranda')],
+                    ['name' => 'Riwayat Konseling', 'url' => route('kemahasiswaan_riwayat.konseling')],
+                    ['name' => "Riwayat Konseling Detail - $nim", 'url' => null],
+                ];
+                break;
+
+            default:
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('kemahasiswaan_beranda')],
                     ['name' => '<i class="fas fa-question-circle"></i> Halaman Tidak Dikenal', 'url' => null],
                 ];
         }
