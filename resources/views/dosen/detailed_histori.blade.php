@@ -8,13 +8,8 @@
             <a href="{{ route('dosen.histori') }}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left"></i> Back
             </a>
-            <h4 class="d-inline-block ms-3">Detail Perwalian</h4>
         </div>
-        <div>
-            <a href="{{ route('berita_acara.print', $perwalian->ID_Perwalian) }}" class="btn btn-primary">
-                <i class="fas fa-print"></i> Print Perwalian PDF
-            </a>
-        </div>
+        
     </div>
 
     <!-- Perwalian Information -->
@@ -29,6 +24,12 @@
             @endif
         </div>
     </div>
+
+    <div>
+            <a href="{{ route('berita_acara.print', $perwalian->ID_Perwalian) }}" class="btn btn-primary">
+                <i class="fas fa-print"></i> Print Perwalian PDF
+            </a>
+        </div>
 
     <div class="row">
         <!-- Left: Table of Students -->

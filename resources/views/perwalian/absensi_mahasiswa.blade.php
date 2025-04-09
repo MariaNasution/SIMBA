@@ -5,7 +5,9 @@
     <div class="container">
         <!-- Back Button -->
         <div class="mb-3">
-            <button onclick="goBack()" class="btn btn-secondary">⟵ Back</button>
+            <button onclick="goBack()" class="btn back-btn">
+                <span class="arrow"><</span>Back
+            </button>
         </div>
 
         <!-- Class Selection Buttons -->
@@ -25,16 +27,48 @@
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
+            margin-left: 200px
+
         }
         .am-class-btn {
-            padding: 10px 20px;
-            background-color: #007bff;
+            width: 650px;
+            padding: 15px 20px;
+            background-color: #68B8EA;
             color: white;
+            font-size: large;
+            font-weight: 100px;
+            text-align: center;
             text-decoration: none;
             border-radius: 5px;
+            transition: background-color 0.3s ease;
         }
         .am-class-btn:hover {
             background-color: #0056b3;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            background-color: #68B8EA;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 8px;
+
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background-color: #4A9CD6; /* Slightly darker shade for hover */
+        }
+
+        .back-btn .arrow {
+            font-size: 40px; /* Increased from 24px to 32px for a bigger arrow */
+            margin-right: 0px; /* Space between arrow and "Back" text */
+            line-height: 1; /* Ensure vertical alignment */
         }
     </style>
 

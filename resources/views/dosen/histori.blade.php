@@ -3,10 +3,9 @@
 @section('content')
   <!-- History Page Header -->
   <div class="header">
-    <h1>History</h1>
     <div class="search-container">
       <!-- We wrap the inputs in a form so we can submit the filters -->
-      <form action="{{ route('dosen.histori') }}" method="GET" style="display: flex; gap: 0.5rem;">
+      <form action="{{ route('dosen.histori') }}" method="GET">
         <input type="text" name="search" placeholder="Cari..." 
                value="{{ request('search') ?? '' }}" />
         <select name="category" onchange="this.form.submit()">
@@ -82,35 +81,35 @@
 
     .header {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      justify-content: flex-end; /* Aligns the search-container to the right */
       padding: 1rem 2rem;
-      background-color: #008cc9;
-      color: #fff;
-    }
-
-    .header h1 {
-      font-size: 1.5rem;
+      color: #ddd;
     }
 
     .search-container {
       display: flex;
-      align-items: center;
+      flex-direction: column; /* Stack elements vertically */
       gap: 0.5rem;
+      width: 200px; /* Match the width in the image */
     }
 
-    .search-container input[type="text"] {
-      padding: 0.5rem;
-      border: none;
-      border-radius: 4px;
-      outline: none;
-    }
-
+    .search-container input[type="text"],
     .search-container select {
+      width: 100%; /* Full width of the container */
       padding: 0.5rem;
-      border: none;
+      border: 1px solid #ddd; /* Add a light border to match the image */
       border-radius: 4px;
       outline: none;
+      background-color: #f5f5f5; /* Light gray background to match the image */
+      color: #666; /* Text color to match the placeholder in the image */
+    }
+
+    .search-container input[type="text"]::placeholder {
+      color: #999; /* Placeholder color to match the image */
+    }
+
+    .search-container .btn {
+      display: none; /* Hide the button as it's not in the image */
     }
 
     .container {
@@ -150,6 +149,28 @@
     /* Optional: style links inside .item */
     .item a {
       color: #333;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .header {
+        padding: 1rem;
+      }
+
+      .search-container {
+        width: 100%;
+        max-width: 200px; /* Keep the width consistent on smaller screens */
+      }
+
+      .container {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .column {
+        width: 100%;
+        max-width: 280px;
+      }
     }
   </style>
 @endsection

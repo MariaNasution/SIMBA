@@ -23,10 +23,10 @@ class DosenController extends Controller
         $nip = session('user')['username'];
         $baseUrl = 'https://cis-dev.del.ac.id';
         $studentsByYear = [];
-        $classesByYear = [];
         $prodisByYear = [];
+        $semesterAveragesByYear = []; // New array to store semester averages
 
-        $academicYears = [2020];
+        $academicYears = [2020]; // Expanded for your Blade template
         $currentSem = 2;
 
         if ($apiToken) {
@@ -48,7 +48,6 @@ class DosenController extends Controller
                 $dosenData = $dosenResponse->json();
                 $dosenSession = $dosenData['data']['dosen'][0];
                 session()->forget('user');
-
                 session(['user' => [
                     "username" => $nip,
                     "role" => 'dosen',
@@ -71,7 +70,6 @@ class DosenController extends Controller
                     return back()->with('error', 'Dosen ID not found.');
                 }
 
-                // Fetch anak wali for each year
                 foreach ($academicYears as $year) {
                     $mahasiswaResponse = Http::withToken($apiToken)
                         ->withOptions(['verify' => false])
@@ -83,8 +81,8 @@ class DosenController extends Controller
                         ]);
 
                     $studentsByYear[$year] = [];
-                    $classesByYear[$year] = [];
                     $prodisByYear[$year] = [];
+                    $semesterAveragesByYear[$year] = []; // Initialize for this year
 
                     if ($mahasiswaResponse->successful()) {
                         $responseData = $mahasiswaResponse->json();
@@ -102,60 +100,40 @@ class DosenController extends Controller
                                 }
 
                                 $classStudents = [];
+                                $semesterTotals = []; // To store sum and count per semester
 
-                                if (!is_array($students)) {
-                                    Log::error("anak_wali is not an array for class {$kelas} in year {$year}", ['anak_wali' => $students]);
-                                    continue;
-                                }
-
-                                // Batch fetch penilaian data
                                 $penilaianDataBatch = $this->batchFetchPenilaian($students, $apiToken, $baseUrl, $year, $currentSem);
 
                                 foreach ($students as $student) {
-                                    if (!is_array($student)) {
-                                        Log::warning("Student data is not an array for class {$kelas} in year {$year}", ['student' => $student]);
-                                        continue;
-                                    }
-
                                     $nim = $student['nim'] ?? null;
-                                    if (!$nim) {
-                                        Log::warning("Student NIM is missing for class {$kelas} in year {$year}", ['student' => $student]);
-                                        continue;
-                                    }
+                                    if (!$nim) continue;
 
-                                    if (!isset($student['nama'])) {
-                                        Log::warning("Student name is missing for NIM {$nim}", ['student' => $student]);
-                                        continue;
-                                    }
-
-                                    // Use batched penilaian data
                                     $penilaianData = $penilaianDataBatch[$nim] ?? [
                                         'IP' => '0.00',
                                         'IP Semester' => [],
                                         'status_krs' => 'Approved',
                                     ];
 
-                                    // Calculate IPK and IPS
                                     $ipk = isset($penilaianData['IP']) && is_numeric($penilaianData['IP'])
                                         ? number_format(floatval($penilaianData['IP']), 2)
                                         : null;
 
                                     $ipSemesterData = $penilaianData['IP Semester'] ?? [];
-                                    if (!is_array($ipSemesterData)) {
-                                        Log::warning("IP Semester data is not an array for student {$nim}", ['ipSemesterData' => $ipSemesterData]);
-                                        $ipSemesterData = [];
-                                    }
-
                                     $validIps = [];
                                     foreach ($ipSemesterData as $entry) {
-                                        if (!is_array($entry)) {
-                                            Log::warning("IP Semester entry is not an array for student {$nim}", ['entry' => $entry]);
-                                            continue;
-                                        }
                                         if (isset($entry['ip_semester']) && isset($entry['sem']) && 
                                             is_numeric($entry['ip_semester']) && 
                                             $entry['ip_semester'] !== "Belum di-generate") {
+                                            $sem = $entry['sem'];
+                                            $ip = floatval($entry['ip_semester']);
                                             $validIps[] = $entry;
+
+                                            // Aggregate totals
+                                            if (!isset($semesterTotals[$sem])) {
+                                                $semesterTotals[$sem] = ['total' => 0, 'count' => 0];
+                                            }
+                                            $semesterTotals[$sem]['total'] += $ip;
+                                            $semesterTotals[$sem]['count'] += 1;
                                         }
                                     }
 
@@ -182,13 +160,15 @@ class DosenController extends Controller
 
                                 $studentsByYear[$year][$kelas] = $classStudents;
                                 $prodisByYear[$year][$kelas] = $this->kelasToProdi($kelas) ?? null;
+
+                                // Calculate averages for this class
+                                $averages = [];
+                                foreach ($semesterTotals as $sem => $data) {
+                                    $averages[$sem] = number_format($data['total'] / $data['count'], 2);
+                                }
+                                $semesterAveragesByYear[$year][$kelas] = $averages;
                             }
                         }
-                    } else {
-                        Log::warning("Failed to fetch anak wali for year {$year}", [
-                            'status' => $mahasiswaResponse->status(),
-                            'response' => $mahasiswaResponse->body(),
-                        ]);
                     }
                 }
 
@@ -203,8 +183,7 @@ class DosenController extends Controller
             }
         }
 
-        // Removed: $breadcrumbs = DosenBreadcrumbController::getBreadcrumbs();
-        return view('beranda.homeDosen', compact('studentsByYear', 'prodisByYear', 'perwalianAnnouncement'));
+        return view('beranda.homeDosen', compact('studentsByYear', 'prodisByYear', 'perwalianAnnouncement', 'semesterAveragesByYear'));
     }
 
     public function showDetailedClass($year, $kelas)
@@ -392,11 +371,11 @@ class DosenController extends Controller
                 ->async()
                 ->get("{$baseUrl}/api/library-api/get-penilaian", [
                     'nim' => $nim,
-                    'ta' => $year,
-                    'sem_ta' => $semester,
+                   
                 ]);
-        }
 
+        }
+    
         foreach ($promises as $nim => $promise) {
             try {
                 $response = $promise->wait();
@@ -429,7 +408,6 @@ class DosenController extends Controller
                 ];
             }
         }
-
         return $penilaianDataBatch;
     }
 
