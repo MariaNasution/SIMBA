@@ -3,22 +3,37 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Notifikasi;
-use Illuminate\Support\Facades\Auth; // jika menggunakan Auth atau ambil dari session
+use App\Services\NotificationService;
 
 class NotifikasiController extends Controller
 {
+    protected $notificationService;
+
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
+    /**
+     * Mark all notifications as read for the authenticated user.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function markAllRead(Request $request)
     {
-        // Misalnya, kita mengambil nim mahasiswa dari request atau session
-        $nim = $request->input('nim');
-        if (!$nim) {
-            return response()->json(['message' => 'NIM not provided'], 400);
+        // Use the authenticated user rather than relying on a 'nim' input.
+        $user = auth()->user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        // Update semua notifikasi yang belum dibaca untuk mahasiswa tersebut
-        Notifikasi::where('nim', $nim)->where('is_read', false)->update(['is_read' => true]);
+        $updatedCount = $this->notificationService->markAllRead($user->id);
 
-        return response()->json(['message' => 'Notifikasi telah ditandai sebagai dibaca.']);
+        return response()->json([
+            'message' => 'Notifications have been marked as read.',
+            'updated_count' => $updatedCount,
+        ]);
     }
 }
