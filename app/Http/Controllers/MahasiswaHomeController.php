@@ -17,6 +17,10 @@ class MahasiswaHomeController extends Controller
     public function index()
     {
         $user = session('user');
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
         if (!$this->isValidMahasiswa($user)) {
             Log::error('User not authenticated or not a mahasiswa', ['user' => $user]);
             return redirect()->route('login')->withErrors(['error' => 'Please log in as a mahasiswa.']);
@@ -29,7 +33,10 @@ class MahasiswaHomeController extends Controller
         }
 
         $nim = $mahasiswa->nim;
+<<<<<<< Updated upstream
         $notifications = Notifikasi::where('nim', $nim)->latest()->get();
+=======
+>>>>>>> Stashed changes
         $apiToken = session('api_token');
 
         // Fetch student data and store related session data
@@ -74,17 +81,21 @@ class MahasiswaHomeController extends Controller
         ));
     }
 
+<<<<<<< Updated upstream
     /**
      * Validate that the user exists and has a mahasiswa role.
      *
      * @param mixed $user
      * @return bool
      */
+=======
+>>>>>>> Stashed changes
     private function isValidMahasiswa($user): bool
     {
         return $user && isset($user['role']) && $user['role'] === 'mahasiswa';
     }
 
+<<<<<<< Updated upstream
     /**
      * Fetch student data from the API and store sem_ta and ta in session.
      *
@@ -92,6 +103,8 @@ class MahasiswaHomeController extends Controller
      * @param string $apiToken
      * @return array
      */
+=======
+>>>>>>> Stashed changes
     private function fetchStudentData(string $nim, string $apiToken): array
     {
         try {
@@ -106,7 +119,7 @@ class MahasiswaHomeController extends Controller
                 $studentData = $response->json()['data'] ?? [];
                 session([
                     'sem_ta' => $studentData['sem_ta'] ?? null,
-                    'ta'     => $studentData['ta'] ?? null,
+                    'ta' => $studentData['ta'] ?? null,
                 ]);
                 return $studentData;
             } else {
@@ -118,6 +131,7 @@ class MahasiswaHomeController extends Controller
         return [];
     }
 
+<<<<<<< Updated upstream
     /**
      * Fetch academic performance data (penilaian) from the API.
      *
@@ -125,6 +139,8 @@ class MahasiswaHomeController extends Controller
      * @param string $apiToken
      * @return array|null Returns an array containing labels and values or null if failed.
      */
+=======
+>>>>>>> Stashed changes
     private function fetchPenilaianData(string $nim, string $apiToken): ?array
     {
         try {
@@ -141,7 +157,6 @@ class MahasiswaHomeController extends Controller
                 $data = $response->json();
                 $ipSemester = $data['IP Semester'] ?? [];
 
-                // Sort by academic year (ta) and semester (sem)
                 uasort($ipSemester, function ($a, $b) {
                     if ($a['ta'] === $b['ta']) {
                         return $a['sem'] <=> $b['sem'];
@@ -167,7 +182,47 @@ class MahasiswaHomeController extends Controller
         } catch (\Exception $e) {
             Log::error('Exception on fetching penilaian data:', ['message' => $e->getMessage()]);
         }
+<<<<<<< Updated upstream
         return null;
+=======
+
+        return null;
+    }
+
+    private function handlePerwalian(Mahasiswa $mahasiswa): array
+    {
+        $dosen = null;
+        $notifications = collect();
+        $dosenNotifications = collect();
+        $notificationCount = 0;
+        $noPerwalianMessage = null;
+
+        $perwalian = Perwalian::where('ID_Perwalian', $mahasiswa->ID_Perwalian)
+            ->where('Status', 'Scheduled')
+            ->first();
+
+        if ($perwalian) {
+            $dosen = Dosen::where('nip', $perwalian->ID_Dosen_Wali)->first();
+            $notifications = Notifikasi::where('Id_Perwalian', $perwalian->ID_Perwalian)
+                ->where('nim', $mahasiswa->nim)
+                ->get();
+
+            $dosenWaliIds = $notifications->map(function ($notification) {
+                return optional($notification->perwalian)->ID_Dosen_Wali;
+            })->filter()->unique();
+
+            $dosenNotifications = $dosenWaliIds->isNotEmpty()
+                ? Dosen::whereIn('nip', $dosenWaliIds)->get()
+                : collect();
+
+            $notificationCount = $notifications->count();
+        } else {
+            $noPerwalianMessage = 'No scheduled perwalian sessions at this time.';
+            Log::info('No scheduled perwalian found for student', ['nim' => $mahasiswa->nim]);
+        }
+
+        return [$dosen, $notifications, $dosenNotifications, $notificationCount, $noPerwalianMessage];
+>>>>>>> Stashed changes
     }
 
     /**

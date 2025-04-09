@@ -1,20 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="d-flex align-items-center mb-4 border-bottom-line">
-        <h3 class="me-auto">
-            @if(session('user.role') == 'kemahasiswaan')
-                <a href="{{ route('kemahasiswaan_beranda') }}"> <i class="fas fa-list me-3"></i>Konseling</a> /
-                <a href="{{ route('kemahasiswaan_daftar_pelanggaran') }}">Daftar Pelanggaran</a>
-            @elseif(session('user.role') == 'konselor')
-                <a href="{{ route('konselor_beranda') }}"> <i class="fas fa-list me-3"></i>Konselinge</a> /
-                <a href="{{ route('konselor_daftar_pelanggaran') }}">Daftar Pelanggaran</a>
-            @endif
-        </h3>
-        <a href="#" onclick="confirmLogout()">
-            <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
-        </a>
-    </div>
+ 
 
     <div class="card-body">
               {{-- Menampilkan jumlah data yang sedang ditampilkan --}}

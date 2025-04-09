@@ -2,25 +2,6 @@
 
 @section('content')
 
-    <div class="d-flex align-items-center mb-4 border-bottom-line">
-        <h3 class="me-auto">
-            @if(session('user.role') == 'kemahasiswaan')
-                <a href="{{ route('kemahasiswaan_beranda') }}">
-                    <i class="fas fa-list me-3"></i>Konseling
-                </a> /
-                <a href="{{ route('kemahasiswaan_daftar_request') }}">Daftar Request Konseling</a>
-            @elseif(session('user.role') == 'konselor')
-                <a href="{{ route('konselor_beranda') }}">
-                    <i class="fas fa-list me-3"></i>Konseling
-                </a> /
-                <a href="{{ route('konselor_daftar_request') }}">Daftar Request Konseling</a>
-            @endif
-        </h3>
-        <a href="#" onclick="confirmLogout()">
-            <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
-        </a>
-    </div>
-
     {{-- Alert Notifikasi --}}
     @if (session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -46,7 +27,7 @@
         </p>
 
         {{-- Filter Sorting --}}
-        <div class="d-flex justify-content-start mb-3">
+        <div class="d-flex justify-content-end mb-3">
             @if(session('user.role') == 'kemahasiswaan')
                 <form action="{{ route('kemahasiswaan_daftar_request') }}" method="GET">
             @elseif(session('user.role') == 'konselor')
@@ -89,22 +70,22 @@
                             @endif
                                     @csrf
                                     @method('PUT')
-                                    <button class="btn btn-success btn-sm">
+                                    <button type="submit" class="btn btn-success btn-sm">
                                         <i class="fas fa-check"></i>
                                     </button>
                                 </form>
-                            {{-- Reject Button --}}
-                            @if(session('user.role') == 'kemahasiswaan')
-                                <button class="btn btn-danger btn-sm reject-btn"
-                                    data-url="{{ route('kemahasiswaan_reject_konseling', $request->id) }}">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            @elseif(session('user.role') == 'konselor')
-                                <button class="btn btn-danger btn-sm reject-btn"
-                                    data-url="{{ route('konselor_reject_konseling', $request->id) }}">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            @endif
+                                {{-- Reject Button --}}
+                                @if(session('user.role') == 'kemahasiswaan')
+                                    <button class="btn btn-danger btn-sm reject-btn"
+                                        data-url="{{ route('kemahasiswaan_reject_konseling', $request->id) }}">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                @elseif(session('user.role') == 'konselor')
+                                    <button class="btn btn-danger btn-sm reject-btn"
+                                        data-url="{{ route('konselor_reject_konseling', $request->id) }}">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                @endif
                         </td>
                     </tr>
                 @endforeach
@@ -118,7 +99,7 @@
 
     <!-- Modal untuk alasan penolakan -->
     <div class="modal fade" id="rejectReasonModal" tabindex="-1" aria-labelledby="rejectReasonModalLabel"
-         aria-hidden="true">
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
