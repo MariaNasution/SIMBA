@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 use App\Models\Mahasiswa; // Import Mahasiswa model
 use App\Models\Perwalian; // Import Perwalian model
 
-class CreateNotifikasi2Table extends Migration
+class CreateNotifikasiTable extends Migration
 {
     public function up()
     {
