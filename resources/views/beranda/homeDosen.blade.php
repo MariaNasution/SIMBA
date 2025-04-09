@@ -6,7 +6,7 @@
         <div class="announcement-banner">
             <div class="announcement-header">
                 <i class="far fa-bullhorn announcement-icon" aria-hidden="true"></i>
-                <h4>Pengumuman</h4>
+                <h5>Pengumuman</h5>
             </div>
             <div class="announcement-text">
                 <p>{!! nl2br(e($perwalianAnnouncement)) !!}</p>
@@ -19,12 +19,12 @@
             @if (!empty($studentsByYear[$year]))
                 @foreach ($studentsByYear[$year] as $kelas => $classData)
                     <div class="col-md-12 mb-4">
-                        <div class="card p-3 shadow-sm">
+                        <div class="card p-3">
                             <h5 class="card-title">{{ $prodisByYear[$year][$kelas] }} {{ $year }} - {{ $kelas }}</h5>
-                            <div class="content-container" style="max-height: 300px; overflow-y: auto;">
+                            <div class="content-container" style="height: 300px; position: relative;">
                                 <!-- Table -->
                                 <div class="table-wrapper">
-                                    <table class="table table-striped">
+                                    <table class="table table-bordered">
                                         <thead>
                                             <tr>
                                                 <th>NIM</th>
@@ -50,8 +50,8 @@
                                     </table>
                                 </div>
                                 <!-- Chart -->
-                                <div class="chart-wrapper" style="display: none;">
-                                    <canvas class="progress-chart"></canvas>
+                                <div class="chart-wrapper" style="display: none; height: 100%;">
+                                    <canvas class="progress-chart" style="max-height: 100%; max-width: 100%;"></canvas>
                                 </div>
                             </div>
                             <div class="text-end mt-2">
@@ -67,95 +67,137 @@
 </div>
 
 <style>
-        @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap');
 
-        .announcement-banner * {
-            font-family: 'Nunito Sans', sans-serif !important;
-        }
+    .announcement-banner * {
+        font-family: 'Nunito Sans', sans-serif !important;
+    }
 
-        .announcement-banner {
-            background-color: #f28c82;
-            padding: 25px 15px;
-            border-radius: 10px;
-            display: block;
-            margin-bottom: 20px;
-            color: #fff;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            max-width: 450px;
-            width: 450px;
-            min-height: 80px;
-        }
+    .announcement-banner {
+        background-color: #f28c82;
+        padding: 25px 15px;
+        border-radius: 10px;
+        display: block;
+        margin-bottom: 20px;
+        color: #fff;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        max-width: 450px;
+        width: 450px;
+        min-height: 80px;
+    }
 
-        .announcement-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 5px;
-        }
+    .announcement-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+    }
 
-        .announcement-icon {
-            font-size: 24px;
-            margin-right: 10px;
-            color: #fff;
-        }
+    .announcement-icon {
+        font-size: 24px;
+        margin-right: 10px;
+        color: #fff;
+    }
 
-        .announcement-header h4 {
-            font-size: 18px;
-            font-weight: 600;
-            margin: 0;
-            display: inline-block;
-            vertical-align: middle;
-            text-align: left;
-        }
+    .announcement-header h5 {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0;
+        display: inline-block;
+        vertical-align: middle;
+        text-align: left;
+    }
 
-        .announcement-text {
-            display: block;
-            width: 100%;
-        }
+    .announcement-text {
+        display: block;
+        width: 100%;
+    }
+    
+    .announcement-text p {
+        font-size: 14px;
+        margin-left: 10px;
+        margin-top: 10px;
+        line-height: 1.5;
+        text-align: left;
+        font-weight: 700;
+        color: #fff;
+    }
 
-        .announcement-text p {
-            font-size: 14px;
-            margin-left: 10px;
-            margin-top: 10px;
-            line-height: 1.5;
-            text-align: left;
-            font-weight: 700;
-            color: #fff;
-        }
+    .card-title {
+        text-align: left;
+        margin-bottom: 15px;
+    }
+    
+    .card {
+        background-color: transparent;
+        box-shadow: none;
+    }
 
-        .content-container {
-            position: relative;
-            transition: all 0.5s ease;
-        }
+    .content-container {
+        transition: all 0.5s ease;
+        overflow-y: auto; /* Keep this for table scrolling if needed */
+    }
 
-        .table-wrapper, .chart-wrapper {
-            width: 100%;
-            transition: transform 0.5s ease;
-        }
+    .table-wrapper, .chart-wrapper {
+        width: 100%;
+        height: 100%; /* Ensure both take full height of container */
+        transition: transform 0.5s ease;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
 
-        .table-wrapper {
-            transform: translateX(0);
-        }
+    .table-wrapper {
+        transform: translateX(0);
+    }
 
-        .chart-wrapper {
-            transform: translateX(100%);
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
+    .chart-wrapper {
+        transform: translateX(100%);
+    }
 
-        .table-wrapper.slide-out {
-            transform: translateX(-100%);
-        }
+    .table-wrapper.slide-out {
+        transform: translateX(-100%);
+    }
 
-        .chart-wrapper.slide-in {
-            transform: translateX(0);
-        }
-    </style>
+    .chart-wrapper.slide-in {
+        transform: translateX(0);
+    }
+
+    .table {
+        border-collapse: collapse;
+    }
+
+    .table th {
+        padding-left: 8px;
+        padding-right: 8px;
+        padding-top: 4px;
+        padding-bottom: 4px;
+        border: 1px solid #333;
+    }
+   
+    .table td {
+        border: 1px solid #333;
+        padding: 8px;
+    }
+
+    .table tbody td {
+        color: #333;
+        background-color: #DFF0D8;
+    }
+
+    .table tbody tr:first-child td {
+        background-color: #F2DEDE;
+    }
+
+    .table thead th {
+        background-color: #fff;
+        color: #333;
+    }
+</style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const prodisByYear = @json($prodisByYear);
-    const studentsByYear = @json($studentsByYear);
+    const semesterAveragesByYear = @json($semesterAveragesByYear);
 
     document.addEventListener('DOMContentLoaded', function() {
         const toggleButtons = document.querySelectorAll('.toggle-chart');
@@ -189,28 +231,14 @@
                     this.textContent = 'Kembali ke Tabel';
                     
                     if (!chartInitialized) {
-                        const students = studentsByYear[year][kelas];
-                        const semesterAverages = {};
-                        students.forEach(student => {
-                            const semester = student.semester || 1;
-                            if (!semesterAverages[semester]) {
-                                semesterAverages[semester] = { total: 0, count: 0 };
-                            }
-                            const ipk = parseFloat(student.ipk) || 0;
-                            semesterAverages[semester].total += ipk;
-                            semesterAverages[semester].count += 1;
-                        });
+                        const semesterAverages = semesterAveragesByYear[year][kelas] || {};
+                        const maxSemester = Math.max(...Object.keys(semesterAverages).map(Number), 5);
 
                         const labels = [];
                         const data = [];
-                        for (let sem = 1; sem <= 5; sem++) {
-                            labels.push(`SEM ${sem}`);
-                            if (semesterAverages[sem]) {
-                                const avg = semesterAverages[sem].total / semesterAverages[sem].count;
-                                data.push(avg.toFixed(2));
-                            } else {
-                                data.push(0);
-                            }
+                        for (let sem = 1; sem <= maxSemester; sem++) {
+                            labels.push(`Semester ${sem}`);
+                            data.push(semesterAverages[sem] || 0);
                         }
 
                         chartInstance = new Chart(canvas, {
@@ -231,21 +259,23 @@
                             },
                             options: {
                                 responsive: true,
+                                maintainAspectRatio: false, // Allow chart to fill container without maintaining default aspect ratio
                                 plugins: {
                                     title: {
                                         display: true,
-                                        text: `Kemajuan Studi Kelas ${prodisByYear[year][Object.keys(studentsByYear[year]).indexOf(kelas)]} ${year} - ${kelas}`,
-                                        font: { size: 16 }
+                                        text: `Progress Pencapaian ${prodisByYear[year][kelas]} ${year} - ${kelas}`,
+                                        font: { size: 16 },
+                                        color: 'black'
                                     },
                                     legend: { position: 'bottom' }
                                 },
                                 scales: {
                                     y: {
                                         beginAtZero: false,
-                                        min: 2.8,
-                                        max: 3.4,
-                                        ticks: { stepSize: 0.12 },
-                                        title: { display: true, text: 'NR Rata-rata Kelas' }
+                                        min: 2.0,
+                                        max: 4.0,
+                                        ticks: { stepSize: 0.5 },
+                                        title: { display: true, text: 'Index Prestasi' }
                                     },
                                     x: { title: { display: true, text: 'Semester' } }
                                 }

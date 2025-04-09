@@ -1,324 +1,242 @@
-@extends('layouts.app')
+<?php
 
-@section('content')
-    <div class="container">
-        
+namespace App\Http\Controllers;
 
-        <!-- Back Button -->
-        <div class="mb-4">
-            <a href="{{ route('berita_acara.select_class') }}" class="btn btn-outline-primary">
-                <i class="fas fa-arrow-left"></i> Back
-            </a>
-        </div>
+use Illuminate\Http\Request;
+use App\Models\BeritaAcara;
+use App\Models\Absensi;
+use App\Models\Perwalian;
+use Carbon\Carbon;
+use App\Models\Mahasiswa;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
-        <!-- Feedback Messages -->
-        <div id="feedbackMessage" class="alert alert-dismissible fade show d-none" role="alert">
-            <span id="feedbackText"></span>
-            <button type="button" class="btn-close" onclick="hideFeedback()"></button>
-        </div>
-
-        <!-- Absensi Table -->
-        <div class="mb-4">
-            <h4 style="font-size: 18px; font-weight: 600; color: #333;">
-                Absensi Kelas {{ $selectedClass }} pada {{ \Carbon\Carbon::parse($selectedDate)->translatedFormat('l, d F Y') }}
-            </h4>
-
-            <style>
-                table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin-top: 20px;
-                }
-
-                th, td {
-                    border: 1px solid #ddd;
-                    padding: 8px;
-                    text-align: left;
-                }
-
-                th {
-                    background-color: #f2f2f2;
-                }
-
-                .status-display {
-                    display: block;
-                }
-
-                .status-desc {
-                    position: relative;
-                }
-            </style>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>NIM</th>
-                        <th>Nama</th>
-                        <th>Status Kehadiran</th>
-                        <th>Keterangan</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($absensiRecords as $record)
-                        <tr>
-                            <td>{{ $record->nim ?? 'N/A' }}</td>
-                            <td>{{ $record->mahasiswa->nama ?? 'Unknown' }}</td>
-                            <td>
-                                <div class="status-display">
-                                    <span class="selected-status">
-                                        @if ($record->status_kehadiran === 'hadir')
-                                            ✅ Hadir
-                                        @elseif ($record->status_kehadiran === 'alpa')
-                                            ❌ Alpa
-                                        @elseif ($record->status_kehadiran === 'izin')
-                                            📝 Izin
-                                        @else
-                                            Tidak Diketahui
-                                        @endif
-                                    </span>
-                                </div>
-                            </td>
-                            <td class="status-desc">
-                                <span class="keterangan-text">
-                                    {{ $record->keterangan ?? '' }}
-                                </span>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="4">Tidak ada data absensi untuk perwalian ini.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Berita Acara Form -->
-        <div class="text-center">
-            <img src="{{ asset('assets/img/Logo Institut Teknologi Del.png') }}" alt="Logo IT Del" class="mb-4" style="max-width: 150px;">
-            <h3 class="fw-bold title-centered">AGENDA PERWALIAN</h3>
-
-            <form id="beritaAcaraForm" onsubmit="handleFormSubmit(event)">
-            @csrf
-                <div class="text-start mt-4">
-                    <div class="info-container">
-                        <div class="info-row">
-                            <strong class="info-label-large">Kelas</strong><span>:</span>
-                            <input type="text" name="kelas" value="{{ $selectedClass }}" class="editable-input" readonly>
-                        </div>
-                        <div class="info-row">
-                            <strong class="info-label-large">Angkatan</strong><span>:</span>
-                            <input type="number" name="angkatan" value="{{ $selectedAngkatan ?? '' }}" class="editable-input" required oninput="showFieldFeedback('Angkatan', this)">
-                        </div>
-                        <div class="info-row">
-                            <strong class="info-label-large">Dosen Wali</strong><span>:</span>
-                            <strong>{{ session('user')['username'] ?? 'Nama Tidak Ditemukan' }}</strong>
-                        </div>
-                    </div>
-                </div>
-                <div class="berita-acara-box">
-                    <div class="info-container">
-                        <div class="info-row">
-                            <span class="info-label">Tanggal</span><span>:</span>
-                            <input type="date" name="tanggal_perwalian" value="{{ $selectedDate }}" class="editable-input" readonly>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Perihal</span><span>:</span>
-                            <input type="text" name="perihal_perwalian" value="{{ old('perihal_perwalian') }}" class="editable-input" required oninput="showFieldFeedback('Perihal Perwalian', this)">
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Agenda</span><span>:</span>
-                            <textarea name="agenda" class="editable-textarea" rows="4" required oninput="showFieldFeedback('Agenda', this)">{{ old('agenda') }}</textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="footer-info">
-                    <span class="left">IT Del/Berita Acara Perwalian</span>
-                    <span class="right">Halaman 1 dari 2</span>
-                </div>
-
-                <div class="page-break"></div>
-
-                <img src="{{ asset('assets/img/Logo Institut Teknologi Del.png') }}" alt="Logo IT Del" class="mb-4" style="max-width: 150px;">
-                <h3 class="fw-bold title-centered">BERITA ACARA PERWALIAN</h3>
-                <h5 class="sub-title">( Feedback dari mahasiswa selama perwalian )</h5>
-
-                <div class="berita-acara-box">
-                    <div class="info-container">
-                        <div class="info-row">
-                            <span class="info-label">Hari/Tanggal</span><span>:</span>
-                            <input type="date" name="hari_tanggal" value="{{ old('hari_tanggal') }}" class="editable-input" required oninput="showFieldFeedback('Hari/Tanggal Feedback', this)">
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Perihal Feedback</span><span>:</span>
-                            <input type="text" name="perihal2" value="{{ old('perihal2') }}" class="editable-input" oninput="showFieldFeedback('Perihal Feedback', this)">
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Catatan</span><span>:</span>
-                            <textarea name="catatan" class="editable-textarea" rows="4" oninput="showFieldFeedback('Catatan', this)">{{ old('catatan') }}</textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="signature-box">
-                    <p>
-                        Sitoluama, <input type="date" name="tanggal_ttd" value="{{ old('tanggal_ttd') }}" class="editable-input" required oninput="showFieldFeedback('Tanggal Tanda Tangan', this)">
-                    </p>
-                    <br><br><br>
-                    <p><input type="text" name="dosen_wali_ttd" value="({{ session('user')['username'] ?? 'Nama Tidak Ditemukan' }})" class="editable-input" required oninput="showFieldFeedback('Dosen Wali TTD', this)"></p>
-                </div>
-
-                <div class="footer-info">
-                    <span class="left">IT Del/Berita Acara Perwalian</span>
-                    <span class="right">Halaman 2 dari 2</span>
-                </div>
-
-                <div class="submit-container">
-                    <button type="submit" class="btn btn-success" id="submitButton">
-                        <span id="buttonText">Submit</span>
-                        <span id="buttonLoading" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                    </button>
-                </div>
-            </form>
-
-            <!-- Modal for Success -->
-            <div class="modal fade" id="beritaAcaraModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header bg-success-subtle">
-                            <h5 class="modal-title fw-bold" id="modalLabel">Berita Acara</h5>
-                        </div>
-                        <div class="modal-body">
-                            <p id="modalMessage"></p>
-                            <p id="modalDate"></p>
-                        </div>
-                        <div class="modal-footer">
-                            <a href="{{ route('dosen') }}" class="btn btn-success">OKE</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <style>
-        .border-bottom-line { border-bottom: 1px solid #E5E5E5; padding-bottom: 10px; }
-        #feedbackMessage.alert-success { background-color: #d4edda; color: #155724; }
-        #feedbackMessage.alert-danger { background-color: #f8d7da; color: #721c24; }
-        .berita-acara-box { min-height: 700px; border: 2px solid #333; border-radius: 5px; padding: 15px; background-color: #f9f9f9; }
-        .info-container { display: grid; grid-template-columns: max-content 10px auto; gap: 5px; }
-        .info-row { display: contents; }
-        .info-label-large { font-size: 1.2rem; font-weight: bold; text-align: left; white-space: nowrap; }
-        .info-label { font-size: 1rem; font-weight: normal; text-align: left; white-space: nowrap; }
-        .info-row span { align-self: start; }
-        .title-centered { display: flex; justify-content: center; align-items: center; min-height: 100px; }
-        .footer-info { display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.9rem; font-weight: bold; }
-        .footer-info .left { text-align: left; }
-        .footer-info .right { text-align: right; }
-        .page-break { page-break-before: always; margin-top: 100px; }
-        .signature-box { margin-top: 40px; text-align: left; }
-        .signature-box p { margin: 5px 0; font-size: 1rem; font-weight: bold; }
-        .submit-container { display: flex; justify-content: flex-end; padding-right: 50px; margin-top: 50px; }
-        .editable-input, .editable-textarea { border: none; background: transparent; outline: none; width: 100%; font-size: inherit; font-family: inherit; }
-        .editable-textarea { min-height: 50px; resize: none; }
-        .btn-outline-primary { transition: all 0.3s ease; }
-        .btn-outline-primary:hover { background-color: #e9ecef; }
-    </style>
-
-    <script>
-        const storeRoute = "{{ route('berita_acara.store') }}";
-
-        function showFeedback(message, type = 'success') {
-            const feedbackMessage = document.getElementById('feedbackMessage');
-            const feedbackText = document.getElementById('feedbackText');
-            feedbackText.textContent = message;
-            feedbackMessage.classList.remove('d-none', 'alert-success', 'alert-danger');
-            feedbackMessage.classList.add(`alert-${type}`);
-            setTimeout(hideFeedback, 5000);
+class BeritaAcaraController extends Controller
+{
+    public function selectClass(Request $request)
+    {
+        $user = session('user');
+        if (!$user) {
+            return redirect()->route('login')->withErrors(['error' => 'Anda harus login untuk mengakses berita acara.']);
         }
 
-        function hideFeedback() {
-            const feedbackMessage = document.getElementById('feedbackMessage');
-            feedbackMessage.classList.add('d-none');
+        // Fetch classes associated with the user
+        $classes = [];
+        $dosenRecord = DB::table('dosen_wali')
+            ->where('username', $user['username'])
+            ->first();
+        if ($dosenRecord && !empty($dosenRecord->kelas)) {
+            $classes = array_map('trim', explode(',', $dosenRecord->kelas));
         }
+        Log::info('Classes fetched for user', ['username' => $user['username'], 'classes' => $classes]);
 
-        function showFieldFeedback(fieldName, element) {
-            if (element.value.trim()) {
-                const message = element.type === 'date'
-                    ? `${fieldName} diisi: ${new Date(element.value).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}`
-                    : `${fieldName} diisi: ${element.value}`;
-                showFeedback(message, 'success');
-            } else {
-                showFeedback(`${fieldName} dikosongkan.`, 'danger');
-            }
-        }
-
-        function handleFormSubmit(event) {
-            event.preventDefault();
-            const form = document.getElementById('beritaAcaraForm');
-            const submitButton = document.getElementById('submitButton');
-            const buttonText = document.getElementById('buttonText');
-            const buttonLoading = document.getElementById('buttonLoading');
-
-            submitButton.disabled = true;
-            buttonText.classList.add('d-none');
-            buttonLoading.classList.remove('d-none');
-
-            const formData = new FormData(form);
-
-            // Log the form data for debugging
-            for (let [key, value] of formData.entries()) {
-                console.log(`${key}: ${value}`);
-            }
-
-            fetch(storeRoute, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                },
+        // Fetch all completed perwalians for these classes
+        $completedPerwalians = Perwalian::whereIn('kelas', $classes)
+            ->where('ID_Dosen_Wali', $user['nip'])
+            ->where('Status', 'Completed')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('absensi')
+                    ->whereColumn('absensi.ID_Perwalian', 'perwalian.ID_Perwalian');
             })
-            .then(response => {
-                console.log('Response status:', response.status);
-                return response.json();
+            ->whereNotExists(function ($query) use ($user) {
+                $query->select(DB::raw(1))
+                    ->from('berita_acaras')
+                    ->whereColumn('berita_acaras.tanggal_perwalian', 'perwalian.Tanggal')
+                    ->whereColumn('berita_acaras.kelas', 'perwalian.kelas')
+                    ->where('berita_acaras.user_id', $user['user_id']);
             })
-            .then(data => {
-                console.log('Response data:', data);
-                submitButton.disabled = false;
-                buttonText.classList.remove('d-none');
-                buttonLoading.classList.add('d-none');
+            ->get()
+            ->map(function ($perwalian) {
+                return [
+                    'class' => $perwalian->kelas,
+                    'date' => $perwalian->Tanggal,
+                    'angkatan' => $perwalian->angkatan,
+                    'display' => "Kelas {$perwalian->kelas} - " . Carbon::parse($perwalian->Tanggal)->translatedFormat('l, d F Y'),
+                ];
+            })->toArray();
 
-                if (data.success) {
-                    const modal = new bootstrap.Modal(document.getElementById('beritaAcaraModal'));
-                    document.getElementById('modalLabel').textContent = `Berita Acara ${data.kelas}`;
-                    document.getElementById('modalMessage').textContent = `Terima kasih telah mengisi berita acara kelas ${data.kelas} pada perwalian`;
-                    document.getElementById('modalDate').textContent = new Date(data.tanggal_perwalian).toLocaleDateString('id-ID', {
-                        weekday: 'long',
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric'
-                    });
-                    modal.show();
-                } else {
-                    showFeedback(data.message, 'danger');
-                }
-            })
-            .catch(error => {
-                console.error('Error submitting form:', error);
-                submitButton.disabled = false;
-                buttonText.classList.remove('d-none');
-                buttonLoading.classList.add('d-none');
-                showFeedback('Gagal mengirimkan form: ' + error.message, 'danger');
-            });
+        Log::info('Completed perwalians fetched', [
+            'count' => count($completedPerwalians),
+            'data' => $completedPerwalians
+        ]);
+        return view('perwalian.berita_acara_select_class', compact('completedPerwalians'));
+    }
+
+    public function create(Request $request)
+    {
+        $user = session('user');
+        if (!$user) {
+            return redirect()->route('login')->withErrors(['error' => 'Anda harus login untuk mengakses berita acara.']);
+        }
+        $selectedClass = $request->query('kelas');
+        $selectedDate = $request->query('tanggal_perwalian');
+        $selectedAngkatan = $request->query('angkatan');
+
+        if (!$selectedClass || !$selectedDate) {
+            return redirect()->route('berita_acara.select_class')->withErrors(['error' => 'Kelas dan tanggal perwalian harus dipilih.']);
         }
 
-        function confirmLogout() {
-            if (confirm('Apakah Anda yakin ingin logout?')) {
-                window.location.href = "{{ route('logout') }}";
-            }
+        // Fetch the perwalian to ensure it exists and meets criteria
+        $perwalian = Perwalian::where('kelas', $selectedClass)
+            ->where('Tanggal', $selectedDate)
+            ->where('ID_Dosen_Wali', $user['nip'])
+            ->where('Status', 'Completed')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('absensi')
+                    ->whereColumn('absensi.ID_Perwalian', 'perwalian.ID_Perwalian');
+            })
+            ->whereNotExists(function ($query) use ($user) {
+                $query->select(DB::raw(1))
+                    ->from('berita_acaras')
+                    ->whereColumn('berita_acaras.tanggal_perwalian', 'perwalian.Tanggal')
+                    ->whereColumn('berita_acaras.kelas', 'perwalian.kelas')
+                    ->where('berita_acaras.user_id', $user['user_id']);
+            })
+            ->first();
+        if (!$perwalian) {
+            return redirect()->route('berita_acara.select_class')->withErrors(['error' => 'Perwalian ini tidak valid atau sudah memiliki berita acara.']);
         }
-    </script>
-@endsection
+
+        // Fetch absensi records
+        $absensiRecords = Absensi::where('ID_Perwalian', $perwalian->ID_Perwalian)
+            ->with('mahasiswa')
+            ->get();
+
+        Log::info('Absensi records fetched for form', [
+            'ID_Perwalian' => $perwalian->ID_Perwalian,
+            'count' => $absensiRecords->count()
+        ]);
+
+        return view('perwalian.berita_acara', compact('selectedClass', 'selectedDate', 'selectedAngkatan', 'absensiRecords', 'perwalian'));
+    }
+
+    public function store(Request $request)
+    {
+        $user = session('user');
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Anda harus login untuk membuat berita acara.'], 401);
+        }
+
+        // Log the incoming request data
+        Log::info('Store request received in BeritaAcaraController', [
+            'request_data' => $request->all(),
+            'user' => $user,
+        ]);
+
+        $selectedClass = $request->kelas;
+        $selectedDate = $request->tanggal_perwalian;
+
+        // Verify the perwalian session
+        $perwalian = Perwalian::where('kelas', $selectedClass)
+            ->where('Tanggal', $selectedDate)
+            ->where('ID_Dosen_Wali', $user['nip'])
+            ->where('Status', 'Completed')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('absensi')
+                    ->whereColumn('absensi.ID_Perwalian', 'perwalian.ID_Perwalian');
+            })
+            ->whereNotExists(function ($query) use ($user) {
+                $query->select(DB::raw(1))
+                    ->from('berita_acaras')
+                    ->whereColumn('berita_acaras.tanggal_perwalian', 'perwalian.Tanggal')
+                    ->whereColumn('berita_acaras.kelas', 'perwalian.kelas')
+                    ->where('berita_acaras.user_id', $user['user_id']);
+            })
+            ->first();
+
+        // Log the result of the Perwalian query
+        Log::info('Perwalian check in store method', [
+            'selectedClass' => $selectedClass,
+            'selectedDate' => $selectedDate,
+            'user_nip' => $user['nip'],
+            'perwalian_found' => $perwalian ? true : false,
+            'perwalian_data' => $perwalian ? $perwalian->toArray() : null,
+        ]);
+
+        if (!$perwalian) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Perwalian ini belum selesai, tidak memiliki absensi, atau sudah memiliki berita acara.',
+            ], 400);
+        }
+
+        $request->validate([
+            'kelas' => 'required|string|max:255',
+            'angkatan' => 'required|integer',
+            'tanggal_perwalian' => [
+                'required',
+                'date',
+                'date_format:Y-m-d',
+            ],
+            'perihal_perwalian' => 'required|string|max:255',
+            'agenda' => 'required|string',
+            'hari_tanggal' => [
+                'required',
+                'date',
+                'date_format:Y-m-d',
+            ],
+            'perihal2' => 'nullable|string|max:255',
+            'catatan' => 'nullable|string',
+            'tanggal_ttd' => [
+                'required',
+                'date',
+                'date_format:Y-m-d',
+            ],
+            'dosen_wali_ttd' => 'required|string|max:255',
+        ]);
+
+        try {
+            $beritaAcara = BeritaAcara::create([
+                'kelas' => $request->kelas,
+                'angkatan' => $request->angkatan,
+                'dosen_wali' => $user['username'],
+                'tanggal_perwalian' => $request->tanggal_perwalian,
+                'perihal_perwalian' => $request->perihal_perwalian,
+                'agenda_perwalian' => $request->agenda,
+                'hari_tanggal_feedback' => $request->hari_tanggal,
+                'perihal_feedback' => $request->perihal2 ?? 'Tidak ada',
+                'catatan_feedback' => $request->catatan,
+                'tanggal_ttd' => $request->tanggal_ttd,
+                'dosen_wali_ttd' => $request->dosen_wali_ttd,
+                'user_id' => $user['user_id'],
+            ]);
+            Log::info("Value of berita acara", ['berita_acara' => $beritaAcara->toArray()]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Berita acara berhasil disimpan.',
+                'kelas' => $request->kelas,
+                'tanggal_perwalian' => $request->tanggal_perwalian,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to create Berita Acara: ' . $e->getMessage(), ['exception' => $e->getTraceAsString()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menyimpan berita acara: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function show($id)
+    {
+        $user = session('user');
+        if (!$user) {
+            return redirect()->route('login')->withErrors(['error' => 'Anda harus login untuk melihat berita acara.']);
+        }
+
+        $beritaAcara = BeritaAcara::where('user_id', $user['user_id'])->findOrFail($id);
+        return view('perwalian.berita_acara_detail', compact('beritaAcara'));
+    }
+
+    public function success($kelas, $tanggal_perwalian)
+    {
+        $user = session('user');
+        if (!$user) {
+            return redirect()->route('login')->withErrors(['error' => 'Anda harus login untuk melihat halaman ini.']);
+        }
+
+        return view('perwalian.berita_acara_success', compact('kelas', 'tanggal_perwalian'));
+    }
+}

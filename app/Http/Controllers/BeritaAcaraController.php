@@ -229,4 +229,14 @@ class BeritaAcaraController extends Controller
         $beritaAcara = BeritaAcara::where('user_id', $user['user_id'])->findOrFail($id);
         return view('perwalian.berita_acara_detail', compact('beritaAcara'));
     }
+
+    public function success($kelas, $tanggal_perwalian)
+    {
+        $user = session('user');
+        if (!$user) {
+            return redirect()->route('login')->withErrors(['error' => 'Anda harus login untuk melihat halaman ini.']);
+        }
+
+        return view('perwalian.berita_acara_success', compact('kelas', 'tanggal_perwalian'));
+    }
 }

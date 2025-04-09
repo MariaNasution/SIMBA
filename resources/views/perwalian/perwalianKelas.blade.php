@@ -4,18 +4,24 @@
     <style>
         table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: collapse; /* Ensure borders collapse properly */
             margin-top: 20px;
         }
 
         th, td {
-            border: 1px solid #ddd;
+            border: 2px solid #aaa; /* Consistent border for all cells */
             padding: 8px;
             text-align: left;
         }
 
         th {
             background-color: #f2f2f2;
+        }
+
+        .btn {
+            background-color: #4CAF50;
+            color: #fff;
+            margin-top: 20px;
         }
 
         .button-container {
@@ -28,10 +34,16 @@
         .status-cell {
             position: relative;
             cursor: pointer;
+            display: flex; /* Keep flex for centering */
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            padding: 8px; /* Match td padding to avoid size differences */
+            box-sizing: border-box; /* Ensure padding doesn’t increase cell size */
         }
 
         .status-buttons {
             display: flex;
+            justify-content: center; /* Center the buttons */
             gap: 5px;
         }
 
@@ -43,17 +55,17 @@
         }
 
         .present {
-            background-color: #28a745;
+            opacity: 100%;
             color: white;
         }
 
         .absent {
-            background-color: #dc3545;
+            opacity: 100%;
             color: white;
         }
 
         .permission {
-            background-color: #ffc107;
+            opacity: 100%;
             color: black;
         }
 
@@ -91,30 +103,58 @@
             border-radius: 3px;
         }
 
-        .breadcrumb {
-            margin-bottom: 20px;
-        }
-
         .back-btn {
-            text-decoration: none;
-            color: #007bff;
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            background-color: #68B8EA;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 8px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-bottom: 30px;
+            margin-left: 10px;
         }
 
         .back-btn:hover {
-            text-decoration: underline;
+            background-color: #4A9CD6;
         }
 
-        .arrow {
-            margin-right: 5px;
+        .back-btn .arrow {
+            font-size: 40px;
+            margin-right: 0px;
+            line-height: 1;
+        }
+
+        form button {
+            background: none;
+            border: none;
+            padding: 0;
+            margin: 0;
+            box-shadow: none;
+            outline: none;
+            text-align: center;
+        }
+
+        form button:hover {
+            opacity: 0.8;
+            cursor: pointer;
+        }
+
+        .status-btn {
+            text-align: center;
         }
     </style>
 
-    <!-- Breadcrumb -->
-    <div class="breadcrumb">
-        <a href="{{ route('absensi') }}" class="back-btn">
-            <span class="arrow">⟵</span> Back
-        </a>
+    <div class="mb-3" style="text-align: left;">
+        <button onclick="goBack()" class="btn back-btn">
+            <span class="arrow"><</span>Back
+        </button>
     </div>
+
 
     <!-- Header -->
     <h1>{{ $title }}</h1>
@@ -136,10 +176,8 @@
     <form id="attendanceForm" action="{{ route('absensi.store', ['date' => $date, 'class' => $class]) }}" method="POST" onsubmit="return confirm('Are you sure you want to save the attendance data?');">
         @csrf
 
-        <!-- Quick Access and Simpan Buttons -->
         <div class="button-container">
-            <button type="button" onclick="markAllHadir()" class="btn btn-success">✅ Quick Access</button>
-            <button type="submit" class="btn btn-primary">Simpan</button>
+            <button type="button" onclick="markAllHadir()" class="btn"> Quick Access</button>
         </div>
 
         <!-- Attendance Table -->
@@ -195,6 +233,11 @@
             </tbody>
         </table>
     </form>
+
+    <!-- Save Button -->
+    <div class="button-container">
+        <button type="submit" class="btn">Simpan</button>
+    </div>
 
     <script>
         function updateStatus(event, element, emoji, text) {
@@ -287,5 +330,9 @@
                 }
             });
         });
+
+        function goBack() {
+            window.history.back();
+        }
     </script>
 @endsection

@@ -26,7 +26,8 @@ class MahasiswaPerwalianController extends Controller
         }
 
         // Fetch the absensi record for the student
-        $absensi = Absensi::where('nim', $student['nim'])->first();
+        $absensi = Absensi::where('nim', $student->nim)->latest('updated_at')->first();
+        
         $perwalian = Perwalian::where('ID_Perwalian', $student->ID_Perwalian)
         ->orderBy('updated_at', 'desc')
         ->first();        $dosen = Dosen::where('nip', optional($perwalian)->ID_Dosen_Wali)->first(); // Safe access if $perwalian is null

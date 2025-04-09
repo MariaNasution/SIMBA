@@ -44,7 +44,6 @@
             <li class="submenu-item">
                 <a href="{{ route('kemahasiswaan_ajukan_konseling') }}">
                     <i class="fas fa-user-friends"></i> Ajukan Konseling
-
                 </a>
             </li>
             <li class="submenu-item">
@@ -58,5 +57,30 @@
                 </a>
             </li>
         </ul>
+        <!-- Perwalian dengan submenu-->
+        <li class="menu-item">
+            <a href="javascript:void(0);" onclick="toggleSubMenu('perwalian-submenu')">
+                <i class="bi bi-calendar3"></i> Perwalian
+                <i class="fas fa-chevron-down submenu-toggle" id="perwalian-toggle"></i>
+            </a>
+        </li>
+        <ul class="submenu" id="perwalian-submenu" style="display: none;">
+            <li class="submenu-item">
+                <a href="{{ route('kemahasiswaan_perwalian.jadwal') }}">
+                    Jadwalkan Perwalian
+                </a>
+            </li>
+            <li class="submenu-item">
+                <a href="{{ route('kemahasiswaan_perwalian.kelas') }}">
+                    Perwalian Kelas
+                </a>
+            </li>
+            <li class="submenu-item">
+                <a href="{{ route('kemahasiswaan_perwalian.berita_acara') }}">
+                    <i class="fas fa-book-open"></i> Berita Acara
+                </a>
+            </li>
+            </ul>
+        </li>
     </ul>
 </div>
