@@ -23,7 +23,7 @@
         }
 
         .content {
-            position: relative;
+            position: static;
             z-index: 1;
         }
         .content::before {
