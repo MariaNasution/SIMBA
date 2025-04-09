@@ -6,19 +6,35 @@ use Illuminate\Database\Eloquent\Model;
 
 class Notifikasi extends Model
 {
-    protected $table = 'notifikasi'; // Specify the table name
-    protected $primaryKey = 'ID_Notifikasi'; // Set primary key
-    public $incrementing = true; // Auto increment primary key
+    // Specify the table name and primary key
+    protected $table = 'notifikasi';
+    protected $primaryKey = 'ID_Notifikasi';
+    public $incrementing = true;
 
-    protected $fillable = ['ID_Notifikasi', 'Pesan', 'nim', 'Id_Konseling', 'Id_Perwalian', 'nama'];
+    // Only include fields that should be mass assignable.
+    // Removed the primary key since it auto-increments.
+    protected $fillable = [
+        'Pesan',
+        'nim',
+        'Id_Konseling',
+        'Id_Perwalian',
+        'nama'
+    ];
+
+    // Optionally, cast foreign keys to integers for consistency.
+    protected $casts = [
+        'Id_Konseling'  => 'integer',
+        'Id_Perwalian'  => 'integer',
+    ];
 
     /**
      * Relationship with Mahasiswa model.
      * Each notification belongs to a student (Mahasiswa).
+     * Assumes the Mahasiswa model has a primary key 'NIM'.
      */
     public function mahasiswa()
     {
-        //return $this->belongsTo(Mahasiswa::class, 'NIM', 'nim');
+        return $this->belongsTo(Mahasiswa::class, 'nim', 'NIM');
     }
 
     /**
@@ -31,8 +47,8 @@ class Notifikasi extends Model
     }
 
     /**
-     * Relationship dengan RequestKonseling.
-     * Setiap notifikasi terkait dengan pengajuan konseling tertentu.
+     * Relationship with RequestKonseling model.
+     * Each notification is related to a konseling request.
      */
     public function konseling()
     {

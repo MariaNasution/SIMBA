@@ -3,6 +3,9 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Models\StudentBehavior;
+use App\Observers\StudentBehaviorObserver;
+use App\Services\NotificationService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +22,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Resolve the NotificationService instance from the container
+        $notificationService = $this->app->make(NotificationService::class);
+        
+        // Register the observer for StudentBehavior
+        StudentBehavior::observe(new StudentBehaviorObserver($notificationService));
     }
 }
