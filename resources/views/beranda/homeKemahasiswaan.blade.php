@@ -12,7 +12,7 @@
                     <ul class="list-unstyled text-start pengumuman">
                         @forelse ($pengumuman as $item)
                             <li class="d-flex justify-content-between align-items-center mb-2">
-                                <a href="{{ route('kemahasiswaan_pengumumanadmin.detail', $item->id) }}" class="text-decoration-none">
+                                <a href="{{ route('kemahasiswaan_pengumumankemahasiswaan.detail', $item->id) }}" class="text-decoration-none">
                                     <span>
                                         <strong
                                             class="@switch($item->sumber)

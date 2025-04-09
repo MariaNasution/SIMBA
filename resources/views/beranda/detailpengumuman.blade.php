@@ -1,12 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="d-flex align-items-center mb-4 border-bottom-line">
-        <h3 class="me-auto">Beranda / Home / Pengumuman</h3>
-        <a href="#" onclick="confirmLogout()">
-            <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
-        </a>
-    </div>
 
     <!-- Konten Detail Pengumuman -->
     <div class="container mt-4">

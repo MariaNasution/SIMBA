@@ -81,7 +81,7 @@ Route::middleware(['auth.session', 'role:kemahasiswaan'])
         Route::get('/beranda', [KemahasiswaanController::class, 'index'])->name('beranda');
         Route::post('/beranda/store', [KemahasiswaanController::class, 'store'])->name('pengumuman.store');
         Route::delete('/beranda/{id}', [KemahasiswaanController::class, 'destroy'])->name('pengumuman.destroy');
-        Route::get('/pengumuman/{id}', [KemahasiswaanController::class, 'show'])->name('pengumunankonselor.detail');
+        Route::get('/pengumuman/{id}', [KemahasiswaanController::class, 'show'])->name('pengumumankemahasiswaan.detail');
         Route::post('/calendar/upload', [CalendarController::class, 'upload'])->name('calendar.upload');
 
         // Perwalian
@@ -139,7 +139,7 @@ Route::middleware(['auth.session', 'role:konselor'])
         Route::get('/beranda', [KonselorController::class, 'index'])->name('beranda');
         Route::post('/beranda/store', [KonselorController::class, 'store'])->name('pengumuman.store');
         Route::delete('/beranda/{id}', [KonselorController::class, 'destroy'])->name('pengumuman.destroy');
-        Route::get('/pengumuman/{id}', [KonselorController::class, 'show'])->name('pengumunankonselor.detail');
+        Route::get('/pengumuman/{id}', [KonselorController::class, 'show'])->name('pengumumankonselor.detail');
         Route::post('/calendar/upload', [CalendarController::class, 'upload'])->name('calendar.upload');
         // Group untuk konseling
         Route::prefix('konseling')->group(function () {

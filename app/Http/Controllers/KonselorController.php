@@ -31,7 +31,7 @@ class KonselorController extends Controller
             'deskripsi' => $request->deskripsi,
         ]);
 
-        return redirect()->route('konselor')->with('success', 'Data berhasil disimpan!');
+        return redirect()->route('konselor_beranda')->with('success', 'Data berhasil disimpan!');
     }
 
     public function destroy($id)

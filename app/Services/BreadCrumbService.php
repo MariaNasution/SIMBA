@@ -152,10 +152,10 @@ class BreadCrumbService
                 ];
                 break;
 
-            case 'konselor_pengumunankonselor.detail':
+            case 'konselor_pengumumankonselor.detail':
                 $breadcrumbs = [
-                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('konselor_beranda')],
-                    ['name' => '<i class="fas fa-bullhorn"></i> Detail Pengumuman', 'url' => null],
+                    ['name' => '<i class="fas fa-bullhorn"></i> Beranda', 'url' => route('konselor_beranda')],
+                    ['name' => 'Detail Pengumuman', 'url' => null],
                 ];
                 break;
 
@@ -298,10 +298,10 @@ class BreadCrumbService
                 ];
                 break;
 
-            case 'kemahasiswaan_pengumunankemahasiswaan.detail':
+            case 'kemahasiswaan_pengumumankemahasiswaan.detail':
                 $breadcrumbs = [
-                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('kemahasiswaan_beranda')],
-                    ['name' => '<i class="fas fa-bullhorn"></i> Detail Pengumuman', 'url' => null],
+                    ['name' => '<i class="fas fa-bullhorn"></i> Beranda', 'url' => route('kemahasiswaan_beranda')],
+                    ['name' => 'Detail Pengumuman', 'url' => null],
                 ];
                 break;
 
@@ -483,7 +483,7 @@ class BreadCrumbService
 
             case 'mahasiswa_konseling':
                 $breadcrumbs = [
-                    ['name' => '<i class="fas fa-comments"></i> Konseling', 'url' => null],
+                    ['name' => '<i class="fas fa-user-friends"></i> Konseling', 'url' => null],
                 ];
                 break;
 
@@ -495,8 +495,8 @@ class BreadCrumbService
 
             case 'mhs_konseling_request':
                 $breadcrumbs = [
-                    ['name' => '<i class="fas fa-comments"></i> Konseling', 'url' => route('mahasiswa_konseling')],
-                    ['name' => '<i class="fas fa-plus-circle"></i> Request Konseling', 'url' => null],
+                    ['name' => '<i class="fas fa-user-friends"></i> Konseling', 'url' => route('mahasiswa_konseling')],
+                    ['name' => 'Request Konseling', 'url' => null],
                 ];
                 break;
 
