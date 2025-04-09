@@ -67,8 +67,7 @@ class UserSeeder extends Seeder
             ['username' => 'ifs19038', 'password' => Hash::make('mahasiswa'), 'role' => 'mahasiswa', 'anak_wali' => '0309020008'],
             ['username' => 'ifs19039', 'password' => Hash::make('mahasiswa'), 'role' => 'mahasiswa', 'anak_wali' => '0309020008'],
             // Dosen users
-            ['username' => 'dosen', 'password' => Hash::make('dosen'), 'role' => 'dosen', 'anak_wali' => null],
-            ['username' => '0308190348', 'password' => Hash::make('dosen'), 'role' => 'dosen', 'anak_wali' => null],
+            ['username' => '0309130087', 'password' => Hash::make('dosen'), 'role' => 'dosen', 'anak_wali' => null],
             ['username' => '0311020009', 'password' => Hash::make('dosen'), 'role' => 'dosen', 'anak_wali' => null],
             ['username' => '0309020008', 'password' => Hash::make('dosen'), 'role' => 'dosen', 'anak_wali' => null],
             // Other roles
@@ -102,17 +101,17 @@ class UserSeeder extends Seeder
 
         // Array for dosen
         $nips = [
-            'dosen', '0309130087', '0311020009', '0309020008'
+            '0309130087', '0311020009', '0309020008'
         ];
 
         $dosenNames = [
-            'Dosen', 'Arie Satia Dharma, S.T, M.Kom.',
+            'Arie Satia Dharma, S.T, M.Kom.',
             'Dr. Arlinta Christy Barus, ST., M.InfoTech.',
             'Dr. Johannes Harungguan Sianipar, S.T., M.T.'
         ];
 
         $dosenClasses = [
-            '12IF2', '11IF1,11IF2,14IF2', '14IF1', '12IF1,12IF2',
+            '11IF1,11IF2,14IF2', '14IF1', '12IF1,12IF2',
         ];
 
         

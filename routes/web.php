@@ -10,6 +10,7 @@ use App\Http\Controllers\MahasiswaKonselingController;
 use App\Http\Controllers\MahasiswaPerwalianController;
 use App\Http\Controllers\MahasiswaRequestKonselingController;
 use App\Http\Controllers\KemahasiswaanController;
+use App\Http\Controllers\KemahasiswaanPerwalianController;
 use App\Http\Controllers\KemajuanStudiController;
 use App\Http\Controllers\DetailNilaiController;
 use App\Http\Controllers\CatatanPerilakuController;
@@ -85,9 +86,10 @@ Route::middleware(['auth.session', 'role:kemahasiswaan'])
         Route::post('/calendar/upload', [CalendarController::class, 'upload'])->name('calendar.upload');
 
         // Perwalian
-        Route::get('/perwalian/jadwal', [KemahasiswaanController::class, 'jadwalPerwalian'])->name('perwalian.jadwal');
-        Route::get('/perwalian/kelas', [KemahasiswaanController::class, 'kelasPerwalian'])->name('perwalian.kelas');
-        Route::get('/perwalian/berita-acara', [KemahasiswaanController::class, 'beritaAcaraPerwalian'])->name('perwalian.berita_acara');
+        Route::get('/perwalian/jadwal', [KemahasiswaanPerwalianController::class, 'jadwalPerwalian'])->name('perwalian.jadwal');
+        Route::post('/perwalian/store', [KemahasiswaanPerwalianController::class, 'store'])->name('perwalian.store'); // New route
+        Route::get('/perwalian/kelas', [KemahasiswaanPerwalianController::class, 'kelasPerwalian'])->name('perwalian.kelas');
+        Route::get('/perwalian/berita-acara', [KemahasiswaanPerwalianController::class, 'beritaAcaraPerwalian'])->name('perwalian.berita_acara');
 
         // Konseling
         Route::prefix('konseling')->group(function () {

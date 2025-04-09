@@ -371,6 +371,7 @@ class SetPerwalianController extends Controller
                 ->where('Tanggal', Carbon::parse($validatedData['selectedDate'])->format('Y-m-d'))
                 ->first();
             if ($existingPerwalian) {
+                
                 return response()->json([
                     'success' => false,
                     'message' => 'A perwalian session is already scheduled for this class on this date. Use the Edit option to delete and request again.'
@@ -388,6 +389,7 @@ class SetPerwalianController extends Controller
                 'nama' => $user['nama'],
                 'kelas' => $validatedData['selectedClass'],
                 'angkatan' => $year,
+                'role' => 'mahasiswa',
             ]);
             if (!$perwalian) {
                 Log::error('Failed to create Perwalian record');
