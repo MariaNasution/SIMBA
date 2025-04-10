@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;400&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;400&display=swap");
 
 * {
     margin: 0;
@@ -8,11 +8,15 @@
 
 .app-wrapper {
     padding: 10px;
-    padding-top : 0px;
+    padding-top: 0px;
     padding-right: 0px;
     text-align: center;
     align-items: center;
     width: 100%;
+}
+
+ps-32 {
+    padding-left: 50px;
 }
 
 .card {
@@ -92,16 +96,11 @@
     cursor: pointer;
 }
 
-
 .sidebar {
     width: 300px;
     min-height: 100vh;
     max-height: 100vh;
-    background: radial-gradient(
-        circle at top right,
-        #3282B8 0%,
-        #BBE1FA 100%
-    );
+    background: radial-gradient(circle at top right, #3282b8 0%, #bbe1fa 100%);
     color: white;
     padding: 20px;
     display: flex;
@@ -189,7 +188,7 @@
 }
 
 .menu-item i {
-    font-size: 18px !important; 
+    font-size: 18px !important;
     color: rgb(63, 63, 63);
     width: 24px;
     height: 24px;
@@ -260,7 +259,6 @@
 #perizinan-toggle {
     font-size: 13px !important; /* Ubah ukuran ikon */
 }
-
 
 .sidebar,
 main {
@@ -476,7 +474,7 @@ h4 {
     font-family: "Roboto Serif";
     font-size: 1.5rem;
     font-weight: 600;
-    color: #ffffff;
+    color: #ffffff;
 }
 
 /* Styling untuk daftar ul */
@@ -592,9 +590,8 @@ ul li {
 }
 
 .navbar {
-
     color: white;
-    background-color: #3282B8;
+    background-color: #3282b8;
     padding-left: 20px;
     padding-right: 20px;
     padding-bottom: 10px;
@@ -610,26 +607,21 @@ ul li {
 h3 {
     text-align: left; /* Mengatur teks agar rata kiri */
     padding-top: 5px;
-
 }
 
 /* Mengatur warna tautan menjadi hitam dan menghapus garis bawah */
 h3.me-auto a {
-    font-family: 'Poppins', sans-serif; /* Use Poppins, with a fallback to sans-serif */    
+    font-family: "Poppins", sans-serif; /* Use Poppins, with a fallback to sans-serif */
     font-weight: 200;
     font-size: 18px;
     color: white; /* Warna Putih */
     text-decoration: none; /* Menghapus garis bawah */
     padding-left: 20px;
-    
 }
 /* Mengatur warna tautan menjadi hitam dan menghapus garis bawah */
 h3.me-auto i {
-   
     margin-right: 10px;
-    
 }
-
 
 /* Efek hover opsional untuk tautan */
 h3.me-auto a:hover {
@@ -814,25 +806,26 @@ p {
     margin: 30px auto;
 }
 
-
-.table th, .table td {
-    width: auto; 
-    text-align: center; 
-    vertical-align: middle; 
+.table th,
+.table td {
+    width: auto;
+    text-align: center;
+    vertical-align: middle;
     padding: 10px;
-    border: 1px solid #dee2e6; 
+    border: 1px solid #dee2e6;
 }
 
 .date-input {
     max-width: 300px;
 }
 .btn-custom-blue {
-    background-color: #528BB8;
-    border-color: #528BB8;
+    background-color: #528bb8;
+    border-color: #528bb8;
     color: #fff;
 }
 .text-blue {
-    color: #528BB8;}
+    color: #528bb8;
+}
 
 /*
 **
@@ -872,7 +865,6 @@ Perwalian CSS
     font-size: 14px;
 }
 
-
 .am-header h1 {
     font-size: 24px;
     color: #333;
@@ -890,7 +882,8 @@ Perwalian CSS
 }
 
 .am-class-btn {
-    background-color: #007bff; /* Make the background transparent */    color: #fff;
+    background-color: #007bff; /* Make the background transparent */
+    color: #fff;
     border: none;
     padding: 12px 20px;
     border-radius: 4px;
@@ -903,7 +896,7 @@ Perwalian CSS
 }
 
 /**Konseling**/
-   /* Agar teks yang dipilih di Select2 tetap rata kiri */
-   .select2-container .select2-selection--single .select2-selection__rendered {
+/* Agar teks yang dipilih di Select2 tetap rata kiri */
+.select2-container .select2-selection--single .select2-selection__rendered {
     text-align: left !important;
 }

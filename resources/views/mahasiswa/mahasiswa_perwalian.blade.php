@@ -15,7 +15,8 @@
         <p><strong>Status:</strong> <span class="status-{{ strtolower($perwalian->Status) }}">{{ $perwalian->Status }}</span></p>
 
         @else 
-        <p><strong>Status:</strong> <span class="status-{{ strtolower($perwalian->Status) }}">{{ $absensi->status_kehadiran }}</span></p>
+        <p><strong>Status:</strong> <span >{{ $absensi->status_kehadiran }}</span></p>
+        
         @endif
 
     @else

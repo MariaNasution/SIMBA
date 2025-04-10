@@ -120,16 +120,16 @@ class KemahasiswaanController extends Controller
     
     public function jadwalPerwalian()
 {
-    return view('perwalian_jadwal'); // TANPA folder tambahan
+    return view('perwalian.perwalian_jadwal'); // TANPA folder tambahan
 }
 
 public function kelasPerwalian()
 {
-    return view('perwalian_kelas');
+    return view('perwalian.perwalian_kelas');
 }
 
 public function beritaAcaraPerwalian()
 {
-    return view('perwalian_berita_acara');
+    return view('perwalian.perwalian_berita_acara');
 }
 }
