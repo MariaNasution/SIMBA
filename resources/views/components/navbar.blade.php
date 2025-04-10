@@ -31,12 +31,15 @@
                     <li><h6 class="dropdown-header">Notifikasi</h6></li>
                     @forelse ($notifications ?? [] as $notif)
                         <li>
-                            <a class="dropdown-item" href="{{ route('mahasiswa_perwalian') }}">
+                            <!-- Using the dynamic link if present -->
+                            <a class="dropdown-item" href="{{ $notif->link ?? route('mahasiswa_perwalian') }}">
                                 {{ $notif->Pesan ?? 'No message' }} by {{ $notif->nama }}
                             </a>
                         </li>
                     @empty
-                        <li><a class="dropdown-item" href="{{ route('mahasiswa_perwalian') }}">Tidak ada notifikasi</a></li>
+                        <li>
+                            <a class="dropdown-item" href="{{ route('mahasiswa_perwalian') }}">Tidak ada notifikasi</a>
+                        </li>
                     @endforelse
                 </ul>
             </div>

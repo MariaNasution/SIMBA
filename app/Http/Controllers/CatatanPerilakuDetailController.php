@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\OrangTua;
-use Illuminate\Support\Str;
-use App\Models\Notifikasi;
 use App\Services\TwilioService;
 use App\Models\StudentBehavior;
+use App\Models\Mahasiswa;
 use Illuminate\Support\Facades\Log;
+use App\Notifications\UniversalNotification; // Gunakan universal notification
 
 class CatatanPerilakuDetailController extends Controller
 {
@@ -17,73 +17,78 @@ class CatatanPerilakuDetailController extends Controller
      */
     public function store(Request $request)
     {
-        // Validasi input
+        // Validate input
         $validated = $request->validate([
-            'student_nim' => 'required',
-            'ta' => 'required',
-            'semester' => 'required|integer',
-            'type' => 'required|in:pelanggaran,perbuatan_baik',
-            'pelanggaran' => 'nullable|string',
+            'student_nim'    => 'required',
+            'ta'             => 'required',
+            'semester'       => 'required|integer',
+            'type'           => 'required|in:pelanggaran,perbuatan_baik',
+            'pelanggaran'    => 'nullable|string',
             'perbuatan_baik' => 'nullable|string',
-            'unit' => 'nullable|string',
-            'tanggal' => 'nullable|date',
-            'poin' => 'nullable|integer',
-            'tindakan' => 'nullable|string',
-            'keterangan' => 'nullable|string',
-            'kredit_poin' => 'nullable|integer',
+            'unit'           => 'nullable|string',
+            'tanggal'        => 'nullable|date',
+            'poin'           => 'nullable|integer',
+            'tindakan'       => 'nullable|string',
+            'keterangan'     => 'nullable|string',
+            'kredit_poin'    => 'nullable|integer',
         ]);
 
-        // Siapkan data untuk disimpan
+        // Prepare data for saving
         $data = [
             'student_nim' => $validated['student_nim'],
-            'ta' => $validated['ta'],
-            'semester' => $validated['semester'],
-            'type' => $validated['type'],
-            'unit' => $validated['unit'] ?? null,
-            'tanggal' => $validated['tanggal'] ?? null,
-            'poin' => $validated['poin'] ?? 0,
-            'tindakan' => $validated['tindakan'] ?? null,
+            'ta'          => $validated['ta'],
+            'semester'    => $validated['semester'],
+            'type'        => $validated['type'],
+            'unit'        => $validated['unit'] ?? null,
+            'tanggal'     => $validated['tanggal'] ?? null,
+            'poin'        => $validated['poin'] ?? 0,
+            'tindakan'    => $validated['tindakan'] ?? null,
         ];
 
-        // Simpan input ke kolom description sesuai tipe
+        // Save input to description field based on type
         if ($validated['type'] === 'pelanggaran') {
             $data['description'] = $validated['pelanggaran'] ?? null;
         } else {
             $data['description'] = $validated['perbuatan_baik'] ?? null;
         }
 
-        // Buat record StudentBehavior
+        // Create a new student behavior record
         StudentBehavior::create($data);
 
-        // --- Kirim SMS ke Orang Tua dan buat log ---
+        // --- Send SMS to Orang Tua and log ---
         $orangTua = OrangTua::where('nim', $validated['student_nim'])->first();
         if ($orangTua && $orangTua->no_hp) {
             $behaviorType = $validated['type'] === 'pelanggaran' ? 'Pelanggaran' : 'Perbuatan Baik';
             $message = "Halo, data {$behaviorType} untuk mahasiswa dengan NIM {$validated['student_nim']} telah ditambahkan.";
             try {
                 app(TwilioService::class)->sendSms($orangTua->no_hp, $message);
-                Log::info("SMS berhasil dikirim ke {$orangTua->no_hp} untuk mahasiswa NIM {$validated['student_nim']}.");
+                Log::info("SMS sent to {$orangTua->no_hp} for mahasiswa NIM {$validated['student_nim']}.");
             } catch (\Exception $e) {
-                Log::error("Gagal mengirim SMS ke {$orangTua->no_hp} untuk mahasiswa NIM {$validated['student_nim']}. Error: " . $e->getMessage());
+                Log::error("Failed to send SMS to {$orangTua->no_hp} for mahasiswa NIM {$validated['student_nim']}. Error: " . $e->getMessage());
             }
         } else {
-            Log::warning("Tidak ditemukan data Orang Tua atau nomor HP kosong untuk mahasiswa NIM {$validated['student_nim']}.");
+            Log::warning("No Orang Tua record or phone number for mahasiswa NIM {$validated['student_nim']}.");
         }
 
-        // --- Buat notifikasi untuk mahasiswa ---
+        // --- Create Universal Notification for mahasiswa ---
         $notificationMessage = "Data " . ($validated['type'] === 'pelanggaran' ? 'Pelanggaran' : 'Perbuatan Baik') . " telah ditambahkan.";
         try {
-            Notifikasi::create([
-                'Pesan' => $notificationMessage,
-                'nim' => $validated['student_nim'],
-                'Id_Perwalian' => null, // karena notifikasi ini untuk catatan perilaku
-            ]);
-            Log::info("Notifikasi (tambah) berhasil dibuat untuk mahasiswa NIM {$validated['student_nim']}.");
+            $mahasiswa = Mahasiswa::where('nim', $validated['student_nim'])->first();
+            if ($mahasiswa) {
+                // Extra data bisa disertakan untuk informasi tambahan, misalnya kategori dan aksi
+                $mahasiswa->notify(new UniversalNotification($notificationMessage, [
+                    'category' => 'catatan_perilaku',
+                    'action'   => 'store'
+                ]));
+                Log::info("Universal notification (store) sent for mahasiswa NIM {$validated['student_nim']}.");
+            } else {
+                Log::error("Mahasiswa with NIM {$validated['student_nim']} not found for notification.");
+            }
         } catch (\Exception $e) {
-            Log::error("Gagal membuat notifikasi untuk mahasiswa NIM {$validated['student_nim']}. Error: " . $e->getMessage());
+            Log::error("Failed to send universal notification for mahasiswa NIM {$validated['student_nim']}. Error: " . $e->getMessage());
         }
 
-        // Redirect dengan flash message
+        // Redirect with flash message
         return redirect()
             ->route('catatan_perilaku_detail', ['studentNim' => $validated['student_nim']])
             ->with('success', 'Data berhasil ditambahkan.');
@@ -96,7 +101,7 @@ class CatatanPerilakuDetailController extends Controller
         return view('catatan_perilaku_edit', compact('behavior'));
     }
 
-    // Method update untuk mengupdate data sesuai tipe catatan
+    // Update method to update catatan perilaku record
     public function update(Request $request, $id)
     {
         $behavior = StudentBehavior::findOrFail($id);
@@ -104,73 +109,78 @@ class CatatanPerilakuDetailController extends Controller
         if ($behavior->type == 'pelanggaran') {
             $validated = $request->validate([
                 'pelanggaran' => 'required|string',
-                'unit' => 'nullable|string',
-                'tanggal' => 'nullable|date',
-                'poin' => 'nullable|integer',
-                'tindakan' => 'nullable|string',
+                'unit'        => 'nullable|string',
+                'tanggal'     => 'nullable|date',
+                'poin'        => 'nullable|integer',
+                'tindakan'    => 'nullable|string',
             ]);
             $data = [
                 'description' => $validated['pelanggaran'],
-                'unit' => $validated['unit'] ?? null,
-                'tanggal' => $validated['tanggal'] ?? null,
-                'poin' => $validated['poin'] ?? 0,
-                'tindakan' => $validated['tindakan'] ?? null,
+                'unit'        => $validated['unit'] ?? null,
+                'tanggal'     => $validated['tanggal'] ?? null,
+                'poin'        => $validated['poin'] ?? 0,
+                'tindakan'    => $validated['tindakan'] ?? null,
             ];
         } elseif ($behavior->type == 'perbuatan_baik') {
             $validated = $request->validate([
                 'perbuatan_baik' => 'required|string',
-                'keterangan' => 'nullable|string',
-                'unit' => 'nullable|string',
-                'tanggal' => 'nullable|date',
-                'kredit_poin' => 'nullable|integer',
-                'tindakan' => 'nullable|string',
+                'keterangan'     => 'nullable|string',
+                'unit'           => 'nullable|string',
+                'tanggal'        => 'nullable|date',
+                'kredit_poin'    => 'nullable|integer',
+                'tindakan'       => 'nullable|string',
             ]);
             $data = [
                 'description' => $validated['perbuatan_baik'],
-                'unit' => $validated['unit'] ?? null,
-                'tanggal' => $validated['tanggal'] ?? null,
-                'poin' => $validated['kredit_poin'] ?? 0,
-                'tindakan' => $validated['tindakan'] ?? null,
-                'keterangan' => $validated['keterangan'] ?? null,
+                'unit'        => $validated['unit'] ?? null,
+                'tanggal'     => $validated['tanggal'] ?? null,
+                'poin'        => $validated['kredit_poin'] ?? 0,
+                'tindakan'    => $validated['tindakan'] ?? null,
+                'keterangan'  => $validated['keterangan'] ?? null,
                 'kredit_poin' => $validated['kredit_poin'] ?? 0,
             ];
         }
 
-        // Perbarui record
+        // Update record
         $behavior->update($data);
 
-        // --- Kirim SMS ke Orang Tua dan buat log (Update) ---
+        // --- Send SMS update to Orang Tua ---
         $orangTua = OrangTua::where('nim', $behavior->student_nim)->first();
         if ($orangTua && $orangTua->no_hp) {
             $behaviorType = $behavior->type === 'pelanggaran' ? 'Pelanggaran' : 'Perbuatan Baik';
             $message = "Halo, data {$behaviorType} untuk mahasiswa dengan NIM {$behavior->student_nim} telah diperbarui.";
             try {
                 app(TwilioService::class)->sendSms($orangTua->no_hp, $message);
-                Log::info("SMS update berhasil dikirim ke {$orangTua->no_hp} untuk mahasiswa NIM {$behavior->student_nim}.");
+                Log::info("SMS update sent to {$orangTua->no_hp} for mahasiswa NIM {$behavior->student_nim}.");
             } catch (\Exception $e) {
-                Log::error("Gagal mengirim SMS update ke {$orangTua->no_hp} untuk mahasiswa NIM {$behavior->student_nim}. Error: " . $e->getMessage());
+                Log::error("Failed to send SMS update to {$orangTua->no_hp} for mahasiswa NIM {$behavior->student_nim}. Error: " . $e->getMessage());
             }
         } else {
-            Log::warning("Tidak ditemukan data Orang Tua atau nomor HP kosong untuk mahasiswa NIM {$behavior->student_nim} pada update data.");
+            Log::warning("No Orang Tua record or phone number for mahasiswa NIM {$behavior->student_nim} during update.");
         }
 
-        // --- Buat notifikasi untuk mahasiswa (Update) ---
+        // --- Create Universal Notification for update ---
         $notificationMessage = "Data " . ($behavior->type === 'pelanggaran' ? 'Pelanggaran' : 'Perbuatan Baik') . " telah diperbarui.";
         try {
-            Notifikasi::create([
-                'Pesan' => $notificationMessage,
-                'nim' => $behavior->student_nim,
-                'Id_Perwalian' => null,
-            ]);
-            Log::info("Notifikasi (update) berhasil dibuat untuk mahasiswa NIM {$behavior->student_nim}.");
+            $mahasiswa = Mahasiswa::where('nim', $behavior->student_nim)->first();
+            if ($mahasiswa) {
+                $mahasiswa->notify(new UniversalNotification($notificationMessage, [
+                    'category' => 'catatan_perilaku',
+                    'action'   => 'update'
+                ]));
+                Log::info("Universal notification (update) sent for mahasiswa NIM {$behavior->student_nim}.");
+            } else {
+                Log::error("Mahasiswa with NIM {$behavior->student_nim} not found for update notification.");
+            }
         } catch (\Exception $e) {
-            Log::error("Gagal membuat notifikasi update untuk mahasiswa NIM {$behavior->student_nim}. Error: " . $e->getMessage());
+            Log::error("Failed to send universal notification update for mahasiswa NIM {$behavior->student_nim}. Error: " . $e->getMessage());
         }
 
         return redirect()
             ->route('catatan_perilaku_detail', ['studentNim' => $behavior->student_nim])
             ->with('success', 'Data berhasil diperbarui.');
     }
+
     /**
      * Remove the specified record from storage.
      */
@@ -180,34 +190,38 @@ class CatatanPerilakuDetailController extends Controller
         $studentNim = $behavior->student_nim;
         $behaviorType = $behavior->type === 'pelanggaran' ? 'Pelanggaran' : 'Perbuatan Baik';
 
-        // Hapus record
+        // Delete record
         $behavior->delete();
 
-        // --- Kirim SMS ke Orang Tua dan buat log (Hapus) ---
+        // --- Send SMS deletion notice to Orang Tua ---
         $orangTua = OrangTua::where('nim', $studentNim)->first();
         if ($orangTua && $orangTua->no_hp) {
             $message = "Halo, data {$behaviorType} untuk mahasiswa dengan NIM {$studentNim} telah dihapus.";
             try {
                 app(TwilioService::class)->sendSms($orangTua->no_hp, $message);
-                Log::info("SMS hapus berhasil dikirim ke {$orangTua->no_hp} untuk mahasiswa NIM {$studentNim}.");
+                Log::info("SMS deletion sent to {$orangTua->no_hp} for mahasiswa NIM {$studentNim}.");
             } catch (\Exception $e) {
-                Log::error("Gagal mengirim SMS hapus ke {$orangTua->no_hp} untuk mahasiswa NIM {$studentNim}. Error: " . $e->getMessage());
+                Log::error("Failed to send SMS deletion to {$orangTua->no_hp} for mahasiswa NIM {$studentNim}. Error: " . $e->getMessage());
             }
         } else {
-            Log::warning("Tidak ditemukan data Orang Tua atau nomor HP kosong untuk mahasiswa NIM {$studentNim} pada penghapusan data.");
+            Log::warning("No Orang Tua record or phone number for mahasiswa NIM {$studentNim} during deletion.");
         }
 
-        // --- Buat notifikasi untuk mahasiswa (Hapus) ---
+        // --- Create Universal Notification for deletion ---
         $notificationMessage = "Data {$behaviorType} telah dihapus.";
         try {
-            Notifikasi::create([
-                'Pesan' => $notificationMessage,
-                'nim' => $studentNim,
-                'Id_Perwalian' => null,
-            ]);
-            Log::info("Notifikasi (hapus) berhasil dibuat untuk mahasiswa NIM {$studentNim}.");
+            $mahasiswa = Mahasiswa::where('nim', $studentNim)->first();
+            if ($mahasiswa) {
+                $mahasiswa->notify(new UniversalNotification($notificationMessage, [
+                    'category' => 'catatan_perilaku',
+                    'action'   => 'destroy'
+                ]));
+                Log::info("Universal notification (destroy) sent for mahasiswa NIM {$studentNim}.");
+            } else {
+                Log::error("Mahasiswa with NIM {$studentNim} not found for deletion notification.");
+            }
         } catch (\Exception $e) {
-            Log::error("Gagal membuat notifikasi hapus untuk mahasiswa NIM {$studentNim}. Error: " . $e->getMessage());
+            Log::error("Failed to send universal notification deletion for mahasiswa NIM {$studentNim}. Error: " . $e->getMessage());
         }
 
         return redirect()

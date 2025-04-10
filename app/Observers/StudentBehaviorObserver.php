@@ -3,63 +3,47 @@
 namespace App\Observers;
 
 use App\Models\StudentBehavior;
-use App\Services\NotificationService;
+use App\Models\Mahasiswa;
+use App\Notifications\UniversalNotification;
+use Illuminate\Support\Facades\Log;
 
 class StudentBehaviorObserver
 {
-    protected $notificationService;
-
-    public function __construct(NotificationService $notificationService)
-    {
-        $this->notificationService = $notificationService;
-    }
-
-    /**
-     * Handle the StudentBehavior "created" event.
-     *
-     * @param  \App\Models\StudentBehavior  $behavior
-     * @return void
-     */
     public function created(StudentBehavior $behavior)
     {
-        // When a new behavior is added, notify the student by their NIM.
-        $this->notificationService->createNotification(
-            $behavior->nim,               // Assuming 'nim' is used as the identifier
-            'pelanggaran',                // Type/category of the notification
-            'Catatan perilaku baru telah ditambahkan.', // Notification message
-            ['action' => 'create', 'data' => $behavior->toArray()]
-        );
+        $this->sendNotification($behavior, 'ditambahkan');
     }
-
-    /**
-     * Handle the StudentBehavior "updated" event.
-     *
-     * @param  \App\Models\StudentBehavior  $behavior
-     * @return void
-     */
     public function updated(StudentBehavior $behavior)
     {
-        $this->notificationService->createNotification(
-            $behavior->nim,
-            'pelanggaran',
-            'Catatan perilaku telah diubah.',
-            ['action' => 'update', 'data' => $behavior->toArray()]
-        );
+        $this->sendNotification($behavior, 'diperbarui');
     }
 
-    /**
-     * Handle the StudentBehavior "deleted" event.
-     *
-     * @param  \App\Models\StudentBehavior  $behavior
-     * @return void
-     */
     public function deleted(StudentBehavior $behavior)
     {
-        $this->notificationService->createNotification(
-            $behavior->nim,
-            'pelanggaran',
-            'Catatan perilaku telah dihapus.',
-            ['action' => 'delete', 'data' => $behavior->toArray()]
-        );
+        $this->sendNotification($behavior, 'dihapus');
     }
+
+    protected function sendNotification(StudentBehavior $behavior, $actionText)
+    {
+        $mahasiswa = Mahasiswa::where('nim', $behavior->student_nim)->first();
+        if (!$mahasiswa) {
+            Log::error("Mahasiswa with NIM {$behavior->student_nim} not found.");
+            return;
+        }
+    
+        $typeLabel = $behavior->type === 'pelanggaran' ? 'Pelanggaran' : 'Perbuatan Baik';
+        $message   = "Data {$typeLabel} telah {$actionText}.";
+    
+        // Determine a destination route based on behavior type or other criteria
+        $destinationRoute = route('mahasiswa_perwalian'); // default route
+        // You could add conditions to adjust this route as needed
+    
+        try {
+            // For Laravel built-in notifications, you might include the link inside the data payload.
+            $mahasiswa->notify(new UniversalNotification($message, ['link' => $destinationRoute]));
+            Log::info("Notification sent to Mahasiswa NIM {$behavior->student_nim}: {$message}");
+        } catch (\Exception $e) {
+            Log::error("Failed to send notification to Mahasiswa NIM {$behavior->student_nim}. Error: " . $e->getMessage());
+        }
+    }   
 }

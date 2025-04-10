@@ -9,8 +9,7 @@ class Dosen_Wali extends Model
 {
 
     use SoftDeletes;
-
-
+    
     protected $table = 'dosen_wali'; // Specify the correct table name
     protected $primaryKey = 'username'; // Set primary key
     public $incrementing = false; // Disable auto-increment

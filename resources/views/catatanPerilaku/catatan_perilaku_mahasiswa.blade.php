@@ -4,10 +4,8 @@
 
 <!-- Tambahkan CSS untuk animasi dropdown -->
 
-
 @section('content')
 <!-- Header -->
-
 
 <div class="container mt-4">
   <p class="text-center mb-4">Daftar Nilai Perilaku Mahasiswa</p>

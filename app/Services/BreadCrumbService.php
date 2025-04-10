@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\Mahasiswa;
 use App\Models\Notifikasi;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class BreadCrumbService
@@ -585,7 +584,7 @@ class BreadCrumbService
                 $notifications = $this->generateStudentNotifications($user);
                 break;
             default:
-                Log::info('Unhandled role', ['role' => $user['role']]);
+                Log::info('Unhandled role in notification generation', ['role' => $user['role']]);
                 break;
         }
 
@@ -596,15 +595,20 @@ class BreadCrumbService
     {
         $student = Mahasiswa::where('nim', $user['nim'])->first();
 
-        if (!$student || !isset($student->ID_Perwalian)) {
-            Log::info('No student or ID_Perwalian found', ['nim' => $user['nim']]);
+        if (!$student) {
+            Log::info('No student found in generateStudentNotifications', ['nim' => $user['nim']]);
             return collect([]);
         }
 
-        // Assuming Notifikasi has a foreign key like 'perwalian_id' linking to Mahasiswa
-        $notifications = Notifikasi::where('ID_Notifikasi', $student->ID_Perwalian)->get();
-        Log::info('Notifications fetched', ['count' => $notifications->count()]);
+        // Retrieve notifications using Laravel’s built-in notifications relationship
+        $notifications = $student->notifications()->orderBy('created_at', 'desc')->get();
+
+        Log::info('Notifications fetched for student', [
+            'nim'   => $student->nim,
+            'count' => $notifications->count(),
+        ]);
 
         return $notifications;
     }
+    
 }

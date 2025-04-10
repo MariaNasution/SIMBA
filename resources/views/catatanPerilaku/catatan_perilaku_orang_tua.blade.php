@@ -2,9 +2,6 @@
 
 <link rel="stylesheet" href="{{ url('assets/css/catatan_perilaku.css') }}">
 
-<!-- Tambahkan CSS untuk animasi dropdown -->
-
-
 @section('content')
 <!-- Header -->
 

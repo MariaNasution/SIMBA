@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Notifications\Notifiable; // Tambahkan trait Notifiable
 use Illuminate\Database\Eloquent\Model;
 
 class Mahasiswa extends Model
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
 
     protected $table = 'mahasiswa';
     protected $primaryKey = 'nim';
@@ -15,11 +16,6 @@ class Mahasiswa extends Model
     protected $keyType = 'string';
 
     protected $fillable = ['nim', 'username', 'ID_Dosen', 'ID_Perwalian', 'nama', 'kelas'];
-
-    // public function user()
-    // {
-    //     return $this->belongsTo(User::class, 'username', 'username');
-    // }
 
     public function dosen()
     {
@@ -34,11 +30,6 @@ class Mahasiswa extends Model
     public function absensi()
     {
         return $this->hasMany(Absensi::class, 'nim', 'nim');
-    }
-
-    public function notifikasi()
-    {
-        return $this->hasMany(Notifikasi::class, 'nim', 'nim');
     }
 
     public function requestKonseling()
