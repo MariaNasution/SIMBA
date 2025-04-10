@@ -31,6 +31,8 @@ class BreadCrumbService
                 return $this->generateKonselorBreadcrumbs($currentRoute, $params);
             case 'kemahasiswaan':
                 return $this->generateKemahasiswaanBreadcrumbs($currentRoute, $params);
+            case 'orang_tua':
+                return $this->generateOrangTuaBreadcrumbs($currentRoute, $params);
             default:
                 return [
                     ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => url('/')],
@@ -38,6 +40,36 @@ class BreadCrumbService
                 ];
         }
     }
+
+    protected function generateOrangTuaBreadcrumbs($currentRoute, $params = [])
+    {
+        $breadcrumbs = [];
+    
+        Log::info('Current Route', ['route' => $breadcrumbs]);
+        switch ($currentRoute) {
+            case 'orang_tua':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => null],
+                ];
+                break;
+    
+            case 'catatan_perilaku_orang_tua':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('orang_tua')],
+                    ['name' => '<i class="fas fa-user-edit"></i> Catatan Perilaku', 'url' => null],
+                ];
+                break;
+    
+            default:
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('orang_tua')],
+                    ['name' => '<i class="fas fa-question-circle"></i> Halaman Tidak Dikenal', 'url' => null],
+                ];
+        }
+    
+        return $breadcrumbs;
+    }
+    
 
     protected function generateDosenBreadcrumbs($currentRoute, $params = [])
     {
@@ -434,95 +466,72 @@ class BreadCrumbService
     }
 
     protected function generateMahasiswaBreadcrumbs($currentRoute, $params = [])
-    {
-        $breadcrumbs = [];
+{
+    $breadcrumbs = [];
 
-        switch ($currentRoute) {
-            case 'beranda':
-                $breadcrumbs = [
-                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => null],
-                ];
-                break;
+    switch ($currentRoute) {
+        case 'beranda':
+            $breadcrumbs = [
+                ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => null],
+            ];
+            break;
 
-            case 'pengumuman.detail':
-                $id = $params['id'] ?? 'N/A';
-                $breadcrumbs = [
-                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
-                    ['name' => "<i class='fas fa-bullhorn'></i> Pengumuman #$id", 'url' => null],
-                ];
-                break;
+        case 'profil':
+            $breadcrumbs = [
+                ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
+                ['name' => '<i class="fas fa-user"></i> Profil', 'url' => null],
+            ];
+            break;
 
-            case 'profil':
-                $breadcrumbs = [
-                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
-                    ['name' => '<i class="fas fa-user"></i> Profil', 'url' => null],
-                ];
-                break;
+        case 'kemajuan_studi':
+            $breadcrumbs = [
+                ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
+                ['name' => '<i class="fas fa-graduation-cap"></i> Kemajuan Studi', 'url' => null],
+            ];
+            break;
 
-            case 'kemajuan_studi':
-                $breadcrumbs = [
-                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
-                    ['name' => '<i class="fas fa-graduation-cap"></i> Kemajuan Studi', 'url' => null],
-                ];
-                break;
+        case 'detailnilai':
+            $kode_mk = $params['kode_mk'] ?? 'N/A';
+            $breadcrumbs = [
+                ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
+                ['name' => '<i class="fas fa-book-open"></i> Kemajuan Studi', 'url' => route('kemajuan_studi')],
+                ['name' => "<i class='fas fa-list-ol'></i> Detail Nilai $kode_mk", 'url' => null],
+            ];
+            break;
 
-            case 'detailnilai':
-                $kode_mk = $params['kode_mk'] ?? 'N/A';
-                $breadcrumbs = [
-                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
-                    ['name' => '<i class="fas fa-book-open"></i> Kemajuan Studi', 'url' => route('kemajuan_studi')],
-                    ['name' => "<i class='fas fa-list-ol'></i> Detail Nilai $kode_mk", 'url' => null],
-                ];
-                break;
+        case 'catatan_perilaku':
+            $breadcrumbs = [
+                ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
+                ['name' => '<i class="fas fa-user-edit"></i> Catatan Perilaku', 'url' => null],
+            ];
+            break;
 
-            case 'catatan_perilaku':
-                $breadcrumbs = [
-                    ['name' => '<i class="fas fa-sticky-note"></i> Catatan Perilaku', 'url' => null],
-                ];
-                break;
+        case 'mahasiswa_konseling':
+            $breadcrumbs = [
+                ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
+                ['name' => '<i class="fas fa-user-friends"></i> Konseling', 'url' => null],
+            ];
+            break;
 
-            case 'mahasiswa_konseling':
-                $breadcrumbs = [
-                    ['name' => '<i class="fas fa-user-friends"></i> Konseling', 'url' => null],
-                ];
-                break;
+        case 'mahasiswa_perwalian':
+            $breadcrumbs = [
+                ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
+                ['name' => '<i class="fas fa-list-alt"></i> Perwalian', 'url' => null],
+            ];
+            break;
 
-            case 'mahasiswa_perwalian':
-                $breadcrumbs = [
-                    ['name' => '<i class="fas fa-users"></i> Perwalian', 'url' => null],
-                ];
-                break;
+        // ... tambahkan case lainnya untuk mahasiswa
 
-            case 'mhs_konseling_request':
-                $breadcrumbs = [
-                    ['name' => '<i class="fas fa-user-friends"></i> Konseling', 'url' => route('mahasiswa_konseling')],
-                    ['name' => 'Request Konseling', 'url' => null],
-                ];
-                break;
-
-            case 'mhs_konseling_request.store':
-                $breadcrumbs = [
-                    ['name' => '<i class="fas fa-comments"></i> Konseling', 'url' => route('mahasiswa_konseling')],
-                    ['name' => '<i class="fas fa-plus-circle"></i> Request Konseling', 'url' => null],
-                ];
-                break;
-
-            case 'mhs_konseling_store':
-                $breadcrumbs = [
-                    ['name' => '<i class="fas fa-comments"></i> Konseling', 'url' => route('mahasiswa_konseling')],
-                    ['name' => '<i class="fas fa-check-circle"></i> Konseling Disimpan', 'url' => null],
-                ];
-                break;
-
-            default:
-                $breadcrumbs = [
-                    ['name' => '<i class="fas fa-question-circle"></i> Unknown Page', 'url' => null],
-                ];
-                break;
-        }
-
-        return $breadcrumbs;
+        default:
+            $breadcrumbs = [
+                ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
+                ['name' => '<i class="fas fa-question-circle"></i> Halaman Tidak Dikenal', 'url' => null],
+            ];
+            break;
     }
+
+    return $breadcrumbs;
+}
 
     public function generateNotifications()
     {
