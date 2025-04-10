@@ -6,22 +6,13 @@
 
         <!-- Main Content -->
         <div class="container-fluid p-4">
-            <div class="d-flex align-items-center mb-4 border-bottom-line">
-                <h3 class="me-auto">
-                    <a href="{{ route('kemahasiswaan_beranda') }}">Home</a>
-                </h3>
-                <a href="#" onclick="confirmLogout()">
-                    <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
-                </a>
-            </div>
-
             <div class="col-md-6">
                 <div class="cards p-3">
                     <h5 class="border-bottom-line text-start">PENGUMUMAN</h5>
                     <ul class="list-unstyled text-start pengumuman">
                         @forelse ($pengumuman as $item)
                             <li class="d-flex justify-content-between align-items-center mb-2">
-                                <a href="{{ route('kemahasiswaan_pengumumanadmin.detail', $item->id) }}" class="text-decoration-none">
+                                <a href="{{ route('kemahasiswaan_pengumumankemahasiswaan.detail', $item->id) }}" class="text-decoration-none">
                                     <span>
                                         <strong
                                             class="@switch($item->sumber)

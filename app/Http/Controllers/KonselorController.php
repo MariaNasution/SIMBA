@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Pengumuman;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use App\Models\RequestKonseling;
 use App\Models\KonselingLanjutan;
 
@@ -31,7 +30,7 @@ class KonselorController extends Controller
             'deskripsi' => $request->deskripsi,
         ]);
 
-        return redirect()->route('konselor')->with('success', 'Data berhasil disimpan!');
+        return redirect()->route('konselor_beranda')->with('success', 'Data berhasil disimpan!');
     }
 
     public function destroy($id)

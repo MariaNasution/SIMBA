@@ -2,17 +2,6 @@
 
 @section('content')
 
-  {{-- Header --}}
-  <div class="d-flex align-items-center mb-4 border-bottom pb-2">
-    <h3 class="me-auto">
-    <a href="{{ route('beranda') }}"><i class="fas fa-home me-2"></i>Home</a> /
-    <a href="{{ route('mhs_konseling_request') }}">Request Konseling</a>
-    </h3>
-    <a href="#" onclick="confirmLogout()" title="Logout">
-    <i class="fas fa-sign-out-alt fs-5 cursor-pointer"></i>
-    </a>
-  </div>
-
   {{-- Notifikasi Sukses/Error --}}
   @if (session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>

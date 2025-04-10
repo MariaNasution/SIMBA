@@ -6,11 +6,20 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Models\RequestKonseling;
-use App\Models\Notifikasi;
 use Exception;
+use App\Models\Mahasiswa;
+use App\Notifications\UniversalNotification; 
+use App\Services\NotificationService; 
 
 class AjukanKonselingController extends Controller
 {
+    protected $notificationService;
+
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
     public function index()
     {
         // Initialize empty data
@@ -105,20 +114,31 @@ class AjukanKonselingController extends Controller
                 'nim' => $request->input('nim'),
                 'nama_mahasiswa' => $request->input('nama'),
                 'tanggal_pengajuan' => $request->input('tanggal_pengajuan'),
-                'deskripsi_pengajuan' => $request->deskripsi ?? '',
+                'deskripsi_pengajuan' => $request->input('deskripsi_pengajuan') ?? '',
                 'status' => 'approved',
             ]);
 
-            // Buat notifikasi untuk mahasiswa terkait
-            Notifikasi::create([
-                'Pesan' => "Anda telah diajukan untuk mengadakan konseling pada " . $request->input('tanggal_pengajuan'),
-                'nim' => $request->input('nim'),
-                'Id_Konseling' => $konseling->id,
-                'Id_Perwalian' => null,
-                'nama' => null,
-            ]);
+            // --- Create Universal Notification for the mahasiswa ---
+            $mahasiswa = Mahasiswa::where('nim', $request->input('nim'))->first();
+            if ($mahasiswa) {
+                $message = "Anda telah diajukan untuk mengadakan konseling pada " . $request->input('tanggal_pengajuan');
+                // Pass any extra data if needed (like id_konseling and category)
+                $mahasiswa->notify(new UniversalNotification($message, [
+                    'id_konseling' => $konseling->id,
+                    'category' => 'ajukan_konseling',
+                    'action'   => 'store'
+                ]));
+                Log::info("Universal notification sent for konseling request for mahasiswa NIM " . $request->input('nim'));
+            } else {
+                Log::error("Mahasiswa with NIM " . $request->input('nim') . " not found for notification.");
+            }
 
-            return redirect()->route('konseling.index')->with('success', 'Berhasil mengajukan konseling');
+            // Redirect based on user role
+            if (session('user.role') == 'kemahasiswaan') {
+                return redirect()->route('kemahasiswaan_konseling.ajukan')->with('success', 'Berhasil mengajukan konseling');
+            } else {
+                return redirect()->route('konselor_konseling.ajukan')->with('success', 'Berhasil mengajukan konseling');
+            }
         } catch (Exception $e) {
             Log::error('Exception saat mengajukan konseling:', ['message' => $e->getMessage()]);
             return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);

@@ -91,34 +91,3 @@
     </div>
 </div>
 @endsection
-
-@section('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const notificationDropdown = document.getElementById('notificationDropdown');
-    const notificationBadge = document.getElementById('notificationBadge');
-
-    notificationDropdown.addEventListener('click', function() {
-        // Hide the badge visually
-        if (notificationBadge) {
-            notificationBadge.style.display = 'none';
-        }
-
-        // Send AJAX request to mark notifications as read
-        fetch("{{ route('notifications.markRead') }}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': "{{ csrf_token() }}"
-            },
-            body: JSON.stringify({ nim: "{{ $mahasiswa->nim }}" })
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data.message);
-        })
-        .catch(error => console.error('Error:', error));
-    });
-});
-</script>
-@endsection

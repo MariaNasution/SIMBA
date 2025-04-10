@@ -49,19 +49,7 @@
 
 @section('content')
 <!-- Header -->
-<div class="d-flex align-items-center mb-4 border-bottom">
-  <h3 class="me-auto">
-    <a href="{{ route('pelanggaran_keasramaan') }}">
-      <i class="fas fa-user-edit"></i> Catatan Perilaku /
-    </a>
-    <a href="{{ route('catatan_perilaku_detail', ['studentNim' => $studentNim]) }}">
-      Detail / {{ $studentNim }}
-    </a>
-  </h3>
-  <a href="#" onclick="confirmLogout()">
-    <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
-  </a>
-</div>
+
 
 <div class="container mt-4">
   <div class="position-relative mb-4">
@@ -149,65 +137,68 @@
                 </thead>
                 <tbody>
                   @php $pelanggaranIndex = 1; @endphp
-@forelse ($perilaku['pelanggaran'] ?? [] as $pelanggaran)
-    <!-- Display Row -->
-    <tr id="displayRowPelanggaran{{ $pelanggaran['id'] }}">
-        <td style="width: 5%;">{{ $pelanggaranIndex++ }}</td>
-        <td>{{ $pelanggaran['pelanggaran'] ?? '-' }}</td>
-        <td style="width: 115px;">{{ $pelanggaran['unit'] ?? '-' }}</td>
-        <td>{{ $pelanggaran['tanggal'] ?? '-' }}</td>
-        <td style="width: 70px;">{{ $pelanggaran['poin'] ?? 0 }}</td>
-        <td>{{ $pelanggaran['tindakan'] ?? '-' }}</td>
-        <td>
-            @if (isset($pelanggaran['id']))
-                <!-- Tombol Edit -->
-                <button type="button" class="btn btn-outline-primary btn-sm" title="Edit" onclick="toggleEditForm('Pelanggaran', {{ $pelanggaran['id'] }})">
-                    <i class="fas fa-pencil-alt"></i>
-                </button>
-                <!-- Tombol Delete -->
-                <button type="button" class="btn btn-outline-danger btn-sm delete-btn" 
-                    data-id="{{ $pelanggaran['id'] }}" 
-                    data-url="{{ route('student_behaviors.destroy', $pelanggaran['id']) }}" 
-                    data-type="pelanggaran" 
-                    title="Delete">
-                    <i class="fas fa-trash"></i>
-                </button>
-            @endif
-        </td>
-    </tr>
-
-    <!-- Inline Edit Form Row (hidden secara default) -->
-    <tr id="editFormPelanggaran{{ $pelanggaran['id'] }}" style="display: none;">
-        <form action="{{ route('student_behaviors.update', $pelanggaran['id']) }}" method="POST">
-            @csrf
-            <td style="width: 5%;">{{ $pelanggaranIndex - 1 }}</td>
-            <td>
-                <textarea name="pelanggaran" class="form-control" required>{{ old('pelanggaran', $pelanggaran['pelanggaran']) }}</textarea>
-            </td>
-            <td style="width: 115px;">
-                <input type="text" name="unit" class="form-control" value="{{ old('unit', $pelanggaran['unit']) }}">
-            </td>
-            <td>
-              <input type="date" name="tanggal" class="form-control tanggal" value="{{ old('tanggal', $pelanggaran['tanggal']) }}">
-            </td>
-            <td style="width: 70px;">
-                <input type="number" name="poin" class="form-control" value="{{ old('poin', $pelanggaran['poin']) }}" min="1" max="100">
-            </td>
-            <td>
-                <textarea name="tindakan" class="form-control">{{ old('tindakan', $pelanggaran['tindakan']) }}</textarea>
-            </td>
-            <td>
-                <button type="submit" class="btn btn-success btn-sm" title="Simpan"><i class="fas fa-save"></i></button>
-                <button type="button" class="btn btn-secondary btn-sm" title="Batal" onclick="toggleEditForm('Pelanggaran', {{ $pelanggaran['id'] }})"><i class="fas fa-times"></i></button>
-            </td>
-        </form>
-    </tr>
-@empty
-    <tr>
-        <td colspan="{{ $pelanggaranColspan }}" class="no-results">No results found.</td>
-    </tr>
-@endforelse
-                  
+                  @forelse ($perilaku['pelanggaran'] ?? [] as $pelanggaran)
+                  <!-- Display Row -->
+                  <tr id="displayRowPelanggaran{{ $pelanggaran['id'] ?? 'api' }}">
+                      <td style="width: 5%;">{{ $pelanggaranIndex++ }}</td>
+                      <td>{{ $pelanggaran['pelanggaran'] ?? '-' }}</td>
+                      <td style="width: 115px;">{{ $pelanggaran['unit'] ?? '-' }}</td>
+                      <td>{{ $pelanggaran['tanggal'] ?? '-' }}</td>
+                      <td style="width: 70px;">{{ $pelanggaran['poin'] ?? 0 }}</td>
+                      <td>{{ $pelanggaran['tindakan'] ?? '-' }}</td>
+                      <td>
+                          @if (!is_null($pelanggaran['id']))
+                              <!-- Tombol Edit -->
+                              <button type="button" class="btn btn-outline-primary btn-sm" title="Edit" onclick="toggleEditForm('Pelanggaran', {{ $pelanggaran['id'] }})">
+                                  <i class="fas fa-pencil-alt"></i>
+                              </button>
+                              <!-- Tombol Delete -->
+                              <button type="button" class="btn btn-outline-danger btn-sm delete-btn" 
+                                  data-id="{{ $pelanggaran['id'] }}" 
+                                  data-url="{{ route('student_behaviors.destroy', $pelanggaran['id']) }}" 
+                                  data-type="pelanggaran" 
+                                  title="Delete">
+                                  <i class="fas fa-trash"></i>
+                              </button>
+                          @else
+                              <span class="text-muted">(API data - not editable)</span>
+                          @endif
+                      </td>
+                  </tr>
+              
+                  <!-- Inline Edit Form Row (hidden by default) -->
+                  @if (!is_null($pelanggaran['id']))
+                  <tr id="editFormPelanggaran{{ $pelanggaran['id'] }}" style="display: none;">
+                      <form action="{{ route('student_behaviors.update', $pelanggaran['id']) }}" method="POST">
+                          @csrf
+                          <td style="width: 5%;">{{ $pelanggaranIndex - 1 }}</td>
+                          <td>
+                              <textarea name="pelanggaran" class="form-control" required>{{ old('pelanggaran', $pelanggaran['pelanggaran']) }}</textarea>
+                          </td>
+                          <td style="width: 115px;">
+                              <input type="text" name="unit" class="form-control" value="{{ old('unit', $pelanggaran['unit']) }}">
+                          </td>
+                          <td>
+                              <input type="date" name="tanggal" class="form-control tanggal" value="{{ old('tanggal', $pelanggaran['tanggal']) }}">
+                          </td>
+                          <td style="width: 70px;">
+                              <input type="number" name="poin" class="form-control" value="{{ old('poin', $pelanggaran['poin']) }}" min="1" max="100">
+                          </td>
+                          <td>
+                              <textarea name="tindakan" class="form-control">{{ old('tindakan', $pelanggaran['tindakan']) }}</textarea>
+                          </td>
+                          <td>
+                              <button type="submit" class="btn btn-success btn-sm" title="Simpan"><i class="fas fa-save"></i></button>
+                              <button type="button" class="btn btn-secondary btn-sm" title="Batal" onclick="toggleEditForm('Pelanggaran', {{ $pelanggaran['id'] }})"><i class="fas fa-times"></i></button>
+                          </td>
+                      </form>
+                  </tr>
+                  @endif
+              @empty
+                  <tr>
+                      <td colspan="{{ $pelanggaranColspan }}" class="no-results">No results found.</td>
+                  </tr>
+              @endforelse              
                   <!-- Plus Sign Row untuk Pelanggaran -->
                   <tr id="plusRow{{ $key }}">
                     <td colspan="{{ $pelanggaranColspan }}" class="text-end">
@@ -286,64 +277,66 @@
                 </thead>
                 <tbody>
                   @php $perbuatanBaikIndex = 1; @endphp
-@forelse ($perilaku['perbuatan_baik'] ?? [] as $perbuatan)
-    <!-- Display Row -->
-    <tr id="displayRowPerbuatanBaik{{ $perbuatan['id'] }}">
-        <td style="width: 5%;">{{ $perbuatanBaikIndex++ }}</td>
-        <td>{{ $perbuatan['perbuatan_baik'] ?? '-' }}</td>
-        <td>{{ $perbuatan['tindakan'] ?? '-' }}</td>
-        <td style="width: 50px;">{{ $perbuatan['poin'] ?? 0 }}</td>
-        <td style="width: 115px;">{{ $perbuatan['unit'] ?? '-' }}</td>
-        <td>{{ $perbuatan['tanggal'] ?? '-' }}</td>
-        <td>
-            @if (isset($perbuatan['id']))
-                <button type="button" class="btn btn-outline-primary btn-sm" title="Edit" onclick="toggleEditForm('PerbuatanBaik', {{ $perbuatan['id'] }})">
-                    <i class="fas fa-pencil-alt"></i>
-                </button>
-                <button type="button" class="btn btn-outline-danger btn-sm delete-btn" 
-                    data-id="{{ $perbuatan['id'] }}" 
-                    data-url="{{ route('student_behaviors.destroy', $perbuatan['id']) }}" 
-                    data-type="perbuatan_baik" 
-                    title="Delete">
-                    <i class="fas fa-trash"></i>
-                </button>
-            @endif
-        </td>
-    </tr>
-
-    <!-- Inline Edit Form Row (hidden secara default) -->
-    <tr id="editFormPerbuatanBaik{{ $perbuatan['id'] }}" style="display: none;">
-        <form action="{{ route('student_behaviors.update', $perbuatan['id']) }}" method="POST">
-            @csrf
-            <td style="width: 5%;">{{ $perbuatanBaikIndex - 1 }}</td>
-            <td>
-                <textarea name="perbuatan_baik" class="form-control" required>{{ old('perbuatan_baik', $perbuatan['perbuatan_baik']) }}</textarea>
-            </td>
-            <td>
-                <textarea name="keterangan" class="form-control">{{ old('keterangan', $perbuatan['keterangan'] ?? '') }}</textarea>
-            </td>
-            <td style="width: 50px;">
-                <input type="number" name="kredit_poin" class="form-control" value="{{ old('kredit_poin', $perbuatan['poin']) }}" min="1" max="100">
-            </td>
-            <td style="width: 115px;">
-                <input type="text" name="unit" class="form-control" value="{{ old('unit', $perbuatan['unit']) }}">
-            </td>
-            <td>
-              <input type="date" name="tanggal" class="form-control tanggal" value="{{ old('tanggal', $perbuatan['tanggal']) }}">
-            </td>
-            <td>
-                <button type="submit" class="btn btn-success btn-sm" title="Simpan"><i class="fas fa-save"></i></button>
-                <button type="button" class="btn btn-secondary btn-sm" title="Batal" onclick="toggleEditForm('PerbuatanBaik', {{ $perbuatan['id'] }})"><i class="fas fa-times"></i></button>
-            </td>
-        </form>
-    </tr>
-@empty
-    <tr>
-        <td colspan="{{ $perbuatanBaikColspan }}" class="no-results">No results found.</td>
-    </tr>
-@endforelse
-
-                  
+                  @forelse ($perilaku['perbuatan_baik'] ?? [] as $perbuatan)
+                  <!-- Display Row -->
+                  <tr id="displayRowPerbuatanBaik{{ $perbuatan['id'] ?? 'api' }}">
+                      <td style="width: 5%;">{{ $perbuatanBaikIndex++ }}</td>
+                      <td>{{ $perbuatan['perbuatan_baik'] ?? '-' }}</td>
+                      <td>{{ $perbuatan['tindakan'] ?? '-' }}</td>
+                      <td style="width: 50px;">{{ $perbuatan['poin'] ?? 0 }}</td>
+                      <td style="width: 115px;">{{ $perbuatan['unit'] ?? '-' }}</td>
+                      <td>{{ $perbuatan['tanggal'] ?? '-' }}</td>
+                      <td>
+                          @if (!is_null($perbuatan['id']))
+                              <button type="button" class="btn btn-outline-primary btn-sm" title="Edit" onclick="toggleEditForm('PerbuatanBaik', {{ $perbuatan['id'] }})">
+                                  <i class="fas fa-pencil-alt"></i>
+                              </button>
+                              <button type="button" class="btn btn-outline-danger btn-sm delete-btn" 
+                                  data-id="{{ $perbuatan['id'] }}" 
+                                  data-url="{{ route('student_behaviors.destroy', $perbuatan['id']) }}" 
+                                  data-type="perbuatan_baik" 
+                                  title="Delete">
+                                  <i class="fas fa-trash"></i>
+                              </button>
+                          @else
+                              <span class="text-muted">(API data - not editable)</span>
+                          @endif
+                      </td>
+                  </tr>
+              
+                  @if (!is_null($perbuatan['id']))
+                  <!-- Inline Edit Form Row (hidden by default) -->
+                  <tr id="editFormPerbuatanBaik{{ $perbuatan['id'] }}" style="display: none;">
+                      <form action="{{ route('student_behaviors.update', $perbuatan['id']) }}" method="POST">
+                          @csrf
+                          <td style="width: 5%;">{{ $perbuatanBaikIndex - 1 }}</td>
+                          <td>
+                              <textarea name="perbuatan_baik" class="form-control" required>{{ old('perbuatan_baik', $perbuatan['perbuatan_baik']) }}</textarea>
+                          </td>
+                          <td>
+                              <textarea name="keterangan" class="form-control">{{ old('keterangan', $perbuatan['keterangan'] ?? '') }}</textarea>
+                          </td>
+                          <td style="width: 50px;">
+                              <input type="number" name="kredit_poin" class="form-control" value="{{ old('kredit_poin', $perbuatan['poin']) }}" min="1" max="100">
+                          </td>
+                          <td style="width: 115px;">
+                              <input type="text" name="unit" class="form-control" value="{{ old('unit', $perbuatan['unit']) }}">
+                          </td>
+                          <td>
+                              <input type="date" name="tanggal" class="form-control tanggal" value="{{ old('tanggal', $perbuatan['tanggal']) }}">
+                          </td>
+                          <td>
+                              <button type="submit" class="btn btn-success btn-sm" title="Simpan"><i class="fas fa-save"></i></button>
+                              <button type="button" class="btn btn-secondary btn-sm" title="Batal" onclick="toggleEditForm('PerbuatanBaik', {{ $perbuatan['id'] }})"><i class="fas fa-times"></i></button>
+                          </td>
+                      </form>
+                  </tr>
+                  @endif
+              @empty
+                  <tr>
+                      <td colspan="{{ $perbuatanBaikColspan }}" class="no-results">No results found.</td>
+                  </tr>
+              @endforelse              
                   <!-- Plus Sign Row untuk Perbuatan Baik -->
                   <tr id="plusRowPB{{ $key }}">
                     <td colspan="{{ $perbuatanBaikColspan }}" class="text-end">
