@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\Log;
 use App\Models\RequestKonseling;
 use Exception;
 use App\Models\Mahasiswa;
-use App\Notifications\UniversalNotification; // Use our universal notification
+use App\Notifications\UniversalNotification; 
+use App\Services\NotificationService; 
 
 class AjukanKonselingController extends Controller
 {

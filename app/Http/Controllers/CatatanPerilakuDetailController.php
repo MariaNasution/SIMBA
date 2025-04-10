@@ -8,7 +8,6 @@ use App\Services\TwilioService;
 use App\Models\StudentBehavior;
 use App\Models\Mahasiswa;
 use Illuminate\Support\Facades\Log;
-use App\Notifications\UniversalNotification; // Gunakan universal notification
 
 class CatatanPerilakuDetailController extends Controller
 {
@@ -53,6 +52,7 @@ class CatatanPerilakuDetailController extends Controller
         }
 
         // Create a new student behavior record
+        // Observer akan mengirim notifikasi secara otomatis saat record dibuat.
         StudentBehavior::create($data);
 
         // --- Send SMS to Orang Tua and log ---
@@ -68,24 +68,6 @@ class CatatanPerilakuDetailController extends Controller
             }
         } else {
             Log::warning("No Orang Tua record or phone number for mahasiswa NIM {$validated['student_nim']}.");
-        }
-
-        // --- Create Universal Notification for mahasiswa ---
-        $notificationMessage = "Data " . ($validated['type'] === 'pelanggaran' ? 'Pelanggaran' : 'Perbuatan Baik') . " telah ditambahkan.";
-        try {
-            $mahasiswa = Mahasiswa::where('nim', $validated['student_nim'])->first();
-            if ($mahasiswa) {
-                // Extra data bisa disertakan untuk informasi tambahan, misalnya kategori dan aksi
-                $mahasiswa->notify(new UniversalNotification($notificationMessage, [
-                    'category' => 'catatan_perilaku',
-                    'action'   => 'store'
-                ]));
-                Log::info("Universal notification (store) sent for mahasiswa NIM {$validated['student_nim']}.");
-            } else {
-                Log::error("Mahasiswa with NIM {$validated['student_nim']} not found for notification.");
-            }
-        } catch (\Exception $e) {
-            Log::error("Failed to send universal notification for mahasiswa NIM {$validated['student_nim']}. Error: " . $e->getMessage());
         }
 
         // Redirect with flash message
@@ -142,6 +124,7 @@ class CatatanPerilakuDetailController extends Controller
         }
 
         // Update record
+        // Observer akan mengirim notifikasi secara otomatis saat record diupdate.
         $behavior->update($data);
 
         // --- Send SMS update to Orang Tua ---
@@ -159,23 +142,6 @@ class CatatanPerilakuDetailController extends Controller
             Log::warning("No Orang Tua record or phone number for mahasiswa NIM {$behavior->student_nim} during update.");
         }
 
-        // --- Create Universal Notification for update ---
-        $notificationMessage = "Data " . ($behavior->type === 'pelanggaran' ? 'Pelanggaran' : 'Perbuatan Baik') . " telah diperbarui.";
-        try {
-            $mahasiswa = Mahasiswa::where('nim', $behavior->student_nim)->first();
-            if ($mahasiswa) {
-                $mahasiswa->notify(new UniversalNotification($notificationMessage, [
-                    'category' => 'catatan_perilaku',
-                    'action'   => 'update'
-                ]));
-                Log::info("Universal notification (update) sent for mahasiswa NIM {$behavior->student_nim}.");
-            } else {
-                Log::error("Mahasiswa with NIM {$behavior->student_nim} not found for update notification.");
-            }
-        } catch (\Exception $e) {
-            Log::error("Failed to send universal notification update for mahasiswa NIM {$behavior->student_nim}. Error: " . $e->getMessage());
-        }
-
         return redirect()
             ->route('catatan_perilaku_detail', ['studentNim' => $behavior->student_nim])
             ->with('success', 'Data berhasil diperbarui.');
@@ -191,6 +157,7 @@ class CatatanPerilakuDetailController extends Controller
         $behaviorType = $behavior->type === 'pelanggaran' ? 'Pelanggaran' : 'Perbuatan Baik';
 
         // Delete record
+        // Observer akan mengirim notifikasi secara otomatis saat record dihapus.
         $behavior->delete();
 
         // --- Send SMS deletion notice to Orang Tua ---
@@ -205,23 +172,6 @@ class CatatanPerilakuDetailController extends Controller
             }
         } else {
             Log::warning("No Orang Tua record or phone number for mahasiswa NIM {$studentNim} during deletion.");
-        }
-
-        // --- Create Universal Notification for deletion ---
-        $notificationMessage = "Data {$behaviorType} telah dihapus.";
-        try {
-            $mahasiswa = Mahasiswa::where('nim', $studentNim)->first();
-            if ($mahasiswa) {
-                $mahasiswa->notify(new UniversalNotification($notificationMessage, [
-                    'category' => 'catatan_perilaku',
-                    'action'   => 'destroy'
-                ]));
-                Log::info("Universal notification (destroy) sent for mahasiswa NIM {$studentNim}.");
-            } else {
-                Log::error("Mahasiswa with NIM {$studentNim} not found for deletion notification.");
-            }
-        } catch (\Exception $e) {
-            Log::error("Failed to send universal notification deletion for mahasiswa NIM {$studentNim}. Error: " . $e->getMessage());
         }
 
         return redirect()

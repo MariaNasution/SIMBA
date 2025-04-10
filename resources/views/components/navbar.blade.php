@@ -33,7 +33,7 @@
                         <li>
                             <!-- Using the dynamic link if present -->
                             <a class="dropdown-item" href="{{ $notif->link ?? route('mahasiswa_perwalian') }}">
-                                {{ $notif->Pesan ?? 'No message' }} by {{ $notif->nama }}
+                                {{ $notif->data['message'] ?? 'No message' }}
                             </a>
                         </li>
                     @empty
