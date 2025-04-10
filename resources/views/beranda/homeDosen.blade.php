@@ -20,7 +20,7 @@
                 @foreach ($studentsByYear[$year] as $kelas => $classData)
                     <div class="col-md-12 mb-4">
                         <div class="card p-3">
-                            <h5 class="card-title">{{ $prodisByYear[$year][$kelas] }} {{ $year }} - {{ $kelas }}</h5>
+                            <h5 class="card-title">{{ $prodisByYear[$year][$kelas] }} {{ $angkatanByKelasAndYear[$year][$kelas] }} - {{ $kelas }}</h5>
                             <div class="content-container" style="height: 300px; position: relative;">
                                 <!-- Table -->
                                 <div class="table-wrapper">
@@ -134,12 +134,12 @@
 
     .content-container {
         transition: all 0.5s ease;
-        overflow-y: auto; /* Keep this for table scrolling if needed */
+        overflow-y: auto;
     }
 
     .table-wrapper, .chart-wrapper {
         width: 100%;
-        height: 100%; /* Ensure both take full height of container */
+        height: 100%;
         transition: transform 0.5s ease;
         position: absolute;
         top: 0;
@@ -198,6 +198,7 @@
 <script>
     const prodisByYear = @json($prodisByYear);
     const semesterAveragesByYear = @json($semesterAveragesByYear);
+    const angkatanByKelasAndYear = @json($angkatanByKelasAndYear);
 
     document.addEventListener('DOMContentLoaded', function() {
         const toggleButtons = document.querySelectorAll('.toggle-chart');
@@ -214,6 +215,7 @@
                 const canvas = chartWrapper.querySelector('.progress-chart');
                 const year = this.getAttribute('data-year');
                 const kelas = this.getAttribute('data-kelas');
+                const angkatan = angkatanByKelasAndYear[year][kelas] || year;
                 
                 if (tableWrapper.classList.contains('slide-out')) {
                     tableWrapper.classList.remove('slide-out');
@@ -259,11 +261,11 @@
                             },
                             options: {
                                 responsive: true,
-                                maintainAspectRatio: false, // Allow chart to fill container without maintaining default aspect ratio
+                                maintainAspectRatio: false,
                                 plugins: {
                                     title: {
                                         display: true,
-                                        text: `Progress Pencapaian ${prodisByYear[year][kelas]} ${year} - ${kelas}`,
+                                        text: `Progress Pencapaian ${prodisByYear[year][kelas]} ${angkatan} - ${kelas}`,
                                         font: { size: 16 },
                                         color: 'black'
                                     },

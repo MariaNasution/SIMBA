@@ -2,10 +2,10 @@
 
 @section('content')
     <div class="container-fluid">
-        <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center py-2">
-            <h4 class="ms-3 mb-0">Perwalian / Jadwalkan Perwalian</h4>
-            <a href="#" class="me-3 text-white"><i class="fas fa-arrow-right"></i></a>
+    
+        <!-- Success Popup -->
+        <div id="successPopup" class="alert alert-success" style="display: none; position: fixed; top: 20px; right: 20px; z-index: 1000;">
+            Successfully made Perwalian
         </div>
 
         <!-- Form Jadwal -->
@@ -13,50 +13,92 @@
             <div class="col-md-8">
                 <h5>Jadwalkan Perwalian</h5>
 
-                <div class="row">
-                    <!-- Jadwal Mulai -->
-                    <div class="col-md-6 mb-3">
-                        <label for="jadwalMulai" class="form-label">Jadwal Mulai</label>
-                        <div class="input-group">
-                            <input type="datetime-local" class="form-control custom-input" id="jadwalMulai"
-                                name="jadwalMulai" value="2025-03-20T01:45">
-                            <span class="input-group-text"><i class="far fa-clock"></i></span>
+                <form id="perwalianForm">
+                    @csrf
+
+                    <div class="row">
+                        <!-- Jadwal Mulai -->
+                        <div class="col-md-6 mb-3">
+                            <label for="jadwalMulai" class="form-label">Jadwal Mulai</label>
+                            <div class="input-group">
+                                <input type="datetime-local" class="form-control custom-input" id="jadwalMulai"
+                                    name="jadwalMulai" required>
+                                <span class="input-group-text"><i class="far fa-clock"></i></span>
+                            </div>
+                            <span class="text-danger" id="jadwalMulaiError"></span>
+                        </div>
+
+                        <!-- Jadwal Selesai -->
+                        <div class="col-md-6 mb-3">
+                            <label for="jadwalSelesai" class="form-label">Jadwal Selesai</label>
+                            <div class="input-group">
+                                <input type="datetime-local" class="form-control custom-input" id="jadwalSelesai"
+                                    name="jadwalSelesai" required>
+                                <span class="input-group-text"><i class="far fa-clock"></i></span>
+                            </div>
+                            <span class="text-danger" id="jadwalSelesaiError"></span>
                         </div>
                     </div>
 
-                    <!-- Jadwal Selesai -->
-                    <div class="col-md-6 mb-3">
-                        <label for="jadwalSelesai" class="form-label">Jadwal Selesai</label>
-                        <div class="input-group">
-                            <input type="datetime-local" class="form-control custom-input" id="jadwalSelesai"
-                                name="jadwalSelesai">
-                            <span class="input-group-text"><i class="far fa-clock"></i></span>
+                    <!-- Dropdown Keterangan -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="keterangan" class="form-label">Keterangan</label>
+                            <select class="form-select custom-select" id="keterangan" name="keterangan" required>
+                                <option selected disabled>Pilih Keterangan</option>
+                                <option value="Semester Baru">Semester Baru</option>
+                                <option value="Sebelum UTS">Sebelum UTS</option>
+                                <option value="Sebelum UAS">Sebelum UAS</option>
+                            </select>
+                            <span class="text-danger" id="keteranganError"></span>
                         </div>
                     </div>
-                </div>
 
-                <!-- Dropdown Keterangan -->
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="keterangan" class="form-label">Keterangan</label>
-                        <select class="form-select custom-select" id="keterangan" name="keterangan">
-                            <option selected disabled>Pilih Keterangan</option>
-                            <option>Semester Baru</option>
-                            <option>Sebelum UTS</option>
-                            <option>Sebelum UAS</option>
-                        </select>
+                    <!-- Tombol Jadwalkan -->
+                    <div class="row mt-2">
+                        <div class="col-md-3">
+                            <button type="submit" class="btn custom-btn w-100">Jadwalkan</button>
+                        </div>
                     </div>
-                </div>
-
-                <!-- Tombol Jadwalkan -->
-                <div class="row mt-2">
-                    <div class="col-md-3">
-                        <button class="btn custom-btn w-100">Jadwalkan</button>
-                    </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>
+
+    <script>
+        document.getElementById('perwalianForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+
+            fetch("{{ route('kemahasiswaan_perwalian.store') }}", {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success popup
+                    const popup = document.getElementById('successPopup');
+                    popup.style.display = 'block';
+                    setTimeout(() => {
+                        popup.style.display = 'none';
+                    }, 3000); // Fade away after 3 seconds
+                } else {
+                    // Display error messages
+                    document.getElementById('jadwalMulaiError').textContent = data.errors?.jadwalMulai || data.message || '';
+                    document.getElementById('jadwalSelesaiError').textContent = data.errors?.jadwalSelesai || '';
+                    document.getElementById('keteranganError').textContent = data.errors?.keterangan || '';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('jadwalMulaiError').textContent = 'An unexpected error occurred.';
+            });
+        });
+    </script>
 
     <style>
         /* Custom styling untuk input */
@@ -98,7 +140,6 @@
             font-size: 14px;
             color: #424242;
             margin-bottom: 6px;
-            /* Jarak yang lebih lega dari label ke input */
         }
     </style>
 @endsection

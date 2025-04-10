@@ -26,10 +26,13 @@ class MahasiswaPerwalianController extends Controller
         }
 
         // Fetch the absensi record for the student
-        $absensi = Absensi::where('nim', $student->nim)->first();
+        $absensi = Absensi::where('nim', $student->nim)->latest('updated_at')->first();
+        
         $perwalian = Perwalian::where('ID_Perwalian', $student->ID_Perwalian)
         ->orderBy('updated_at', 'desc')
-        ->first();        $dosen = Dosen::where('nip', optional($perwalian)->ID_Dosen_Wali)->first(); // Safe access if $perwalian is null
+        ->first();        
+        
+        $dosen = Dosen::where('nip', optional($perwalian)->ID_Dosen_Wali)->first(); // Safe access if $perwalian is null
         // Fetch all notifications with perwalian relationship to avoid N+1 problem
         $notifications = Notifikasi::with('perwalian') // Eager load perwalian
                                  ->where('Id_Perwalian', $student->ID_Perwalian)

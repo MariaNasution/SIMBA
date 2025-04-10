@@ -10,6 +10,7 @@ use App\Http\Controllers\MahasiswaKonselingController;
 use App\Http\Controllers\MahasiswaPerwalianController;
 use App\Http\Controllers\MahasiswaRequestKonselingController;
 use App\Http\Controllers\KemahasiswaanController;
+use App\Http\Controllers\KemahasiswaanPerwalianController;
 use App\Http\Controllers\KemajuanStudiController;
 use App\Http\Controllers\DetailNilaiController;
 use App\Http\Controllers\CatatanPerilakuController;
@@ -73,7 +74,6 @@ Route::middleware(['auth.session', 'ensure.student.data', 'role:mahasiswa'])->gr
 
 });
 
-// Middleware untuk kemahasiswaan
 Route::middleware(['auth.session', 'role:kemahasiswaan'])
     ->prefix('kemahasiswaan')
     ->name('kemahasiswaan_')
@@ -85,9 +85,11 @@ Route::middleware(['auth.session', 'role:kemahasiswaan'])
         Route::post('/calendar/upload', [CalendarController::class, 'upload'])->name('calendar.upload');
 
         // Perwalian
-        Route::get('/perwalian/jadwal', [KemahasiswaanController::class, 'jadwalPerwalian'])->name('perwalian.jadwal');
-        Route::get('/perwalian/kelas', [KemahasiswaanController::class, 'kelasPerwalian'])->name('perwalian.kelas');
-        Route::get('/perwalian/berita-acara', [KemahasiswaanController::class, 'beritaAcaraPerwalian'])->name('perwalian.berita_acara');
+        Route::get('/perwalian/jadwal', [KemahasiswaanPerwalianController::class, 'jadwalPerwalian'])->name('perwalian.jadwal');
+        Route::post('/perwalian/store', [KemahasiswaanPerwalianController::class, 'store'])->name('perwalian.store');
+        Route::get('/perwalian/kelas', [KemahasiswaanPerwalianController::class, 'kelasPerwalian'])->name('perwalian.kelas');
+        Route::get('/perwalian/berita-acara', [KemahasiswaanPerwalianController::class, 'beritaAcaraPerwalian'])->name('perwalian.berita_acara');
+        Route::post('/perwalian/berita-acara/search', [KemahasiswaanPerwalianController::class, 'searchBeritaAcara'])->name('perwalian.berita_acara.search');
 
         // Konseling
         Route::prefix('konseling')->group(function () {
@@ -127,10 +129,7 @@ Route::middleware(['auth.session', 'role:kemahasiswaan'])
             Route::get('/konseling-lanjutan/{nim}', [KemahasiswaanController::class, 'detail'])->name('konseling.lanjutan.detail');
             Route::post('/konseling/lanjutan', [KonselingLanjutanController::class, 'store'])->name('konseling.lanjutan.store');
         });
-
-    
     });
-
 // Middleware untuk konselor
 Route::middleware(['auth.session', 'role:konselor'])
     ->prefix('konselor')
@@ -208,38 +207,34 @@ Route::middleware(['auth.session', 'ensure.student.data', 'role:mahasiswa'])->gr
 
 });
 
-// Middleware untuk dosen
 Route::middleware(['auth.session', 'role:dosen'])->group(function () {
-
-
+    // DosenController Routes (unchanged)
     Route::get('/dosen/beranda', [DosenController::class, 'beranda'])->name('dosen');
     Route::get('/dosen/perwalian', [DosenController::class, 'index'])->name('dosen.perwalian');
     Route::get('/dosen/presensi', [DosenController::class, 'presensi'])->name('dosen.presensi');
-    Route::get('/dosen/absensi-mahasiswa', [AbsensiController::class, 'index'])->name('absensi');
+    Route::get('/dosen/detailed-class/{year}/{kelas}', [DosenController::class, 'showDetailedClass'])->name('dosen.detailedClass');
 
-    Route::get('/absensi-mahasiswa/{date}/{class}', [AbsensiController::class, 'show'])->name('absensi.show');
-    Route::post('/absensi-mahasiswa/{date}/{class}', [AbsensiController::class, 'store'])->name('absensi.store');
+    // SetPerwalianController Routes (unchanged)
     Route::get('/set-perwalian', [SetPerwalianController::class, 'index'])->name('set.perwalian');
     Route::post('/set-perwalian/store', [SetPerwalianController::class, 'store'])->name('set.perwalian.store');
     Route::delete('/set-perwalian/destroy', [SetPerwalianController::class, 'destroy'])->name('set.perwalian.destroy');
     Route::get('/set-perwalian/calendar', [SetPerwalianController::class, 'getCalendar'])->name('set.perwalian.calendar');
-    Route::get('/dosen/detailed-class/{year}/{kelas}', [DosenController::class, 'showDetailedClass'])->name('dosen.detailedClass');
     Route::get('/set-perwalian/histori', [SetPerwalianController::class, 'histori'])->name('dosen.histori');
     Route::get('/set-perwalian/histori/detailed/{id}', [SetPerwalianController::class, 'detailedHistori'])->name('dosen.histori.detailed');
     Route::get('/set-perwalian/print-berita-acara/{id}', [SetPerwalianController::class, 'printBeritaAcara'])->name('berita_acara.print');
 
-    Route::get('/perwalian/berita-acara', [BeritaAcaraController::class, 'index'])->name('perwalian.berita_acara');
-    Route::post('/perwalian/berita-acara', [BeritaAcaraController::class, 'store'])->name('perwalian.berita_acara.store');
+    // AbsensiController Routes
+    Route::get('/absensi-mahasiswa', [AbsensiController::class, 'index'])->name('absensi');
+    Route::get('/absensi-mahasiswa/{date}/{class}', [AbsensiController::class, 'show'])->name('absensi.show');
+    Route::post('/absensi-mahasiswa/{date}/{class}', [AbsensiController::class, 'store'])->name('absensi.store');
+    Route::get('/absensi-mahasiswa/completed', [AbsensiController::class, 'completed'])->name('absensi.completed');
 
-    Route::get('/berita-acara/select-class', [BeritaAcaraController::class, 'selectClass'])->name('berita_acara.select_class');
+    // BeritaAcaraController Routes - Updated
     Route::get('/berita-acara', [BeritaAcaraController::class, 'index'])->name('berita_acara.index');
-    Route::get('/berita-acara/create', [BeritaAcaraController::class, 'create'])->name('berita_acara.create');
-    Route::post('/berita-acara/store', [BeritaAcaraController::class, 'store'])->name('berita_acara.store');
-    Route::get('/berita-acara/{id}', [BeritaAcaraController::class, 'show'])->name('berita_acara.show');
-    Route::get('/berita-acara/success', [BeritaAcaraController::class, 'successPage'])->name('berita-acara.success');
-    Route::get('/berita-acara/success/{kelas}/{tanggal_perwalian}', [BeritaAcaraController::class, 'success'])
-        ->name('berita-acara.success');
-
+    Route::get('/berita-acara/select-class', [BeritaAcaraController::class, 'selectClass'])->name('berita_acara.select_class');
+    Route::get('/berita-acara/create/{date}/{class}', [BeritaAcaraController::class, 'create'])->name('berita_acara.create');
+    Route::post('/berita-acara/store/{date}/{class}', [BeritaAcaraController::class, 'store'])->name('berita_acara.store');
+    Route::get('/berita-acara/success/{kelas}/{tanggal_perwalian}', [BeritaAcaraController::class, 'success'])->name('berita_acara.success');
 });
 
 // Middleware untuk keasramaan

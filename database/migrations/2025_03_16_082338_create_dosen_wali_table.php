@@ -9,13 +9,14 @@ return new class extends Migration
     public function up()
     {
         Schema::create('dosen_wali', function (Blueprint $table) {
-            $table->string('username')->primary(); // Foreign key to users tableS
+            $table->string('username')->primary(); // Foreign key to users table
             $table->string('kelas')->nullable();
+            $table->string('angkatan')->nullable(); // Added angkatan column
             $table->timestamps();
+            $table->softDeletes(); // Added deleted_at column for soft deletes
 
             // Define the foreign key constraint
             $table->foreign('username')->references('username')->on('users')->onDelete('cascade');
-            
         });
     }
 
@@ -23,12 +24,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('dosen_wali');
     }
-
-
 };
-
-
-
-
-
-    
