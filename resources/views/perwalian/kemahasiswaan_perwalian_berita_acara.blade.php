@@ -215,6 +215,13 @@
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
+    .class-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #2E7D32;
+        margin-bottom: 20px;
+        text-align: center;
+    }
 </style>
 
 <script>
@@ -327,51 +334,56 @@ function searchBeritaAcara(event) {
                 const recordDiv = document.createElement('div');
                 recordDiv.classList.add('record-container');
 
-                // Absensi Table
+                // Add a title for the class
                 recordDiv.innerHTML = `
-                    <h4 style="font-size: 18px; font-weight: 600; color: #333;">
-                        Absensi Kelas ${record.kelas || 'N/A'} pada ${formatDate(record.tanggal_perwalian)}
-                    </h4>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>NIM</th>
-                                <th>Nama</th>
-                                <th>Status Kehadiran</th>
-                                <th>Keterangan</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${record.absensi && Array.isArray(record.absensi) && record.absensi.length > 0 ? record.absensi.map((absensi, absensiIndex) => {
-                                console.log(`Processing absensi ${absensiIndex + 1} for record ${index + 1}:`, absensi);
-                                return `
-                                    <tr>
-                                        <td>${absensi.nim || 'N/A'}</td>
-                                        <td>${absensi.nama || 'Unknown'}</td>
-                                        <td>
-                                            <div class="status-display">
-                                                <span class="selected-status">
-                                                    ${absensi.status_kehadiran === 'hadir' ? '✅ Hadir' :
-                                                      absensi.status_kehadiran === 'alpa' ? '❌ Alpa' :
-                                                      absensi.status_kehadiran === 'izin' ? '📝 Izin' : 'Tidak Diketahui'}
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td class="status-desc">
-                                            <span class="keterangan-text">${absensi.keterangan || ''}</span>
-                                        </td>
-                                    </tr>
-                                `;
-                            }).join('') : `
+                    <h3 class="class-title">Berita Acara Kelas ${record.kelas || 'N/A'}</h3>
+
+                    <!-- Absensi Table -->
+                    <div class="mb-4">
+                        <h4 style="font-size: 18px; font-weight: 600; color: #333;">
+                            Absensi Kelas ${record.kelas || 'N/A'} pada ${formatDate(record.tanggal_perwalian)}
+                        </h4>
+                        <table>
+                            <thead>
                                 <tr>
-                                    <td colspan="4">Tidak ada data absensi untuk perwalian ini.</td>
+                                    <th>NIM</th>
+                                    <th>Nama</th>
+                                    <th>Status Kehadiran</th>
+                                    <th>Keterangan</th>
                                 </tr>
-                            `}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                ${record.absensi && Array.isArray(record.absensi) && record.absensi.length > 0 ? record.absensi.map((absensi, absensiIndex) => {
+                                    console.log(`Processing absensi ${absensiIndex + 1} for record ${index + 1}:`, absensi);
+                                    return `
+                                        <tr>
+                                            <td>${absensi.nim || 'N/A'}</td>
+                                            <td>${absensi.nama || 'Unknown'}</td>
+                                            <td>
+                                                <div class="status-display">
+                                                    <span class="selected-status">
+                                                        ${absensi.status_kehadiran === 'hadir' ? '✅ Hadir' :
+                                                          absensi.status_kehadiran === 'alpa' ? '❌ Alpa' :
+                                                          absensi.status_kehadiran === 'izin' ? '📝 Izin' : 'Tidak Diketahui'}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td class="status-desc">
+                                                <span class="keterangan-text">${absensi.keterangan || ''}</span>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('') : `
+                                    <tr>
+                                        <td colspan="4">Tidak ada data absensi untuk perwalian ini.</td>
+                                    </tr>
+                                `}
+                            </tbody>
+                        </table>
+                    </div>
 
                     <!-- Berita Acara Details -->
-                    <div class="text-center mt-5">
+                    <div class="text-center">
                         <img src="{{ asset('assets/img/Logo Institut Teknologi Del.png') }}" alt="Logo IT Del" class="mb-4" style="max-width: 150px;">
                         <h3 class="fw-bold title-centered">AGENDA PERWALIAN</h3>
                         <div class="text-start mt-4">

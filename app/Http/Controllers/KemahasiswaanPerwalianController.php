@@ -9,6 +9,7 @@ use App\Models\Dosen;
 use App\Models\Dosen_Wali;
 use App\Models\BeritaAcara;
 use App\Models\Absensi;
+use App\Models\DosenWali;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -221,158 +222,263 @@ class KemahasiswaanPerwalianController extends Controller
     }
 
     public function searchBeritaAcara(Request $request)
-{
-    try {
-        // Log the incoming request for debugging
-        Log::info('searchBeritaAcara request received', [
-            'request' => $request->all(),
-        ]);
-
-        // Validate the request inputs
-        $validator = Validator::make($request->all(), [
-            'prodi' => 'required|string|in:S1Informatika,S1TeknikRekayasaPerangkatLunak,S1TeknikKomputer,S1TeknikInformasi,S1TeknikBioproses,S1TeknikMetalurgi,S1SistemInformasi,S1TeknikElektro,S1ManajemenRekayasa',
-            'keterangan' => 'required|string|in:Semester Baru,Sebelum UTS,Sebelum UAS',
-            'angkatan' => 'required|integer|min:2000|max:' . date('Y'),
-        ]);
-
-        if ($validator->fails()) {
-            Log::error('Validation failed in searchBeritaAcara', ['errors' => $validator->errors()]);
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-
-        $prodi = $request->input('prodi');
-        $keterangan = $request->input('keterangan');
-        $angkatan = $request->input('angkatan');
-
-        // Map Prodi to kelas prefix
-        $prodiMap = [
-            'S1Informatika' => 'IF',
-            'S1TeknikRekayasaPerangkatLunak' => 'TRPL',
-            'S1TeknikKomputer' => 'TK',
-            'S1TeknikInformasi' => 'TI',
-            'S1TeknikBioproses' => 'TB',
-            'S1TeknikMetalurgi' => 'TM',
-            'S1SistemInformasi' => 'SI',
-            'S1TeknikElektro' => 'TE',
-            'S1ManajemenRekayasa' => 'MR',
-        ];
-
-        $kelasPrefix = $prodiMap[$prodi] ?? null;
-        if (!$kelasPrefix) {
-            Log::error('Invalid prodi mapping', ['prodi' => $prodi]);
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid Prodi value.',
-            ], 400);
-        }
-
-        // Build the query for berita_acaras with absensi relationship
-        $query = BeritaAcara::query()
-            ->with('absensi') // Eager-load the absensi relationship
-            ->where('angkatan', $angkatan);
-            Log::error('Invalid queries', ['query' => $ $query]);
-
-
-        // Filter by kelas (e.g., 12IF1, 12IF2)
-        $query->where(function ($q) use ($kelasPrefix) {
-            $q->where('kelas', 'LIKE', "%{$kelasPrefix}1")
-              ->orWhere('kelas', 'LIKE', "%{$kelasPrefix}2");
-        });
-
-        // Apply date range filters based on keterangan using applyKeteranganFilter
-        $this->applyKeteranganFilter($query, $keterangan);
-
-        // Limit to 2 results
-        $beritaAcaras = $query->take(2)->get();
-
-        Log::info('searchBeritaAcara query executed', [
-            'prodi' => $prodi,
-            'keterangan' => $keterangan,
-            'angkatan' => $angkatan,
-            'kelas_prefix' => $kelasPrefix,
-            'results_count' => $beritaAcaras->count(),
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'data' => $beritaAcaras,
-        ]);
-    } catch (\Exception $e) {
-        Log::error('Error in searchBeritaAcara', [
-            'message' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(),
-        ]);
-
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to search Berita Acara: ' . $e->getMessage(),
-        ], 500);
-    }
-}
-
-    private function applyKeteranganFilter($query, $keterangan)
     {
-        Log::info('Applying keterangan filter logic', ['keterangan' => $keterangan]);
-        if ($keterangan === 'Semester Baru') {
-            $query->where(function ($q) {
-                $q->whereMonth('tanggal_perwalian', 1)
-                ->orWhere(function ($q2) {
-                    $q2->whereMonth('tanggal_perwalian', 2)
-                        ->whereDay('tanggal_perwalian', 1);
-                })
-                ->orWhere(function ($q2) {
-                    $q2->whereMonth('tanggal_perwalian', 5)
-                        ->whereDay('tanggal_perwalian', '>', 19);
-                })
-                ->orWhereMonth('tanggal_perwalian', 8)
-                ->orWhere(function ($q2) {
-                    $q2->whereMonth('tanggal_perwalian', 9)
-                        ->whereDay('tanggal_perwalian', 1);
-                });
+        try {
+            // Log the incoming request for debugging
+            Log::info('searchBeritaAcara request received', [
+                'request' => $request->all(),
+            ]);
+    
+            // Validate the request inputs
+            $validator = Validator::make($request->all(), [
+                'prodi' => 'required|string|in:S1Informatika,S1TeknikRekayasaPerangkatLunak,S1TeknikKomputer,S1TeknikInformasi,S1TeknikBioproses,S1TeknikMetalurgi,S1SistemInformasi,S1TeknikElektro,S1ManajemenRekayasa',
+                'keterangan' => 'required|string|in:Semester Baru,Sebelum UTS,Sebelum UAS',
+                'angkatan' => 'required|integer|min:2000|max:' . date('Y'),
+            ]);
+    
+            Log::info('Validator instance created', [
+                'rules' => $validator->getRules(),
+            ]);
+    
+            if ($validator->fails()) {
+                Log::error('Validation failed in searchBeritaAcara', [
+                    'errors' => $validator->errors(),
+                ]);
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+    
+            $prodi = $request->input('prodi');
+            Log::info('Prodi value extracted', ['prodi' => $prodi]);
+    
+            $keterangan = $request->input('keterangan');
+            Log::info('Keterangan value extracted', ['keterangan' => $keterangan]);
+    
+            $angkatan = $request->input('angkatan');
+            Log::info('Angkatan value extracted', ['angkatan' => $angkatan]);
+    
+            // Map Prodi to kelas suffix (e.g., S1Informatika -> IF)
+            $prodiMap = [
+                'S1Informatika' => 'IF',
+                'S1TeknikRekayasaPerangkatLunak' => 'TRPL',
+                'S1TeknikKomputer' => 'TK',
+                'S1TeknikInformasi' => 'TI',
+                'S1TeknikBioproses' => 'TB',
+                'S1TeknikMetalurgi' => 'TM',
+                'S1SistemInformasi' => 'SI',
+                'S1TeknikElektro' => 'TE',
+                'S1ManajemenRekayasa' => 'MR',
+            ];
+    
+            Log::info('Prodi map defined', ['prodiMap' => $prodiMap]);
+    
+            $kelasPrefix = $prodiMap[$prodi] ?? null;
+            Log::info('Kelas prefix determined', ['kelasPrefix' => $kelasPrefix]);
+    
+            if (!$kelasPrefix) {
+                Log::error('Invalid prodi mapping', ['prodi' => $prodi]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid Prodi value.',
+                ], 400);
+            }
+    
+            // Fetch all BeritaAcara records matching angkatan and kelas
+            $query = BeritaAcara::query()
+                ->with(['absensi.mahasiswa']) // Eager-load absensi and its mahasiswa relationship
+                ->where('angkatan', $angkatan);
+    
+            Log::info('Query instance created', [
+                'query' => $query->toSql(),
+                'bindings' => $query->getBindings(),
+            ]);
+    
+            // Filter by kelas (e.g., 12IF1, 12IF2)
+            $query->where(function ($q) use ($kelasPrefix) {
+                $q->where('kelas', 'LIKE', "%{$kelasPrefix}1")
+                  ->orWhere('kelas', 'LIKE', "%{$kelasPrefix}2");
             });
-        } elseif ($keterangan === 'Sebelum UTS') {
-            $query->where(function ($q) {
-                $q->where(function ($q2) {
-                    $q2->whereMonth('tanggal_perwalian', 2)
-                        ->whereBetween('DAY(tanggal_perwalian)', [2, 29]);
-                })
-                ->orWhere(function ($q2) {
-                    $q2->whereMonth('tanggal_perwalian', 3)
-                        ->whereBetween('DAY(tanggal_perwalian)', [1, 10]);
-                })
-                ->orWhere(function ($q2) {
-                    $q2->whereMonth('tanggal_perwalian', 9)
-                        ->whereBetween('DAY(tanggal_perwalian)', [2, 30]);
-                })
-                ->orWhere(function ($q2) {
-                    $q2->whereMonth('tanggal_perwalian', 10)
-                        ->whereBetween('DAY(tanggal_perwalian)', [1, 14]);
-                });
-            });
-        } elseif ($keterangan === 'Sebelum UAS') {
-            $query->where(function ($q) {
-                $q->where(function ($q2) {
-                    $q2->whereMonth('tanggal_perwalian', 3)
-                        ->whereBetween('DAY(tanggal_perwalian)', [11, 31]);
-                })
-                ->orWhereMonth('tanggal_perwalian', 4)
-                ->orWhere(function ($q2) {
-                    $q2->whereMonth('tanggal_perwalian', 5)
-                        ->whereDay('tanggal_perwalian', '<=', 19);
-                })
-                ->orWhere(function ($q2) {
-                    $q2->whereMonth('tanggal_perwalian', 10)
-                        ->whereBetween('DAY(tanggal_perwalian)', [15, 31]);
-                })
-                ->orWhereMonth('tanggal_perwalian', 11)
-                ->orWhere(function ($q2) {
-                    $q2->whereMonth('tanggal_perwalian', 12)
-                        ->whereDay('tanggal_perwalian', '<=', 11);
-                });
-            });
+    
+            Log::info('Query updated with kelas filter', [
+                'query' => $query->toSql(),
+                'bindings' => $query->getBindings(),
+            ]);
+    
+            // Get all matching records (no date filtering yet)
+            $allBeritaAcaras = $query->get();
+    
+            Log::info('All BeritaAcara records fetched', [
+                'allBeritaAcaras_count' => $allBeritaAcaras->count(),
+                'allBeritaAcaras' => $allBeritaAcaras->toArray(),
+            ]);
+    
+            // Log the initial fetch
+            Log::info('Fetched all BeritaAcara records before filtering', [
+                'prodi' => $prodi,
+                'keterangan' => $keterangan,
+                'angkatan' => $angkatan,
+                'kelas_prefix' => $kelasPrefix,
+                'results_count' => $allBeritaAcaras->count(),
+            ]);
+    
+            // Map keterangan to category (as used in determineCategory)
+            $categoryMap = [
+                'Semester Baru' => 'semester_baru',
+                'Sebelum UTS' => 'sebelum_uts',
+                'Sebelum UAS' => 'sebelum_uas',
+            ];
+    
+            Log::info('Category map defined', ['categoryMap' => $categoryMap]);
+    
+            $targetCategory = $categoryMap[$keterangan] ?? null;
+            Log::info('Target category determined', ['targetCategory' => $targetCategory]);
+    
+            if (!$targetCategory) {
+                Log::error('Invalid keterangan for category mapping', ['keterangan' => $keterangan]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid Keterangan value.',
+                ], 400);
+            }
+    
+            // Filter BeritaAcara records based on tanggal_perwalian using determineCategory
+            $filteredBeritaAcaras = $allBeritaAcaras->filter(function ($beritaAcara) use ($targetCategory) {
+                // Extract month and day from tanggal_perwalian (ignoring year)
+                $month = (int) $beritaAcara->tanggal_perwalian->month;
+                Log::info('Month extracted from tanggal_perwalian', [
+                    'beritaAcara_id' => $beritaAcara->id,
+                    'month' => $month,
+                ]);
+    
+                $day = (int) $beritaAcara->tanggal_perwalian->day;
+                Log::info('Day extracted from tanggal_perwalian', [
+                    'beritaAcara_id' => $beritaAcara->id,
+                    'day' => $day,
+                ]);
+    
+                // Use determineCategory to classify the date
+                $category = $this->determineCategory($month, $day);
+                Log::info('Category determined for BeritaAcara', [
+                    'beritaAcara_id' => $beritaAcara->id,
+                    'month' => $month,
+                    'day' => $day,
+                    'category' => $category,
+                ]);
+    
+                // Keep the record if its category matches the target category
+                $matches = $category === $targetCategory;
+                Log::info('Category match check', [
+                    'beritaAcara_id' => $beritaAcara->id,
+                    'category' => $category,
+                    'targetCategory' => $targetCategory,
+                    'matches' => $matches,
+                ]);
+    
+                return $matches;
+            })->take(2); // Limit to 2 results after filtering
+    
+            Log::info('Filtered BeritaAcara records collection', [
+                'filteredBeritaAcaras_count' => $filteredBeritaAcaras->count(),
+                'filteredBeritaAcaras' => $filteredBeritaAcaras->toArray(),
+            ]);
+    
+            // Log the filtered results
+            Log::info('Filtered BeritaAcara records', [
+                'prodi' => $prodi,
+                'keterangan' => $keterangan,
+                'angkatan' => $angkatan,
+                'kelas_prefix' => $kelasPrefix,
+                'filtered_results_count' => $filteredBeritaAcaras->count(),
+            ]);
+    
+            $responseData = $filteredBeritaAcaras->values();
+            Log::info('Response data prepared', [
+                'responseData_count' => $responseData->count(),
+                'responseData' => $responseData->toArray(),
+            ]);
+    
+            return response()->json([
+                'success' => true,
+                'data' => $responseData,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in searchBeritaAcara', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+    
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to search Berita Acara: ' . $e->getMessage(),
+            ], 500);
         }
     }
+
+/**
+ * Determine the category of a date based on month and day (ignoring year).
+ *
+ * @param int $month
+ * @param int $day
+ * @return string
+ */
+private function determineCategory($month, $day)
+{
+    // Semester Genap: (months 1 to 5)
+    if ($month == 1) {
+        return 'semester_baru';
+    }
+    if ($month == 2) {
+        if ($day == 1) {
+            return 'semester_baru';
+        }
+        if ($day >= 2 && $day <= 29) {
+            return 'sebelum_uts';
+        }
+    }
+    if ($month == 3) {
+        if ($day <= 10) {
+            return 'sebelum_uts';
+        }
+        if ($day >= 11 && $day <= 31) {
+            return 'sebelum_uas';
+        }
+    }
+    if ($month == 4 || $month == 5) {
+        if ($month == 5 && $day > 19) {
+            return 'semester_baru';
+        }
+        return 'sebelum_uas';
+    }
+    // Semester Ganjil: (months 8 to 12)
+    if ($month == 8) {
+        return 'semester_baru';
+    }
+    if ($month == 9) {
+        if ($day == 1) {
+            return 'semester_baru';
+        }
+        if ($day >= 2 && $day <= 30) {
+            return 'sebelum_uts';
+        }
+    }
+    if ($month == 10) {
+        if ($day <= 14) {
+            return 'sebelum_uts';
+        }
+        if ($day >= 15 && $day <= 31) {
+            return 'sebelum_uas';
+        }
+    }
+    if ($month == 11) {
+        return 'sebelum_uas';
+    }
+    if ($month == 12) {
+        if ($day <= 11) {
+            return 'sebelum_uas';
+        }
+    }
+    return 'semester_baru';
+}
 }
