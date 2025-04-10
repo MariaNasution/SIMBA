@@ -161,7 +161,7 @@
 
     <div class="mb-3" style="text-align: left;">
         <button onclick="goBack()" class="btn back-btn">
-            <span class="arrow">&lt;</span>Back
+            <span class="arrow"><</span>Back
         </button>
     </div>
 
@@ -182,7 +182,7 @@
     @endif
 
     <!-- Form for Attendance -->
-    <form id="attendanceForm" action="{{ route('absensi.store', ['date' => $date, 'class' => $class]) }}" method="POST" onsubmit="return confirm('Are you sure you want to save the attendance data?');">
+    <form id="attendanceForm" action="{{ route('absensi.store', ['date' => $date, 'class' => $class]) }}" method="POST">
         @csrf
 
         <div class="button-container">
