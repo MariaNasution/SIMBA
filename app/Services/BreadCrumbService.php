@@ -61,6 +61,14 @@ class BreadCrumbService
                     ['name' => '<i class="fas fa-user-edit"></i> Catatan Perilaku', 'url' => null],
                 ];
                 break;
+                
+                case 'catatan_perilaku_detail':
+                    $breadcrumbs = [
+                        ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('keasramaan')],
+                        ['name' => '<i class="fas fa-user-edit"></i> Catatan Perilaku', 'url' => route('pelanggaran_keasramaan')],
+                        ['name' => '<i class="fas fa-eye"></i> Detail Catatan Perilaku', 'url' => null],
+                    ];
+                    break;
     
             default:
                 $breadcrumbs = [
