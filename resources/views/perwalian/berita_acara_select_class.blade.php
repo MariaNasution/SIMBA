@@ -1,8 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-    
-
     <div class="container">
         <!-- Back Button -->
         <div class="mb-3">
@@ -10,6 +8,18 @@
         </div>
 
         <!-- Feedback Messages -->
+        @if (session('success'))
+            <div id="feedbackMessage" class="alert alert-dismissible fade show alert-success" role="alert">
+                <span id="feedbackText">{{ session('success') }}</span>
+                <button type="button" class="btn-close" onclick="hideFeedback()"></button>
+            </div>
+        @endif
+        @if (session('error'))
+            <div id="feedbackMessage" class="alert alert-dismissible fade show alert-danger" role="alert">
+                <span id="feedbackText">{{ session('error') }}</span>
+                <button type="button" class="btn-close" onclick="hideFeedback()"></button>
+            </div>
+        @endif
         <div id="feedbackMessage" class="alert alert-dismissible fade show d-none" role="alert">
             <span id="feedbackText"></span>
             <button type="button" class="btn-close" onclick="hideFeedback()"></button>
@@ -18,7 +28,7 @@
         <!-- Class and Perwalian Buttons -->
         <div class="am-class-buttons">
             @forelse ($completedPerwalians as $perwalian)
-                <a href="{{ route('berita_acara.create', ['kelas' => $perwalian['class'], 'tanggal_perwalian' => $perwalian['date'], 'angkatan' => $perwalian['angkatan'] ]) }}"
+                <a href="{{ route('berita_acara.create', ['date' => $perwalian['date'], 'class' => $perwalian['class'], 'angkatan' => $perwalian['angkatan']]) }}"
                    class="am-class-btn">
                     {{ $perwalian['display'] }}
                 </a>

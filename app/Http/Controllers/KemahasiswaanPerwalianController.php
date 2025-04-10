@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\Perwalian;
 use App\Models\Notifikasi;
 use App\Models\Dosen;
+use App\Models\Dosen_Wali;
+use App\Models\BeritaAcara;
+use App\Models\Absensi;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -172,11 +175,208 @@ class KemahasiswaanPerwalianController extends Controller
 
     public function kelasPerwalian()
     {
-        return view('perwalian.perwalian_kelas');
+        // Fetch Perwalian records for mahasiswa with status Scheduled
+        $perwalianList = Perwalian::where('role', 'mahasiswa')
+            ->where('status', 'Scheduled')
+            ->get();
+
+        // Get the list of ID_Dosen_Wali from the Perwalian records
+        $dosenWaliUsernames = $perwalianList->pluck('ID_Dosen_Wali')->unique()->filter();
+
+        // Fetch only the Dosen_Wali records that are referenced by Perwalian
+        $dosenWaliList = Dosen_Wali::whereIn('username', $dosenWaliUsernames)
+            ->get()
+            ->keyBy('username'); // Key the collection by username for easy lookup
+
+        // Fetch Dosen records where there exists a Dosen_Wali with a matching username (dosen.nip = dosen_wali.username)
+        $dosenList = Dosen::whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('dosen_wali')
+                    ->whereColumn('dosen_wali.username', 'dosen.nip');
+            })
+            ->whereIn('nip', $dosenWaliUsernames) // Only fetch Dosen records that are referenced by Perwalian
+            ->get()
+            ->keyBy('nip'); // Key the collection by nip for easy lookup
+
+        return view('perwalian.kemahasiswaan_perwalian_kelas', compact('perwalianList', 'dosenList', 'dosenWaliList'));
     }
 
     public function beritaAcaraPerwalian()
     {
-        return view('perwalian.perwalian_berita_acara');
+        return view('perwalian.kemahasiswaan_perwalian_berita_acara');
+    }
+
+    public function searchBeritaAcara(Request $request)
+    {
+        $user = session('user');
+        if (!$user || $user['role'] !== 'kemahasiswaan') {
+            Log::error('User is not kemahasiswaan in KemahasiswaanPerwalianController@searchBeritaAcara', ['user' => $user]);
+            return response()->json(['success' => false, 'message' => 'Anda harus login sebagai kemahasiswaan untuk mencari berita acara.'], 401);
+        }
+
+        try {
+            // Get the filter inputs
+            $prodi = $request->input('prodi');
+            $keterangan = $request->input('keterangan');
+            $angkatan = $request->input('angkatan');
+
+            // Build the query
+            $query = BeritaAcara::query();
+
+            // Filter by Angkatan
+            if ($angkatan && $angkatan !== 'Angkatan') {
+                $query->where('angkatan', $angkatan);
+            }
+
+            // Filter by Prodi (based on kelas prefix, e.g., "12IF1" for Informatika)
+            if ($prodi && $prodi !== 'Pilih Prodi') {
+                $prodiPrefixes = [
+                    'S1 Informatika' => ['IF'],
+                    'S1 Sistem Informasi' => ['SI'],
+                    'S1 Teknik Elektro' => ['EL'],
+                    'D3 Teknologi Informasi' => ['TI'],
+                    'D3 Teknologi Komputer' => ['TK'],
+                    'D4 Teknologi Rekayasa Perangkat Lunak' => ['TRPL'],
+                    'S1 Manajemen Rekayasa' => ['MR'],
+                    'S1 Teknik Metalurgi' => ['MT'],
+                    'S1 Bioproses' => ['BP'],
+                ];
+
+                if (isset($prodiPrefixes[$prodi])) {
+                    $query->where(function ($q) use ($prodiPrefixes, $prodi) {
+                        foreach ($prodiPrefixes[$prodi] as $prefix) {
+                            $q->orWhere('kelas', 'LIKE', "%{$prefix}%");
+                        }
+                    });
+                }
+            }
+
+            // Filter by Keterangan
+            if ($keterangan && $keterangan !== 'Keterangan') {
+                $this->applyKeteranganFilter($query, $keterangan);
+            }
+
+            // Log the query for debugging
+            Log::info('Search Berita Acara Query', [
+                'prodi' => $prodi,
+                'keterangan' => $keterangan,
+                'angkatan' => $angkatan,
+                'sql' => $query->toSql(),
+                'bindings' => $query->getBindings(),
+            ]);
+
+            // Fetch the filtered Berita Acara records with related Perwalian and Absensi
+            $beritaAcaras = $query->with(['perwalian.absensi.mahasiswa'])->get();
+
+            // Format the response
+            $results = $beritaAcaras->map(function ($beritaAcara) {
+                $absensiRecords = $beritaAcara->perwalian ? $beritaAcara->perwalian->absensi : collect();
+                return [
+                    'id' => $beritaAcara->id,
+                    'kelas' => $beritaAcara->kelas,
+                    'angkatan' => $beritaAcara->angkatan,
+                    'dosen_wali' => $beritaAcara->dosen_wali,
+                    'tanggal_perwalian' => $beritaAcara->tanggal_perwalian
+                        ? Carbon::parse($beritaAcara->tanggal_perwalian)->translatedFormat('l, d F Y')
+                        : 'N/A',
+                    'perihal_perwalian' => $beritaAcara->perihal_perwalian ?? 'N/A',
+                    'agenda_perwalian' => $beritaAcara->agenda_perwalian ?? 'N/A',
+                    'hari_tanggal_feedback' => $beritaAcara->hari_tanggal_feedback
+                        ? Carbon::parse($beritaAcara->hari_tanggal_feedback)->translatedFormat('l, d F Y')
+                        : 'N/A',
+                    'perihal_feedback' => $beritaAcara->perihal_feedback ?? 'N/A',
+                    'catatan_feedback' => $beritaAcara->catatan_feedback ?? 'N/A',
+                    'tanggal_ttd' => $beritaAcara->tanggal_ttd
+                        ? Carbon::parse($beritaAcara->tanggal_ttd)->translatedFormat('d F Y')
+                        : 'N/A',
+                    'dosen_wali_ttd' => $beritaAcara->dosen_wali_ttd ?? 'N/A',
+                    'absensi' => $absensiRecords->map(function ($absensi) {
+                        return [
+                            'nim' => $absensi->nim ?? 'N/A',
+                            'nama' => $absensi->mahasiswa->nama ?? 'Unknown',
+                            'status_kehadiran' => $absensi->status_kehadiran ?? 'N/A',
+                            'keterangan' => $absensi->keterangan ?? '',
+                        ];
+                    })->toArray(),
+                ];
+            })->toArray();
+
+            return response()->json([
+                'success' => true,
+                'data' => $results,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in searchBeritaAcara', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mencari Berita Acara: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    private function applyKeteranganFilter($query, $keterangan)
+    {
+        // Logic adapted from determineCategory
+        if ($keterangan === 'Semester Baru') {
+            $query->where(function ($q) {
+                $q->whereMonth('tanggal_perwalian', 1)
+                ->orWhere(function ($q2) {
+                    $q2->whereMonth('tanggal_perwalian', 2)
+                        ->whereDay('tanggal_perwalian', 1);
+                })
+                ->orWhere(function ($q2) {
+                    $q2->whereMonth('tanggal_perwalian', 5)
+                        ->whereDay('tanggal_perwalian', '>', 19);
+                })
+                ->orWhereMonth('tanggal_perwalian', 8)
+                ->orWhere(function ($q2) {
+                    $q2->whereMonth('tanggal_perwalian', 9)
+                        ->whereDay('tanggal_perwalian', 1);
+                });
+            });
+        } elseif ($keterangan === 'Sebelum UTS') {
+            $query->where(function ($q) {
+                $q->where(function ($q2) {
+                    $q2->whereMonth('tanggal_perwalian', 2)
+                        ->whereBetween('DAY(tanggal_perwalian)', [2, 29]);
+                })
+                ->orWhere(function ($q2) {
+                    $q2->whereMonth('tanggal_perwalian', 3)
+                        ->whereBetween('DAY(tanggal_perwalian)', [1, 10]);
+                })
+                ->orWhere(function ($q2) {
+                    $q2->whereMonth('tanggal_perwalian', 9)
+                        ->whereBetween('DAY(tanggal_perwalian)', [2, 30]);
+                })
+                ->orWhere(function ($q2) {
+                    $q2->whereMonth('tanggal_perwalian', 10)
+                        ->whereBetween('DAY(tanggal_perwalian)', [1, 14]);
+                });
+            });
+        } elseif ($keterangan === 'Sebelum UAS') {
+            $query->where(function ($q) {
+                $q->where(function ($q2) {
+                    $q2->whereMonth('tanggal_perwalian', 3)
+                        ->whereBetween('DAY(tanggal_perwalian)', [11, 31]);
+                })
+                ->orWhereMonth('tanggal_perwalian', 4)
+                ->orWhere(function ($q2) {
+                    $q2->whereMonth('tanggal_perwalian', 5)
+                        ->whereDay('tanggal_perwalian', '<=', 19);
+                })
+                ->orWhere(function ($q2) {
+                    $q2->whereMonth('tanggal_perwalian', 10)
+                        ->whereBetween('DAY(tanggal_perwalian)', [15, 31]);
+                })
+                ->orWhereMonth('tanggal_perwalian', 11)
+                ->orWhere(function ($q2) {
+                    $q2->whereMonth('tanggal_perwalian', 12)
+                        ->whereDay('tanggal_perwalian', '<=', 11);
+                });
+            });
+        }
     }
 }

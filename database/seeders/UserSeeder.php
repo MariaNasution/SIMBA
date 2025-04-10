@@ -110,6 +110,10 @@ class UserSeeder extends Seeder
             'Dr. Johannes Harungguan Sianipar, S.T., M.T.'
         ];
 
+        $angkatan = [
+            '2020,2020,2017','2017', '2019,2019',
+        ];
+
         $dosenClasses = [
             '11IF1,11IF2,14IF2', '14IF1', '12IF1,12IF2',
         ];
@@ -175,6 +179,7 @@ class UserSeeder extends Seeder
                     DB::table('dosen_wali')->insert([
                         'username' => $user['username'],
                         'kelas' => $dosenClasses[$nipIndex],
+                        'angkatan' => $angkatan[$nipIndex],
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);

@@ -20,7 +20,6 @@ class StudentSyncService
     public function syncStudents($dosenId, $year, $semester, $kelas)
     {
         $students = $this->fetchStudents($dosenId, $year, $semester, $kelas);
-
         foreach ($students as $student) {
             Mahasiswa::updateOrCreate(
                 ['nim' => $student['nim']],

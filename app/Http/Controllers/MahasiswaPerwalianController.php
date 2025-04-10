@@ -30,7 +30,9 @@ class MahasiswaPerwalianController extends Controller
         
         $perwalian = Perwalian::where('ID_Perwalian', $student->ID_Perwalian)
         ->orderBy('updated_at', 'desc')
-        ->first();        $dosen = Dosen::where('nip', optional($perwalian)->ID_Dosen_Wali)->first(); // Safe access if $perwalian is null
+        ->first();        
+        
+        $dosen = Dosen::where('nip', optional($perwalian)->ID_Dosen_Wali)->first(); // Safe access if $perwalian is null
         // Fetch all notifications with perwalian relationship to avoid N+1 problem
         $notifications = Notifikasi::with('perwalian') // Eager load perwalian
                                  ->where('Id_Perwalian', $student->ID_Perwalian)

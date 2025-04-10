@@ -9,9 +9,10 @@ class CreatePerwalianTable extends Migration
     public function up()
     {
         Schema::create('perwalian', function (Blueprint $table) {
+            $table->string('ID_Dosen_Wali')->nullable();
             $table->id('ID_Perwalian');
             $table->string('username')->nullable();
-            $table->enum('Status', ['Scheduled', 'Completed', 'Canceled']);
+            $table->enum('Status', ['Scheduled', 'Presented', 'Completed', 'Canceled']);
             $table->string('nama');
             $table->string('kelas')->nullable();
             $table->string('angkatan');
@@ -20,6 +21,8 @@ class CreatePerwalianTable extends Migration
             $table->string('role');
             $table->string('keterangan')->nullable(); // Removed after('role')
             $table->timestamps();
+
+            $table->foreign('ID_Dosen_Wali')->references('nip')->on('dosen')->onDelete('set null');
 
         });
     }

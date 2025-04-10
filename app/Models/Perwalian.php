@@ -17,12 +17,14 @@ class Perwalian extends Model
      * @var array
      */
     protected $fillable = [
+        'ID_Dosen_Wali',
+        'username',
         'Status',
-        'Tanggal',
-        'Tanggal_Selesai',
         'nama',
         'kelas',
         'angkatan',
+        'Tanggal',
+        'Tanggal_Selesai',
         'role',
         'keterangan',
     ];
@@ -35,14 +37,22 @@ class Perwalian extends Model
     protected $casts = [
         'Tanggal' => 'datetime',
         'Tanggal_Selesai' => 'datetime',
+        'Status' => 'string', // Ensure enum is cast as string
     ];
+
+    /**
+     * Indicates if the model should be timestamped.
+     *
+     * @var bool
+     */
+    public $timestamps = true;
 
     /**
      * Get the dosen wali associated with this perwalian.
      */
     public function dosenWali()
     {
-        return $this->belongsTo(DosenWali::class, 'ID_Dosen_Wali', 'nip');
+        return $this->belongsTo(Dosen_Wali::class, 'ID_Dosen_Wali', 'nip');
     }
 
     /**
