@@ -536,7 +536,7 @@ class BreadCrumbService
             ];
             break;
 
-        case 'catatan_perilaku':
+        case 'catatan_perilaku_mahasiswa':
             $breadcrumbs = [
                 ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
                 ['name' => '<i class="fas fa-user-edit"></i> Catatan Perilaku', 'url' => null],
@@ -557,7 +557,7 @@ class BreadCrumbService
             ];
             break;
 
-        // ... tambahkan case lainnya untuk mahasiswa
+   
 
         default:
             $breadcrumbs = [
