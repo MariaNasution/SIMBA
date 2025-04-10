@@ -493,9 +493,12 @@ class BreadCrumbService
             case 'mahasiswa':
                 $notifications = $this->generateStudentNotifications($user);
                 break;
-            case 'kemahasiswaan':
-                $notifications = $this->generateKemahasiswaanNotifications($user);
+            case 'dosen':
+                $notifications = $this->generateDosenNotifications($user);
                 break;
+            // case 'kemahasiswaan':
+            //     $notifications = $this->generateKemahasiswaanNotifications($user);
+            //     break;
             default:
                 Log::info('Unhandled role', ['role' => $user['role']]);
                 break;
@@ -523,13 +526,21 @@ class BreadCrumbService
     {
         $dosen = Dosen::where('nip', $user['nip'])->first();
 
-        if (!$dosen || !isset($student->ID_Perwalian)) {
-            Log::info('No student or ID_Perwalian found', ['nim' => $user['nim']]);
+        if (!$dosen) {
+            Log::info('No dosen found', ['nip' => $user['nip']]);
             return collect([]);
         }
 
-        $notifications = Notifikasi::where('ID_Notifikasi', $student->ID_Perwalian)->get()->where('role', 'mahasiswa');
-        Log::info('Notifications fetched', ['count' => $notifications->count()]);
+        // Fetch notifications for the dosen role and load the associated Perwalian
+        $notifications = Notifikasi::where('role', 'dosen')
+            ->where('nama', $dosen['nama'])
+            ->with(['perwalian' => function ($query) {
+                $query->select('ID_Perwalian', 'Tanggal', 'Tanggal_Selesai');
+            }])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        Log::info('Notifications fetched for dosen', ['count' => $notifications->count()]);
 
         return $notifications;
     }

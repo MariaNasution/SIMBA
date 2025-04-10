@@ -18,14 +18,17 @@ class KemahasiswaanPerwalianController extends Controller
 {
     public function jadwalPerwalian()
     {
+        Log::info('jadwalPerwalian method called');
         return view('perwalian.perwalian_jadwal');
     }
 
     public function store(Request $request)
     {
-        // Log the incoming request
-        Log::info('Perwalian store request received', ['request' => $request->all()]);
-
+        Log::info('Perwalian store request received', [
+            'request' => $request->all(),
+            'headers' => $request->headers->all(),
+        ]);
+    
         // Validate the form inputs
         $validator = Validator::make($request->all(), [
             'jadwalMulai' => [
@@ -45,26 +48,28 @@ class KemahasiswaanPerwalianController extends Controller
             ],
             'keterangan' => 'required|in:Semester Baru,Sebelum UTS,Sebelum UAS',
         ]);
-
+    
         if ($validator->fails()) {
-            Log::error('Validation failed', ['errors' => $validator->errors()]);
+            Log::error('Validation failed in store method', ['errors' => $validator->errors()]);
             return response()->json([
                 'success' => false,
                 'errors' => $validator->errors(),
             ], 422);
         }
-
+    
         try {
             // Check if the user is kemahasiswaan
             $user = session('user');
-            if (!$user || $user['role'] !== 'kemahasiswaan') {
-                Log::error('User is not kemahasiswaan', ['user' => $user]);
+            Log::info('Session user data in store method', ['user' => $user]);
+    
+            if (!$user || !is_array($user) || !isset($user['role']) || $user['role'] !== 'kemahasiswaan') {
+                Log::error('User is not kemahasiswaan in store method', ['user' => $user]);
                 return response()->json([
                     'success' => false,
                     'message' => 'You must be logged in as kemahasiswaan to schedule a Perwalian.'
                 ], 401);
             }
-
+    
             // Fetch all usernames from the dosen_wali table
             $usernames = DB::table('dosen_wali')->pluck('username')->toArray();
             Log::info('Fetched usernames from dosen_wali', ['usernames' => $usernames]);
@@ -75,7 +80,7 @@ class KemahasiswaanPerwalianController extends Controller
                     'message' => 'No dosen wali usernames found to schedule Perwalian for.'
                 ], 404);
             }
-
+    
             // Loop through usernames and fetch matching Dosen records
             $dosenList = [];
             foreach ($usernames as $username) {
@@ -90,7 +95,7 @@ class KemahasiswaanPerwalianController extends Controller
                     Log::warning('No Dosen found for username', ['username' => $username]);
                 }
             }
-
+    
             Log::info('Fetched dosen records', [
                 'count' => count($dosenList),
                 'records' => array_map(fn($dosen) => $dosen->toArray(), $dosenList),
@@ -102,14 +107,14 @@ class KemahasiswaanPerwalianController extends Controller
                     'message' => 'No matching dosen found for the dosen wali usernames.'
                 ], 404);
             }
-
+    
             // Check for existing scheduled Perwalian with role 'dosen' on the same date
             $startDate = Carbon::parse($request->jadwalMulai)->format('Y-m-d');
             $existingPerwalian = Perwalian::where('role', 'dosen')
                 ->where('Status', 'Scheduled')
                 ->whereDate('Tanggal', $startDate)
                 ->first();
-
+    
             if ($existingPerwalian) {
                 Log::info('Existing Perwalian found', ['perwalian' => $existingPerwalian->toArray()]);
                 return response()->json([
@@ -117,30 +122,37 @@ class KemahasiswaanPerwalianController extends Controller
                     'message' => 'A Perwalian session for dosen is already scheduled on this date.'
                 ], 400);
             }
-
+    
             // Create a single Perwalian record (not tied to a specific Dosen)
             $year = Carbon::parse($request->jadwalMulai)->year;
             $perwalianData = [
                 'Tanggal' => Carbon::parse($request->jadwalMulai),
                 'Tanggal_Selesai' => Carbon::parse($request->jadwalSelesai),
                 'Status' => 'Scheduled',
-                'nama' => $user['username'], // Use the kemahasiswaan username as the creator
+                'nama' => $user['username'],
                 'kelas' => '',
                 'angkatan' => $year,
-                'role' => 'dosen', // Still associated with the 'dosen' role for scheduling purposes
+                'role' => 'dosen',
                 'keterangan' => $request->keterangan,
             ];
-
+    
             $perwalian = DB::transaction(function () use ($perwalianData, $dosenList, $request) {
                 Log::info('Creating single Perwalian record', ['data' => $perwalianData]);
                 $perwalian = Perwalian::create($perwalianData);
                 Log::info('Made perwalian', ['perwalian' => $perwalian->toArray()]);
-
+    
+                // Format the date for the notification message
+                $startDate = Carbon::parse($perwalian->Tanggal);
+                $endDate = $perwalian->Tanggal_Selesai ? Carbon::parse($perwalian->Tanggal_Selesai) : $startDate->copy()->addHours(2);
+                $dayName = $startDate->translatedFormat('l'); // e.g., "Jumat"
+                $formattedDate = $startDate->translatedFormat('j F Y'); // e.g., "10 April 2025"
+                $startTime = $startDate->format('H:i'); // e.g., "13:26"
+                $endTime = $endDate->format('H:i'); // e.g., "16:26"
+                $formattedDateTime = "$dayName, $formattedDate at $startTime - $endTime";
+    
                 // Create notifications only for Dosen
-                $notificationMessage = "Perwalian scheduled for {$request->jadwalMulai} to {$request->jadwalSelesai} (Keterangan: {$request->keterangan})";
-
-                // Notify all Dosen
                 foreach ($dosenList as $dosen) {
+                    $notificationMessage = "Perwalian scheduled for {$dosen->nama} (Keterangan: {$perwalian->keterangan}) - {$formattedDateTime}";
                     $notificationData = [
                         'Pesan' => $notificationMessage,
                         'NIM' => null,
@@ -152,12 +164,12 @@ class KemahasiswaanPerwalianController extends Controller
                     $notification = Notifikasi::create($notificationData);
                     Log::info('Created notification for dosen', ['notification' => $notification->toArray()]);
                 }
-
+    
                 return $perwalian;
             });
-
+    
             Log::info('Transaction committed successfully');
-
+    
             return response()->json([
                 'success' => true,
                 'message' => 'Perwalian scheduled successfully on ' . $request->jadwalMulai,
@@ -175,6 +187,7 @@ class KemahasiswaanPerwalianController extends Controller
 
     public function kelasPerwalian()
     {
+        Log::info('kelasPerwalian method called');
         // Fetch Perwalian records for mahasiswa with status Scheduled
         $perwalianList = Perwalian::where('role', 'mahasiswa')
             ->where('status', 'Scheduled')
@@ -186,140 +199,123 @@ class KemahasiswaanPerwalianController extends Controller
         // Fetch only the Dosen_Wali records that are referenced by Perwalian
         $dosenWaliList = Dosen_Wali::whereIn('username', $dosenWaliUsernames)
             ->get()
-            ->keyBy('username'); // Key the collection by username for easy lookup
+            ->keyBy('username');
 
-        // Fetch Dosen records where there exists a Dosen_Wali with a matching username (dosen.nip = dosen_wali.username)
+        // Fetch Dosen records where there exists a Dosen_Wali with a matching username
         $dosenList = Dosen::whereExists(function ($query) {
                 $query->select(DB::raw(1))
                     ->from('dosen_wali')
                     ->whereColumn('dosen_wali.username', 'dosen.nip');
             })
-            ->whereIn('nip', $dosenWaliUsernames) // Only fetch Dosen records that are referenced by Perwalian
+            ->whereIn('nip', $dosenWaliUsernames)
             ->get()
-            ->keyBy('nip'); // Key the collection by nip for easy lookup
+            ->keyBy('nip');
 
         return view('perwalian.kemahasiswaan_perwalian_kelas', compact('perwalianList', 'dosenList', 'dosenWaliList'));
     }
 
     public function beritaAcaraPerwalian()
     {
+        Log::info('beritaAcaraPerwalian method called');
         return view('perwalian.kemahasiswaan_perwalian_berita_acara');
     }
 
     public function searchBeritaAcara(Request $request)
-    {
-        $user = session('user');
-        if (!$user || $user['role'] !== 'kemahasiswaan') {
-            Log::error('User is not kemahasiswaan in KemahasiswaanPerwalianController@searchBeritaAcara', ['user' => $user]);
-            return response()->json(['success' => false, 'message' => 'Anda harus login sebagai kemahasiswaan untuk mencari berita acara.'], 401);
-        }
+{
+    try {
+        // Log the incoming request for debugging
+        Log::info('searchBeritaAcara request received', [
+            'request' => $request->all(),
+        ]);
 
-        try {
-            // Get the filter inputs
-            $prodi = $request->input('prodi');
-            $keterangan = $request->input('keterangan');
-            $angkatan = $request->input('angkatan');
+        // Validate the request inputs
+        $validator = Validator::make($request->all(), [
+            'prodi' => 'required|string|in:S1Informatika,S1TeknikRekayasaPerangkatLunak,S1TeknikKomputer,S1TeknikInformasi,S1TeknikBioproses,S1TeknikMetalurgi,S1SistemInformasi,S1TeknikElektro,S1ManajemenRekayasa',
+            'keterangan' => 'required|string|in:Semester Baru,Sebelum UTS,Sebelum UAS',
+            'angkatan' => 'required|integer|min:2000|max:' . date('Y'),
+        ]);
 
-            // Build the query
-            $query = BeritaAcara::query();
-
-            // Filter by Angkatan
-            if ($angkatan && $angkatan !== 'Angkatan') {
-                $query->where('angkatan', $angkatan);
-            }
-
-            // Filter by Prodi (based on kelas prefix, e.g., "12IF1" for Informatika)
-            if ($prodi && $prodi !== 'Pilih Prodi') {
-                $prodiPrefixes = [
-                    'S1 Informatika' => ['IF'],
-                    'S1 Sistem Informasi' => ['SI'],
-                    'S1 Teknik Elektro' => ['EL'],
-                    'D3 Teknologi Informasi' => ['TI'],
-                    'D3 Teknologi Komputer' => ['TK'],
-                    'D4 Teknologi Rekayasa Perangkat Lunak' => ['TRPL'],
-                    'S1 Manajemen Rekayasa' => ['MR'],
-                    'S1 Teknik Metalurgi' => ['MT'],
-                    'S1 Bioproses' => ['BP'],
-                ];
-
-                if (isset($prodiPrefixes[$prodi])) {
-                    $query->where(function ($q) use ($prodiPrefixes, $prodi) {
-                        foreach ($prodiPrefixes[$prodi] as $prefix) {
-                            $q->orWhere('kelas', 'LIKE', "%{$prefix}%");
-                        }
-                    });
-                }
-            }
-
-            // Filter by Keterangan
-            if ($keterangan && $keterangan !== 'Keterangan') {
-                $this->applyKeteranganFilter($query, $keterangan);
-            }
-
-            // Log the query for debugging
-            Log::info('Search Berita Acara Query', [
-                'prodi' => $prodi,
-                'keterangan' => $keterangan,
-                'angkatan' => $angkatan,
-                'sql' => $query->toSql(),
-                'bindings' => $query->getBindings(),
-            ]);
-
-            // Fetch the filtered Berita Acara records with related Perwalian and Absensi
-            $beritaAcaras = $query->with(['perwalian.absensi.mahasiswa'])->get();
-
-            // Format the response
-            $results = $beritaAcaras->map(function ($beritaAcara) {
-                $absensiRecords = $beritaAcara->perwalian ? $beritaAcara->perwalian->absensi : collect();
-                return [
-                    'id' => $beritaAcara->id,
-                    'kelas' => $beritaAcara->kelas,
-                    'angkatan' => $beritaAcara->angkatan,
-                    'dosen_wali' => $beritaAcara->dosen_wali,
-                    'tanggal_perwalian' => $beritaAcara->tanggal_perwalian
-                        ? Carbon::parse($beritaAcara->tanggal_perwalian)->translatedFormat('l, d F Y')
-                        : 'N/A',
-                    'perihal_perwalian' => $beritaAcara->perihal_perwalian ?? 'N/A',
-                    'agenda_perwalian' => $beritaAcara->agenda_perwalian ?? 'N/A',
-                    'hari_tanggal_feedback' => $beritaAcara->hari_tanggal_feedback
-                        ? Carbon::parse($beritaAcara->hari_tanggal_feedback)->translatedFormat('l, d F Y')
-                        : 'N/A',
-                    'perihal_feedback' => $beritaAcara->perihal_feedback ?? 'N/A',
-                    'catatan_feedback' => $beritaAcara->catatan_feedback ?? 'N/A',
-                    'tanggal_ttd' => $beritaAcara->tanggal_ttd
-                        ? Carbon::parse($beritaAcara->tanggal_ttd)->translatedFormat('d F Y')
-                        : 'N/A',
-                    'dosen_wali_ttd' => $beritaAcara->dosen_wali_ttd ?? 'N/A',
-                    'absensi' => $absensiRecords->map(function ($absensi) {
-                        return [
-                            'nim' => $absensi->nim ?? 'N/A',
-                            'nama' => $absensi->mahasiswa->nama ?? 'Unknown',
-                            'status_kehadiran' => $absensi->status_kehadiran ?? 'N/A',
-                            'keterangan' => $absensi->keterangan ?? '',
-                        ];
-                    })->toArray(),
-                ];
-            })->toArray();
-
-            return response()->json([
-                'success' => true,
-                'data' => $results,
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error in searchBeritaAcara', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
+        if ($validator->fails()) {
+            Log::error('Validation failed in searchBeritaAcara', ['errors' => $validator->errors()]);
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan saat mencari Berita Acara: ' . $e->getMessage(),
-            ], 500);
+                'errors' => $validator->errors(),
+            ], 422);
         }
+
+        $prodi = $request->input('prodi');
+        $keterangan = $request->input('keterangan');
+        $angkatan = $request->input('angkatan');
+
+        // Map Prodi to kelas prefix
+        $prodiMap = [
+            'S1Informatika' => 'IF',
+            'S1TeknikRekayasaPerangkatLunak' => 'TRPL',
+            'S1TeknikKomputer' => 'TK',
+            'S1TeknikInformasi' => 'TI',
+            'S1TeknikBioproses' => 'TB',
+            'S1TeknikMetalurgi' => 'TM',
+            'S1SistemInformasi' => 'SI',
+            'S1TeknikElektro' => 'TE',
+            'S1ManajemenRekayasa' => 'MR',
+        ];
+
+        $kelasPrefix = $prodiMap[$prodi] ?? null;
+        if (!$kelasPrefix) {
+            Log::error('Invalid prodi mapping', ['prodi' => $prodi]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid Prodi value.',
+            ], 400);
+        }
+
+        // Build the query for berita_acaras with absensi relationship
+        $query = BeritaAcara::query()
+            ->with('absensi') // Eager-load the absensi relationship
+            ->where('angkatan', $angkatan);
+            Log::error('Invalid queries', ['query' => $ $query]);
+
+
+        // Filter by kelas (e.g., 12IF1, 12IF2)
+        $query->where(function ($q) use ($kelasPrefix) {
+            $q->where('kelas', 'LIKE', "%{$kelasPrefix}1")
+              ->orWhere('kelas', 'LIKE', "%{$kelasPrefix}2");
+        });
+
+        // Apply date range filters based on keterangan using applyKeteranganFilter
+        $this->applyKeteranganFilter($query, $keterangan);
+
+        // Limit to 2 results
+        $beritaAcaras = $query->take(2)->get();
+
+        Log::info('searchBeritaAcara query executed', [
+            'prodi' => $prodi,
+            'keterangan' => $keterangan,
+            'angkatan' => $angkatan,
+            'kelas_prefix' => $kelasPrefix,
+            'results_count' => $beritaAcaras->count(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => $beritaAcaras,
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Error in searchBeritaAcara', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to search Berita Acara: ' . $e->getMessage(),
+        ], 500);
     }
+}
 
     private function applyKeteranganFilter($query, $keterangan)
     {
-        // Logic adapted from determineCategory
+        Log::info('Applying keterangan filter logic', ['keterangan' => $keterangan]);
         if ($keterangan === 'Semester Baru') {
             $query->where(function ($q) {
                 $q->whereMonth('tanggal_perwalian', 1)

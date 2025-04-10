@@ -74,7 +74,6 @@ Route::middleware(['auth.session', 'ensure.student.data', 'role:mahasiswa'])->gr
 
 });
 
-// Middleware untuk kemahasiswaan
 Route::middleware(['auth.session', 'role:kemahasiswaan'])
     ->prefix('kemahasiswaan')
     ->name('kemahasiswaan_')
@@ -87,10 +86,11 @@ Route::middleware(['auth.session', 'role:kemahasiswaan'])
 
         // Perwalian
         Route::get('/perwalian/jadwal', [KemahasiswaanPerwalianController::class, 'jadwalPerwalian'])->name('perwalian.jadwal');
-        Route::post('/perwalian/store', [KemahasiswaanPerwalianController::class, 'store'])->name('perwalian.store'); // New route
+        Route::post('/perwalian/store', [KemahasiswaanPerwalianController::class, 'store'])->name('perwalian.store');
         Route::get('/perwalian/kelas', [KemahasiswaanPerwalianController::class, 'kelasPerwalian'])->name('perwalian.kelas');
         Route::get('/perwalian/berita-acara', [KemahasiswaanPerwalianController::class, 'beritaAcaraPerwalian'])->name('perwalian.berita_acara');
-        Route::post('/perwalian/berita-acara/search', [KemahasiswaanPerwalianController::class, 'searchBeritaAcara'])->name('kemahasiswaan_perwalian.berita_acara.search');
+        Route::post('/perwalian/berita-acara/search', [KemahasiswaanPerwalianController::class, 'searchBeritaAcara'])->name('perwalian.berita_acara.search');
+
         // Konseling
         Route::prefix('konseling')->group(function () {
             Route::get('/daftar_pelanggaran', [DaftarPelanggaranController::class, 'daftarPelanggaran'])->name('daftar_pelanggaran');
@@ -129,10 +129,7 @@ Route::middleware(['auth.session', 'role:kemahasiswaan'])
             Route::get('/konseling-lanjutan/{nim}', [KemahasiswaanController::class, 'detail'])->name('konseling.lanjutan.detail');
             Route::post('/konseling/lanjutan', [KonselingLanjutanController::class, 'store'])->name('konseling.lanjutan.store');
         });
-
-    
     });
-
 // Middleware untuk konselor
 Route::middleware(['auth.session', 'role:konselor'])
     ->prefix('konselor')

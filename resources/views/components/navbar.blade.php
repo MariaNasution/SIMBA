@@ -29,14 +29,32 @@
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="notificationDropdown">
                     <li><h6 class="dropdown-header">Notifikasi</h6></li>
-                    @forelse ($notifications ?? [] as $notif)
+                    @php
+                        // Determine the role
+                        $userRole = session('user')['role'] ?? null;
+                        // Only define the route for mahasiswa
+                        $notificationRoute = $userRole === 'mahasiswa' ? route('mahasiswa_perwalian') : null;
+                    @endphp
+                    @forelse ($notifications as $notif)
                         <li>
-                            <a class="dropdown-item" href="{{ route('mahasiswa_perwalian') }}">
-                                {{ $notif->Pesan ?? 'No message' }} by {{ $notif->nama }}
-                            </a>
+                            @if($userRole === 'mahasiswa')
+                                <a class="dropdown-item" href="{{ $notificationRoute }}">
+                                    {{ $notif->Pesan ?? 'No message' }} by {{ $notif->nama ?? 'Unknown' }}
+                                </a>
+                            @else
+                                <span class="dropdown-item">
+                                    {{ $notif->Pesan ?? 'No message' }}
+                                </span>
+                            @endif
                         </li>
                     @empty
-                        <li><a class="dropdown-item" href="{{ route('mahasiswa_perwalian') }}">Tidak ada notifikasi</a></li>
+                        <li>
+                            @if($userRole === 'mahasiswa')
+                                <a class="dropdown-item" href="{{ $notificationRoute }}">Tidak ada notifikasi</a>
+                            @else
+                                <span class="dropdown-item">Tidak ada notifikasi</span>
+                            @endif
+                        </li>
                     @endforelse
                 </ul>
             </div>
