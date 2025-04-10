@@ -58,9 +58,6 @@
       Detail / {{ $studentNim }}
     </a>
   </h3>
-  <a href="#" onclick="confirmLogout()">
-    <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
-  </a>
 </div>
 
 <div class="container mt-4">
