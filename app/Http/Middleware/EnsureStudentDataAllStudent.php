@@ -11,7 +11,7 @@ class EnsureStudentDataAllStudent
     public function handle(Request $request, Closure $next)
     {
         $userRole = $request->session()->get('user.role');
-        
+
         if (in_array($userRole, ['keasramaan'])) {
             if (!$request->session()->has('student_data_all_student')) {
                 $apiToken = $request->session()->get('api_token');
@@ -21,7 +21,9 @@ class EnsureStudentDataAllStudent
                     try {
                         $response = Http::withToken($apiToken)
                             ->withOptions(['verify' => false])
-                            ->get('https://cis-dev.del.ac.id/api/library-api/mahasiswa');
+                            ->get('https://cis-dev.del.ac.id/api/library-api/mahasiswa', [
+                                'status' => 'Aktif'
+                            ]);
 
                         if ($response->successful()) {
                             $data = $response->json();
@@ -32,10 +34,10 @@ class EnsureStudentDataAllStudent
                             $dummyData = [
                                 'mahasiswa' => [
                                     [
-                                        'nim'         => '11S19001',
-                                        'nama'        => 'Budi Santoso',
-                                        'angkatan'    => '2024',
-                                        'prodi_name'  => 'Teknik Informatika',
+                                        'nim' => '11S19001',
+                                        'nama' => 'Budi Santoso',
+                                        'angkatan' => '2024',
+                                        'prodi_name' => 'Teknik Informatika',
                                     ],
                                 ],
                             ];
@@ -47,10 +49,10 @@ class EnsureStudentDataAllStudent
                         $dummyData = [
                             'mahasiswa' => [
                                 [
-                                    'nim'         => '11S19001',
-                                    'nama'        => 'Budi Santoso',
-                                    'angkatan'    => '2024',
-                                    'prodi_name'  => 'Teknik Informatika',
+                                    'nim' => '11S19001',
+                                    'nama' => 'Budi Santoso',
+                                    'angkatan' => '2024',
+                                    'prodi_name' => 'Teknik Informatika',
                                 ],
                             ],
                         ];
@@ -62,10 +64,10 @@ class EnsureStudentDataAllStudent
                     $dummyData = [
                         'mahasiswa' => [
                             [
-                                'nim'         => '11S19001',
-                                'nama'        => 'Budi Santoso',
-                                'angkatan'    => '2024',
-                                'prodi_name'  => 'Teknik Informatika',
+                                'nim' => '11S19001',
+                                'nama' => 'Budi Santoso',
+                                'angkatan' => '2024',
+                                'prodi_name' => 'Teknik Informatika',
                             ],
                         ],
                     ];

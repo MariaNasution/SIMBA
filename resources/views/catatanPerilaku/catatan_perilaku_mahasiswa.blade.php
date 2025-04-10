@@ -4,12 +4,11 @@
 
 <!-- Tambahkan CSS untuk animasi dropdown -->
 
-
 @section('content')
 <!-- Header -->
 <div class="d-flex align-items-center mb-4 border-bottom">
   <h3 class="me-auto">
-    <a>
+    <a href="{{ route('catatan_perilaku_mahasiswa') }}">
       <i class="fas fa-user-edit"></i> Catatan Perilaku
     </a>
   </h3>

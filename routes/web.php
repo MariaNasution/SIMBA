@@ -1,6 +1,5 @@
 <?php
 
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AbsensiController;
@@ -28,10 +27,9 @@ use App\Http\Controllers\HasilKonselingController;
 use App\Http\Controllers\DaftarRequestKonselingController;
 use App\Http\Controllers\CatatanPerilakuDetailController;
 use App\Http\Controllers\SmsController;
-use App\Http\Controllers\NotifikasiController;
-use App\Http\Controllers\PerwalianController;
+use App\Http\Controllers\NotificationController;
 
-Route::post('/notifications/mark-read', [NotifikasiController::class, 'markAllRead'])->name('notifications.markRead');
+Route::post('/notifications/mark-read', [NotificationController::class, 'markAllRead'])->name('notifications.markRead');
 use App\Http\Controllers\KonselingLanjutanController;
 use App\Http\Controllers\BeritaAcaraController;
 
@@ -189,7 +187,7 @@ Route::middleware(['auth.session', 'ensure.student.data', 'role:mahasiswa'])->gr
     Route::get('/mahasiswa/profil', [ProfilController::class, 'index'])->name('profil');
     Route::get('perkuliahan/kemajuan_studi', [KemajuanStudiController::class, 'index'])->name('kemajuan_studi');
     Route::get('/detailnilai/{kode_mk}', [DetailNilaiController::class, 'show'])->name('detailnilai');
-    Route::get('/catatan_perilaku', [CatatanPerilakuController::class, 'index'])->name('catatan_perilaku');
+    Route::get('/catatan_perilaku', [CatatanPerilakuController::class, 'index'])->name('catatan_perilaku_mahasiswa');
 
     Route::get('/mahasiswa_konseling', [MahasiswaKonselingController::class, 'index'])->name('mahasiswa_konseling');
     Route::get('/mahasiswa_perwalian', [MahasiswaPerwalianController::class, 'index'])->name('mahasiswa_perwalian');
@@ -266,8 +264,6 @@ Route::middleware(['auth.session', 'ensure.student.data.all.student', 'role:keas
     });
 
 });
-
-
 
 // Middleware untuk orang tua
 Route::middleware(['auth.session', 'ensure.student.data.ortu', 'role:orang_tua'])->group(function () {

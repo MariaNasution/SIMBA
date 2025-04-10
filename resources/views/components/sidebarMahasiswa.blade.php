@@ -40,7 +40,7 @@
       </a>
     </li>
     <li class="menu-item">
-      <a href="{{ route('catatan_perilaku') }}">
+      <a href="{{ route('catatan_perilaku_mahasiswa') }}">
           <i class="fas fa-user-edit"></i> Catatan perilaku
       </a>
   </li>
