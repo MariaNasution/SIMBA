@@ -1,14 +1,31 @@
 @extends('layouts.app')
 
 @section('content')
-    
-
     <div class="main-content flex-grow-1 p-4">
+        <!-- Feedback Messages -->
         <div id="feedbackMessage" class="alert alert-dismissible fade show d-none" role="alert">
             <span id="feedbackText"></span>
             <button type="button" class="btn-close" onclick="hideFeedback()"></button>
         </div>
 
+        <!-- Notifications Section -->
+        @if ($notifications->isNotEmpty())
+            <div class="notifications mb-4">
+                <h5 style="font-size: 18px; font-weight: 600; color: #333;">Notifications</h5>
+                <ul class="list-group">
+                    @foreach ($notifications as $notification)
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>{{ $notification->data['message'] }}</span>
+                            @if (!$notification->read_at)
+                                <button class="btn btn-sm btn-primary" onclick="markAsRead('{{ $notification->id }}')">Mark as Read</button>
+                            @endif
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <!-- Class Selection -->
         <div class="mb-4">
             <label for="classSelect" style="font-size: 16px; font-weight: 500; color: #333;">Select Class for Perwalian:</label>
             <select id="classSelect" name="selectedClass" class="form-select" style="max-width: 200px;" onchange="updateSelectedClass()">
@@ -23,6 +40,7 @@
             </select>
         </div>
 
+        <!-- Calendar Section -->
         <div class="calendar-container mb-5 mx-auto position-relative" style="max-width: 500px; background: #fff;">
             <div class="d-flex justify-content-between align-items-center mb-2 p-3 border-bottom">
                 <button onclick="changeMonth('{{ $currentDate->copy()->subMonth()->format('Y-m') }}')" class="btn btn-outline-secondary" style="border-radius: 4px;" id="prevMonthBtn"><</button>
@@ -36,6 +54,7 @@
             </div>
         </div>
 
+        <!-- Form Section -->
         <div class="d-flex justify-content-end mt-4">
             <form id="requestForm" onsubmit="handleFormSubmit(event)">
                 @csrf
@@ -54,6 +73,7 @@
         </div>
         <p class="text-muted mt-2" style="font-size: 12px;" id="noteText"></p>
 
+        <!-- Related Dosen Section -->
         @if(!empty($dosenNotifications) && $dosenNotifications->count() > 0)
             <div class="mt-4">
                 <h5 style="font-size: 18px; font-weight: 600; color: #333;">Related Dosen</h5>
@@ -68,6 +88,7 @@
         @endif
     </div>
 
+    <!-- Styles -->
     <style>
         .border-bottom-line { border-bottom: 1px solid #E5E5E5; padding-bottom: 10px; }
         .calendar-container { width: 100%; border: none; }
@@ -93,6 +114,7 @@
         #feedbackMessage.alert-danger { background-color: #f8d7da; color: #721c24; }
     </style>
 
+    <!-- Scripts -->
     <script>
         let scheduledClasses = @json($scheduledClasses);
         let scheduledDatesByClass = @json($scheduledDatesByClass);
@@ -278,11 +300,6 @@
                 _method: method === 'DELETE' ? 'DELETE' : undefined,
             };
 
-            console.log('Submitting to:', url);
-            console.log('Method:', method);
-            console.log('CSRF Token:', csrfToken);
-            console.log('Request Data:', data);
-
             fetch(url, {
                 method: method,
                 headers: {
@@ -293,13 +310,8 @@
                 },
                 body: JSON.stringify(data),
             })
-            .then(response => {
-                console.log('Response status:', response.status);
-                console.log('Response headers:', [...response.headers.entries()]);
-                return response.text().then(text => ({ status: response.status, text }));
-            })
+            .then(response => response.text().then(text => ({ status: response.status, text })))
             .then(({ status, text }) => {
-                console.log('Response text:', text);
                 let json;
                 try {
                     json = JSON.parse(text);
@@ -331,6 +343,31 @@
                 buttonText.classList.remove('d-none');
                 buttonLoading.classList.add('d-none');
                 showFeedback('Failed to process the request: ' + error.message, 'danger');
+            });
+        }
+
+        function markAsRead(notificationId) {
+            fetch('/notifications/' + notificationId + '/read', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update UI: Remove the "Mark as Read" button
+                    const button = document.querySelector(`button[onclick="markAsRead('${notificationId}')"]`);
+                    if (button) button.remove();
+                    showFeedback('Notification marked as read', 'success');
+                } else {
+                    showFeedback('Failed to mark notification as read', 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showFeedback('Error marking notification as read', 'danger');
             });
         }
 

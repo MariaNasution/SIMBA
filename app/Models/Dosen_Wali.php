@@ -4,11 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notifiable;
 
 class Dosen_Wali extends Model
 {
 
     use SoftDeletes;
+    use Notifiable;
     
     protected $table = 'dosen_wali'; // Specify the correct table name
     protected $primaryKey = 'username'; // Set primary key

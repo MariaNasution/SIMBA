@@ -213,7 +213,7 @@ Route::middleware(['auth.session', 'role:dosen'])->group(function () {
     Route::get('/dosen/presensi', [DosenController::class, 'presensi'])->name('dosen.presensi');
     Route::get('/dosen/detailed-class/{year}/{kelas}', [DosenController::class, 'showDetailedClass'])->name('dosen.detailedClass');
 
-    // SetPerwalianController Routes (unchanged)
+    // SetPerwalianController Routes
     Route::get('/set-perwalian', [SetPerwalianController::class, 'index'])->name('set.perwalian');
     Route::post('/set-perwalian/store', [SetPerwalianController::class, 'store'])->name('set.perwalian.store');
     Route::delete('/set-perwalian/destroy', [SetPerwalianController::class, 'destroy'])->name('set.perwalian.destroy');
@@ -221,6 +221,7 @@ Route::middleware(['auth.session', 'role:dosen'])->group(function () {
     Route::get('/set-perwalian/histori', [SetPerwalianController::class, 'histori'])->name('dosen.histori');
     Route::get('/set-perwalian/histori/detailed/{id}', [SetPerwalianController::class, 'detailedHistori'])->name('dosen.histori.detailed');
     Route::get('/set-perwalian/print-berita-acara/{id}', [SetPerwalianController::class, 'printBeritaAcara'])->name('berita_acara.print');
+    Route::post('/notifications/{notificationId}/read', [SetPerwalianController::class, 'markNotificationAsRead'])->name('notifications.markRead');
 
     // AbsensiController Routes
     Route::get('/absensi-mahasiswa', [AbsensiController::class, 'index'])->name('absensi');
@@ -228,7 +229,7 @@ Route::middleware(['auth.session', 'role:dosen'])->group(function () {
     Route::post('/absensi-mahasiswa/{date}/{class}', [AbsensiController::class, 'store'])->name('absensi.store');
     Route::get('/absensi-mahasiswa/completed', [AbsensiController::class, 'completed'])->name('absensi.completed');
 
-    // BeritaAcaraController Routes - Updated
+    // BeritaAcaraController Routes
     Route::get('/berita-acara', [BeritaAcaraController::class, 'index'])->name('berita_acara.index');
     Route::get('/berita-acara/select-class', [BeritaAcaraController::class, 'selectClass'])->name('berita_acara.select_class');
     Route::get('/berita-acara/create/{date}/{class}', [BeritaAcaraController::class, 'create'])->name('berita_acara.create');
