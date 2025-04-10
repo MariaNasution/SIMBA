@@ -10,7 +10,7 @@ class CreateMahasiswaTable extends Migration
     public function up()
     {
         Schema::create('mahasiswa', function (Blueprint $table) {
-            $table->string('nim', 8)->primary();
+            $table->string('nim', 8)->nullable()->unique();
             $table->string('username')->nullable();
             $table->foreignIdFor(Dosen::class, 'ID_Dosen')->nullable();
             $table->unsignedBigInteger('ID_Perwalian')->nullable();
