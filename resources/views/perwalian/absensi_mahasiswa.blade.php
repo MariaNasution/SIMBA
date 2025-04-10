@@ -3,13 +3,7 @@
 @section('content')
     
     <div class="container">
-        <!-- Back Button -->
-        <div class="mb-3">
-            <button onclick="goBack()" class="btn back-btn">
-                <span class="arrow"><</span>Back
-            </button>
-        </div>
-
+    
         <!-- Class Selection Buttons -->
         <div class="am-class-buttons">
             @forelse ($classes as $classItem)
@@ -27,7 +21,8 @@
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
-            margin-left: 200px
+            margin-left: 200px;
+            margin-top: 100px
 
         }
         .am-class-btn {

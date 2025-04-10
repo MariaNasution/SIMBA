@@ -17,6 +17,7 @@ class BeritaAcara extends Model
         'tanggal_perwalian',
         'perihal_perwalian',
         'agenda_perwalian',
+        'keterangan',
         'hari_tanggal_feedback',
         'perihal_feedback', // ✅ Tambahkan ini jika belum ada
         'catatan_feedback',
