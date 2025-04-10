@@ -5,6 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use App\Models\Mahasiswa; // Import Mahasiswa model
 use App\Models\Perwalian; // Import Perwalian model
+use App\Models\RequestKonseling; // Import RequestKonseling model
 
 class CreateNotifikasiTable extends Migration
 {
@@ -25,6 +26,9 @@ class CreateNotifikasiTable extends Migration
 
             // Kolom foreign key untuk Perwalian (opsional), jika terkait dengan perwalian tertentu
             $table->foreignIdFor(Perwalian::class, 'Id_Perwalian')->nullable();
+
+            // Kolom foreign key untuk Request Konseling (opsional), jika terkait dengan perwalian Ajukan Konseling tertentu
+            $table->foreignIdFor(RequestKonseling::class, 'Id_Konseling')->nullable();
 
             // Timestamps (created_at dan updated_at)
             $table->timestamps();

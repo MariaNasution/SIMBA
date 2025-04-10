@@ -6,11 +6,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Models\RequestKonseling;
-use App\Models\Notifikasi;
 use Exception;
+use App\Services\NotificationService;
 
 class AjukanKonselingController extends Controller
 {
+    protected $notificationService;
+
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
     public function index()
     {
         // Initialize empty data
@@ -109,24 +116,31 @@ class AjukanKonselingController extends Controller
                 'status' => 'approved',
             ]);
 
-            // Buat notifikasi untuk mahasiswa terkait
-            Notifikasi::create([
-                'Pesan' => "Anda telah diajukan untuk mengadakan konseling pada " . $request->input('tanggal_pengajuan'),
-                'nim' => $request->input('nim'),
-                'Id_Konseling' => $konseling->id,
-                'Id_Perwalian' => null,
-                'nama' => null,
-            ]);
+            // Buat notifikasi untuk pengguna yang bersangkutan
+            $nim = $request->input('nim');
+            $message = 'Anda telah diajukan untuk melakukan konseling.';
+            $type = 'konseling';
+            $data = [
+                'action' => 'create',
+                'data' => $konseling->toArray()
+            ];
 
-            // Redirect based on user role
-        if (session('user.role') == 'kemahasiswaan') {
-            return redirect()->route('kemahasiswaan_konseling.ajukan')->with('success', 'Berhasil mengajukan konseling');
-        } else {
-            return redirect()->route('konselor_konseling.ajukan')->with('success', 'Berhasil mengajukan konseling');
-        }
-    } catch (Exception $e) {
-        Log::error('Exception saat mengajukan konseling:', ['message' => $e->getMessage()]);
-        return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            $this->notificationService->createNotification(
+            $nim,
+            $type,
+            $message,
+            $data,
+        );
+
+                // Redirect based on user role
+                if (session('user.role') == 'kemahasiswaan') {
+                    return redirect()->route('kemahasiswaan_konseling.ajukan')->with('success', 'Berhasil mengajukan konseling');
+                } else {
+                    return redirect()->route('konselor_konseling.ajukan')->with('success', 'Berhasil mengajukan konseling');
+                }
+            } catch (Exception $e) {
+                Log::error('Exception saat mengajukan konseling:', ['message' => $e->getMessage()]);
+                return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            }
     }
-}
 }
