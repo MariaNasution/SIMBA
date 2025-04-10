@@ -9,6 +9,7 @@ use App\Services\StudentSyncService;
 use App\Models\Absensi;
 use App\Models\Perwalian;
 use App\Models\Mahasiswa;
+use Carbon\Carbon;
 
 class AbsensiController extends Controller
 {
@@ -40,13 +41,12 @@ class AbsensiController extends Controller
         $syncYear = $year - 5;
         $semester = 2;
 
-        // Fetch Perwalian records to get the list of classes
+        // Fetch Perwalian records with Status "Scheduled"
         try {
-            
             $perwalianRecords = Perwalian::where('ID_Dosen_Wali', $dosen['nip'])
-            ->where('Status', 'Scheduled')
-            ->get();
-            Log::info('Perwalian records fetched', [
+                ->where('Status', 'Scheduled') // Only show "Scheduled" Perwalian
+                ->get();
+            Log::info('Scheduled Perwalian records fetched', [
                 'count' => $perwalianRecords->count(),
                 'records' => $perwalianRecords->toArray(),
             ]);
@@ -78,7 +78,7 @@ class AbsensiController extends Controller
 
             // Prepare the classes for the view
             foreach ($perwalianRecords as $record) {
-                $date = \Carbon\Carbon::parse($record->Tanggal);
+                $date = Carbon::parse($record->Tanggal);
                 $classes[] = [
                     'year' => substr($record->kelas, 0, 2),
                     'date' => $date->format('Y-m-d'),
@@ -123,16 +123,20 @@ class AbsensiController extends Controller
             'pegawai_id' => $dosen['pegawai_id'] ?? 'not set',
         ]);
 
+        // Fetch Perwalian with Status "Scheduled"
         $perwalian = Perwalian::where('Tanggal', $date)
             ->where('kelas', $class)
+            ->where('ID_Dosen_Wali', $dosen['nip'])
+            ->where('Status', 'Scheduled') // Only allow "Scheduled" Perwalian
             ->first();
         if (!$perwalian) {
-            Log::error('Perwalian not found for date and class:', [
+            Log::error('Perwalian not found or not in Scheduled status:', [
                 'date' => $date,
                 'class' => $class,
+                'dosen_nip' => $dosen['nip'],
             ]);
             return redirect()->route('absensi')
-                ->with('error', 'No perwalian session found for this date and class.');
+                ->with('error', 'No perwalian session found for this date and class, or it has already been presented or completed.');
         }
 
         Log::info('Perwalian record found', [
@@ -142,7 +146,7 @@ class AbsensiController extends Controller
         ]);
 
         // Fetch students directly from the API
-        $year = \Carbon\Carbon::parse($date)->year;
+        $year = Carbon::parse($date)->year;
         $syncYear = $year - 5;
         $currentSem = 2; // Adjust based on your semester logic if needed
         $students = $this->studentSyncService->fetchStudents($dosen['pegawai_id'], $syncYear, $currentSem, $class);
@@ -238,7 +242,7 @@ class AbsensiController extends Controller
         }
         unset($student);
 
-        $title = "Absensi Mahasiswa / $class Angkatan " . \Carbon\Carbon::parse($date)->year;
+        $title = "Absensi Mahasiswa / $class Angkatan " . Carbon::parse($date)->year;
 
         return view('perwalian.perwalianKelas', compact('title', 'students', 'date', 'class', 'studentData', 'perwalian'));
     }
@@ -253,30 +257,23 @@ class AbsensiController extends Controller
         }
 
         try {
-            // Fetch the newest Perwalian record for the given date and class
+            // Fetch the newest Perwalian record for the given date and class with Status "Scheduled"
+            $dosen = session('user');
             $perwalian = Perwalian::where('Tanggal', $date)
                 ->where('kelas', $class)
+                ->where('ID_Dosen_Wali', $dosen['nip'])
+                ->where('Status', 'Scheduled') // Only allow "Scheduled" Perwalian
                 ->orderBy('created_at', 'desc') // Ensure the newest record is fetched
                 ->first();
 
             if (!$perwalian) {
-                Log::error('Perwalian not found for date and class in AbsensiController@store:', [
+                Log::error('Perwalian not found or not in Scheduled status in AbsensiController@store:', [
                     'date' => $date,
                     'class' => $class,
+                    'dosen_nip' => $dosen['nip'],
                 ]);
                 return redirect()->route('absensi.show', ['date' => $date, 'class' => $class])
-                    ->with('error', 'No perwalian session found for this date and class.');
-            }
-
-            // Check if the Perwalian is already Completed
-            if ($perwalian->Status === 'Completed') {
-                Log::warning('Perwalian session is already marked as Completed:', [
-                    'perwalian_id' => $perwalian->ID_Perwalian,
-                    'date' => $date,
-                    'class' => $class,
-                ]);
-                return redirect()->route('absensi')
-                    ->with('info', 'This perwalian session is already marked as completed.');
+                    ->with('error', 'No perwalian session found for this date and class, or it has already been presented or completed.');
             }
 
             // Save attendance records
@@ -312,6 +309,7 @@ class AbsensiController extends Controller
                         'status' => $status,
                     ]);
                 } else {
+                    Log::info('Created an absensi');
                     Absensi::create([
                         'ID_Perwalian' => $perwalian->ID_Perwalian,
                         'nim' => $nim,
@@ -329,16 +327,16 @@ class AbsensiController extends Controller
                 }
             }
 
-            // Update Perwalian status to Completed
-            $perwalian->update(['Status' => 'Completed']);
-            Log::info('Perwalian status updated to Completed:', [
+            // Update Perwalian status to "Presented"
+            $perwalian->update(['Status' => 'Presented']);
+            Log::info('Perwalian status updated to Presented after saving attendance:', [
                 'perwalian_id' => $perwalian->ID_Perwalian,
+                'kelas' => $class,
                 'date' => $date,
-                'class' => $class,
             ]);
 
             return redirect()->route('absensi')
-                ->with('success', 'Attendance data saved successfully, and perwalian session marked as completed.');
+                ->with('success', 'Attendance data saved successfully. Please create a Berita Acara to mark this perwalian session as completed.');
         } catch (\Exception $e) {
             Log::error('Failed to save attendance data in AbsensiController@store:', [
                 'message' => $e->getMessage(),
@@ -352,12 +350,20 @@ class AbsensiController extends Controller
     public function completed()
     {
         $classes = [];
+        $dosen = session('user');
+
+        if (!$dosen) {
+            Log::error('No user authenticated in AbsensiController@completed');
+            return redirect()->route('login')->with('error', 'Please log in to access this page.');
+        }
 
         try {
-            $perwalianRecords = Perwalian::where('Status', 'Completed')->get();
+            $perwalianRecords = Perwalian::where('ID_Dosen_Wali', $dosen['nip'])
+                ->where('Status', 'Completed') // Only show "Completed" Perwalian
+                ->get();
             
             foreach ($perwalianRecords as $record) {
-                $date = \Carbon\Carbon::parse($record->Tanggal);
+                $date = Carbon::parse($record->Tanggal);
                 $classes[] = [
                     'year' => substr($record->kelas, 0, 2),
                     'date' => $date->format('Y-m-d'),
@@ -370,6 +376,8 @@ class AbsensiController extends Controller
             usort($classes, function ($a, $b) {
                 return strcmp($a['date'] . $a['class'], $b['date'] . $b['class']);
             });
+
+            Log::info('Completed Perwalian records prepared for view', ['classes' => $classes]);
         } catch (\Exception $e) {
             Log::error('Exception occurred in AbsensiController@completed:', [
                 'message' => $e->getMessage(),

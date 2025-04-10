@@ -1,15 +1,21 @@
 @extends('layouts.app')
 
 @section('content')
-    
-
     <div class="container">
-        <!-- Back Button -->
-        <div class="mb-3">
-            <button onclick="goBack()" class="btn btn-secondary">⟵ Back</button>
-        </div>
-
+        
         <!-- Feedback Messages -->
+        @if (session('success'))
+            <div id="feedbackMessage" class="alert alert-dismissible fade show alert-success" role="alert">
+                <span id="feedbackText">{{ session('success') }}</span>
+                <button type="button" class="btn-close" onclick="hideFeedback()"></button>
+            </div>
+        @endif
+        @if (session('error'))
+            <div id="feedbackMessage" class="alert alert-dismissible fade show alert-danger" role="alert">
+                <span id="feedbackText">{{ session('error') }}</span>
+                <button type="button" class="btn-close" onclick="hideFeedback()"></button>
+            </div>
+        @endif
         <div id="feedbackMessage" class="alert alert-dismissible fade show d-none" role="alert">
             <span id="feedbackText"></span>
             <button type="button" class="btn-close" onclick="hideFeedback()"></button>
@@ -17,10 +23,10 @@
 
         <!-- Class and Perwalian Buttons -->
         <div class="am-class-buttons">
-            @forelse ($completedPerwalians as $perwalian)
-                <a href="{{ route('berita_acara.create', ['kelas' => $perwalian['class'], 'tanggal_perwalian' => $perwalian['date'], 'angkatan' => $perwalian['angkatan'] ]) }}"
+            @forelse ($presentedPerwalians as $perwalian)
+                <a href="{{ route('berita_acara.create', ['date' => $perwalian['date'], 'class' => $perwalian['class'], 'angkatan' => $perwalian['angkatan']]) }}"
                    class="am-class-btn">
-                    {{ $perwalian['display'] }}
+                    Kelas {{ $perwalian['display'] }}
                 </a>
             @empty
                 <p class="text-muted">Tidak ada perwalian selesai yang tersedia untuk membuat berita acara.</p>
@@ -29,25 +35,51 @@
     </div>
 
     <style>
-        .border-bottom-line {
-            border-bottom: 1px solid #E5E5E5;
-            padding-bottom: 10px;
-        }
         .am-class-buttons {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
+            margin-left: 370px;
+            align-items:center ;
+            margin-top: 100px;
         }
         .am-class-btn {
-            padding: 10px 20px;
-            background-color: #007bff;
+            width: 150px;
+            height: 130;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: #68B8EA;
             color: white;
+            font-size: large;
+            font-weight: 100;
+            text-align: center;
             text-decoration: none;
             border-radius: 5px;
             transition: background-color 0.3s ease;
         }
         .am-class-btn:hover {
             background-color: #0056b3;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            background-color: #68B8EA;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 8;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .back-btn:hover {
+            background-color: #4A9CD6;
+        }
+        .back-btn .arrow {
+            font-size: 40px;
+            margin-right: 0px;
+            line-height: 1;
         }
         #feedbackMessage.alert-success {
             background-color: #d4edda;

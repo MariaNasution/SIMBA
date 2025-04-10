@@ -23,12 +23,12 @@
         <ul class="submenu" id="konseling-submenu" style="display: none;">
             <li class="submenu-item">
                 <a href="{{ route('kemahasiswaan_daftar_pelanggaran') }}">
-                    <i class="fas fa-list"></i> Daftar Pelanggaran
+                    <i class="fas fa-exclamation-triangle"></i> Daftar Pelanggaran
                 </a>
             </li>
             <li class="submenu-item">
                 <a href="{{ route('kemahasiswaan_hasil_konseling') }}">
-                    <i class="fas fa-book"></i> Hasil Konseling
+                    <i class="fas fa-clipboard-check"></i> Hasil Konseling
                 </a>
             </li>
             <li class="submenu-item">
@@ -48,31 +48,31 @@
             </li>
             <li class="submenu-item">
                 <a href="{{ route('kemahasiswaan_daftar_request') }}">
-                    <i class="fas fa-book-open"></i> Daftar Request
+                    <i class="fas fa-list-alt"></i> Daftar Request
                 </a>
             </li>
             <li class="submenu-item">
                 <a href="{{ route('kemahasiswaan_riwayat_daftar_request') }}">
-                    <i class="fas fa-book-open"></i> Riwayat Daftar Request
+                    <i class="fas fa-history"></i> Riwayat Daftar Request
                 </a>
             </li>
         </ul>
-        <!-- Perwalian dengan submenu-->
+        <!-- Perwalian dengan submenu -->
         <li class="menu-item">
             <a href="javascript:void(0);" onclick="toggleSubMenu('perwalian-submenu')">
-                <i class="bi bi-calendar3"></i> Perwalian
+                <i class="fas fa-calendar-alt"></i> Perwalian
                 <i class="fas fa-chevron-down submenu-toggle" id="perwalian-toggle"></i>
             </a>
         </li>
         <ul class="submenu" id="perwalian-submenu" style="display: none;">
             <li class="submenu-item">
                 <a href="{{ route('kemahasiswaan_perwalian.jadwal') }}">
-                    Jadwalkan Perwalian
+                    <i class="fas fa-clock"></i> Jadwalkan Perwalian
                 </a>
             </li>
             <li class="submenu-item">
                 <a href="{{ route('kemahasiswaan_perwalian.kelas') }}">
-                    Perwalian Kelas
+                    <i class="fas fa-chalkboard-teacher"></i> Perwalian Kelas
                 </a>
             </li>
             <li class="submenu-item">
@@ -80,7 +80,6 @@
                     <i class="fas fa-book-open"></i> Berita Acara
                 </a>
             </li>
-            </ul>
-        </li>
+        </ul>
     </ul>
 </div>

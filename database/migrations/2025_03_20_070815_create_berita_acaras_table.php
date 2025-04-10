@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->date('tanggal_perwalian'); // Tanggal perwalian
             $table->string('perihal_perwalian'); // Perihal perwalian
             $table->text('agenda_perwalian'); // Agenda perwalian
+            $table->string('keterangan')->nullable(); // Removed after('role')
             $table->date('hari_tanggal_feedback'); // Tanggal feedback mahasiswa
             $table->string('perihal_feedback'); // Perihal feedback
             $table->text('catatan_feedback'); // Catatan mahasiswa

@@ -6,16 +6,25 @@
             width: 100%;
             border-collapse: collapse; /* Ensure borders collapse properly */
             margin-top: 20px;
+            border: 2px solid #aaa; /* Add border to the table itself */
         }
 
         th, td {
             border: 2px solid #aaa; /* Consistent border for all cells */
             padding: 8px;
             text-align: left;
+            box-sizing: border-box; /* Ensure padding doesn’t increase cell size */
         }
 
         th {
             background-color: #f2f2f2;
+            font-weight: bold; /* Ensure headers stand out */
+        }
+
+        /* Ensure the empty state cell also has proper borders */
+        td[colspan="4"] {
+            text-align: center;
+            border: 2px solid #aaa; /* Ensure the colspan cell has borders */
         }
 
         .btn {
@@ -101,6 +110,7 @@
             padding: 5px;
             border: 1px solid #ddd;
             border-radius: 3px;
+            box-sizing: border-box; /* Ensure input fits within cell */
         }
 
         .back-btn {
@@ -155,7 +165,6 @@
         </button>
     </div>
 
-
     <!-- Header -->
     <h1>{{ $title }}</h1>
     <h2>Quick Access</h2>
@@ -173,11 +182,11 @@
     @endif
 
     <!-- Form for Attendance -->
-    <form id="attendanceForm" action="{{ route('absensi.store', ['date' => $date, 'class' => $class]) }}" method="POST" onsubmit="return confirm('Are you sure you want to save the attendance data?');">
+    <form id="attendanceForm" action="{{ route('absensi.store', ['date' => $date, 'class' => $class]) }}" method="POST">
         @csrf
 
         <div class="button-container">
-            <button type="button" onclick="markAllHadir()" class="btn"> Quick Access</button>
+            <button type="button" onclick="markAllHadir()" class="btn">Quick Access</button>
         </div>
 
         <!-- Attendance Table -->
@@ -232,12 +241,12 @@
                 @endforelse
             </tbody>
         </table>
-    </form>
 
-    <!-- Save Button -->
-    <div class="button-container">
-        <button type="submit" class="btn">Simpan</button>
-    </div>
+        <!-- Save Button -->
+        <div class="button-container">
+            <button type="submit" class="btn">Simpan</button>
+        </div>
+    </form>
 
     <script>
         function updateStatus(event, element, emoji, text) {

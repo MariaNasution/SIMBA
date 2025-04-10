@@ -29,7 +29,13 @@
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="notificationDropdown">
                     <li><h6 class="dropdown-header">Notifikasi</h6></li>
-                    @forelse ($notifications ?? [] as $notif)
+                    @php
+                        // Determine the role
+                        $userRole = session('user')['role'] ?? null;
+                        // Only define the route for mahasiswa
+                        $notificationRoute = $userRole === 'mahasiswa' ? route('mahasiswa_perwalian') : null;
+                    @endphp
+                    @forelse ($notifications as $notif)
                         <li>
                             <!-- Using the dynamic link if present -->
                             <a class="dropdown-item" href="{{ $notif->link ?? route('mahasiswa_perwalian') }}">
