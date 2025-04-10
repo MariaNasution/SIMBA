@@ -2,12 +2,7 @@
 
 @section('content')
     <!-- Header -->
-    <div class="d-flex align-items-center mb-4 border-bottom-line">
-        <h3 class="me-auto">
-            <a ><i class ="fas fa-home"></i> Beranda</a>
-        </h3>
 
-    </div>
 
     <!-- Main Content: Pengumuman -->
     <div class="container-fluid p-4">

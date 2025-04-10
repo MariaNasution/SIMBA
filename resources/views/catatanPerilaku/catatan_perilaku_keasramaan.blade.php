@@ -1,12 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class=" align-items-cend-flexter mb-4 border-bottom">
-  <h3 class="me-auto">
-    <a><i class="fas fa-user-edit"></i> Catatan Perilaku</a>
-  </h3>
 
-</div>
 
 <div class="container mt-4">
   <h3 class="text-center mb-4">Mahasiswa Aktif TA 2024</h3>

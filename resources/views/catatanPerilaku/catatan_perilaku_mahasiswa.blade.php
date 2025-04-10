@@ -7,14 +7,7 @@
 
 @section('content')
 <!-- Header -->
-<div class="d-flex align-items-center mb-4 border-bottom">
-  <h3 class="me-auto">
-    <a>
-      <i class="fas fa-user-edit"></i> Catatan Perilaku
-    </a>
-  </h3>
 
-</div>
 
 <div class="container mt-4">
   <p class="text-center mb-4">Daftar Nilai Perilaku Mahasiswa</p>
