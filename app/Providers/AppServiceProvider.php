@@ -5,6 +5,9 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Models\StudentBehavior;
 use App\Observers\StudentBehaviorObserver;
+use App\Models\RequestKonseling;
+use App\Observers\RequestKonselingObserver;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -21,5 +24,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         StudentBehavior::observe(StudentBehaviorObserver::class);
+        RequestKonseling::observe(RequestKonselingObserver::class);
     }
 }

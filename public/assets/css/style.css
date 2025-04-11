@@ -900,3 +900,7 @@ Perwalian CSS
 .select2-container .select2-selection--single .select2-selection__rendered {
     text-align: left !important;
 }
+
+.text-start h4 {
+    color:#000;
+}
