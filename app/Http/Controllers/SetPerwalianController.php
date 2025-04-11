@@ -11,6 +11,7 @@ use App\Models\Notifikasi;
 use App\Services\StudentSyncService;
 use App\Models\Absensi;
 use App\Models\BeritaAcara;
+use Barryvdh\DomPDF\PDF as DomPDF;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;

@@ -25,7 +25,7 @@
     </div>
 
     <div>
-        <a href="{{ route('berita_acara.print', $perwalian->ID_Perwalian) }}" class="btn btn-primary">
+        <a href="{{ route('berita_acara.print', $perwalian->ID_Perwalian) }}" class="btn btn-primary print">
             <i class="fas fa-print"></i> Print Perwalian PDF
         </a>
     </div>
@@ -93,6 +93,10 @@
         padding: 0.5em 0.75em;
     }
 
+
+    .print {
+        margin-bottom: 30px;
+    }
     /* Imported styles for the back button */
     .back-btn {
         display: inline-flex;
