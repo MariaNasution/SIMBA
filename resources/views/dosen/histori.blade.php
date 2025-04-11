@@ -18,42 +18,54 @@
   <!-- Content Columns -->
   <div class="histori-container">
     <div class="histori-column">
-      <h2>Semester Baru</h2>
-      @forelse ($semesterBaru as $item)
-        <div class="histori-item">
-          <a href="{{ route('dosen.histori.detailed', $item->ID_Perwalian) }}">
-            {{ \Carbon\Carbon::parse($item->Tanggal)->translatedFormat('l, d F Y') }} ({{ $item->kelas }})
-          </a>
-        </div>
-      @empty
-        <div class="histori-item">Tidak ada data</div>
-      @endforelse
+      <div class="histori-title">
+        <h2>Semester Baru</h2>
+      </div>
+      <div class="histori-items">
+        @forelse ($semesterBaru as $item)
+          <div class="histori-item">
+            <a href="{{ route('dosen.histori.detailed', $item->ID_Perwalian) }}">
+              {{ \Carbon\Carbon::parse($item->Tanggal)->translatedFormat('l, d F Y') }} ({{ $item->kelas }})
+            </a>
+          </div>
+        @empty
+          <div class="histori-item">Tidak ada data</div>
+        @endforelse
+      </div>
     </div>
 
     <div class="histori-column">
-      <h2>Sebelum UTS</h2>
-      @forelse ($sebelumUts as $item)
-        <div class="histori-item">
-          <a href="{{ route('dosen.histori.detailed', $item->ID_Perwalian) }}">
-            {{ \Carbon\Carbon::parse($item->Tanggal)->translatedFormat('l, d F Y') }} ({{ $item->kelas }})
-          </a>
-        </div>
-      @empty
-        <div class="histori-item">Tidak ada data</div>
-      @endforelse
+      <div class="histori-title">
+        <h2>Sebelum UTS</h2>
+      </div>
+      <div class="histori-items">
+        @forelse ($sebelumUts as $item)
+          <div class="histori-item">
+            <a href="{{ route('dosen.histori.detailed', $item->ID_Perwalian) }}">
+              {{ \Carbon\Carbon::parse($item->Tanggal)->translatedFormat('l, d F Y') }} ({{ $item->kelas }})
+            </a>
+          </div>
+        @empty
+          <div class="histori-item">Tidak ada data</div>
+        @endforelse
+      </div>
     </div>
 
     <div class="histori-column">
-      <h2>Sebelum UAS</h2>
-      @forelse ($sebelumUas as $item)
-        <div class="histori-item">
-          <a href="{{ route('dosen.histori.detailed', $item->ID_Perwalian) }}">
-            {{ \Carbon\Carbon::parse($item->Tanggal)->translatedFormat('l, d F Y') }} ({{ $item->kelas }})
-          </a>
-        </div>
-      @empty
-        <div class="histori-item">Tidak ada data</div>
-      @endforelse
+      <div class="histori-title">
+        <h2>Sebelum UAS</h2>
+      </div>
+      <div class="histori-items">
+        @forelse ($sebelumUas as $item)
+          <div class="histori-item">
+            <a href="{{ route('dosen.histori.detailed', $item->ID_Perwalian) }}">
+              {{ \Carbon\Carbon::parse($item->Tanggal)->translatedFormat('l, d F Y') }} ({{ $item->kelas }})
+            </a>
+          </div>
+        @empty
+          <div class="histori-item">Tidak ada data</div>
+        @endforelse
+      </div>
     </div>
   </div>
 </div>
@@ -87,9 +99,9 @@
     padding: 0.5rem 0.75rem;
     border: 1px solid #ccc;
     border-radius: 6px;
-    background: #fff;
+    background: #FDFDFD;
     font-size: 0.95rem;
-    color: #333;
+    color: #B7B3B6;
     width: 180px;
   }
 
@@ -101,23 +113,38 @@
   }
 
   .histori-column {
+    padding-top: 50px;
     flex: 1;
-    min-width: 260px;
-    background: #fff;
-    padding: 1.25rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    max-width: 300px;
+  
   }
 
-  .histori-column h2 {
+  .histori-title {
+
+    background: #fff;
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow only on the bottom */
+    gap:20px;
+  }
+
+  .histori-title h2 {
     text-align: center;
     font-size: 1.1rem;
     color: #222;
-    margin-bottom: 1rem;
+    margin: 0; /* Remove default margin to fit within padding */
+  }
+
+  .histori-items {
+    background: transparent; /* Ensure no white background */
+    font-family: "Poppins", sans-serif;
   }
 
   .histori-item {
-    background: #e8f0fe;
+    background: #68B8EA;
+    color: #fff;
+
     padding: 0.75rem;
     border-radius: 6px;
     margin-bottom: 0.7rem;
@@ -132,7 +159,7 @@
 
   .histori-item a {
     text-decoration: none;
-    color: #111827;
+    color: #fff;
     display: block;
     width: 100%;
   }

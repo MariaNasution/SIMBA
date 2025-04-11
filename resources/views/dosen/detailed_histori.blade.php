@@ -5,11 +5,10 @@
     <!-- Header with Back and Print Buttons -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <a href="{{ route('dosen.histori') }}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left"></i> Back
+            <a href="{{ route('dosen.histori') }}" class="back-btn">
+                <span class="arrow">&lt;</span> Back
             </a>
         </div>
-        
     </div>
 
     <!-- Perwalian Information -->
@@ -26,10 +25,10 @@
     </div>
 
     <div>
-            <a href="{{ route('berita_acara.print', $perwalian->ID_Perwalian) }}" class="btn btn-primary">
-                <i class="fas fa-print"></i> Print Perwalian PDF
-            </a>
-        </div>
+        <a href="{{ route('berita_acara.print', $perwalian->ID_Perwalian) }}" class="btn btn-primary">
+            <i class="fas fa-print"></i> Print Perwalian PDF
+        </a>
+    </div>
 
     <div class="row">
         <!-- Left: Table of Students -->
@@ -92,6 +91,34 @@
     .badge {
         font-size: 0.9rem;
         padding: 0.5em 0.75em;
+    }
+
+    /* Imported styles for the back button */
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 8px;
+        background-color: #68B8EA;
+        color: #fff;
+        font-size: 18px;
+        font-weight: 8px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-bottom: 30px;
+        margin-left: 10px;
+        text-decoration: none; /* Ensure the link doesn't have an underline */
+    }
+
+    .back-btn:hover {
+        background-color: #4A9CD6;
+    }
+
+    .back-btn .arrow {
+        font-size: 40px;
+        margin-right: 0px;
+        line-height: 1;
     }
 </style>
 @endsection

@@ -37,14 +37,23 @@
                     @endphp
                     @forelse ($notifications as $notif)
                         <li>
-                            <!-- Using the dynamic link if present -->
-                            <a class="dropdown-item" href="{{ $notif->link ?? route('mahasiswa_perwalian') }}">
-                                {{ $notif->data['message'] ?? 'No message' }}
-                            </a>
+                            @if($userRole === 'mahasiswa')
+                                <a class="dropdown-item" href="{{ $notificationRoute }}">
+                                    {{ $notif->Pesan ?? 'No message' }} by {{ $notif->nama ?? 'Unknown' }}
+                                </a>
+                            @else
+                                <span class="dropdown-item">
+                                    {{ $notif->Pesan ?? 'No message' }}
+                                </span>
+                            @endif
                         </li>
                     @empty
                         <li>
-                            <a class="dropdown-item" href="{{ route('mahasiswa_perwalian') }}">Tidak ada notifikasi</a>
+                            @if($userRole === 'mahasiswa')
+                                <a class="dropdown-item" href="{{ $notificationRoute }}">Tidak ada notifikasi</a>
+                            @else
+                                <span class="dropdown-item">Tidak ada notifikasi</span>
+                            @endif
                         </li>
                     @endforelse
                 </ul>

@@ -27,10 +27,35 @@
             border: 2px solid #aaa; /* Ensure the colspan cell has borders */
         }
 
+        .status-cell {
+            width: 220px;
+            padding-left: 10px;
+
+        }
+        .status-cell button{
+
+            position: relative;
+            cursor: pointer;
+            display: flex; /* Keep flex for centering */
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            padding: 8px; /* Match td padding to avoid size differences */
+            box-sizing: border-box; /* Ensure padding doesn’t increase cell size */
+            margin-right: 20px;
+            font-size: 20px;
+            border-top: none;
+            border-right: none;
+            border-left: none;
+        }
+
         .btn {
             background-color: #4CAF50;
             color: #fff;
             margin-top: 20px;
+        }
+
+        .btn:hover {
+            background-color: red;
         }
 
         .button-container {
@@ -40,15 +65,7 @@
             margin-bottom: 20px;
         }
 
-        .status-cell {
-            position: relative;
-            cursor: pointer;
-            display: flex; /* Keep flex for centering */
-            justify-content: center; /* Center horizontally */
-            align-items: center; /* Center vertically */
-            padding: 8px; /* Match td padding to avoid size differences */
-            box-sizing: border-box; /* Ensure padding doesn’t increase cell size */
-        }
+        
 
         .status-buttons {
             display: flex;
@@ -167,7 +184,6 @@
 
     <!-- Header -->
     <h1>{{ $title }}</h1>
-    <h2>Quick Access</h2>
 
     <!-- Success/Error Messages -->
     @if (session('success'))
@@ -207,9 +223,9 @@
                         <td class="status-cell" onclick="showDropdown(this)">
                             <input type="hidden" name="attendance[{{ $student['nim'] }}][status]" class="attendance-status" value="{{ $student['status_kehadiran'] ?? '' }}">
                             <div class="status-buttons" style="{{ $student['status_kehadiran'] ? 'display: none;' : '' }}">
-                                <button type="button" class="status-btn present" onclick="updateStatus(event, this, '✅', 'Hadir')">✅</button>
+                                <button type="button" class="status-btn present" onclick="updateStatus(event, this, '✅', 'Hadir')">✅ </button>
                                 <button type="button" class="status-btn absent" onclick="updateStatus(event, this, '❌', 'Alpa')">❌</button>
-                                <button type="button" class="status-btn permission" onclick="updateStatus(event, this, '📝', 'Izin')">📝</button>
+                                <button type="button" class="status-btn permission" onclick="updateStatus(event, this, '📝', 'Izin')">📝 </button>
                             </div>
                             <div class="status-display" style="{{ $student['status_kehadiran'] ? 'display: block;' : 'display: none;' }}">
                                 <span class="selected-status">

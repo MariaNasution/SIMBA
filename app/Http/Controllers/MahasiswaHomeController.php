@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Mahasiswa;
-use App\Models\Notifikasi;
-use App\Models\Perwalian;
-use App\Models\Dosen;
-use App\Models\Absensi;
-use App\Models\Pengumuman;
 use App\Models\Calendar;
-use Illuminate\Support\Facades\Http;
+use App\Models\Pengumuman;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
+use App\Models\Absensi;
+use App\Models\Perwalian;
+use App\Models\Mahasiswa;
+use App\Models\Dosen;
 
 class MahasiswaHomeController extends Controller
 {
@@ -27,21 +25,32 @@ class MahasiswaHomeController extends Controller
         $mahasiswa = Mahasiswa::where('username', $user['username'])->first();
         if (!$mahasiswa) {
             Log::error('No mahasiswa record found for user', ['username' => $user['username']]);
-            return redirect()->route('login')->withErrors(['error' => 'Mahasiswa record not found.']);
+            return redirect()->route('login')->withErrors(['error' => 'Mahasiswa data not found.']);
         }
 
         $nim = $mahasiswa->nim;
         $apiToken = session('api_token');
 
+        // Fetch student data and store related session data
         $studentData = $this->fetchStudentData($nim, $apiToken);
+
+        // Fetch academic performance data
         $performance = $this->fetchPenilaianData($nim, $apiToken);
         if (!$performance) {
             return redirect()->route('beranda')->withErrors(['error' => 'Gagal mengambil data kemajuan studi.']);
         }
         list($labels, $values) = $performance;
 
-        list($dosen, $notifications, $dosenNotifications, $notificationCount, $noPerwalianMessage) = $this->handlePerwalian($mahasiswa);
+        // Handle perwalian and notifications
+        list(
+            $dosen,
+            $notifications,
+            $dosenNotifications,
+            $notificationCount,
+            $noPerwalianMessage
+        ) = $this->handlePerwalian($mahasiswa);
 
+        // Additional data
         $absensi = Absensi::where('nim', $mahasiswa->nim)
             ->where('ID_Perwalian', $mahasiswa->ID_Perwalian)
             ->first();
@@ -105,9 +114,18 @@ class MahasiswaHomeController extends Controller
                     'nim' => $nim,
                 ]);
 
+            Log::info('Respons API mentah:', ['body' => $response->body()]);
+
             if ($response->successful()) {
-                $data = $response->json()['data'] ?? [];
+                $data = $response->json();
                 $ipSemester = $data['IP Semester'] ?? [];
+
+                uasort($ipSemester, function ($a, $b) {
+                    if ($a['ta'] === $b['ta']) {
+                        return $a['sem'] <=> $b['sem'];
+                    }
+                    return $a['ta'] <=> $b['ta'];
+                });
 
                 $labels = [];
                 $values = [];
@@ -127,15 +145,17 @@ class MahasiswaHomeController extends Controller
         } catch (\Exception $e) {
             Log::error('Exception on fetching penilaian data:', ['message' => $e->getMessage()]);
         }
+
         return null;
     }
 
     private function handlePerwalian(Mahasiswa $mahasiswa): array
     {
         $dosen = null;
-        $notifications = collect();
+        // Use Laravel's built-in notifications relationship from the Mahasiswa model
+        $notifications = $mahasiswa->notifications()->orderBy('created_at', 'desc')->get();
+        $notificationCount = $notifications->count();
         $dosenNotifications = collect();
-        $notificationCount = 0;
         $noPerwalianMessage = null;
 
         $perwalian = Perwalian::where('ID_Perwalian', $mahasiswa->ID_Perwalian)
@@ -144,19 +164,15 @@ class MahasiswaHomeController extends Controller
 
         if ($perwalian) {
             $dosen = Dosen::where('nip', $perwalian->ID_Dosen_Wali)->first();
-            $notifications = Notifikasi::where('Id_Perwalian', $perwalian->ID_Perwalian)
-                ->where('nim', $mahasiswa->nim)
-                ->get();
 
+            // Example: If you stored 'ID_Dosen_Wali' in the notification payload, you can extract them:
             $dosenWaliIds = $notifications->map(function ($notification) {
-                return optional($notification->perwalian)->ID_Dosen_Wali;
+                return $notification->data['ID_Dosen_Wali'] ?? null;
             })->filter()->unique();
 
             $dosenNotifications = $dosenWaliIds->isNotEmpty()
                 ? Dosen::whereIn('nip', $dosenWaliIds)->get()
                 : collect();
-
-            $notificationCount = $notifications->count();
         } else {
             $noPerwalianMessage = 'No scheduled perwalian sessions at this time.';
             Log::info('No scheduled perwalian found for student', ['nim' => $mahasiswa->nim]);
@@ -164,6 +180,7 @@ class MahasiswaHomeController extends Controller
 
         return [$dosen, $notifications, $dosenNotifications, $notificationCount, $noPerwalianMessage];
     }
+
 
     public function show($id)
     {
