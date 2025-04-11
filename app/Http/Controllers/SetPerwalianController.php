@@ -670,13 +670,13 @@ class SetPerwalianController extends Controller
             Log::warning('No username found in session for detailedHistori', ['session' => session()->all()]);
             return redirect()->route('login')->with('error', 'Please log in to access this page.');
         }
-
+    
         $user = Dosen::where('username', $username)->first();
         if (!$user) {
             Log::error('No Dosen found for username in detailedHistori', ['username' => $username]);
             return redirect()->route('login')->with('error', 'User not found or not authorized.');
         }
-
+    
         // Find the Perwalian record by ID and ensure it belongs to the dosen
         $perwalian = Perwalian::where('ID_Perwalian', $id)
             ->where('ID_Dosen_Wali', $user->nip)
@@ -684,30 +684,31 @@ class SetPerwalianController extends Controller
         if (!$perwalian) {
             return redirect()->route('dosen.histori')->with('error', 'Perwalian not found.');
         }
-
-        // Get all students for this Perwalian
+    
+        // Get all mahasiswa records for this Perwalian
         $mahasiswaRecords = DB::table('mahasiswa')
             ->where('ID_Perwalian', $perwalian->ID_Perwalian)
             ->orderBy('nama')
             ->get();
-
-        // Fetch Absensi records for these students
+    
+        // Fetch Absensi records for these students (keyed by nim)
         $absensiRecords = DB::table('absensi')
             ->where('ID_Perwalian', $perwalian->ID_Perwalian)
             ->get()
             ->keyBy('nim');
-
-        // Build students array with status
+    
+        // Build students array using actual status from absensi record if it exists
         $students = [];
         foreach ($mahasiswaRecords as $m) {
-            $status = $absensiRecords->has($m->nim) ? 'Selesai' : 'Belum';
+            $absRecord = $absensiRecords->get($m->nim);
+            $status = $absRecord ? $absRecord->status_kehadiran : 'Belum';
             $students[] = [
-                'nim' => $m->nim,
-                'nama' => $m->nama,
-                'status' => $status,
+                'nim'   => $m->nim,
+                'nama'  => $m->nama,
+                'status'=> $status,
             ];
         }
-
+    
         // Get Berita Acara record for catatan (from dosen wali)
         $beritaAcara = DB::table('berita_acaras')
             ->where('kelas', $perwalian->kelas)
@@ -715,11 +716,11 @@ class SetPerwalianController extends Controller
             ->where('user_id', $user->user_id)
             ->first();
         $catatan = $beritaAcara->catatan_feedback ?? null;
-
+    
         return view('dosen.detailed_histori', [
             'perwalian' => $perwalian,
-            'students' => $students,
-            'catatan' => $catatan,
+            'students'  => $students,
+            'catatan'   => $catatan,
         ]);
     }
 
