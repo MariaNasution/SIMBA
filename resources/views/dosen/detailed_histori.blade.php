@@ -8,7 +8,6 @@
             <a href="{{ route('dosen.histori') }}" class="back-btn">
                 <span class="arrow"><</span> Back
             </a>
-            <h4 class="ms-3 d-inline-block">Detail Perwalian</h4>
         </div>
         <div>
             <a href="{{ route('berita_acara.print', $perwalian->ID_Perwalian) }}" class="btn btn-primary">

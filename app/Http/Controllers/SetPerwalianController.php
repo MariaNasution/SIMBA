@@ -541,60 +541,77 @@ class SetPerwalianController extends Controller
             return redirect()->route('login')->with('error', 'User not found or not authorized.');
         }
 
-        // Retrieve all Perwalian records for this dosen (not just "Completed")
+        // Retrieve all Perwalian records for this dosen
         $perwalianRecords = Perwalian::where('ID_Dosen_Wali', $user->nip)
             ->orderBy('Tanggal', 'desc') // Order by date for better history view
+            ->where('Status', 'Completed')
             ->get();
 
-        // Filter by search text (if any)
         $searchTerm = $request->input('search');
+        $selectedCategory = $request->input('category');
+
+        // First, if a search term is provided, filter by keyword
         if ($searchTerm) {
             $lowerSearch = mb_strtolower($searchTerm);
-            $perwalianRecords = $perwalianRecords->filter(function ($item) use ($lowerSearch) {
+            $searchTokens = array_filter(explode(' ', $lowerSearch));
+
+            $perwalianRecords = $perwalianRecords->filter(function ($item) use ($searchTokens) {
                 $kelas = mb_strtolower($item->kelas);
-                $nama = mb_strtolower($item->nama ?? '');
-                $tanggal = $item->Tanggal;
-                $status = mb_strtolower($item->Status);
-                return (str_contains($kelas, $lowerSearch) ||
-                        str_contains($nama, $lowerSearch) ||
-                        str_contains($tanggal, $lowerSearch) ||
-                        str_contains($status, $lowerSearch));
+                $tanggal = mb_strtolower(Carbon::parse($item->Tanggal)->translatedFormat('l, d F Y'));
+
+                foreach ($searchTokens as $token) {
+                    if (!str_contains($kelas, $token) && !str_contains($tanggal, $token)) {
+                        return false;
+                    }
+                }
+                return true;
             })->values();
         }
 
-        // Categorize each date into Semester Baru, Sebelum UTS, or Sebelum UAS
+        // Initialize variables for the view
         $semesterBaru = [];
         $sebelumUts = [];
         $sebelumUas = [];
+        $singleRecords = [];
+        $categoryTitle = '';
+        $showSingleCategory = false;
 
-        foreach ($perwalianRecords as $record) {
-            $dateObj = Carbon::parse($record->Tanggal);
-            $month = $dateObj->month;
-            $day = $dateObj->day;
-            $category = $this->determineCategory($month, $day);
-            if ($category === 'semester_baru') {
-                $semesterBaru[] = $record;
-            } elseif ($category === 'sebelum_uts') {
-                $sebelumUts[] = $record;
-            } elseif ($category === 'sebelum_uas') {
-                $sebelumUas[] = $record;
-            } else {
-                $semesterBaru[] = $record;
-            }
-        }
-
-        // Filter by category (if selected)
-        $selectedCategory = $request->input('category');
+        // If a category is selected, filter records and prepare for single-column display
         if ($selectedCategory) {
-            if ($selectedCategory === 'semester_baru') {
-                $sebelumUts = [];
-                $sebelumUas = [];
-            } elseif ($selectedCategory === 'sebelum_uts') {
-                $semesterBaru = [];
-                $sebelumUas = [];
-            } elseif ($selectedCategory === 'sebelum_uas') {
-                $semesterBaru = [];
-                $sebelumUts = [];
+            $showSingleCategory = true;
+            $perwalianRecords = $perwalianRecords->filter(function ($item) use ($selectedCategory) {
+                $dateObj = Carbon::parse($item->Tanggal);
+                $category = $this->determineCategory($dateObj->month, $dateObj->day);
+                return $category === $selectedCategory;
+            })->values();
+
+            // Set the category title and single records array
+            switch ($selectedCategory) {
+                case 'semester_baru':
+                    $categoryTitle = 'Semester Baru';
+                    break;
+                case 'sebelum_uts':
+                    $categoryTitle = 'Sebelum UTS';
+                    break;
+                case 'sebelum_uas':
+                    $categoryTitle = 'Sebelum UAS';
+                    break;
+            }
+            $singleRecords = $perwalianRecords->toArray();
+        } else {
+            // If no category is selected, categorize all records into three arrays
+            foreach ($perwalianRecords as $record) {
+                $dateObj = Carbon::parse($record->Tanggal);
+                $category = $this->determineCategory($dateObj->month, $dateObj->day);
+                if ($category === 'semester_baru') {
+                    $semesterBaru[] = $record;
+                } elseif ($category === 'sebelum_uts') {
+                    $sebelumUts[] = $record;
+                } elseif ($category === 'sebelum_uas') {
+                    $sebelumUas[] = $record;
+                } else {
+                    $semesterBaru[] = $record;
+                }
             }
         }
 
@@ -602,8 +619,13 @@ class SetPerwalianController extends Controller
             'semesterBaru' => $semesterBaru,
             'sebelumUts' => $sebelumUts,
             'sebelumUas' => $sebelumUas,
+            'singleRecords' => $singleRecords,
+            'categoryTitle' => $categoryTitle,
+            'selectedCategory' => $selectedCategory,
+            'showSingleCategory' => $showSingleCategory,
         ]);
     }
+
 
     private function determineCategory($month, $day)
     {
@@ -746,17 +768,23 @@ class SetPerwalianController extends Controller
         if (!$perwalian) {
             return redirect()->route('dosen.histori')->with('error', 'Perwalian not found.');
         }
+        Log::Info('Gote her1');
 
         // Ensure the Perwalian is in "Completed" status
         if ($perwalian->Status !== 'Completed') {
             return redirect()->route('dosen.histori')->with('error', 'Berita Acara can only be printed for completed Perwalian sessions.');
         }
 
+        Log::Info('Gote her2');
+
         // Get Mahasiswa records for this Perwalian
         $mahasiswaRecords = DB::table('mahasiswa')
             ->where('ID_Perwalian', $perwalian->ID_Perwalian)
             ->orderBy('nama')
             ->get();
+
+            Log::Info('Gote her3');
+
         $students = [];
         foreach ($mahasiswaRecords as $m) {
             $students[] = [
@@ -765,22 +793,31 @@ class SetPerwalianController extends Controller
             ];
         }
 
+        Log::Info('Gote her4');
+
         // Get BeritaAcara record (dosen wali's report)
         $beritaAcara = DB::table('berita_acaras')
             ->where('kelas', $perwalian->kelas)
             ->where('tanggal_perwalian', $perwalian->Tanggal)
-            ->where('user_id', $user->user_id)
+            ->where('dosen_wali', $user->username)
             ->first();
+
+            
 
         if (!$beritaAcara) {
             return redirect()->route('dosen.histori')->with('error', 'Berita Acara not found for this Perwalian session.');
         }
+
+        Log::Info('Gote her6');
+
 
         // Get Absensi records for mahasiswa (for the attendance table)
         $absensiRecords = DB::table('absensi')
             ->where('ID_Perwalian', $perwalian->ID_Perwalian)
             ->get()
             ->keyBy('nim');
+
+            Log::Info('Gote her7');
 
         // Prepare data for the PDF view
         $pdfData = [
@@ -790,9 +827,15 @@ class SetPerwalianController extends Controller
             'beritaAcara' => $beritaAcara,
         ];
 
+        
+        Log::Info('Gote her8');
+
         // Load the PDF view
         $pdf = PDF::loadView('dosen.berita_acara_pdf', $pdfData)
             ->setPaper('a4', 'portrait');
+
+            Log::Info('Gote her9');
+
         return $pdf->download('Perwalian_' . $perwalian->kelas . '_' . $perwalian->Tanggal . '.pdf');
     }
 }
