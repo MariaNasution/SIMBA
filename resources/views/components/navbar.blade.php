@@ -32,19 +32,35 @@
                     @php
                         // Determine the role
                         $userRole = session('user')['role'] ?? null;
-                        // Only define the route for mahasiswa
-                        $notificationRoute = $userRole === 'mahasiswa' ? route('mahasiswa_perwalian') : null;
                     @endphp
                     @forelse ($notifications as $notif)
+                        @php
+                            $notifData = $notif->data;
+                            $type = $notifData['extra_data']['type'] ?? null;
+                            $label = $type ? strtoupper($type) : 'INFO';
+
+                            $link = match($type) {
+                                'konseling' => route('mahasiswa_konseling'),
+                                'perwalian' => route('mahasiswa_perwalian'),
+                                default => route('mahasiswa_perwalian'),
+                            };
+
+                            $badgeClass = match($type) {
+                                'konseling' => 'bg-success',
+                                'perwalian' => 'bg-primary',
+                                default => 'bg-secondary',
+                            };
+                        @endphp
                         <li>
                             <!-- Using the dynamic link if present -->
-                            <a class="dropdown-item" href="{{ $notif->link ?? route('mahasiswa_perwalian') }}">
+                            <a class="dropdown-item" href="{{ $link }}">
+                                <span class="badge {{ $badgeClass }} me-1">[{{ $label }}]</span>
                                 {{ $notif->data['message'] ?? 'No message' }}
                             </a>
                         </li>
                     @empty
                         <li>
-                            <a class="dropdown-item" href="{{ route('mahasiswa_perwalian') }}">Tidak ada notifikasi</a>
+                            <a class="dropdown-item" href="">Tidak ada notifikasi</a>
                         </li>
                     @endforelse
                 </ul>
