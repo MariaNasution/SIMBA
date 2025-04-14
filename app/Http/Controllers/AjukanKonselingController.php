@@ -6,20 +6,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Models\RequestKonseling;
-use Exception;
 use App\Models\Mahasiswa;
-use App\Notifications\UniversalNotification; 
-use App\Services\NotificationService; 
+use Exception;
 
 class AjukanKonselingController extends Controller
 {
-    protected $notificationService;
-
-    public function __construct(NotificationService $notificationService)
-    {
-        $this->notificationService = $notificationService;
-    }
-
     public function index()
     {
         // Initialize empty data
@@ -110,28 +101,13 @@ class AjukanKonselingController extends Controller
 
         try {
             // Simpan pengajuan konseling
-            $konseling = RequestKonseling::create([
+            RequestKonseling::create(attributes: [
                 'nim' => $request->input('nim'),
                 'nama_mahasiswa' => $request->input('nama'),
                 'tanggal_pengajuan' => $request->input('tanggal_pengajuan'),
                 'deskripsi_pengajuan' => $request->input('deskripsi_pengajuan') ?? '',
                 'status' => 'approved',
             ]);
-
-            // --- Create Universal Notification for the mahasiswa ---
-            $mahasiswa = Mahasiswa::where('nim', $request->input('nim'))->first();
-            if ($mahasiswa) {
-                $message = "Anda telah diajukan untuk mengadakan konseling pada " . $request->input('tanggal_pengajuan');
-                // Pass any extra data if needed (like id_konseling and category)
-                $mahasiswa->notify(new UniversalNotification($message, [
-                    'id_konseling' => $konseling->id,
-                    'category' => 'ajukan_konseling',
-                    'action'   => 'store'
-                ]));
-                Log::info("Universal notification sent for konseling request for mahasiswa NIM " . $request->input('nim'));
-            } else {
-                Log::error("Mahasiswa with NIM " . $request->input('nim') . " not found for notification.");
-            }
 
             // Redirect based on user role
             if (session('user.role') == 'kemahasiswaan') {

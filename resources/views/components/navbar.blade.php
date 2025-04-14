@@ -32,25 +32,47 @@
                     @php
                         // Determine the role
                         $userRole = session('user')['role'] ?? null;
-                        // Only define the route for mahasiswa
-                        $notificationRoute = $userRole === 'mahasiswa' ? route('mahasiswa_perwalian') : null;
                     @endphp
                     @forelse ($notifications as $notif)
+                        @php
+                            $notifData = $notif->data ?? [];
+                            $type = $notifData['extra_data']['type'] ?? null;
+                            $label = $type ? strtoupper($type) : 'INFO';
+
+                            // Dynamic link generation
+                            $link = match($type) {
+                                'konseling' => route('mahasiswa_konseling'),
+                                'perwalian' => route('mahasiswa_perwalian'),
+                                default => route('mahasiswa_perwalian'),
+                            };
+
+                            $badgeClass = match($type) {
+                                'konseling' => 'bg-success',
+                                'perwalian' => 'bg-primary',
+                                default => 'bg-secondary',
+                            };
+
+                            // Fallback for message and sender
+                            $message = $notifData['message'] ?? $notif->Pesan ?? 'No message';
+                            $sender = $notif->nama ?? 'Unknown';
+                        @endphp
                         <li>
                             @if($userRole === 'mahasiswa')
-                                <a class="dropdown-item" href="{{ $notificationRoute }}">
-                                    {{ $notif->Pesan ?? 'No message' }} by {{ $notif->nama ?? 'Unknown' }}
+                                <a class="dropdown-item" href="{{ $link }}">
+                                    <span class="badge {{ $badgeClass }} me-1">[{{ $label }}]</span>
+                                    {{ $message }} by {{ $sender }}
                                 </a>
                             @else
                                 <span class="dropdown-item">
-                                    {{ $notif->Pesan ?? 'No message' }}
+                                    <span class="badge {{ $badgeClass }} me-1">[{{ $label }}]</span>
+                                    {{ $message }}
                                 </span>
                             @endif
                         </li>
                     @empty
                         <li>
                             @if($userRole === 'mahasiswa')
-                                <a class="dropdown-item" href="{{ $notificationRoute }}">Tidak ada notifikasi</a>
+                                <a class="dropdown-item" href="{{ route('mahasiswa_perwalian') }}">Tidak ada notifikasi</a>
                             @else
                                 <span class="dropdown-item">Tidak ada notifikasi</span>
                             @endif
