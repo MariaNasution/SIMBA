@@ -1,5 +1,6 @@
 <?php
 
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AbsensiController;
@@ -28,9 +29,10 @@ use App\Http\Controllers\HasilKonselingController;
 use App\Http\Controllers\DaftarRequestKonselingController;
 use App\Http\Controllers\CatatanPerilakuDetailController;
 use App\Http\Controllers\SmsController;
-use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\NotifikasiController;
+use App\Http\Controllers\PerwalianController;
 
-Route::post('/notifications/mark-read', [NotificationController::class, 'markAllRead'])->name('notifications.markRead');
+Route::post('/notifications/mark-read', [NotifikasiController::class, 'markAllRead'])->name('notifications.markRead');
 use App\Http\Controllers\KonselingLanjutanController;
 use App\Http\Controllers\BeritaAcaraController;
 
@@ -79,7 +81,7 @@ Route::middleware(['auth.session', 'role:kemahasiswaan'])
         Route::get('/beranda', [KemahasiswaanController::class, 'index'])->name('beranda');
         Route::post('/beranda/store', [KemahasiswaanController::class, 'store'])->name('pengumuman.store');
         Route::delete('/beranda/{id}', [KemahasiswaanController::class, 'destroy'])->name('pengumuman.destroy');
-        Route::get('/pengumuman/{id}', [KemahasiswaanController::class, 'show'])->name('pengumumankemahasiswaan.detail');
+        Route::get('/pengumuman/{id}', [KemahasiswaanController::class, 'show'])->name('pengumunankonselor.detail');
         Route::post('/calendar/upload', [CalendarController::class, 'upload'])->name('calendar.upload');
 
         // Perwalian
@@ -114,7 +116,7 @@ Route::middleware(['auth.session', 'role:kemahasiswaan'])
             // Kemahasiswaan request konseling
             Route::get('/ajukan', [AjukanKonselingController::class, 'index'])->name('konseling.ajukan');
             Route::get('/cari', [AjukanKonselingController::class, 'cariMahasiswa'])->name('konseling.cari');
-            Route::post('/ajukan', [AjukanKonselingController::class, 'ajukanKonseling'])->name('konseling.ajukan');
+            Route::post('/konseling/ajukan', [AjukanKonselingController::class, 'ajukanKonseling'])->name('konseling.ajukan');
             Route::get('/caririwayat', [RiwayatkonselingController::class, 'CariRiwayatMahasiswa'])->name('konseling.caririwayat');
             Route::get('/konseling', [AjukanKonselingController::class, 'index'])->name('konseling.index');
             Route::get('/konseling/pilih', [AjukanKonselingController::class, 'pilihMahasiswa'])->name('konseling.pilih');
@@ -128,6 +130,7 @@ Route::middleware(['auth.session', 'role:kemahasiswaan'])
             Route::post('/konseling/lanjutan', [KonselingLanjutanController::class, 'store'])->name('konseling.lanjutan.store');
         });
     });
+    
 // Middleware untuk konselor
 Route::middleware(['auth.session', 'role:konselor'])
     ->prefix('konselor')
@@ -136,7 +139,7 @@ Route::middleware(['auth.session', 'role:konselor'])
         Route::get('/beranda', [KonselorController::class, 'index'])->name('beranda');
         Route::post('/beranda/store', [KonselorController::class, 'store'])->name('pengumuman.store');
         Route::delete('/beranda/{id}', [KonselorController::class, 'destroy'])->name('pengumuman.destroy');
-        Route::get('/pengumuman/{id}', [KonselorController::class, 'show'])->name('pengumumankonselor.detail');
+        Route::get('/pengumuman/{id}', [KonselorController::class, 'show'])->name('pengumunankonselor.detail');
         Route::post('/calendar/upload', [CalendarController::class, 'upload'])->name('calendar.upload');
         // Group untuk konseling
         Route::prefix('konseling')->group(function () {
@@ -161,10 +164,9 @@ Route::middleware(['auth.session', 'role:konselor'])
             Route::post('/hasil-konseling/upload', [HasilKonselingController::class, 'upload'])->name('hasil_konseling.upload');
 
             // Konselor request konseling
-            Route::get('/ajukan', [AjukanKonselingController::class, 'index'])->name('konseling.form');
+            Route::get('/ajukan', [AjukanKonselingController::class, 'index'])->name('konseling.ajukan.form');
             Route::get('/cari', [AjukanKonselingController::class, 'cariMahasiswa'])->name('konseling.cari');
-            Route::post('/ajukan', [AjukanKonselingController::class, 'ajukanKonseling'])->name('konseling.ajukan');
-
+            Route::post('/konseling/ajukan', [AjukanKonselingController::class, 'ajukanKonseling'])->name('konseling.ajukan.submit');
             Route::get('/caririwayat', [RiwayatkonselingController::class, 'CariRiwayatMahasiswa'])->name('konseling.caririwayat');
             Route::get('/konseling', [AjukanKonselingController::class, 'index'])->name('konseling.index');
             Route::get('/konseling/pilih', [AjukanKonselingController::class, 'pilihMahasiswa'])->name('konseling.pilih');
@@ -259,6 +261,8 @@ Route::middleware(['auth.session', 'ensure.student.data.all.student', 'role:keas
     });
 
 });
+
+
 
 // Middleware untuk orang tua
 Route::middleware(['auth.session', 'ensure.student.data.ortu', 'role:orang_tua'])->group(function () {

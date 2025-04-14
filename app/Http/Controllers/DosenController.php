@@ -71,7 +71,7 @@ class DosenController extends Controller
                     "user_id" => $dosenSession['user_id'],
                 ]]);
 
-                $dosenId = $dosenData['data']['dosen'][0]['dosen_id'] ?? null;
+                $dosenId = $dosenData['data']['dosen'][0]['pegawai_id'] ?? null;
                 if (!$dosenId) {
                     return back()->with('error', 'Dosen ID not found.');
                 }
