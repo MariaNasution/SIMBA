@@ -3,10 +3,10 @@
 @section('content')
     <div class="container">
         <!-- Back Button -->
-        <div class="mb-3">
-            <button onclick="goBack()" class="btn back-btn">
-                <span class="arrow"><</span>Back
-            </button>
+        <div class="mb-4">
+            <a href="{{ route('berita_acara.select_class') }}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
         </div>
 
         <!-- Feedback Messages -->
@@ -204,49 +204,8 @@
         .submit-container { display: flex; justify-content: flex-end; padding-right: 50px; margin-top: 50px; }
         .editable-input, .editable-textarea { border: none; background: transparent; outline: none; width: 100%; font-size: inherit; font-family: inherit; }
         .editable-textarea { min-height: 50px; resize: none; }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .status-display {
-            display: block;
-        }
-        .status-desc {
-            position: relative;
-        }
-        /* Back button styling from perwalian kelas */
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            padding: 2px 8px;
-            background-color: #68B8EA;
-            color: #fff;
-            font-size: 18px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            margin-bottom: 30px;
-            margin-top: -4px;
-            margin-left: 10px;
-        }
-        .back-btn:hover {
-            background-color: #4A9CD6;
-        }
-        .back-btn .arrow {
-            font-size: 40px;
-            margin-right: 0px;
-            line-height: 1;
-        }
+        .btn-outline-primary { transition: all 0.3s ease; }
+        .btn-outline-primary:hover { background-color: #e9ecef; }
     </style>
 
     <script>
@@ -335,10 +294,6 @@
             if (confirm('Apakah Anda yakin ingin logout?')) {
                 window.location.href = "{{ route('logout') }}";
             }
-        }
-
-        function goBack() {
-            window.history.back();
         }
     </script>
 @endsection

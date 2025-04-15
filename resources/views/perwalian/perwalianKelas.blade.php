@@ -4,41 +4,43 @@
     <style>
         table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: collapse; /* Ensure borders collapse properly */
             margin-top: 20px;
-            border: 2px solid #aaa;
+            border: 2px solid #aaa; /* Add border to the table itself */
         }
 
         th, td {
-            border: 2px solid #aaa;
+            border: 2px solid #aaa; /* Consistent border for all cells */
             padding: 8px;
             text-align: left;
-            box-sizing: border-box;
+            box-sizing: border-box; /* Ensure padding doesn’t increase cell size */
         }
 
         th {
             background-color: #f2f2f2;
-            font-weight: bold;
+            font-weight: bold; /* Ensure headers stand out */
         }
 
+        /* Ensure the empty state cell also has proper borders */
         td[colspan="4"] {
             text-align: center;
-            border: 2px solid #aaa;
+            border: 2px solid #aaa; /* Ensure the colspan cell has borders */
         }
 
         .status-cell {
             width: 220px;
             padding-left: 10px;
-        }
 
-        .status-cell button {
+        }
+        .status-cell button{
+
             position: relative;
             cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 8px;
-            box-sizing: border-box;
+            display: flex; /* Keep flex for centering */
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            padding: 8px; /* Match td padding to avoid size differences */
+            box-sizing: border-box; /* Ensure padding doesn’t increase cell size */
             margin-right: 20px;
             font-size: 20px;
             border-top: none;
@@ -47,10 +49,9 @@
         }
 
         .btn {
-            background-color: #4FB19D;
+            background-color: #4CAF50;
             color: #fff;
             margin-top: 20px;
-            padding: 8px 16px;
         }
 
         .btn:hover {
@@ -61,13 +62,15 @@
             display: flex;
             justify-content: flex-end;
             gap: 10px;
+            margin-bottom: 20px;
         }
+
+        
 
         .status-buttons {
             display: flex;
-            justify-content: center;
+            justify-content: center; /* Center the buttons */
             gap: 5px;
-            font-size: 18px; /* Increased font size for status buttons */
         }
 
         .status-btn {
@@ -104,7 +107,6 @@
         .dropdown div {
             padding: 8px;
             cursor: pointer;
-            font-size: 18px; /* Increased font size for dropdown items */
         }
 
         .dropdown div:hover {
@@ -113,7 +115,6 @@
 
         .status-display {
             display: none;
-            font-size: 18px; /* Increased font size for status display */
         }
 
         .status-desc {
@@ -126,7 +127,7 @@
             padding: 5px;
             border: 1px solid #ddd;
             border-radius: 3px;
-            box-sizing: border-box;
+            box-sizing: border-box; /* Ensure input fits within cell */
         }
 
         .back-btn {
@@ -136,12 +137,12 @@
             background-color: #68B8EA;
             color: #fff;
             font-size: 18px;
+            font-weight: 8px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s ease;
             margin-bottom: 30px;
-            margin-top: -4px;
             margin-left: 10px;
         }
 
@@ -173,176 +174,16 @@
         .status-btn {
             text-align: center;
         }
-
-        .absensi-header {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap; /* Allow wrapping for smaller screens */
-        }
-
-        .absensi-block {
-            width: 40%;
-            padding: 25px 30px;
-            margin-left: 120px;
-            background-color: rgb(231, 119, 106);
-            color: white;
-            font-size: large;
-            font-weight: 500;
-            text-align: center;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-
-        .success {
-            padding-bottom: 3px;
-            padding-right: 25px;
-        }
-
-        .absensi-block.success {
-            background-color: #4CAF50;
-        }
-
-        .header-row {
-            display: flex;
-            align-items: flex-start;
-            gap: 20px;
-            margin-bottom: 20px;
-            flex-wrap: wrap; /* Allow wrapping */
-        }
-
-        .quick-access-container {
-            width: 200px;
-            text-align: end;
-            margin-left: auto;
-            margin-top: 40px;
-        }
-
-        .ok-btn-container {
-            display: flex;
-            justify-content: flex-end;
-        }
-
-        .ok-btn {
-            background-color: #DFF0D8;
-            color: #2A2D29;
-            border: 1px solid #4CAF50;
-            padding: 3px 15px;
-            margin-left: 10px;
-            margin-bottom: 10px;
-            margin-top: 13px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .ok-btn:hover {
-            background-color: #f0f0f0;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .absensi-block {
-                width: 100%;
-                margin-left: 0;
-                padding: 15px;
-            }
-
-            .quick-access-container {
-                width: 100%;
-                margin-left: 0;
-                margin-top: 20px;
-                text-align: center;
-            }
-
-            .header-row {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .absensi-header {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .status-cell {
-                width: 150px;
-            }
-
-            table {
-                font-size: 14px;
-            }
-
-            th, td {
-                padding: 6px;
-            }
-
-            .btn {
-                padding: 6px 12px;
-                font-size: 14px;
-            }
-
-            .back-btn {
-                font-size: 16px;
-                margin-left: 0;
-            }
-
-            .back-btn .arrow {
-                font-size: 30px;
-            }
-
-            .status-buttons,
-            .status-display,
-            .dropdown div {
-                font-size: 16px; /* Slightly smaller font size for smaller screens */
-            }
-        }
-
-        @media (max-width: 480px) {
-            .status-cell {
-                width: 100px;
-            }
-
-            .status-btn {
-                padding: 3px 6px;
-                font-size: 12px;
-            }
-
-            .absensi-block {
-                font-size: 16px;
-                padding: 10px;
-            }
-
-            .ok-btn {
-                font-size: 14px;
-                padding: 2px 10px;
-            }
-
-            .status-buttons,
-            .status-display,
-            .dropdown div {
-                font-size: 14px; /* Further adjusted for very small screens */
-            }
-        }
     </style>
 
-    <!-- Header Row with Back Button and Lakukan Absensi Block -->
-    <div class="header-row">
-        <div class="mb-3" style="text-align: left;">
-            <button onclick="goBack()" class="btn back-btn">
-                <span class="arrow"><</span>Back
-            </button>
-        </div>
-        <div class="absensi-header">
-            <div class="absensi-block" id="absensi-block">
-                Lakukan Absensi
-            </div>
-            <div class="quick-access-container">
-                <button type="button" onclick="markAllHadir()" class="btn">Quick Access</button>
-            </div>
-        </div>
+    <div class="mb-3" style="text-align: left;">
+        <button onclick="goBack()" class="btn back-btn">
+            <span class="arrow"><</span>Back
+        </button>
     </div>
+
+    <!-- Header -->
+    <h1>{{ $title }}</h1>
 
     <!-- Success/Error Messages -->
     @if (session('success'))
@@ -359,6 +200,10 @@
     <!-- Form for Attendance -->
     <form id="attendanceForm" action="{{ route('absensi.store', ['date' => $date, 'class' => $class]) }}" method="POST">
         @csrf
+
+        <div class="button-container">
+            <button type="button" onclick="markAllHadir()" class="btn">Quick Access</button>
+        </div>
 
         <!-- Attendance Table -->
         <table>
@@ -514,50 +359,5 @@
         function goBack() {
             window.history.back();
         }
-
-        // Handle form submission with AJAX
-        document.getElementById('attendanceForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent default form submission
-
-            const form = this;
-            const formData = new FormData(form);
-
-            fetch(form.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json',
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Update the "Lakukan Absensi" block
-                    const absensiBlock = document.getElementById('absensi-block');
-                    absensiBlock.classList.add('success');
-                    absensiBlock.innerHTML = 'Absensi Berhasil Disimpan';
-
-                    // Add OK button aligned to the right
-                    const okButtonHtml = `
-                        <div class="ok-btn-container">
-                            <button class="ok-btn" onclick="window.location.href='{{ route('absensi') }}'">OK</button>
-                        </div>
-                    `;
-                    absensiBlock.innerHTML += okButtonHtml;
-
-                    // Disable form inputs to prevent further edits
-                    form.querySelectorAll('input, button').forEach(element => {
-                        element.disabled = true;
-                    });
-                } else {
-                    alert(data.message); // Show error message
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while saving attendance data.');
-            });
-        });
     </script>
 @endsection

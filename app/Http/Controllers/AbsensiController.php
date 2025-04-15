@@ -250,14 +250,12 @@ class AbsensiController extends Controller
     public function store(Request $request, $date, $class)
     {
         $attendance = $request->input('attendance', []);
-    
+
         if (empty($attendance)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No attendance data provided.',
-            ], 400);
+            return redirect()->route('absensi.show', ['date' => $date, 'class' => $class])
+                ->with('error', 'No attendance data provided.');
         }
-    
+
         try {
             // Fetch the newest Perwalian record for the given date and class with Status "Scheduled"
             $dosen = session('user');
@@ -267,25 +265,22 @@ class AbsensiController extends Controller
                 ->where('Status', 'Scheduled') // Only allow "Scheduled" Perwalian
                 ->orderBy('created_at', 'desc') // Ensure the newest record is fetched
                 ->first();
-    
+
             if (!$perwalian) {
                 Log::error('Perwalian not found or not in Scheduled status in AbsensiController@store:', [
                     'date' => $date,
                     'class' => $class,
                     'dosen_nip' => $dosen['nip'],
                 ]);
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No perwalian session found for this date and class, or it has already been presented or completed.',
-                ], 404);
+                return redirect()->route('absensi.show', ['date' => $date, 'class' => $class])
+                    ->with('error', 'No perwalian session found for this date and class, or it has already been presented or completed.');
             }
-    
+
             // Save attendance records
-            $attendanceResults = [];
             foreach ($attendance as $nim => $data) {
                 $status = $data['status'] ?? null;
                 $keterangan = $data['keterangan'] ?? '';
-    
+
                 if (!$status || !in_array(strtolower($status), ['hadir', 'alpa', 'izin'])) {
                     Log::warning('Invalid or missing attendance status for student:', [
                         'nim' => $nim,
@@ -293,15 +288,15 @@ class AbsensiController extends Controller
                     ]);
                     continue;
                 }
-    
+
                 $status = strtolower($status) === 'alpa' ? 'alpa' : strtolower($status);
-    
+
                 $existingRecord = Absensi::where('ID_Perwalian', $perwalian->ID_Perwalian)
                     ->where('nim', $nim)
                     ->where('kelas', $class)
                     ->whereDate('created_at', $date)
                     ->first();
-    
+
                 if ($existingRecord) {
                     $existingRecord->update([
                         'status_kehadiran' => $status,
@@ -330,14 +325,8 @@ class AbsensiController extends Controller
                         'status' => $status,
                     ]);
                 }
-    
-                // Collect attendance results to return
-                $attendanceResults[$nim] = [
-                    'status' => $status,
-                    'keterangan' => $keterangan,
-                ];
             }
-    
+
             // Update Perwalian status to "Presented"
             $perwalian->update(['Status' => 'Presented']);
             Log::info('Perwalian status updated to Presented after saving attendance:', [
@@ -345,22 +334,16 @@ class AbsensiController extends Controller
                 'kelas' => $class,
                 'date' => $date,
             ]);
-    
-            // Return JSON response with attendance results
-            return response()->json([
-                'success' => true,
-                'message' => 'Attendance data saved successfully.',
-                'attendance' => $attendanceResults,
-            ]);
+
+            return redirect()->route('absensi')
+                ->with('success', 'Attendance data saved successfully. Please create a Berita Acara to mark this perwalian session as completed.');
         } catch (\Exception $e) {
             Log::error('Failed to save attendance data in AbsensiController@store:', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to save attendance data: ' . $e->getMessage(),
-            ], 500);
+            return redirect()->route('absensi.show', ['date' => $date, 'class' => $class])
+                ->with('error', 'Failed to save attendance data: ' . $e->getMessage());
         }
     }
 
