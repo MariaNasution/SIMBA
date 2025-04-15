@@ -47,6 +47,7 @@
             font-size: 22px;
             width: 200px;
             height: 130;
+            margin-bottom: 20px;
             align-items: center;
             padding: 15px 20px;
             background-color: #68B8EA;

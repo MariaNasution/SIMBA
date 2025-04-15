@@ -22,7 +22,7 @@
                             </td>
                             <td>{{ $perwalian->kelas ?: 'N/A' }}</td>
                             <td>
-                                {{ isset($dosenWaliList[$perwalian->ID_Dosen_Wali]) ? $dosenWaliList[$perwalian->ID_Dosen_Wali]->angkatan : 'N/A' }}
+                                {{ isset($dosenWaliList[$perwalian->ID_Dosen_Wali]) ? $perwalian['angkatan'] : 'N/A' }}
                             </td>
                             <td>
                                 {{ \Carbon\Carbon::parse($perwalian->Tanggal)->format('d M Y H:i') }} - 

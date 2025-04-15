@@ -42,6 +42,8 @@ class StudentSyncService
             'sem_ta' => $semester,
         ];
 
+        // dd($dosenId, $year, $semester, $kelas);
+
         Log::info('Fetching students from API', [
             'url' => "{$this->baseUrl}/api/library-api/get-all-students-by-dosen-wali",
             'query' => $query,
