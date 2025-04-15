@@ -550,6 +550,14 @@ class BreadCrumbService
             ];
             break;
 
+        case 'mhs_konseling_request':
+            $breadcrumbs = [
+                ['name' => '<i class="fas fa-user-friends"></i> Beranda', 'url' => route('beranda')],
+                ['name' => 'Konseling', 'url' => route('mahasiswa_konseling')],
+                ['name' => 'Request Konseling', 'url' => null],
+                ];
+                break;
+
         case 'mahasiswa_perwalian':
             $breadcrumbs = [
                 ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
