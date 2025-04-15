@@ -15,7 +15,7 @@
     @endif
 
     <div class="row">
-        @foreach ([2020] as $year)
+        @foreach ([2017, 2018, 2019, 2020] as $year)
             @if (!empty($studentsByYear[$year]))
                 @foreach ($studentsByYear[$year] as $kelas => $classData)
                     <div class="col-md-12 mb-4">

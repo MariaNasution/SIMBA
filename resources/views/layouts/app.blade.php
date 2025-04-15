@@ -22,18 +22,13 @@
             overflow: hidden;
         }
 
-        /* Ensure full height for html and body */
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            position: relative; /* Ensure body can position its pseudo-element */
+        .content {
+            position: static;
+            z-index: 1;
         }
-
-        /* Apply background image using a pseudo-element on body */
-        body::before {
+        .content::before {
             content: '';
-            position: fixed; /* Fixed positioning to cover the entire viewport */
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
@@ -43,25 +38,8 @@
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            opacity: 0.12; /* Apply opacity only to the background */
-            z-index: -5; /* Place behind all content */
-        }
-
-        /* Ensure the app-wrapper and its children stretch to full height */
-        .app-wrapper {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .d-flex {
-            flex-grow: 1;
-        }
-
-        .content {
-            position: relative;
-            z-index: 1;
-            flex-grow: 1;
+            opacity: 0.12;
+            z-index: -5;
         }
     </style>
     @yield('styles')

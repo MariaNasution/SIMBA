@@ -44,13 +44,13 @@
             margin-top: 100px;
         }
         .am-class-btn {
-            font-size: 22px;
-            width: 200px;
+            width: 150px;
             height: 130;
             align-items: center;
             padding: 15px 20px;
             background-color: #68B8EA;
             color: white;
+            font-size: large;
             font-weight: 100;
             text-align: center;
             text-decoration: none;

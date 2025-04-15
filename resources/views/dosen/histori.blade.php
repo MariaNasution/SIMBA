@@ -7,87 +7,54 @@
     <form action="{{ route('dosen.histori') }}" method="GET" class="filter-form">
       <input type="text" name="search" placeholder="Cari..." value="{{ request('search') ?? '' }}">
       <select name="category" onchange="this.form.submit()">
-        <option value="" {{ $selectedCategory == '' ? 'selected' : '' }}>Semua Kategori</option>
-        <option value="semester_baru" {{ $selectedCategory == 'semester_baru' ? 'selected' : '' }}>Semester Baru</option>
-        <option value="sebelum_uts" {{ $selectedCategory == 'sebelum_uts' ? 'selected' : '' }}>Sebelum UTS</option>
-        <option value="sebelum_uas" {{ $selectedCategory == 'sebelum_uas' ? 'selected' : '' }}>Sebelum UAS</option>
+        <option value="" {{ request('category') == '' ? 'selected' : '' }}>Kategori</option>
+        <option value="semester_baru" {{ request('category') == 'semester_baru' ? 'selected' : '' }}>Semester Baru</option>
+        <option value="sebelum_uts" {{ request('category') == 'sebelum_uts' ? 'selected' : '' }}>Sebelum UTS</option>
+        <option value="sebelum_uas" {{ request('category') == 'sebelum_uas' ? 'selected' : '' }}>Sebelum UAS</option>
       </select>
     </form>
   </div>
 
-  <!-- Content: Conditional Display -->
-  <div class="histori-container {{ $showSingleCategory ? 'single-category' : '' }}">
-    @if($showSingleCategory)
-      <!-- Single Column Display -->
-      <div class="histori-column">
-        <div class="histori-title">
-          <h2>{{ $categoryTitle }}</h2>
+  <!-- Content Columns -->
+  <div class="histori-container">
+    <div class="histori-column">
+      <h2>Semester Baru</h2>
+      @forelse ($semesterBaru as $item)
+        <div class="histori-item">
+          <a href="{{ route('dosen.histori.detailed', $item->ID_Perwalian) }}">
+            {{ \Carbon\Carbon::parse($item->Tanggal)->translatedFormat('l, d F Y') }} ({{ $item->kelas }})
+          </a>
         </div>
-        <div class="histori-items">
-          @forelse ($singleRecords as $item)
-            <div class="histori-item">
-              <a href="{{ route('dosen.histori.detailed', $item['ID_Perwalian']) }}">
-                {{ \Carbon\Carbon::parse($item['Tanggal'])->translatedFormat('l, d F Y') }} ({{ $item['kelas'] }})
-              </a>
-            </div>
-          @empty
-            <div class="histori-item">Tidak ada data</div>
-          @endforelse
-        </div>
-      </div>
-    @else
-      <!-- Three Column Display -->
-      <div class="histori-column">
-        <div class="histori-title">
-          <h2>Semester Baru</h2>
-        </div>
-        <div class="histori-items">
-          @forelse ($semesterBaru as $item)
-            <div class="histori-item">
-              <a href="{{ route('dosen.histori.detailed', $item->ID_Perwalian) }}">
-                {{ \Carbon\Carbon::parse($item->Tanggal)->translatedFormat('l, d F Y') }} ({{ $item->kelas }})
-              </a>
-            </div>
-          @empty
-            <div class="histori-item">Tidak ada data</div>
-          @endforelse
-        </div>
-      </div>
+      @empty
+        <div class="histori-item">Tidak ada data</div>
+      @endforelse
+    </div>
 
-      <div class="histori-column">
-        <div class="histori-title">
-          <h2>Sebelum UTS</h2>
+    <div class="histori-column">
+      <h2>Sebelum UTS</h2>
+      @forelse ($sebelumUts as $item)
+        <div class="histori-item">
+          <a href="{{ route('dosen.histori.detailed', $item->ID_Perwalian) }}">
+            {{ \Carbon\Carbon::parse($item->Tanggal)->translatedFormat('l, d F Y') }} ({{ $item->kelas }})
+          </a>
         </div>
-        <div class="histori-items">
-          @forelse ($sebelumUts as $item)
-            <div class="histori-item">
-              <a href="{{ route('dosen.histori.detailed', $item->ID_Perwalian) }}">
-                {{ \Carbon\Carbon::parse($item->Tanggal)->translatedFormat('l, d F Y') }} ({{ $item->kelas }})
-              </a>
-            </div>
-          @empty
-            <div class="histori-item">Tidak ada data</div>
-          @endforelse
-        </div>
-      </div>
+      @empty
+        <div class="histori-item">Tidak ada data</div>
+      @endforelse
+    </div>
 
-      <div class="histori-column">
-        <div class="histori-title">
-          <h2>Sebelum UAS</h2>
+    <div class="histori-column">
+      <h2>Sebelum UAS</h2>
+      @forelse ($sebelumUas as $item)
+        <div class="histori-item">
+          <a href="{{ route('dosen.histori.detailed', $item->ID_Perwalian) }}">
+            {{ \Carbon\Carbon::parse($item->Tanggal)->translatedFormat('l, d F Y') }} ({{ $item->kelas }})
+          </a>
         </div>
-        <div class="histori-items">
-          @forelse ($sebelumUas as $item)
-            <div class="histori-item">
-              <a href="{{ route('dosen.histori.detailed', $item->ID_Perwalian) }}">
-                {{ \Carbon\Carbon::parse($item->Tanggal)->translatedFormat('l, d F Y') }} ({{ $item->kelas }})
-              </a>
-            </div>
-          @empty
-            <div class="histori-item">Tidak ada data</div>
-          @endforelse
-        </div>
-      </div>
-    @endif
+      @empty
+        <div class="histori-item">Tidak ada data</div>
+      @endforelse
+    </div>
   </div>
 </div>
 @endsection
@@ -120,92 +87,37 @@
     padding: 0.5rem 0.75rem;
     border: 1px solid #ccc;
     border-radius: 6px;
-    background: #FDFDFD;
+    background: #fff;
     font-size: 0.95rem;
+    color: #333;
     width: 180px;
-  }
-
-  /* Style the placeholder */
-  .filter-form input[type="text"]::placeholder {
-    color: #B7B3B6; /* Placeholder color */
-  }
-
-  /* Style the select placeholder (default option) */
-  .filter-form select {
-    color: #B7B3B6; /* Default color for select */
-  }
-
-  /* Ensure the select text turns black when a non-default option is selected */
-  .filter-form select option:not(:first-child) {
-    color: #000; /* Black text for actual options */
-  }
-
-  /* When the input has a value, make the text black */
-  .filter-form input[type="text"] {
-    color: #000; /* Default text color when typing */
-  }
-
-  /* Ensure the placeholder color persists even when the input is focused or has a value */
-  .filter-form input[type="text"]:focus::placeholder,
-  .filter-form input[type="text"]:not(:placeholder-shown)::placeholder {
-    color: #B7B3B6; /* Keep placeholder color consistent */
   }
 
   .histori-container {
     display: flex;
-    justify-content: space-between; /* For three columns */
+    justify-content: space-between;
     gap: 1.5rem;
     flex-wrap: wrap;
   }
 
-  /* When showing a single category, center the column */
-  .histori-container.single-category {
-    justify-content: center;
-    align-items: center; /* Vertically center the column */
-    min-height: 50vh; /* Ensure there's enough height for vertical centering */
-  }
-
   .histori-column {
-    padding-top: 50px;
     flex: 1;
-    max-width: 300px;
-  }
-
-  /* Adjust the column width and alignment when showing a single category */
-  .histori-container.single-category .histori-column {
-    flex: 0 1 300px;
-    margin-bottom: 500px;
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Center content horizontally within the column */
-    text-align: center; /* Ensure text is centered */
-  }
-
-  .histori-title {
+    min-width: 260px;
     background: #fff;
-    padding: 1rem;
+    padding: 1.25rem;
     border-radius: 10px;
-    margin-bottom: 1rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    width: 100%; /* Ensure the title takes the full width of the column */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
   }
 
-  .histori-title h2 {
+  .histori-column h2 {
+    text-align: center;
     font-size: 1.1rem;
     color: #222;
-    margin: 0;
-  }
-
-  .histori-items {
-    background: transparent;
-    font-family: "Poppins", sans-serif;
-    width: 100%; /* Ensure items take the full width of the column */
+    margin-bottom: 1rem;
   }
 
   .histori-item {
-    background: #68B8EA;
-    color: #fff;
+    background: #e8f0fe;
     padding: 0.75rem;
     border-radius: 6px;
     margin-bottom: 0.7rem;
@@ -220,7 +132,7 @@
 
   .histori-item a {
     text-decoration: none;
-    color: #fff;
+    color: #111827;
     display: block;
     width: 100%;
   }
@@ -240,20 +152,6 @@
     .filter-form input,
     .filter-form select {
       width: 100%;
-    }
-
-    .histori-column {
-      flex: 1;
-      max-width: 100%;
-    }
-
-    .histori-container.single-category .histori-column {
-      flex: 1;
-      max-width: 100%;
-    }
-
-    .histori-container.single-category {
-      min-height: auto; /* Adjust for smaller screens */
     }
   }
 </style>

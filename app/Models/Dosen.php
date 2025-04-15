@@ -3,13 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
 
 class Dosen extends Model
 {
-
-    use Notifiable;
-
     protected $table = 'dosen'; // Specify the correct table name
     protected $primaryKey = 'username'; // Set primary key
     public $incrementing = false; // Disable auto-increment

@@ -9,8 +9,8 @@ class CreatePerwalianTable extends Migration
     public function up()
     {
         Schema::create('perwalian', function (Blueprint $table) {
-            $table->id('ID_Perwalian');
             $table->string('ID_Dosen_Wali')->nullable();
+            $table->id('ID_Perwalian');
             $table->string('username')->nullable();
             $table->enum('Status', ['Scheduled', 'Presented', 'Completed', 'Canceled']);
             $table->string('nama');

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use App\Models\Notifikasi;
 use App\Models\Absensi;
 use App\Models\Perwalian;
 use App\Models\Mahasiswa;
@@ -26,39 +25,40 @@ class MahasiswaPerwalianController extends Controller
         }
 
         // Fetch the absensi record for the student
-        $absensi = Absensi::where('nim', $student->nim)->latest('updated_at')->first();
-        
-        $perwalian = Perwalian::where('ID_Perwalian', $student->ID_Perwalian)
-        ->orderBy('updated_at', 'desc')
-        ->first();        
-        
-        $dosen = Dosen::where('nip', optional($perwalian)->ID_Dosen_Wali)->first(); // Safe access if $perwalian is null
-        // Fetch all notifications with perwalian relationship to avoid N+1 problem
-        $notifications = Notifikasi::with('perwalian') // Eager load perwalian
-                                 ->where('Id_Perwalian', $student->ID_Perwalian)
-                                 ->where('nim', $student->nim)
-                                 ->get();
+        $absensi = Absensi::where('ID_Absensi', $student->ID_Absensi)->first();
 
-        // Get all ID_Dosen_Wali values from notifications (ensure perwalian relationship exists)
+        // Fetch the latest perwalian record for the student
+        $perwalian = Perwalian::where('ID_Perwalian', $student->ID_Perwalian)
+            ->orderBy('updated_at', 'desc')
+            ->first();
+
+        // Fetch dosen info using the perwalian data (if any)
+        $dosen = Dosen::where('nip', optional($perwalian)->ID_Dosen_Wali)->first();
+
+        // Retrieve notifications using Laravel's built-in relationship.
+        // If needed, you can filter by an extra key (for example, if you stored 'id_perwalian' in your notification payload).
+        // Uncomment the following line if your perwalian notifications contain that key:
+        // $notifications = $student->notifications()->where('data->id_perwalian', $student->ID_Perwalian)->orderBy('created_at', 'desc')->get();
+        $notifications = $student->notifications()->orderBy('created_at', 'desc')->get();
+        $notificationCount = $notifications->count();
+
+        // (Optional) If your universal notifications include extra data such as an "ID_Dosen_Wali" key,
+        // you can extract it to fetch a collection of dosen data related to notifications.
         $dosenWaliIds = $notifications->map(function ($notification) {
-            return optional($notification->perwalian)->ID_Dosen_Wali;
+            return $notification->data['ID_Dosen_Wali'] ?? null;
         })->filter()->unique();
 
-        // Filter dosen data to only include matches
-        $dosenNotifications = $dosenWaliIds->isNotEmpty() ? Dosen::whereIn('nip', $dosenWaliIds)->get() : collect(); // Avoid query if empty
+        $dosenNotifications = $dosenWaliIds->isNotEmpty() ? Dosen::whereIn('nip', $dosenWaliIds)->get() : collect();
 
-        // Get notification count
-        $notificationCount = $notifications->count();
-        // Debug: Uncomment to inspect data
-        // dd($student, $absensi, $perwalian, $dosen, $notifications, $dosenNotifications);
-        // dd($notifications[0]->perwalian->dosen);
-        // Pass all necessary data to the view
+        // Pass all necessary data to the view.
         return view('mahasiswa.mahasiswa_perwalian', compact(
-            
             'student',
             'absensi',
-            'perwalian', // Ensure perwalian is included
-            'dosenNotifications'
+            'perwalian', // ensure perwalian is included in the view
+            'dosenNotifications',
+            'notifications',
+            'notificationCount',
+            'dosen'
         ));
     }
 }

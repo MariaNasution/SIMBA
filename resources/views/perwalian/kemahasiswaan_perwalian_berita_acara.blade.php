@@ -287,7 +287,7 @@
                     </div>
 
                     <!-- Berita Acara Details -->
-                    <div >
+                    <div class="text-center">
                         <img src="{{ asset('assets/img/Logo Institut Teknologi Del.png') }}" alt="Logo IT Del" style="max-width: 150px;">
                         <h3 class="fw-bold title-centered">AGENDA PERWALIAN</h3>
                         <div class="text-start mt-4">

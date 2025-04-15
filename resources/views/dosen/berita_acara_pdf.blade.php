@@ -39,13 +39,10 @@
     </div>
     <div class="section">
         <p><strong>Kelas:</strong> {{ $perwalian->kelas }}</p>
-        <p>
-            <strong>Tanggal:</strong>
-            {{ \Carbon\Carbon::parse($beritaAcara->tanggal_perwalian)->translatedFormat('l, d F Y') }}
-        </p>
+        <p><strong>Tanggal:</strong> {{ \Carbon\Carbon::parse($perwalian->Tanggal)->translatedFormat('l, d F Y') }}</p>
         <p><strong>Agenda:</strong></p>
         <div style="border: 1px solid #333; padding: 10px;">
-            {!! nl2br(e($beritaAcara->agenda_perwalian ?? 'Tidak ada agenda')) !!}
+            {!! nl2br(e($perwalian->agenda_perwalian ?? 'Tidak ada agenda')) !!}
         </div>
     </div>
     <div class="footer">
@@ -59,10 +56,7 @@
     </div>
     <div class="section">
         <p><strong>Kelas:</strong> {{ $perwalian->kelas }}</p>
-        <p>
-            <strong>Tanggal:</strong>
-            {{ \Carbon\Carbon::parse($beritaAcara->tanggal_perwalian)->translatedFormat('l, d F Y') }}
-        </p>
+        <p><strong>Tanggal:</strong> {{ \Carbon\Carbon::parse($perwalian->Tanggal)->translatedFormat('l, d F Y') }}</p>
         <p><strong>Berita Acara:</strong></p>
         <div style="border: 1px solid #333; padding: 10px;">
             {!! nl2br(e($beritaAcara->catatan_feedback ?? 'Tidak ada berita acara')) !!}
@@ -89,18 +83,18 @@
             </thead>
             <tbody>
                 @foreach($students as $index => $student)
-                    <tr>
-                        <td>{{ $index + 1 }}</td>
-                        <td>{{ $student['nama'] }}</td>
-                        <td>{{ $student['nim'] }}</td>
-                        <td>
-                            @if(isset($absensi[$student['nim']]))
-                                {{ $absensi[$student['nim']]->status_kehadiran }}
-                            @else
-                                Belum
-                            @endif
-                        </td>
-                    </tr>
+                <tr>
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ $student['nama'] }}</td>
+                    <td>{{ $student['nim'] }}</td>
+                    <td>
+                        @if(isset($absensi[$student['nim']]))
+                            {{ $absensi[$student['nim']]->status_kehadiran }}
+                        @else
+                            Belum
+                        @endif
+                    </td>
+                </tr>
                 @endforeach
             </tbody>
         </table>

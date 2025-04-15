@@ -35,11 +35,10 @@
                     @endphp
                     @forelse ($notifications as $notif)
                         @php
-                            $notifData = $notif->data ?? [];
+                            $notifData = $notif->data;
                             $type = $notifData['extra_data']['type'] ?? null;
                             $label = $type ? strtoupper($type) : 'INFO';
 
-                            // Dynamic link generation
                             $link = match($type) {
                                 'konseling' => route('mahasiswa_konseling'),
                                 'perwalian' => route('mahasiswa_perwalian'),
@@ -51,31 +50,17 @@
                                 'perwalian' => 'bg-primary',
                                 default => 'bg-secondary',
                             };
-
-                            // Fallback for message and sender
-                            $message = $notifData['message'] ?? $notif->Pesan ?? 'No message';
-                            $sender = $notif->nama ?? 'Unknown';
                         @endphp
                         <li>
-                            @if($userRole === 'mahasiswa')
-                                <a class="dropdown-item" href="{{ $link }}">
-                                    <span class="badge {{ $badgeClass }} me-1">[{{ $label }}]</span>
-                                    {{ $message }} by {{ $sender }}
-                                </a>
-                            @else
-                                <span class="dropdown-item">
-                                    <span class="badge {{ $badgeClass }} me-1">[{{ $label }}]</span>
-                                    {{ $message }}
-                                </span>
-                            @endif
+                            <!-- Using the dynamic link if present -->
+                            <a class="dropdown-item" href="{{ $link }}">
+                                <span class="badge {{ $badgeClass }} me-1">[{{ $label }}]</span>
+                                {{ $notif->data['message'] ?? 'No message' }}
+                            </a>
                         </li>
                     @empty
                         <li>
-                            @if($userRole === 'mahasiswa')
-                                <a class="dropdown-item" href="{{ route('mahasiswa_perwalian') }}">Tidak ada notifikasi</a>
-                            @else
-                                <span class="dropdown-item">Tidak ada notifikasi</span>
-                            @endif
+                            <a class="dropdown-item" href="">Tidak ada notifikasi</a>
                         </li>
                     @endforelse
                 </ul>
