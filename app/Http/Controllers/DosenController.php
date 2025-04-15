@@ -71,7 +71,7 @@ class DosenController extends Controller
                     "user_id" => $dosenSession['user_id'],
                 ]]);
 
-                $dosenId = $dosenData['data']['dosen'][0]['dosen_id'] ?? null;
+                $dosenId = $dosenData['data']['dosen'][0]['pegawai_id'] ?? null;
                 if (!$dosenId) {
                     return back()->with('error', 'Dosen ID not found.');
                 }
@@ -205,7 +205,6 @@ class DosenController extends Controller
                 return back()->with('error', 'An error occurred while fetching data: ' . $e->getMessage());
             }
         }
-
         return view('beranda.homeDosen', compact('studentsByYear', 'prodisByYear', 'angkatanByKelasAndYear', 'perwalianAnnouncement', 'semesterAveragesByYear'));
     }
 
@@ -239,12 +238,15 @@ class DosenController extends Controller
                 }
 
                 $dosenData = $dosenResponse->json();
-                $dosenId = $dosenData['data']['dosen'][0]['dosen_id'] ?? null;
+                // search by pegawai_id not dosen_id
+                $dosenId = $dosenData['data']['dosen'][0]['pegawai_id'] ?? null;
                 if (!$dosenId) {
                     return back()->with('error', 'Dosen ID not found.');
-                }
+                }                
+
 
                 $studentsInClass = $this->studentSyncService->fetchStudents($dosenId, $year, $currentSem, $kelas);
+
                 if (empty($studentsInClass)) {
                     Log::warning("No students found for year {$year} and kelas {$kelas}", [
                         'dosen_id' => $dosenId,

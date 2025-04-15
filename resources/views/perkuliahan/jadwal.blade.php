@@ -1,73 +1,145 @@
 @extends('layouts.app')
 
 @section('content')
-    <!-- Header -->
-    <div class="d-flex align-items-center mb-4 border-bottom-line">
-        <h3 class="me-auto">
-            <a href="{{ route('beranda') }}">Home</a> /
-            <a href="{{ route('jadwal') }}">Perkuliahan</a> /
-            <a href="{{ route('jadwal') }}">Jadwal</a>
-        </h3>
-        <a href="#" onclick="confirmLogout()">
-            <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
-        </a>
-    </div>
+    <div class="container-fluid">
+    
+        <!-- Success Popup -->
+        <div id="successPopup" class="alert alert-success" style="display: none; position: fixed; top: 20px; right: 20px; z-index: 1000;">
+            Successfully made Perwalian
+        </div>
 
-    <!-- Konten Utama -->
-    <div class="app-content-header">
-        <div class="container-fluid">
-            <h4 class="mb-5">Jadwal Perkuliahan Mahasiswa</h4>
+        <!-- Form Jadwal -->
+        <div class="row mt-4 mx-2">
+            <div class="col-md-8">
+                <h5>Jadwalkan Perwalian</h5>
+
+                <form id="perwalianForm">
+                    @csrf
+
+                    <div class="row">
+                        <!-- Jadwal Mulai -->
+                        <div class="col-md-6 mb-3">
+                            <label for="jadwalMulai" class="form-label">Jadwal Mulai</label>
+                            <div class="input-group">
+                                <input type="datetime-local" class="form-control custom-input" id="jadwalMulai"
+                                    name="jadwalMulai" required>
+                                <span class="input-group-text"><i class="far fa-clock"></i></span>
+                            </div>
+                            <span class="text-danger" id="jadwalMulaiError"></span>
+                        </div>
+
+                        <!-- Jadwal Selesai -->
+                        <div class="col-md-6 mb-3">
+                            <label for="jadwalSelesai" class="form-label">Jadwal Selesai</label>
+                            <div class="input-group">
+                                <input type="datetime-local" class="form-control custom-input" id="jadwalSelesai"
+                                    name="jadwalSelesai" required>
+                                <span class="input-group-text"><i class="far fa-clock"></i></span>
+                            </div>
+                            <span class="text-danger" id="jadwalSelesaiError"></span>
+                        </div>
+                    </div>
+
+                    <!-- Dropdown Keterangan -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="keterangan" class="form-label">Keterangan</label>
+                            <select class="form-select custom-select" id="keterangan" name="keterangan" required>
+                                <option selected disabled>Pilih Keterangan</option>
+                                <option value="Semester Baru">Semester Baru</option>
+                                <option value="Sebelum UTS">Sebelum UTS</option>
+                                <option value="Sebelum UAS">Sebelum UAS</option>
+                            </select>
+                            <span class="text-danger" id="keteranganError"></span>
+                        </div>
+                    </div>
+
+                    <!-- Tombol Jadwalkan -->
+                    <div class="row mt-2">
+                        <div class="col-md-3">
+                            <button type="submit" class="btn custom-btn w-100">Jadwalkan</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
-    <div class="card-body">
-        <table class="table table-bordered">
-            <thead class="table-light">
-                <tr>
-                    <th>Jam</th>
-                    @foreach ($jadwalFormatted['days'] as $day)
-                        <th>{{ $day }}</th>
-                    @endforeach
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($jadwalFormatted['times'] as $time)
-                    <tr>
-                        <td>{{ $time }}</td>
-                        @foreach ($jadwalFormatted['days'] as $key => $day)
-                            <td class="{{ !empty($jadwalFormatted['schedule'][$time][$key]) ? 'matkul' : '' }}">
-                                @if (!empty($jadwalFormatted['schedule'][$time][$key]))
-                                    @foreach ($jadwalFormatted['schedule'][$time][$key] as $matkul)
-                                        <div>{{ $matkul }}</div>
-                                    @endforeach
-                                @else
-                                    <!-- Jika kosong, kotak tetap tampil tapi tidak ada konten -->
-                                    <div>&nbsp;</div>
-                                @endif
-                            </td>
-                        @endforeach
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        function confirmLogout() {
-            Swal.fire({
-                title: 'Apakah anda yakin ingin keluar?',
-                text: "Anda akan keluar dari akun ini.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, keluar!',
-                cancelButtonText: 'Tidak',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = '{{ route('logout') }}'; // Arahkan ke route logout jika 'Ya' dipilih
+        document.getElementById('perwalianForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+
+            fetch("{{ route('kemahasiswaan_perwalian.store') }}", {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
                 }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success popup
+                    const popup = document.getElementById('successPopup');
+                    popup.style.display = 'block';
+                    setTimeout(() => {
+                        popup.style.display = 'none';
+                    }, 3000); // Fade away after 3 seconds
+                } else {
+                    // Display error messages
+                    document.getElementById('jadwalMulaiError').textContent = data.errors?.jadwalMulai || data.message || '';
+                    document.getElementById('jadwalSelesaiError').textContent = data.errors?.jadwalSelesai || '';
+                    document.getElementById('keteranganError').textContent = data.errors?.keterangan || '';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('jadwalMulaiError').textContent = 'An unexpected error occurred.';
             });
-        }
+        });
     </script>
+
+    <style>
+        /* Custom styling untuk input */
+        .custom-input {
+            background-color: #F5F5F5;
+            border: 1px solid #E0E0E0;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 14px;
+            color: #757575;
+        }
+
+        /* Custom styling untuk dropdown */
+        .custom-select {
+            background-color: #F5F5F5;
+            border: 1px solid #E0E0E0;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 14px;
+            color: #757575;
+        }
+
+        /* Custom styling untuk tombol */
+        .custom-btn {
+            background-color: #2E7D32;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .custom-btn:hover {
+            background-color: #1B5E20;
+        }
+
+        /* Menyesuaikan label */
+        .form-label {
+            font-size: 14px;
+            color: #424242;
+            margin-bottom: 6px;
+        }
+    </style>
 @endsection

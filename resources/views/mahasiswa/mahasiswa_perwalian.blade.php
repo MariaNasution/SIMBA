@@ -2,7 +2,6 @@
 
 @section('content')
 
-
 <strong class="dosen_wali">
     Anak wali dari {{ $dosenNotifications->first()->nama ?? 'Unknown Dosen' }}
 </strong>
@@ -15,8 +14,9 @@
         <p><strong>Status:</strong> <span class="status-{{ strtolower($perwalian->Status) }}">{{ $perwalian->Status }}</span></p>
 
         @else 
-        <p><strong>Status:</strong> <span >{{ $absensi->status_kehadiran }}</span></p>
-        
+        <p><strong>Status:</strong> <span class="status-{{ strtolower($absensi->status_kehadiran) }}">{{ $absensi->status_kehadiran }}</span></p>
+        <p><strong>Keterangan:</strong> <span>{{ $absensi->keterangan }}</span></p>
+
         @endif
 
     @else
@@ -25,6 +25,9 @@
     @endif
 </div>
 
+@endsection
+
+@section('styles')
 <style>
     .dosen_wali {
         text-align: left;
@@ -50,11 +53,38 @@
     }
 
     .status-scheduled {
-        background-color: #28a745; /* Green background for "Hadir" */
+        background-color: #007bff; /* Blue for "Scheduled" */
+        color: white; /* White text */
+        padding: 2px 8px; /* Padding for the status label */
+        border-radius: 10px; /* Rounded corners for the status */
+    }
+
+    .status-izin {
+        background-color: #ffc107; /* Yellow for "Izin" */
+        color: black; /* Black text for readability */
+        padding: 2px 8px; /* Padding for the status label */
+        border-radius: 10px; /* Rounded corners for the status */
+    }
+
+    .status-hadir {
+        background-color: #28a745; /* Green for "Hadir" */
+        color: white; /* White text */
+        padding: 2px 8px; /* Padding for the status label */
+        border-radius: 10px; /* Rounded corners for the status */
+    }
+
+    .status-alpa {
+        background-color: #dc3545; /* Red for "Alpa" */
+        color: white; /* White text */
+        padding: 2px 8px; /* Padding for the status label */
+        border-radius: 10px; /* Rounded corners for the status */
+    }
+
+    .status-unknown {
+        background-color: #6c757d; /* Gray for "Unknown" */
         color: white; /* White text */
         padding: 2px 8px; /* Padding for the status label */
         border-radius: 10px; /* Rounded corners for the status */
     }
 </style>
-
 @endsection

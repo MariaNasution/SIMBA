@@ -1,26 +1,16 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="d-flex align-items-center mb-4 border-bottom-line">
-        <h3 class="me-auto">
-            <a href="{{ route('dosen') }}">Home</a> / <span>Detailed Class</span>
-        </h3>
-        <a href="{{ route('dosen') }}" class="btn btn-secondary">Back</a>
-    </div>
     <div class="app-content-header">
         <div class="container-fluid">
-            <!-- Announcement Banner -->
-            @if(isset($perwalianAnnouncement) && !empty($perwalianAnnouncement))
-                <div class="announcement-banner">
-                    <div class="announcement-header">
-                        <i class="far fa-bullhorn announcement-icon" aria-hidden="true"></i>
-                        <h4>Pengumuman</h4>
-                    </div>
-                    <div class="announcement-text">
-                        <p>{!! nl2br(e($perwalianAnnouncement)) !!}</p>
-                    </div>
-                </div>
-            @endif
+            <!-- Back Button -->
+            <div class="mb-3">
+                <button onclick="goBack()" class="btn back-btn">
+                    <span class="arrow"><</span>Back
+                </button>
+            </div>
+
+     
 
             <div class="row">
                 <div class="col-md-12">
@@ -170,5 +160,42 @@
             font-weight: 700;
             color: #fff;
         }
+
+        /* Back button styling from perwalian kelas */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            background-color: #68B8EA;
+            color: #fff;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-bottom: 30px;
+            margin-top: -4px;
+            margin-left: 10px;
+        }
+
+        .mb-3 {
+            text-align: left;
+        }
+
+        .back-btn:hover {
+            background-color: #4A9CD6;
+        }
+
+        .back-btn .arrow {
+            font-size: 40px;
+            margin-right: 0px;
+            line-height: 1;
+        }
     </style>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
 @endsection

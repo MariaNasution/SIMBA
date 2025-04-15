@@ -1,3 +1,4 @@
+@ -1,21 +1,22 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -17,6 +18,7 @@ return new class extends Migration
 
             // Define the foreign key constraint
             $table->foreign('username')->references('username')->on('users')->onDelete('cascade');
+            
         });
     }
 
@@ -24,4 +26,10 @@ return new class extends Migration
     {
         Schema::dropIfExists('dosen_wali');
     }
+
+
 };
+
+
+
+    
