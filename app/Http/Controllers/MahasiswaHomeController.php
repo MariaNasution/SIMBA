@@ -36,6 +36,7 @@ class MahasiswaHomeController extends Controller
 
         // Fetch academic performance data
         $performance = $this->fetchPenilaianData($nim, $apiToken);
+
         if (!$performance) {
             return redirect()->route('beranda')->withErrors(['error' => 'Gagal mengambil data kemajuan studi.']);
         }
@@ -119,7 +120,6 @@ class MahasiswaHomeController extends Controller
             if ($response->successful()) {
                 $data = $response->json();
                 $ipSemester = $data['IP Semester'] ?? [];
-
                 uasort($ipSemester, function ($a, $b) {
                     if ($a['ta'] === $b['ta']) {
                         return $a['sem'] <=> $b['sem'];

@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>SIMBA</title>
-    <!-- Include only one version of Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/mingcute-icon@latest/dist/mingcute.css">
@@ -21,14 +20,8 @@
         .card {
             overflow: hidden;
         }
-
-        .content {
-            position: static;
-            z-index: 1;
-        }
-        .content::before {
-            content: '';
-            position: absolute;
+        .background-overlay {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
@@ -39,13 +32,24 @@
             background-repeat: no-repeat;
             background-attachment: fixed;
             opacity: 0.12;
-            z-index: -5;
+            z-index: -1000; /* Low z-index to stay behind all content */
+        }
+        .app-wrapper {
+            position: relative; /* Ensure wrapper is a positioning context */
+            min-height: 100vh; /* Ensure it covers the viewport */
+        }
+        .content {
+            position: static; /* Keep static to avoid modal issues */
+            z-index: 1; /* Ensure content is above background */
         }
     </style>
     @yield('styles')
 </head>
 <body>
     <div class="app-wrapper">
+        <!-- Background overlay -->
+        <div class="background-overlay"></div>
+
         <!-- Sidebar and Main Content -->
         <div class="d-flex">
             <!-- Sidebar based on role -->
