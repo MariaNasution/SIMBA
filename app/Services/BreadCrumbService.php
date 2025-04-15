@@ -545,8 +545,8 @@ class BreadCrumbService
 
         case 'mahasiswa_konseling':
             $breadcrumbs = [
-                ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
-                ['name' => '<i class="fas fa-user-friends"></i> Konseling', 'url' => null],
+                ['name' => '<i class="fas fa-user-friends"></i> Beranda', 'url' => route('beranda')],
+                ['name' => 'Konseling', 'url' => null],
             ];
             break;
 
