@@ -800,6 +800,12 @@ class BreadCrumbService
         // Fetch notifications for the dosen role and load the associated Perwalian
         $notifications = Notifikasi::where('role', 'dosen')
             ->where('nama', $dosen['nama'])
+            ->whereHas('perwalian', function ($query) {
+                $query->where(function ($subQuery) {
+                    $subQuery->whereNull('Tanggal_Selesai')
+                            ->orWhere('Tanggal_Selesai', '>=', now());
+                });
+            })
             ->with(['perwalian' => function ($query) {
                 $query->select('ID_Perwalian', 'Tanggal', 'Tanggal_Selesai');
             }])
