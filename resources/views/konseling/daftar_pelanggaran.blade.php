@@ -1,16 +1,31 @@
 @extends('layouts.app')
 
 @section('content')
- 
-
     <div class="card-body">
-              {{-- Menampilkan jumlah data yang sedang ditampilkan --}}
-              <p class="mt-3 text-end">
-                Halaman <span class="fw-bold ">{{ $pelanggaranList->currentPage() }}</span> dari 
-                <span class="fw-bold">{{ $pelanggaranList->lastPage() }}</span> | 
-                Menampilkan <span class="fw-bold ">{{ $pelanggaranList->count() }}</span> dari
-                <span class="fw-bold ">{{ $pelanggaranList->total() }}</span> Entri data
-            </p>
+        <!-- Form Pencarian -->
+        <div class="mb-3">
+            <form action="{{ route('konselor_pelanggaran.daftar') }}" method="GET" class="d-flex align-items-center justify-content-end">
+                <input type="text" name="search" class="form-control me-2" style="max-width: 200px;" placeholder="Cari NIM atau Nama" value="{{ request('search') }}">
+                <button type="submit" class="btn btn-primary me-2">Cari</button>
+                <a href="{{ route('konselor_pelanggaran.daftar') }}" class="btn btn-secondary">Reset</a>
+            </form>
+        </div>
+
+        <!-- Tampilkan pesan error jika ada -->
+        @if($error)
+            <div class="alert alert-warning text-center">
+                {{ $error }}
+            </div>
+        @endif
+
+        {{-- Menampilkan jumlah data yang sedang ditampilkan --}}
+        <p class="mt-3 text-end">
+            Halaman <span class="fw-bold">{{ $pelanggaranList->currentPage() }}</span> dari 
+            <span class="fw-bold">{{ $pelanggaranList->lastPage() }}</span> | 
+            Menampilkan <span class="fw-bold">{{ $pelanggaranList->count() }}</span> dari
+            <span class="fw-bold">{{ $pelanggaranList->total() }}</span> Entri data
+        </p>
+
         <table class="table table-bordered">
             <thead class="table-secondary">
                 <tr>

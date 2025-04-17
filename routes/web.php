@@ -133,6 +133,7 @@ Route::middleware(['auth.session', 'role:konselor'])
     ->prefix('konselor')
     ->name('konselor_')
     ->group(function () {
+        Route::get('/pelanggaran', [DaftarPelanggaranController::class, 'daftarPelanggaran'])->name('pelanggaran.daftar');
         Route::get('/beranda', [KonselorController::class, 'index'])->name('beranda');
         Route::post('/beranda/store', [KonselorController::class, 'store'])->name('pengumuman.store');
         Route::delete('/beranda/{id}', [KonselorController::class, 'destroy'])->name('pengumuman.destroy');
