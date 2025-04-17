@@ -748,38 +748,38 @@ class BreadCrumbService
         return $breadcrumbs;
     }
 
-    public function generateBreadcrumbs($params = [])
-    {
-        $currentRoute = Route::currentRouteName();
-        $user = session('user');
-        $role = $user ? $user['role'] : null;
+    // public function generateBreadcrumbs($params = [])
+    // {
+    //     $currentRoute = Route::currentRouteName();
+    //     $user = session('user');
+    //     $role = $user ? $user['role'] : null;
 
-        if (!$role) {
-            return [
-                ['name' => '<i class="fas fa-home"></i> Home', 'url' => url('/')],
-            ];
-        }
+    //     if (!$role) {
+    //         return [
+    //             ['name' => '<i class="fas fa-home"></i> Home', 'url' => url('/')],
+    //         ];
+    //     }
 
-        switch ($role) {
-            case 'dosen':
-                return $this->generateDosenBreadcrumbs($currentRoute, $params);
-            case 'mahasiswa':
-                return $this->generateMahasiswaBreadcrumbs($currentRoute, $params);
-            case 'konselor':
-                return $this->generateKonselorBreadcrumbs($currentRoute, $params);
-            case 'kemahasiswaan':
-                return $this->generateKemahasiswaanBreadcrumbs($currentRoute, $params);
-            case 'orang_tua':
-                return $this->generateOrangTuaBreadcrumbs($currentRoute, $params);
-            case 'keasramaan':
-                return $this->generateKeasramaanBreadcrumbs($currentRoute, $params);
-            default:
-                return [
-                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => url('/')],
-                    ['name' => '<i class="fas fa-question-circle"></i> Unknown Page', 'url' => null],
-                ];
-        }
-    }
+    //     switch ($role) {
+    //         case 'dosen':
+    //             return $this->generateDosenBreadcrumbs($currentRoute, $params);
+    //         case 'mahasiswa':
+    //             return $this->generateMahasiswaBreadcrumbs($currentRoute, $params);
+    //         case 'konselor':
+    //             return $this->generateKonselorBreadcrumbs($currentRoute, $params);
+    //         case 'kemahasiswaan':
+    //             return $this->generateKemahasiswaanBreadcrumbs($currentRoute, $params);
+    //         case 'orang_tua':
+    //             return $this->generateOrangTuaBreadcrumbs($currentRoute, $params);
+    //         case 'keasramaan':
+    //             return $this->generateKeasramaanBreadcrumbs($currentRoute, $params);
+    //         default:
+    //             return [
+    //                 ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => url('/')],
+    //                 ['name' => '<i class="fas fa-question-circle"></i> Unknown Page', 'url' => null],
+    //             ];
+    //     }
+    // }
 
     public function generateNotifications()
     {
