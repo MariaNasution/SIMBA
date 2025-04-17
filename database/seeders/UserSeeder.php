@@ -22,6 +22,7 @@ class UserSeeder extends Seeder
         DB::table('users')->truncate();
         DB::table('kemahasiswaan')->truncate();
         DB::table('konselor')->truncate();
+        DB::table('admin')->truncate();
         DB::table('mahasiswa')->truncate();
         DB::table('keasramaan')->truncate();
         DB::table('dosen')->truncate();
@@ -53,6 +54,12 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('admin'),
                 'role' => 'konselor',
                 'anak_wali' => null, // No anak wali for admin
+            ],
+            [
+                'username' => 'admin',
+                'password' => Hash::make('admin'),
+                'role' => 'admin',
+                'anak_wali' => null,
             ],
             // Mahasiswa users (12IF1 - 5 students, assigned to NIP 0309020008)
             ['username' => 'ifs19001', 'password' => Hash::make('mahasiswa'), 'role' => 'mahasiswa', 'anak_wali' => '0309020008'],
@@ -189,6 +196,14 @@ class UserSeeder extends Seeder
 
                 case 'konselor':
                     DB::table('konselor')->insert([
+                        'username' => $user['username'],
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                    break;
+                
+                case 'admin':
+                    DB::table('admin')->insert([
                         'username' => $user['username'],
                         'created_at' => now(),
                         'updated_at' => now(),

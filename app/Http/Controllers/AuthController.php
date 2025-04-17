@@ -118,7 +118,11 @@ class AuthController extends Controller
                     case 'konselor':
                         Log::info('Redirecting to konselor route...');
                         return redirect()->route('konselor_beranda')->with('success', 'Login sebagai konselor berhasil!');
-        
+
+                    case 'admin':
+                        Log::info('Redirecting to admin route...');
+                        return redirect()->route('admin_beranda')->with('success', 'Login sebagai admin berhasil!');
+                        
                     default:
                         Log::warning('Unknown role detected:', ['role' => $user->role]);
                         return back()->withErrors(['login' => 'Role tidak dikenali.']);

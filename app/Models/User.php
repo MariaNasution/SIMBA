@@ -65,6 +65,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Define a one-to-one relationship with the Kemahasiswaan model.
+     */
+    public function admin()
+    {
+        return $this->hasOne(Admin::class, 'username', 'username');
+    }
+
+    /**
      * Define a one-to-one relationship with the Keasramaan model.
      */
     public function keasramaan()

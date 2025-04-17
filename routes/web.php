@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\DosenController;
 use App\Http\Controllers\MahasiswaHomeController;
@@ -267,6 +268,11 @@ Route::middleware(['auth.session', 'ensure.student.data.ortu', 'role:orang_tua']
     Route::get('/profil', [ProfilController::class, 'index'])->name('profil');
     Route::get('/orang_tua/beranda', [OrangTuaController::class, 'index'])->name('orang_tua');
     Route::get('/orang_tua/catatan_perilaku', [OrangTuaController::class, 'catatan_perilaku'])->name('catatan_perilaku_orang_tua');
+});
+
+// Middleware untuk Super Admin
+Route::middleware(['auth.session', 'role:admin'])->group(function () {
+    Route::get('/beranda', [AdminController::class, 'index'])->name('admin_beranda');
 });
 
 Route::post('/send-sms', [SmsController::class, 'send']);
