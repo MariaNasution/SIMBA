@@ -681,72 +681,105 @@ class BreadCrumbService
     }
 
     protected function generateMahasiswaBreadcrumbs($currentRoute, $params = [])
-{
-    $breadcrumbs = [];
+    {
+        $breadcrumbs = [];
 
-    switch ($currentRoute) {
-        case 'beranda':
-            $breadcrumbs = [
-                ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => null],
-            ];
-            break;
+        switch ($currentRoute) {
+            case 'beranda':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => null],
+                ];
+                break;
 
-        case 'profil':
-            $breadcrumbs = [
-                ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
-                ['name' => '<i class="fas fa-user"></i> Profil', 'url' => null],
-            ];
-            break;
+            case 'profil':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
+                    ['name' => '<i class="fas fa-user"></i> Profil', 'url' => null],
+                ];
+                break;
 
-        case 'kemajuan_studi':
-            $breadcrumbs = [
-                ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
-                ['name' => '<i class="fas fa-graduation-cap"></i> Kemajuan Studi', 'url' => null],
-            ];
-            break;
+            case 'kemajuan_studi':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
+                    ['name' => '<i class="fas fa-graduation-cap"></i> Kemajuan Studi', 'url' => null],
+                ];
+                break;
 
-        case 'detailnilai':
-            $kode_mk = $params['kode_mk'] ?? 'N/A';
-            $breadcrumbs = [
-                ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
-                ['name' => '<i class="fas fa-book-open"></i> Kemajuan Studi', 'url' => route('kemajuan_studi')],
-                ['name' => "<i class='fas fa-list-ol'></i> Detail Nilai $kode_mk", 'url' => null],
-            ];
-            break;
+            case 'detailnilai':
+                $kode_mk = $params['kode_mk'] ?? 'N/A';
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
+                    ['name' => '<i class="fas fa-book-open"></i> Kemajuan Studi', 'url' => route('kemajuan_studi')],
+                    ['name' => "<i class='fas fa-list-ol'></i> Detail Nilai $kode_mk", 'url' => null],
+                ];
+                break;
 
-        case 'catatan_perilaku_mahasiswa':
-            $breadcrumbs = [
-                ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
-                ['name' => '<i class="fas fa-user-edit"></i> Catatan Perilaku', 'url' => null],
-            ];
-            break;
+            case 'catatan_perilaku_mahasiswa':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
+                    ['name' => '<i class="fas fa-user-edit"></i> Catatan Perilaku', 'url' => null],
+                ];
+                break;
 
-        case 'mahasiswa_konseling':
-            $breadcrumbs = [
-                ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
-                ['name' => '<i class="fas fa-user-friends"></i> Konseling', 'url' => null],
-            ];
-            break;
+            case 'mahasiswa_konseling':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
+                    ['name' => '<i class="fas fa-user-friends"></i> Konseling', 'url' => null],
+                ];
+                break;
 
-        case 'mahasiswa_perwalian':
-            $breadcrumbs = [
-                ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
-                ['name' => '<i class="fas fa-list-alt"></i> Perwalian', 'url' => null],
-            ];
-            break;
+            case 'mahasiswa_perwalian':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
+                    ['name' => '<i class="fas fa-list-alt"></i> Perwalian', 'url' => null],
+                ];
+                break;
 
-   
+    
 
-        default:
-            $breadcrumbs = [
-                ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
-                ['name' => '<i class="fas fa-question-circle"></i> Halaman Tidak Dikenal', 'url' => null],
-            ];
-            break;
+            default:
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('beranda')],
+                    ['name' => '<i class="fas fa-question-circle"></i> Halaman Tidak Dikenal', 'url' => null],
+                ];
+                break;
+        }
+
+        return $breadcrumbs;
     }
 
-    return $breadcrumbs;
-}
+    public function generateBreadcrumbs($params = [])
+    {
+        $currentRoute = Route::currentRouteName();
+        $user = session('user');
+        $role = $user ? $user['role'] : null;
+
+        if (!$role) {
+            return [
+                ['name' => '<i class="fas fa-home"></i> Home', 'url' => url('/')],
+            ];
+        }
+
+        switch ($role) {
+            case 'dosen':
+                return $this->generateDosenBreadcrumbs($currentRoute, $params);
+            case 'mahasiswa':
+                return $this->generateMahasiswaBreadcrumbs($currentRoute, $params);
+            case 'konselor':
+                return $this->generateKonselorBreadcrumbs($currentRoute, $params);
+            case 'kemahasiswaan':
+                return $this->generateKemahasiswaanBreadcrumbs($currentRoute, $params);
+            case 'orang_tua':
+                return $this->generateOrangTuaBreadcrumbs($currentRoute, $params);
+            case 'keasramaan':
+                return $this->generateKeasramaanBreadcrumbs($currentRoute, $params);
+            default:
+                return [
+                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => url('/')],
+                    ['name' => '<i class="fas fa-question-circle"></i> Unknown Page', 'url' => null],
+                ];
+        }
+    }
 
     public function generateNotifications()
     {
@@ -763,11 +796,11 @@ class BreadCrumbService
                 break;
             case 'dosen':
                 $notifications = $this->generateDosenNotifications($user);
+                break;
             default:
                 Log::info('Unhandled role in notification generation', ['role' => $user['role']]);
                 break;
-        }        
-
+        }
 
         return $notifications;
     }
@@ -776,18 +809,21 @@ class BreadCrumbService
     {
         $student = Mahasiswa::where('nim', $user['nim'])->first();
 
-        if (!$student || !isset($student->ID_Perwalian)) {
-            Log::info('No student or ID_Perwalian found', ['nim' => $user['nim']]);
+        if (!$student) {
+            Log::info('No student found', ['nim' => $user['nim']]);
             return collect([]);
         }
-        $notifications = Notifikasi::where('ID_Notifikasi', $student->ID_Perwalian)->get()->where('role', 'mahasiswa');
 
-        Log::info('Notifications fetched', ['count' => $notifications->count()]);
+        // Fetch notifications from Laravel's notifications table
+        $notifications = $student->unreadNotifications()
+            ->where('notifiable_type', 'App\Models\Mahasiswa')
+            ->get();
+
+        Log::info('Notifications fetched for student', ['count' => $notifications->count()]);
 
         return $notifications;
     }
 
-    
     private function generateDosenNotifications($user)
     {
         $dosen = Dosen::where('nip', $user['nip'])->first();
@@ -797,24 +833,82 @@ class BreadCrumbService
             return collect([]);
         }
 
-        // Fetch notifications for the dosen role and load the associated Perwalian
-        $notifications = Notifikasi::where('role', 'dosen')
-            ->where('nama', $dosen['nama'])
-            ->whereHas('perwalian', function ($query) {
-                $query->where(function ($subQuery) {
-                    $subQuery->whereNull('Tanggal_Selesai')
-                            ->orWhere('Tanggal_Selesai', '>=', now());
-                });
-            })
-            ->with(['perwalian' => function ($query) {
-                $query->select('ID_Perwalian', 'Tanggal', 'Tanggal_Selesai');
-            }])
-            ->orderBy('created_at', 'desc')
+        // Fetch notifications from Laravel's notifications table
+        $notifications = $dosen->unreadNotifications()
+            ->where('notifiable_type', 'App\Models\Dosen')
             ->get();
 
         Log::info('Notifications fetched for dosen', ['count' => $notifications->count()]);
 
         return $notifications;
     }
+
+    // public function generateNotifications()
+    // {
+    //     $user = session('user');
+    //     $notifications = collect([]);
+
+    //     if (!$user || !isset($user['role'])) {
+    //         return $notifications;
+    //     }
+    //     // switch ($user['role']) {
+    //     //     case 'mahasiswa':
+    //     //         $notifications = $this->generateStudentNotifications($user);
+    //     //         break;
+    //     //     case 'dosen':
+    //     //         $notifications = $this->generateDosenNotifications($user);
+    //     //     default:
+    //     //         Log::info('Unhandled role in notification generation', ['role' => $user['role']]);
+    //     //         break;
+    //     // }        
+
+
+    //     return $notifications;
+    // }
+
+    // private function generateStudentNotifications($user)
+    // {
+    //     $student = Mahasiswa::where('nim', $user['nim'])->first();
+
+    //     if (!$student || !isset($student->ID_Perwalian)) {
+    //         Log::info('No student or ID_Perwalian found', ['nim' => $user['nim']]);
+    //         return collect([]);
+    //     }
+    //     $notifications = Notifikasi::where('ID_Notifikasi', $student->ID_Perwalian)->get()->where('role', 'mahasiswa');
+
+    //     Log::info('Notifications fetched', ['count' => $notifications->count()]);
+
+    //     return $notifications;
+    // }
+
+    
+    // private function generateDosenNotifications($user)
+    // {
+    //     $dosen = Dosen::where('nip', $user['nip'])->first();
+
+    //     if (!$dosen) {
+    //         Log::info('No dosen found', ['nip' => $user['nip']]);
+    //         return collect([]);
+    //     }
+
+    //     // Fetch notifications for the dosen role and load the associated Perwalian
+    //     $notifications = Notifikasi::where('role', 'dosen')
+    //         ->where('nama', $dosen['nama'])
+    //         ->whereHas('perwalian', function ($query) {
+    //             $query->where(function ($subQuery) {
+    //                 $subQuery->whereNull('Tanggal_Selesai')
+    //                         ->orWhere('Tanggal_Selesai', '>=', now());
+    //             });
+    //         })
+    //         ->with(['perwalian' => function ($query) {
+    //             $query->select('ID_Perwalian', 'Tanggal', 'Tanggal_Selesai');
+    //         }])
+    //         ->orderBy('created_at', 'desc')
+    //         ->get();
+
+    //     Log::info('Notifications fetched for dosen', ['count' => $notifications->count()]);
+
+    //     return $notifications;
+    // }
 
 }

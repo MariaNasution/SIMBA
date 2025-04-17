@@ -32,54 +32,35 @@
                     @php
                         // Determine the role
                         $userRole = session('user')['role'] ?? null;
-                        // Default route for mahasiswa
-                        $notificationRoute = $userRole === 'mahasiswa' ? route('mahasiswa_perwalian') : null;
                     @endphp
-                    @forelse ($notifications ?? [] as $notif)
+                    @forelse ($notifications as $notif)
                         @php
-                            $notifData = $notif->data ?? [];
+                            $notifData = $notif->data;
                             $type = $notifData['extra_data']['type'] ?? null;
+                            $label = $type ? strtoupper($type) : 'INFO';
+
+                            $link = match($type) {
+                                'konseling' => route('mahasiswa_konseling'),
+                                'perwalian' => route('mahasiswa_perwalian'),
+                                default => route('mahasiswa_perwalian'),
+                            };
+
+                            $badgeClass = match($type) {
+                                'konseling' => 'bg-success',
+                                'perwalian' => 'bg-primary',
+                                default => 'bg-secondary',
+                            };
                         @endphp
-                        @if($type)
-                            @php
-                                $label = strtoupper($type);
-                                $link = match($type) {
-                                    'konseling' => route('mahasiswa_konseling'),
-                                    'perwalian' => route('mahasiswa_perwalian'),
-                                    default => route('mahasiswa_perwalian'),
-                                };
-                                $badgeClass = match($type) {
-                                    'konseling' => 'bg-success',
-                                    'perwalian' => 'bg-primary',
-                                    default => 'bg-secondary',
-                                };
-                            @endphp
-                            <li>
-                                <a class="dropdown-item" href="{{ $link }}">
-                                    <span class="badge {{ $badgeClass }} me-1">[{{ $label }}]</span>
-                                    {{ $notifData['message'] ?? 'No message' }}
-                                </a>
-                            </li>
-                        @else
-                            <li>
-                                @if($userRole === 'mahasiswa')
-                                    <a class="dropdown-item" href="{{ $notificationRoute }}">
-                                        {{ $notif->Pesan ?? 'No message' }} by {{ $notif->nama ?? 'Unknown' }}
-                                    </a>
-                                @else
-                                    <span class="dropdown-item">
-                                        {{ $notif->Pesan ?? 'No message' }}
-                                    </span>
-                                @endif
-                            </li>
-                        @endif
+                        <li>
+                            <!-- Using the dynamic link if present -->
+                            <a class="dropdown-item" href="{{ $link }}">
+                                <span class="badge {{ $badgeClass }} me-1">[{{ $label }}]</span>
+                                {{ $notif->data['message'] ?? 'No message' }}
+                            </a>
+                        </li>
                     @empty
                         <li>
-                            @if($userRole === 'mahasiswa')
-                                <a class="dropdown-item" href="{{ $notificationRoute }}">Tidak ada notifikasi</a>
-                            @else
-                                <span class="dropdown-item">Tidak ada notifikasi</span>
-                            @endif
+                            <a class="dropdown-item" href="">Tidak ada notifikasi</a>
                         </li>
                     @endforelse
                 </ul>
