@@ -54,7 +54,7 @@
     {{-- Tabel Data Mahasiswa Konseling Lanjutan --}}
     @if ($mahasiswas->isNotEmpty())
     <div class="mt-4">
-    <h4 class="text-start">Data Mahasiswa</h4>
+    <div class="text-start"><h4>Data Mahasiswa</h4></div>
     <table class="table table-bordered table-striped">
       <thead>
       <tr>

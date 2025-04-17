@@ -53,7 +53,7 @@
         @if ($hasilKonseling->isNotEmpty())
 
             <div class="mt-4">
-                <h4 class="text-start">Data Mahasiswa</h4>
+            <div class="text-start"><h4>Data Mahasiswa</h4></div>
                 {{-- Menampilkan jumlah data yang sedang ditampilkan --}}
                 <p class="mt-3 text-end">
                     Halaman <span class="fw-bold ">{{ $hasilKonseling->currentPage() }}</span> dari

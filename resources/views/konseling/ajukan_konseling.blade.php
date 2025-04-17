@@ -58,7 +58,7 @@
         {{-- Daftar Hasil Pencarian Mahasiswa --}}
         @if (!empty($daftarMahasiswa) && count($daftarMahasiswa) > 0)
             <div class="mt-4">
-                <h4 class="text-start">Hasil Pencarian Mahasiswa</h4>
+                <div class="text-start"><h4>Hasil Pencarian Mahasiswa</h4></div>
                 <table class="table table-bordered table-striped">
                     <thead>
                         <tr>
@@ -104,7 +104,7 @@
         {{-- Tampilkan data mahasiswa yang dipilih --}}
         @if (!empty($dataMahasiswa))
             <div class="mt-4">
-                <h4 class="text-start">Data Mahasiswa yang Dipilih</h4>
+                <div class="text-start"><h4>Data Mahasiswa yang Dipilih</h4></div>
                 <table class="table table-bordered table-striped">
                     <thead>
                         <tr>
