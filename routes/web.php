@@ -76,6 +76,7 @@ Route::middleware(['auth.session', 'role:kemahasiswaan'])
     ->prefix('kemahasiswaan')
     ->name('kemahasiswaan_')
     ->group(function () {
+        Route::get('/pelanggaran', [DaftarPelanggaranController::class, 'daftarPelanggaran'])->name('pelanggaran.daftar');
         Route::get('/beranda', [KemahasiswaanController::class, 'index'])->name('beranda');
         Route::post('/beranda/store', [KemahasiswaanController::class, 'store'])->name('pengumuman.store');
         Route::delete('/beranda/{id}', [KemahasiswaanController::class, 'destroy'])->name('pengumuman.destroy');

@@ -34,7 +34,7 @@ class BreadCrumbService
             case 'orang_tua':
                 return $this->generateOrangTuaBreadcrumbs($currentRoute, $params);
             case 'keasramaan':
-                    return $this->generateKeasramaanBreadcrumbs($currentRoute, $params);
+                return $this->generateKeasramaanBreadcrumbs($currentRoute, $params);
             default:
                 return [
                     ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => url('/')],
@@ -46,7 +46,7 @@ class BreadCrumbService
     protected function generateKeasramaanBreadcrumbs($currentRoute, $params = [])
     {
         $breadcrumbs = [];
-    
+
         Log::info('Current Route', ['route' => $breadcrumbs]);
         switch ($currentRoute) {
             case 'keasramaan':
@@ -54,35 +54,35 @@ class BreadCrumbService
                     ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => null],
                 ];
                 break;
-    
+
             case 'pelanggaran_keasramaan':
                 $breadcrumbs = [
                     ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('keasramaan')],
                     ['name' => '<i class="fas fa-user-edit"></i> Catatan Perilaku', 'url' => null],
                 ];
                 break;
-                
-                case 'catatan_perilaku_detail':
-                    $breadcrumbs = [
-                        ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('keasramaan')],
-                        ['name' => '<i class="fas fa-user-edit"></i> Catatan Perilaku', 'url' => route('pelanggaran_keasramaan')],
-                        ['name' => '<i class="fas fa-eye"></i> Detail Catatan Perilaku', 'url' => null],
-                    ];
-                    break;
-    
+
+            case 'catatan_perilaku_detail':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('keasramaan')],
+                    ['name' => '<i class="fas fa-user-edit"></i> Catatan Perilaku', 'url' => route('pelanggaran_keasramaan')],
+                    ['name' => '<i class="fas fa-eye"></i> Detail Catatan Perilaku', 'url' => null],
+                ];
+                break;
+
             default:
                 $breadcrumbs = [
                     ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('keasramaan')],
                     ['name' => '<i class="fas fa-question-circle"></i> Halaman Tidak Dikenal', 'url' => null],
                 ];
         }
-    
+
         return $breadcrumbs;
     }
     protected function generateOrangTuaBreadcrumbs($currentRoute, $params = [])
     {
         $breadcrumbs = [];
-    
+
         Log::info('Current Route', ['route' => $breadcrumbs]);
         switch ($currentRoute) {
             case 'orang_tua':
@@ -90,24 +90,24 @@ class BreadCrumbService
                     ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => null],
                 ];
                 break;
-    
+
             case 'catatan_perilaku_orang_tua':
                 $breadcrumbs = [
                     ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('orang_tua')],
                     ['name' => '<i class="fas fa-user-edit"></i> Catatan Perilaku', 'url' => null],
                 ];
                 break;
-    
+
             default:
                 $breadcrumbs = [
                     ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('orang_tua')],
                     ['name' => '<i class="fas fa-question-circle"></i> Halaman Tidak Dikenal', 'url' => null],
                 ];
         }
-    
+
         return $breadcrumbs;
     }
-    
+
 
     protected function generateDosenBreadcrumbs($currentRoute, $params = [])
     {
@@ -291,6 +291,13 @@ class BreadCrumbService
                 ];
                 break;
 
+            case 'konselor_pelanggaran.daftar':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-list"></i> Konseling', 'url' => route('konselor_beranda')],
+                    ['name' => 'Daftar Pelanggaran', 'url' => null],
+                ];
+                break;
+
             case 'konselor_pengumumankonselor.detail':
                 $breadcrumbs = [
                     ['name' => '<i class="fas fa-bullhorn"></i> Beranda', 'url' => route('konselor_beranda')],
@@ -434,6 +441,13 @@ class BreadCrumbService
             case 'kemahasiswaan_beranda':
                 $breadcrumbs = [
                     ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => null],
+                ];
+                break;
+
+            case 'kemahasiswaan_pelanggaran.daftar':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-list"></i> Konseling', 'url' => route('kemahasiswaan_beranda')],
+                    ['name' => 'Daftar Pelanggaran', 'url' => null],
                 ];
                 break;
 
@@ -735,7 +749,7 @@ class BreadCrumbService
                 ];
                 break;
 
-    
+
 
             default:
                 $breadcrumbs = [
@@ -881,7 +895,7 @@ class BreadCrumbService
     //     return $notifications;
     // }
 
-    
+
     // private function generateDosenNotifications($user)
     // {
     //     $dosen = Dosen::where('nip', $user['nip'])->first();
