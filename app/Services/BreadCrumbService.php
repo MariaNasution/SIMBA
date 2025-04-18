@@ -31,6 +31,8 @@ class BreadCrumbService
                 return $this->generateKonselorBreadcrumbs($currentRoute, $params);
             case 'kemahasiswaan':
                 return $this->generateKemahasiswaanBreadcrumbs($currentRoute, $params);
+            case 'admin':
+                return $this->generateSuperAdminBreadcrumbs($currentRoute, $params);
             case 'orang_tua':
                 return $this->generateOrangTuaBreadcrumbs($currentRoute, $params);
             case 'keasramaan':
@@ -108,6 +110,34 @@ class BreadCrumbService
         return $breadcrumbs;
     }
 
+    protected function generateSuperAdminBreadcrumbs($currentRoute, $params = [])
+    {
+        $breadcrumbs = [];
+
+        Log::info('Current Route', ['route' => $breadcrumbs]);
+        switch ($currentRoute) {
+            case 'admin_beranda':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => null],
+                ];
+                break;
+
+            case 'admin_add-user':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('admin_add-user')],
+                    ['name' => '<i class="fas fa-user-edit"></i> Kelola Pengguna', 'url' => null],
+                ];
+                break;
+
+            default:
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('admin_beranda')],
+                    ['name' => '<i class="fas fa-question-circle"></i> Halaman Tidak Dikenal', 'url' => null],
+                ];
+        }
+
+        return $breadcrumbs;
+    }
 
     protected function generateDosenBreadcrumbs($currentRoute, $params = [])
     {
@@ -694,6 +724,7 @@ class BreadCrumbService
         return $breadcrumbs;
     }
 
+    
     protected function generateMahasiswaBreadcrumbs($currentRoute, $params = [])
     {
         $breadcrumbs = [];

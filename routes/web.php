@@ -272,7 +272,8 @@ Route::middleware(['auth.session', 'ensure.student.data.ortu', 'role:orang_tua']
 
 // Middleware untuk Super Admin
 Route::middleware(['auth.session', 'role:admin'])->group(function () {
-    Route::get('/beranda', [AdminController::class, 'index'])->name('admin_beranda');
+    Route::get('/admin/beranda', [AdminController::class, 'index'])->name('admin_beranda');
+    Route::get('/admin/add-user', [AdminController::class, 'indexUser'])->name('admin_add-user');
 });
 
 Route::post('/send-sms', [SmsController::class, 'send']);

@@ -57,6 +57,8 @@
                 @include('components.sidebarKemahasiswaan')
             @elseif(session('user.role') === 'konselor')
                 @include('components.sidebarKonselor')
+            @elseif(session('user.role') === 'admin')
+                @include('components.sidebarSuperAdmin')
             @elseif(session('user.role') === 'mahasiswa')
                 @include('components.sidebarMahasiswa')
             @elseif(session('user.role') === 'dosen')
