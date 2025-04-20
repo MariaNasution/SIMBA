@@ -5,7 +5,8 @@
     @if(isset($perwalianAnnouncement) && !empty($perwalianAnnouncement))
         <div class="announcement-banner">
             <div class="announcement-header">
-                <i class="far fa-bullhorn announcement-icon" aria-hidden="true"></i>
+                <!-- Replace Font Awesome icon with custom image -->
+                <img src="{{ asset('assets/img/announcement_line.png') }}" alt="Announcement Icon" class="announcement-icon">
                 <h5>Pengumuman</h5>
             </div>
             <div class="announcement-text">

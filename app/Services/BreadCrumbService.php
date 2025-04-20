@@ -184,7 +184,6 @@ class BreadCrumbService
                 $id = $params['id'] ?? 'N/A';
                 $breadcrumbs = [
                     ['name' => '<i class="fas fa-history"></i> Histori', 'url' => route('dosen.histori')],
-                    ['name' => "<i class='fas fa-eye'></i> Detail #$id", 'url' => null],
                 ];
                 break;
 
@@ -192,7 +191,6 @@ class BreadCrumbService
                 $id = $params['id'] ?? 'N/A';
                 $breadcrumbs = [
                     ['name' => '<i class="fas fa-history"></i> Histori', 'url' => route('dosen.histori')],
-                    ['name' => "<i class='fas fa-print'></i> Cetak Berita Acara #$id", 'url' => null],
                 ];
                 break;
 
@@ -264,7 +262,6 @@ class BreadCrumbService
                 $tanggal_perwalian = $params['tanggal_perwalian'] ?? 'N/A';
                 $breadcrumbs = [
                     ['name' => '<i class="fas fa-book"></i> Berita Acara', 'url' => route('berita_acara.index')],
-                    ['name' => "<i class='fas fa-check-circle'></i> Sukses - $kelas ($tanggal_perwalian)", 'url' => null],
                 ];
                 break;
 
@@ -824,24 +821,24 @@ class BreadCrumbService
         return $notifications;
     }
 
-    private function generateDosenNotifications($user)
-    {
-        $dosen = Dosen::where('nip', $user['nip'])->first();
+    // private function generateDosenNotifications($user)
+    // {
+    //     $dosen = Dosen::where('nip', $user['nip'])->first();
 
-        if (!$dosen) {
-            Log::info('No dosen found', ['nip' => $user['nip']]);
-            return collect([]);
-        }
+    //     if (!$dosen) {
+    //         Log::info('No dosen found', ['nip' => $user['nip']]);
+    //         return collect([]);
+    //     }
 
-        // Fetch notifications from Laravel's notifications table
-        $notifications = $dosen->unreadNotifications()
-            ->where('notifiable_type', 'App\Models\Dosen')
-            ->get();
+    //     // Fetch notifications from Laravel's notifications table
+    //     $notifications = $dosen->unreadNotifications()
+    //         ->where('notifiable_type', 'App\Models\Dosen')
+    //         ->get();
 
-        Log::info('Notifications fetched for dosen', ['count' => $notifications->count()]);
+    //     Log::info('Notifications fetched for dosen', ['count' => $notifications->count()]);
 
-        return $notifications;
-    }
+    //     return $notifications;
+    // }
 
     // public function generateNotifications()
     // {
@@ -882,33 +879,33 @@ class BreadCrumbService
     // }
 
     
-    // private function generateDosenNotifications($user)
-    // {
-    //     $dosen = Dosen::where('nip', $user['nip'])->first();
+    private function generateDosenNotifications($user)
+    {
+        $dosen = Dosen::where('nip', $user['nip'])->first();
 
-    //     if (!$dosen) {
-    //         Log::info('No dosen found', ['nip' => $user['nip']]);
-    //         return collect([]);
-    //     }
+        if (!$dosen) {
+            Log::info('No dosen found', ['nip' => $user['nip']]);
+            return collect([]);
+        }
 
-    //     // Fetch notifications for the dosen role and load the associated Perwalian
-    //     $notifications = Notifikasi::where('role', 'dosen')
-    //         ->where('nama', $dosen['nama'])
-    //         ->whereHas('perwalian', function ($query) {
-    //             $query->where(function ($subQuery) {
-    //                 $subQuery->whereNull('Tanggal_Selesai')
-    //                         ->orWhere('Tanggal_Selesai', '>=', now());
-    //             });
-    //         })
-    //         ->with(['perwalian' => function ($query) {
-    //             $query->select('ID_Perwalian', 'Tanggal', 'Tanggal_Selesai');
-    //         }])
-    //         ->orderBy('created_at', 'desc')
-    //         ->get();
+        // Fetch notifications for the dosen role and load the associated Perwalian
+        $notifications = Notifikasi::where('role', 'dosen')
+            ->where('nama', $dosen['nama'])
+            ->whereHas('perwalian', function ($query) {
+                $query->where(function ($subQuery) {
+                    $subQuery->whereNull('Tanggal_Selesai')
+                            ->orWhere('Tanggal_Selesai', '>=', now());
+                });
+            })
+            ->with(['perwalian' => function ($query) {
+                $query->select('ID_Perwalian', 'Tanggal', 'Tanggal_Selesai');
+            }])
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-    //     Log::info('Notifications fetched for dosen', ['count' => $notifications->count()]);
+        Log::info('Notifications fetched for dosen', ['count' => $notifications->count()]);
 
-    //     return $notifications;
-    // }
+        return $notifications;
+    }
 
 }

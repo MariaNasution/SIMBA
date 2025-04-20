@@ -48,6 +48,11 @@ REDIS_HOST=127.0.0.1
 REDIS_PASSWORD=null
 REDIS_PORT=6379
 
+#Googles reCaptcha
+RECAPTCHA_SITE_KEY=6Lc0bB4rAAAAAAUQANmPX02EsKovJ7JEv_Vjo5or
+RECAPTCHA_SECRET_KEY=6Lc0bB4rAAAAAFgzLG-SphutX0FqLdinbfnMOxt_
+RECAPTCHA_SITE=https://www.google.com/recaptcha/admin/
+
 # Looking to send emails in production? Check out our Email API/SMTP product!
 MAIL_MAILER=smtp
 MAIL_HOST=sandbox.smtp.mailtrap.io

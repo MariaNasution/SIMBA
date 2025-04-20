@@ -1,47 +1,75 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Observers;
 
-use Illuminate\Http\Request;
-use App\Services\NotificationService;
+use App\Models\Perwalian;
+use App\Models\Mahasiswa;
+use App\Notifications\UniversalNotification;
+use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
-class NotificationController extends Controller
+class PerwalianObserver
 {
-    protected $notificationService;
-
-    public function __construct(NotificationService $notificationService)
+    public function created(Perwalian $perwalian)
     {
-        $this->notificationService = $notificationService;
+        $this->sendNotification($perwalian, 'ditambahkan');
     }
 
-    public function markAllRead(Request $request)
+    public function deleted(Perwalian $perwalian)
     {
-        $user = auth()->user();
-
-        if (!$user) {
-            return response()->json(['message' => 'Unauthorized'], 401);
-        }
-
-        $updatedCount = $this->notificationService->markAllRead($user);
-
-        return response()->json([
-            'message'       => 'Semua notifikasi telah ditandai sebagai telah dibaca.',
-            'updated_count' => $updatedCount,
-        ]);
+        $this->deleteNotifications($perwalian);
     }
 
-    public function unread(Request $request)
+    protected function sendNotification(Perwalian $perwalian, $actionText)
     {
-        $user = auth()->user();
+        $mahasiswas = Mahasiswa::where('ID_Perwalian', $perwalian->ID_Perwalian)->get();
 
-        if (!$user) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+        if ($mahasiswas->isEmpty()) {
+            Log::warning('No Mahasiswa found to notify for Perwalian', [
+                'perwalian_id' => $perwalian->ID_Perwalian,
+            ]);
+            return;
         }
 
-        $notifications = $this->notificationService->getUnreadNotifications($user);
+        $date = Carbon::parse($perwalian->Tanggal)->translatedFormat('j F Y');
+        $message = "Perwalian untuk kelas {$perwalian->kelas} pada {$date} telah {$actionText}.";
+        $destinationRoute = route('mahasiswa_perwalian');
 
-        return response()->json([
-            'unread_notifications' => $notifications,
-        ]);
+        try {
+            foreach ($mahasiswas as $mahasiswa) {
+                $mahasiswa->notify(new UniversalNotification($message, ['link' => $destinationRoute, 'type' => 'perwalian']));
+                Log::info("Notification sent to Mahasiswa NIM {$mahasiswa->nim}: {$message}");
+            }
+        } catch (\Exception $e) {
+            Log::error("Failed to send notification for Perwalian (ID: {$perwalian->ID_Perwalian}): " . $e->getMessage());
+        }
+    }
+
+    protected function deleteNotifications(Perwalian $perwalian)
+    {
+        $mahasiswas = Mahasiswa::where('ID_Perwalian', $perwalian->ID_Perwalian)->get();
+
+        if ($mahasiswas->isEmpty()) {
+            Log::info('No Mahasiswa notifications to delete for Perwalian', [
+                'perwalian_id' => $perwalian->ID_Perwalian,
+            ]);
+            return;
+        }
+
+        try {
+            foreach ($mahasiswas as $mahasiswa) {
+                $deletedCount = $mahasiswa->notifications()
+                    ->where('data->type', 'perwalian')
+                    ->where('data->link', route('mahasiswa_perwalian'))
+                    ->delete();
+
+                Log::info("Deleted notifications for Mahasiswa NIM {$mahasiswa->nim} due to Perwalian deletion", [
+                    'perwalian_id' => $perwalian->ID_Perwalian,
+                    'deleted_count' => $deletedCount,
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error("Failed to delete notifications for Perwalian (ID: {$perwalian->ID_Perwalian}): " . $e->getMessage());
+        }
     }
 }

@@ -6,40 +6,32 @@ use App\Models\Perwalian;
 use App\Models\Mahasiswa;
 use App\Notifications\UniversalNotification;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class PerwalianObserver
 {
     public function created(Perwalian $perwalian): void
     {
         try {
-            // Determine the related Mahasiswa records based on the Perwalian
-            $mahasiswas = Mahasiswa::where('ID_Perwalian', $perwalian->ID_Perwalian)->get();
+            if ($perwalian->role !== 'mahasiswa') {
+                Log::info('Skipping PerwalianObserver notification for non-mahasiswa role', [
+                    'perwalian_id' => $perwalian->ID_Perwalian,
+                    'role' => $perwalian->role,
+                ]);
+                return;
+            }
+            Log::Info("The value in Observer" . $perwalian['ID_Perwalian']);
+            $mahasiswas = Mahasiswa::where('ID_Perwalian', $perwalian['ID_Perwalian'])->get();
 
-            if ($mahasiswas->isEmpty() && $perwalian->role === 'dosen') {
-                // For dosen role (from KemahasiswaanPerwalianController), notify the dosen
-                $dosen = \App\Models\Dosen::where('nip', $perwalian->ID_Dosen_Wali)->first();
-                if ($dosen) {
-                    $date = Carbon::parse($perwalian->Tanggal)->translatedFormat('j F Y');
-                    $message = "Perwalian scheduled for you (Keterangan: {$perwalian->keterangan}) - {$date}";
-                    $extraData = [
-                        'link' => route('dosen.perwalian'),
-                        'type' => 'perwalian'
-                    ];
-                    $dosen->notify(new UniversalNotification($message, $extraData));
-                    Log::info("Notification sent to Dosen NIP {$dosen->nip}: {$message}");
-                }
-            } elseif ($mahasiswas->isNotEmpty()) {
-                // For mahasiswa role (from SetPerwalianController), notify all related students
-                foreach ($mahasiswas as $mahasiswa) {
-                    $date = Carbon::parse($perwalian->Tanggal)->translatedFormat('j F Y');
-                    $message = "Perwalian scheduled for your class {$perwalian->kelas} on {$date}.";
-                    $extraData = [
-                        'link' => route('mahasiswa_perwalian'),
-                        'type' => 'perwalian'
-                    ];
-                    $mahasiswa->notify(new UniversalNotification($message, $extraData));
-                    Log::info("Notification sent to Mahasiswa NIM {$mahasiswa->nim}: {$message}");
-                }
+            if ($mahasiswas->isNotEmpty()) {
+                Log::info('Notification sending in observer disabled for testing', [
+                    'perwalian_id' => $perwalian->ID_Perwalian,
+                    'mahasiswa_count' => $mahasiswas->count(),
+                ]);
+            } else {
+                Log::warning('No Mahasiswa found to notify for Perwalian', [
+                    'perwalian_id' => $perwalian->ID_Perwalian,
+                ]);
             }
         } catch (\Exception $e) {
             Log::error("Failed to send notification for Perwalian creation (ID: {$perwalian->ID_Perwalian}): " . $e->getMessage());
@@ -49,29 +41,41 @@ class PerwalianObserver
     public function deleted(Perwalian $perwalian): void
     {
         try {
-            // Determine the related notifiable entities (Mahasiswa or Dosen)
+            if ($perwalian->role !== 'mahasiswa') {
+                Log::info('Skipping PerwalianObserver notification for non-mahasiswa role', [
+                    'perwalian_id' => $perwalian->ID_Perwalian,
+                    'role' => $perwalian->role,
+                ]);
+                return;
+            }
+
             $mahasiswas = Mahasiswa::where('ID_Perwalian', $perwalian->ID_Perwalian)->get();
-            $dosen = \App\Models\Dosen::where('nip', $perwalian->ID_Dosen_Wali)->first();
 
             if ($mahasiswas->isNotEmpty()) {
-                // For mahasiswa role, mark notifications as read for all related students
+                $date = Carbon::parse($perwalian->Tanggal)->translatedFormat('j F Y');
+                $message = "Perwalian for your class {$perwalian->kelas} on {$date} by {$perwalian->nama} has been canceled.";
+                $extraData = [
+                    'link' => route('mahasiswa_perwalian'),
+                    'type' => 'perwalian_canceled'
+                ];
+
                 foreach ($mahasiswas as $mahasiswa) {
-                    $mahasiswa->notifications()
-                        ->where('data->type', 'perwalian')
-                        ->where('data->extra_data->link', route('mahasiswa_perwalian'))
-                        ->update(['read_at' => now()]);
-                    Log::info("Marked notifications as read for Mahasiswa NIM {$mahasiswa->nim} due to Perwalian deletion (ID: {$perwalian->ID_Perwalian})");
+                    try {
+                        $mahasiswa->notify(new UniversalNotification($message, $extraData));
+                        Log::info("Cancellation notification sent to Mahasiswa NIM {$mahasiswa->nim}: {$message}");
+                    } catch (\Exception $e) {
+                        Log::error("Failed to send cancellation notification to Mahasiswa NIM {$mahasiswa->nim}: {$e->getMessage()}", [
+                            'trace' => $e->getTraceAsString(),
+                        ]);
+                    }
                 }
-            } elseif ($dosen) {
-                // For dosen role, mark notifications as read
-                $dosen->notifications()
-                    ->where('data->type', 'perwalian')
-                    ->where('data->extra_data->link', route('dosen.perwalian'))
-                    ->update(['read_at' => now()]);
-                Log::info("Marked notifications as read for Dosen NIP {$dosen->nip} due to Perwalian deletion (ID: {$perwalian->ID_Perwalian})");
+            } else {
+                Log::info('No Mahasiswa found to notify for Perwalian cancellation', [
+                    'perwalian_id' => $perwalian->ID_Perwalian,
+                ]);
             }
         } catch (\Exception $e) {
-            Log::error("Failed to handle notifications for Perwalian deletion (ID: {$perwalian->ID_Perwalian}): " . $e->getMessage());
+            Log::error("Failed to send cancellation notification for Perwalian deletion (ID: {$perwalian->ID_Perwalian}): " . $e->getMessage());
         }
     }
 }

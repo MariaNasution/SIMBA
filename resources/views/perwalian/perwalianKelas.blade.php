@@ -198,6 +198,7 @@
             justify-content: center;
             align-items: center;
             min-height: 80px; /* Fixed minimum height */
+            display: none; /* Hide by default */
         }
 
         .success {
@@ -207,6 +208,7 @@
 
         .absensi-block.success {
             background-color: #4CAF50;
+            display: flex; /* Show when success */
         }
 
         .absensi-content {
@@ -254,6 +256,12 @@
 
         .ok-btn:hover {
             background-color: #f0f0f0;
+        }
+
+        /* Highlight style for unattended row */
+        .highlight-unattended {
+            background-color: #ffeb3b; /* Yellow highlight */
+            transition: background-color 0.5s ease;
         }
 
         @media (max-width: 768px) {
@@ -464,6 +472,13 @@
                 keteranganText.textContent = text === 'Hadir' ? '' : keteranganInput.value;
                 attendanceKeteranganInput.value = text === 'Hadir' ? '' : keteranganInput.value;
             }
+
+            // Hide the "Lakukan Absensi" block when a status is updated
+            const absensiBlock = document.getElementById('absensi-block');
+            absensiBlock.style.display = 'none';
+
+            // Remove highlight from all rows when a status is updated
+            document.querySelectorAll('tr').forEach(row => row.classList.remove('highlight-unattended'));
         }
 
         function showDropdown(cell) {
@@ -493,7 +508,7 @@
                 let keteranganText = statusDesc.querySelector('.keterangan-text');
                 let keteranganInput = statusDesc.querySelector('.keterangan-input');
                 let attendanceStatusInput = statusCell.querySelector('.attendance-status');
-                let attendanceKeteranganInput = statusDesc.querySelector('.attendance-keterangan');
+                let attendanceKeteranganInput = statusCell.closest('tr').querySelector('.attendance-keterangan');
 
                 statusDisplay.innerHTML = `<span class="selected-status">✅ Hadir</span>`;
                 statusButtons.style.display = "none";
@@ -506,6 +521,13 @@
                 keteranganInput.style.display = 'none';
                 keteranganText.textContent = '';
             });
+
+            // Hide the "Lakukan Absensi" block after marking all as Hadir
+            const absensiBlock = document.getElementById('absensi-block');
+            absensiBlock.style.display = 'none';
+
+            // Remove highlight from all rows
+            document.querySelectorAll('tr').forEach(row => row.classList.remove('highlight-unattended'));
         }
 
         document.querySelectorAll('.keterangan-input').forEach(input => {
@@ -533,7 +555,29 @@
 
             const form = this;
             const formData = new FormData(form);
+            const absensiBlock = document.getElementById('absensi-block');
 
+            // Check if all students have an attendance status
+            const statusInputs = Array.from(document.querySelectorAll('.attendance-status'));
+            const allStudentsHaveStatus = statusInputs.every(input => input.value.trim() !== '');
+
+            if (!allStudentsHaveStatus) {
+                // Show the "Lakukan Absensi" block
+                absensiBlock.style.display = 'flex';
+
+                // Find the first student without a status
+                const firstUnattended = statusInputs.find(input => input.value.trim() === '');
+                if (firstUnattended) {
+                    const row = firstUnattended.closest('tr');
+                    // Scroll to the row
+                    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // Highlight the row
+                    row.classList.add('highlight-unattended');
+                }
+                return; // Prevent form submission
+            }
+
+            // If all students have a status, proceed with form submission
             fetch(form.action, {
                 method: 'POST',
                 body: formData,
@@ -545,9 +589,10 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    const absensiBlock = document.getElementById('absensi-block');
-                    const absensiContent = absensiBlock.querySelector('.absensi-content');
+                    // Update the block with success message
                     absensiBlock.classList.add('success');
+                    absensiBlock.style.display = 'flex'; // Show the block for success message
+                    const absensiContent = absensiBlock.querySelector('.absensi-content');
                     absensiContent.innerHTML = `
                         <span id="absensi-text" class="absensi-text">Absensi Berhasil Disimpan</span>
                         <div class="ok-btn-container">
@@ -555,9 +600,16 @@
                         </div>
                     `;
 
+                    // Disable form inputs/buttons
                     form.querySelectorAll('input, button').forEach(element => {
                         element.disabled = true;
                     });
+
+                    // Scroll to the top to show the success message
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                    // Remove highlight from all rows
+                    document.querySelectorAll('tr').forEach(row => row.classList.remove('highlight-unattended'));
                 } else {
                     alert(data.message);
                 }

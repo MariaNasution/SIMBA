@@ -40,14 +40,14 @@
                     <table class="table table-striped mb-0">
                         <thead>
                             <tr>
-                                <th>Nama</th>
+                                <th class="nama-header">Nama</th>
                                 <th>Status Perwalian</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse ($students as $student)
                                 <tr>
-                                    <td>{{ $student['nama'] }}</td>
+                                    <td class="nama-column">{{ $student['nama'] }}</td>
                                     <td>
                                         @php
                                             $status = strtolower($student['status']);
@@ -78,7 +78,7 @@
         <div class="col-md-4">
             <div class="card h-100">
                 <div class="card-header bg-light">
-                    <strong>Catatan (Dosen Wali)</strong>
+                    <strong>Catatan (Feeback Mahasiswa)</strong>
                 </div>
                 <div class="card-body">
                     <p>{{ $catatan ?? 'Tidak ada catatan' }}</p>
@@ -119,6 +119,20 @@
     .badge {
         font-size: 0.9rem;
         padding: 0.5em 0.75em;
+    }
+    /* Align text in the Nama column data cells to the left */
+    .table td.nama-column {
+        text-align: left !important;
+    }
+    /* Thicken the vertical line between columns for both header and data cells */
+    .table th.nama-header,
+    .table td.nama-column {
+        border-right: 2px solid #dee2e6 !important; /* Thicker vertical line */
+    }
+    /* Ensure the table's default border doesn't override our custom border */
+    .table th,
+    .table td {
+        border: 1px solid #dee2e6;
     }
 </style>
 @endsection

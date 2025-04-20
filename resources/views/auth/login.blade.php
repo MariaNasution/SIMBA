@@ -7,9 +7,23 @@
   <title>Login - SIMBA</title>
   <link rel="stylesheet" href="{{ asset('assets/css/login.css') }}">
   <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-
-  <!-- Add SweetAlert2 CSS and JS -->
+  <!-- Add SweetAlert2 JS -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Load reCAPTCHA v2 -->
+  @if (config('services.recaptcha.site_key'))
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  @else
+  <script>
+    console.error('reCAPTCHA site key is missing. Check .env RECAPTCHA_SITE_KEY and config/services.php.');
+    document.addEventListener('DOMContentLoaded', function() {
+      Swal.fire({
+        icon: 'error',
+        title: 'reCAPTCHA Error',
+        text: 'reCAPTCHA configuration is missing. Please contact support or try again later.',
+      });
+    });
+  </script>
+  @endif
 </head>
 
 <body>
@@ -37,12 +51,12 @@
           <button class="btn register-btn">Daftar</button>
           <button class="btn login-btn">Masuk</button>
         </div>
-        <form action="{{ route('login.submit') }}" method="POST">
+        <form id="login-form" action="{{ route('login.submit') }}" method="POST">
           @csrf
           <div class="input-box">
             <i class="bx bxs-user log"></i>
-            <label for="username">Nama Pengguna</label>
-            <input class="log" type="text" id="username" name="username" required>
+            <label for="login-username">Nama Pengguna</label>
+            <input class="log" type="text" id="login-username" name="username" required>
           </div>
           @if ($errors->has('login'))
           <div style="font-size: 12px; color: red; margin: 0 !important; padding: 0 !important; line-height: 1;">
@@ -52,14 +66,23 @@
 
           <div class="input-box">
             <i class="bx bxs-lock-alt log"></i>
-            <label for="password">Kata Sandi</label>
-            <input class="log" type="password" id="password" name="password" required>
+            <label for="login-password">Kata Sandi</label>
+            <input class="log" type="password" id="login-password" name="password" required>
           </div>
           @if ($errors->has('login2'))
           <div style="font-size: 12px; color: red; margin: 0 !important; padding: 0 !important; line-height: 1;">
             {{ $errors->first('login2') }}
           </div>
           @endif
+
+          <!-- reCAPTCHA v2 Widget -->
+          <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
+          @if ($errors->has('g-recaptcha-response'))
+          <div style="font-size: 12px; color: red; margin: 0 !important; padding: 0 !important; line-height: 1;">
+            {{ $errors->first('g-recaptcha-response') }}
+          </div>
+          @endif
+
           <p>Belum Punya Akun? <a href="#" class="register-link"
               onclick="document.querySelector('.register-btn').click(); return false;">Daftar Disini</a></p>
           <button type="submit" class="btn">Masuk</button>
@@ -74,13 +97,13 @@
         <form id="register-form">
           @csrf
           <div class="input-box">
-            <label for="username">Nama Pengguna</label>
-            <input class="reg" type="text" id="username" name="username" required>
+            <label for="register-username">Nama Pengguna</label>
+            <input class="reg" type="text" id="register-username" name="username" required>
             <i class="bx bxs-user reg"></i>
           </div>
           <div class="input-box reg">
-            <label for="password">Kata Sandi</label>
-            <input class="reg" type="password" id="password" name="password" required>
+            <label for="register-password">Kata Sandi</label>
+            <input class="reg" type="password" id="register-password" name="password" required>
             <i class="bx bxs-lock-alt reg"></i>
           </div>
           <div class="input-box">
@@ -104,12 +127,10 @@
     </div>
   </div>
 
-  </div>
-
   <script>
   document.addEventListener("DOMContentLoaded", function() {
-
     const container = document.querySelector(".container");
+    const loginForm = document.getElementById("login-form");
 
     // Tambahkan class no-transition untuk mencegah semua transisi saat halaman pertama kali dimuat
     container.classList.add("no-transition");
@@ -141,6 +162,19 @@
         container.classList.add("active");
         sessionStorage.setItem("activeSection", "login");
       });
+    });
+
+    // Handle reCAPTCHA v2 form submission
+    loginForm.addEventListener("submit", function(e) {
+      const recaptchaResponse = document.getElementById('g-recaptcha-response')?.value;
+      if (!recaptchaResponse) {
+        e.preventDefault();
+        Swal.fire({
+          icon: 'error',
+          title: 'reCAPTCHA Required',
+          text: 'Please complete the reCAPTCHA checkbox.',
+        });
+      }
     });
   });
   </script>
@@ -183,7 +217,7 @@
           }
         })
         .catch(error => {
-          let errorMsg = error?.errors?.username?. [0] || error.message || 'Registrasi gagal. Coba lagi.';
+          let errorMsg = error?.errors?.username?.[0] || error.message || 'Registrasi gagal. Coba lagi.';
 
           Swal.fire({
             icon: 'error',
@@ -194,9 +228,6 @@
     });
   });
   </script>
-
-
-
 
 </body>
 
