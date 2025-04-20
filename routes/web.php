@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\DosenController;
 use App\Http\Controllers\MahasiswaHomeController;
@@ -76,6 +77,7 @@ Route::middleware(['auth.session', 'role:kemahasiswaan'])
     ->prefix('kemahasiswaan')
     ->name('kemahasiswaan_')
     ->group(function () {
+        Route::get('/pelanggaran', [DaftarPelanggaranController::class, 'daftarPelanggaran'])->name('pelanggaran.daftar');
         Route::get('/beranda', [KemahasiswaanController::class, 'index'])->name('beranda');
         Route::post('/beranda/store', [KemahasiswaanController::class, 'store'])->name('pengumuman.store');
         Route::delete('/beranda/{id}', [KemahasiswaanController::class, 'destroy'])->name('pengumuman.destroy');
@@ -133,6 +135,7 @@ Route::middleware(['auth.session', 'role:konselor'])
     ->prefix('konselor')
     ->name('konselor_')
     ->group(function () {
+        Route::get('/pelanggaran', [DaftarPelanggaranController::class, 'daftarPelanggaran'])->name('pelanggaran.daftar');
         Route::get('/beranda', [KonselorController::class, 'index'])->name('beranda');
         Route::post('/beranda/store', [KonselorController::class, 'store'])->name('pengumuman.store');
         Route::delete('/beranda/{id}', [KonselorController::class, 'destroy'])->name('pengumuman.destroy');
@@ -265,6 +268,12 @@ Route::middleware(['auth.session', 'ensure.student.data.ortu', 'role:orang_tua']
     Route::get('/profil', [ProfilController::class, 'index'])->name('profil');
     Route::get('/orang_tua/beranda', [OrangTuaController::class, 'index'])->name('orang_tua');
     Route::get('/orang_tua/catatan_perilaku', [OrangTuaController::class, 'catatan_perilaku'])->name('catatan_perilaku_orang_tua');
+});
+
+// Middleware untuk Super Admin
+Route::middleware(['auth.session', 'role:admin'])->group(function () {
+    Route::get('/admin/beranda', [AdminController::class, 'index'])->name('admin_beranda');
+    Route::get('/admin/add-user', [AdminController::class, 'indexUser'])->name('admin_add-user');
 });
 
 Route::post('/send-sms', [SmsController::class, 'send']);
