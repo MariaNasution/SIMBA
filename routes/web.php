@@ -36,7 +36,6 @@ use App\Http\Controllers\NotificationController;
 Route::post('/notifications/mark-read', [NotificationController::class, 'markAllRead'])->name('notifications.markRead');
 
 Route::post('/notifications/mark-as-read/{id}', [NotificationController::class, 'markAsRead'])
-    ->middleware('auth')
     ->name('notifications.markAsRead');
 use App\Http\Controllers\KonselingLanjutanController;
 use App\Http\Controllers\BeritaAcaraController;

@@ -12,12 +12,12 @@ class NotificationController extends Controller
     public function __construct(NotificationService $notificationService)
     {
         $this->notificationService = $notificationService;
+      
     }
 
     public function markAsRead(Request $request, $id)
     {
         $user = auth()->user();
-        dd($user);
         $success = $this->notificationService->markAsRead($user, $id);
 
         return response()->json([

@@ -18,7 +18,7 @@ class PerwalianObserver
 
     public function created(Perwalian $perwalian)
     {
-        $this->sendNotification($perwalian, 'dibuat');
+        $this->sendNotification($perwalian, 'dijadwalkan');
     }
 
     public function updated(Perwalian $perwalian)
@@ -28,7 +28,7 @@ class PerwalianObserver
 
     public function deleted(Perwalian $perwalian)
     {
-        $this->sendNotification($perwalian, 'dibatalkan/dihapus');
+        $this->sendNotification($perwalian, 'dibatalkan');
     }
 
     protected function sendNotification(Perwalian $perwalian, $actionText)
