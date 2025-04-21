@@ -277,10 +277,17 @@ Route::middleware(['auth.session', 'ensure.student.data.ortu', 'role:orang_tua']
     Route::get('/orang_tua/catatan_perilaku', [OrangTuaController::class, 'catatan_perilaku'])->name('catatan_perilaku_orang_tua');
 });
 
-// Middleware untuk Super Admin
-Route::middleware(['auth.session', 'role:admin'])->group(function () {
-    Route::get('/admin/beranda', [AdminController::class, 'index'])->name('admin_beranda');
-    Route::get('/admin/add-user', [AdminController::class, 'indexUser'])->name('admin_add-user');
+// Middleware untuk Admin
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
+    Route::get('/beranda', [AdminController::class, 'index'])->name('admin.beranda');
+
+    // CRUD Users
+    Route::get('/users', [AdminController::class, 'indexUser'])->name('admin.users.index');
+    Route::get('/users/create', [AdminController::class, 'create'])->name('admin.users.create');
+    Route::post('/users', [AdminController::class, 'store'])->name('admin.users.store');
+    Route::get('/users/{user}/edit', [AdminController::class, 'edit'])->name('admin.users.edit');
+    Route::put('/users/{user}', [AdminController::class, 'update'])->name('admin.users.update');
+    Route::delete('/users/{user}', [AdminController::class, 'destroy'])->name('admin.users.destroy');
 });
 
 Route::post('/send-sms', [SmsController::class, 'send']);

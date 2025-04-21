@@ -32,7 +32,7 @@ class BreadCrumbService
             case 'kemahasiswaan':
                 return $this->generateKemahasiswaanBreadcrumbs($currentRoute, $params);
             case 'admin':
-                return $this->generateSuperAdminBreadcrumbs($currentRoute, $params);
+                return $this->generateAdminBreadcrumbs($currentRoute, $params);
             case 'orang_tua':
                 return $this->generateOrangTuaBreadcrumbs($currentRoute, $params);
             case 'keasramaan':
@@ -110,30 +110,47 @@ class BreadCrumbService
         return $breadcrumbs;
     }
 
-    protected function generateSuperAdminBreadcrumbs($currentRoute, $params = [])
+    protected function generateAdminBreadcrumbs($currentRoute, $params = [])
     {
         $breadcrumbs = [];
 
         Log::info('Current Route', ['route' => $breadcrumbs]);
         switch ($currentRoute) {
-            case 'admin_beranda':
+            case 'admin.beranda':
                 $breadcrumbs = [
                     ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => null],
                 ];
                 break;
 
-            case 'admin_add-user':
+            case 'admin.users.index':
                 $breadcrumbs = [
-                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('admin_add-user')],
-                    ['name' => '<i class="fas fa-user-edit"></i> Kelola Pengguna', 'url' => null],
+                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('admin.beranda')],
+                    ['name' => '<i class="fas fa-users-cog"></i> Kelola Pengguna', 'url' => null],
+                ];
+                break;
+
+            case 'admin.users.create':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('admin.beranda')],
+                    ['name' => '<i class="fas fa-users-cog"></i> Kelola Pengguna', 'url' => route('admin.users.index')],
+                    ['name' => '<i class="fas fa-user-plus"></i> Tambah Pengguna', 'url' => null],
+                ];
+                break;
+
+            case 'admin.users.edit':
+                $breadcrumbs = [
+                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('admin.beranda')],
+                    ['name' => '<i class="fas fa-users-cog"></i> Kelola Pengguna', 'url' => route('admin.users.index')],
+                    ['name' => '<i class="fas fa-user-edit"></i> Edit Pengguna', 'url' => null],
                 ];
                 break;
 
             default:
                 $breadcrumbs = [
-                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('admin_beranda')],
+                    ['name' => '<i class="fas fa-home"></i> Beranda', 'url' => route('admin.beranda')],
                     ['name' => '<i class="fas fa-question-circle"></i> Halaman Tidak Dikenal', 'url' => null],
                 ];
+                break;
         }
 
         return $breadcrumbs;
