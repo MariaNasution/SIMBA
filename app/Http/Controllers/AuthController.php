@@ -49,6 +49,8 @@ class AuthController extends Controller
             Log::info('Password match');
             Log::info('Login berhasil untuk user:', ['username' => $user->username, 'role' => $user->role]);
 
+            auth()->login($user);
+
             $apiToken = null;
             $data = null;
 
@@ -125,6 +127,10 @@ class AuthController extends Controller
                 case 'konselor':
                     Log::info('Redirecting to konselor route...');
                     return redirect()->route('konselor_beranda')->with('success', 'Login sebagai konselor berhasil!');
+                
+                case 'admin':
+                    Log::info('Redirecting to admin route...');
+                    return redirect()->route('admin.beranda')->with('success', 'Login sebagai admin berhasil!');
 
                 default:
                     Log::warning('Unknown role detected:', ['role' => $user->role]);
