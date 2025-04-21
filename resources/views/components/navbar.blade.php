@@ -18,10 +18,10 @@
 
         <div class="nav-icons">
             <div class="dropdown position-relative me-3">
-                <a href="#" class="text-decoration-none" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <a href="#" class="text-decoration-none" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notifications">
                     <i class="fas fa-bell fs-5 cursor-pointer" title="Notifications"></i>
                     @if(isset($notifications) && $notifications->count() > 0)
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-count">
                             {{ $notifications->count() }}
                             <span class="visually-hidden">unread notifications</span>
                         </span>
@@ -30,20 +30,14 @@
                 <ul class="dropdown-menu" aria-labelledby="notificationDropdown">
                     <li><h6 class="dropdown-header">Notifikasi</h6></li>
                     @php
-                        // Determine the role
-                        $userRole = session('user')['role'] ?? null;
+                        $userRole = auth()->user()->role ?? null;
                     @endphp
                     @forelse ($notifications as $notif)
                         @php
                             $notifData = $notif->data;
                             $type = $notifData['extra_data']['type'] ?? null;
                             $label = $type ? strtoupper($type) : 'INFO';
-
-                            $link = match($type) {
-                                'konseling' => route('mahasiswa_konseling'),
-                                'perwalian' => route('mahasiswa_perwalian'),
-                                default => route('mahasiswa_perwalian'),
-                            };
+                            $link = $notifData['extra_data']['link'] ?? route('mahasiswa_perwalian');
 
                             $badgeClass = match($type) {
                                 'konseling' => 'bg-success',
@@ -52,24 +46,26 @@
                             };
                         @endphp
                         <li>
-                            <!-- Using the dynamic link if present -->
-                            <a class="dropdown-item" href="{{ $link }}">
+                            <a class="dropdown-item notification-link" href="{{ $link }}" data-notification-id="{{ $notif->id }}">
                                 <span class="badge {{ $badgeClass }} me-1">[{{ $label }}]</span>
                                 {{ $notif->data['message'] ?? 'No message' }}
                             </a>
                         </li>
                     @empty
                         <li>
-                            <a class="dropdown-item" href="">Tidak ada notifikasi</a>
+                            <a class="dropdown-item" href="#">Tidak ada notifikasi</a>
                         </li>
                     @endforelse
                 </ul>
             </div>
 
             <div class="logout">
-                <a href="{{ route('logout') }}" onclick="event.preventDefault(); confirmLogout();">
-                    <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
-                </a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: inline;">
+                    @csrf
+                    <a href="#" onclick="event.preventDefault(); confirmLogout();">
+                        <i class="fas fa-sign-out-alt fs-5 cursor-pointer" title="Logout"></i>
+                    </a>
+                </form>
             </div>
         </div>
     </nav>
@@ -174,8 +170,52 @@
     <script>
         function confirmLogout() {
             if (confirm('Are you sure you want to logout?')) {
-                window.location.href = "{{ route('logout') }}";
+                document.getElementById('logout-form').submit();
             }
         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const notificationLinks = document.querySelectorAll('.notification-link');
+            notificationLinks.forEach(link => {
+                link.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    const notificationId = this.getAttribute('data-notification-id');
+                    const url = this.getAttribute('href');
+
+                    // Send AJAX request to mark notification as read
+                    fetch("{{ route('notifications.markAsRead', ['id' => '__ID__']) }}".replace('__ID__', notificationId), {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update the badge count
+                            const badge = document.getElementById('notification-count');
+                            let count = parseInt(badge.textContent) - 1;
+                            if (count <= 0) {
+                                badge.remove();
+                            } else {
+                                badge.textContent = count;
+                            }
+                            // Navigate to the link
+                            window.location.href = url;
+                        } else {
+                            console.error('Failed to mark notification as read:', data.message);
+                            // Still navigate to the link even if marking fails
+                            window.location.href = url;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error marking notification as read:', error);
+                        // Navigate to the link even if the request fails
+                        window.location.href = url;
+                    });
+                });
+            });
+        });
     </script>
 @endif

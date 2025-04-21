@@ -9,6 +9,7 @@ use App\Observers\StudentBehaviorObserver;
 use App\Models\RequestKonseling;
 use App\Observers\PerwalianObserver;
 use App\Observers\RequestKonselingObserver;
+use App\Services\NotificationService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,6 +28,9 @@ class AppServiceProvider extends ServiceProvider
     {
         StudentBehavior::observe(StudentBehaviorObserver::class);
         RequestKonseling::observe(RequestKonselingObserver::class);
-        Perwalian::observe(PerwalianObserver::class);
+        // Register PerwalianObserver with NotificationService dependency
+        Perwalian::observe(function () {
+            return new PerwalianObserver(app(NotificationService::class));
+        });
     }
 }

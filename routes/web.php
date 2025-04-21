@@ -31,9 +31,16 @@ use App\Http\Controllers\CatatanPerilakuDetailController;
 use App\Http\Controllers\SmsController;
 use App\Http\Controllers\NotificationController;
 
+
+
 Route::post('/notifications/mark-read', [NotificationController::class, 'markAllRead'])->name('notifications.markRead');
+
+Route::post('/notifications/mark-as-read/{id}', [NotificationController::class, 'markAsRead'])
+    ->middleware('auth')
+    ->name('notifications.markAsRead');
 use App\Http\Controllers\KonselingLanjutanController;
 use App\Http\Controllers\BeritaAcaraController;
+
 
 // Login dan Logout
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
