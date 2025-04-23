@@ -320,6 +320,7 @@ class AbsensiController extends Controller
                         'nim' => $nim,
                         'kelas' => $class,
                         'status_kehadiran' => $status,
+                        'tanggal' => $perwalian->Tanggal,
                         'keterangan' => $keterangan,
                         'created_at' => $date,
                         'updated_at' => now(),

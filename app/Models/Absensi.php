@@ -10,7 +10,7 @@ class Absensi extends Model
     protected $primaryKey = 'ID_Absensi';
     public $incrementing = true;
 
-    protected $fillable = ['ID_Absensi', 'ID_Perwalian', 'nim', 'kelas', 'status_kehadiran', 'keterangan'];
+    protected $fillable = ['ID_Absensi', 'ID_Perwalian', 'nim', 'kelas', 'tanggal', 'status_kehadiran', 'keterangan'];
 
     public function mahasiswa()
     {

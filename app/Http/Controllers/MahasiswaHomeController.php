@@ -3,13 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Calendar;
-use App\Models\Pengumuman;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Http;
 use App\Models\Absensi;
 use App\Models\Perwalian;
 use App\Models\Mahasiswa;
 use App\Models\Dosen;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 
 class MahasiswaHomeController extends Controller
 {
@@ -31,10 +30,8 @@ class MahasiswaHomeController extends Controller
         $nim = $mahasiswa->nim;
         $apiToken = session('api_token');
 
-        // Fetch student data and store related session data
         $studentData = $this->fetchStudentData($nim, $apiToken);
 
-        // Fetch academic performance data
         $performance = $this->fetchPenilaianData($nim, $apiToken);
 
         if (!$performance) {
@@ -42,7 +39,6 @@ class MahasiswaHomeController extends Controller
         }
         list($labels, $values) = $performance;
 
-        // Handle perwalian and notifications
         list(
             $dosen,
             $notifications,
@@ -51,19 +47,15 @@ class MahasiswaHomeController extends Controller
             $noPerwalianMessage
         ) = $this->handlePerwalian($mahasiswa);
 
-        // Additional data
-        $absensi = Absensi::where('nim', $mahasiswa->nim)
-            ->where('ID_Perwalian', $mahasiswa->ID_Perwalian)
-            ->first();
+        $attendanceData = $this->fetchAttendanceFrequency($nim, $mahasiswa->ID_Perwalian);
 
-        $pengumuman = Pengumuman::orderBy('created_at', 'desc')->get();
         $akademik = Calendar::where('type', 'akademik')->latest()->first();
         $bem = Calendar::where('type', 'bem')->latest()->first();
 
         return view('beranda.homeMahasiswa', compact(
             'labels',
             'values',
-            'pengumuman',
+            'attendanceData',
             'akademik',
             'bem',
             'notifications',
@@ -97,10 +89,10 @@ class MahasiswaHomeController extends Controller
                 ]);
                 return $studentData;
             } else {
-                Log::error('Student API request failed', ['status' => $response->status()]);
+                Log::error('Student API request failed', ['status' => $response->status(), 'nim' => $nim]);
             }
         } catch (\Exception $e) {
-            Log::error('Exception on fetching student data:', ['message' => $e->getMessage()]);
+            Log::error('Exception on fetching student data:', ['message' => $e->getMessage(), 'nim' => $nim]);
         }
         return [];
     }
@@ -114,8 +106,6 @@ class MahasiswaHomeController extends Controller
                 ->get('https://cis-dev.del.ac.id/api/library-api/get-penilaian', [
                     'nim' => $nim,
                 ]);
-
-            Log::info('Respons API mentah:', ['body' => $response->body()]);
 
             if ($response->successful()) {
                 $data = $response->json();
@@ -135,24 +125,96 @@ class MahasiswaHomeController extends Controller
                     $values[] = is_numeric($details['ip_semester']) ? (float) $details['ip_semester'] : 0;
                 }
 
-                Log::info('Data labels:', $labels);
-                Log::info('Data values:', $values);
-
                 return [$labels, $values];
             } else {
-                Log::error('Gagal mengambil data API', ['response' => $response->body()]);
+                Log::error('Penilaian API request failed', ['response' => $response->body(), 'nim' => $nim]);
             }
         } catch (\Exception $e) {
-            Log::error('Exception on fetching penilaian data:', ['message' => $e->getMessage()]);
+            Log::error('Exception on fetching penilaian data:', ['message' => $e->getMessage(), 'nim' => $nim]);
         }
 
         return null;
     }
 
+    private function fetchAttendanceFrequency(string $nim, ?string $idPerwalian): array
+    {
+        try {
+            $query = Absensi::where('nim', $nim);
+            if ($idPerwalian) {
+                $query->where('ID_Perwalian', $idPerwalian);
+            }
+
+            $absensiRecords = $query->get();
+
+            // Group records by date
+            $groupedByDate = $absensiRecords->groupBy(function ($record) {
+                return \Carbon\Carbon::parse($record->tanggal)->format('d/m/y');
+            })->filter(function ($group, $date) {
+                return $date !== null;
+            })->sortKeys();
+
+            $dates = $groupedByDate->keys()->toArray();
+            $values = [];
+            $colors = [];
+
+            foreach ($groupedByDate as $date => $records) {
+                $hadirCount = 0;
+                $alpaCount = 0;
+
+                foreach ($records as $record) {
+                    if ($record->status_kehadiran === 'hadir' || $record->status_kehadiran === 'izin') {
+                        $hadirCount++;
+                    } elseif ($record->status_kehadiran === 'alpa') {
+                        $alpaCount++;
+                    }
+                }
+
+                // Determine the status for this date
+                if ($hadirCount > 0) {
+                    $values[] = 0.5; // Hadir or Izin (middle position)
+                    $colors[] = '#007bff'; // Blue for Hadir
+                } else {
+                    $values[] = -0.5; // Tidak Hadir (Alpa, below middle)
+                    $colors[] = '#dc3545'; // Red for Tidak Hadir
+                }
+            }
+
+            // If no data, return a default dataset with two points
+            if (empty($dates)) {
+                return [
+                    'dates' => ['28/04/25', '29/04/25'],
+                    'values' => [-0.5, -0.5],
+                    'colors' => ['#dc3545', '#dc3545'],
+                ];
+            }
+
+            // If only one date, add a dummy date (next day) to ensure line chart renders
+            if (count($dates) === 1) {
+                $singleDate = \Carbon\Carbon::createFromFormat('d/m/y', $dates[0]);
+                $nextDate = $singleDate->addDay()->format('d/m/y');
+                $dates[] = $nextDate;
+                $values[] = $values[0]; // Repeat the same value
+                $colors[] = $colors[0]; // Repeat the same color
+            }
+
+            return [
+                'dates' => $dates,
+                'values' => $values,
+                'colors' => $colors,
+            ];
+        } catch (\Exception $e) {
+            Log::error('Exception on fetching attendance frequency:', ['message' => $e->getMessage(), 'nim' => $nim]);
+            return [
+                'dates' => ['28/04/25', '29/04/25'],
+                'values' => [-0.5, -0.5],
+                'colors' => ['#dc3545', '#dc3545'],
+            ];
+        }
+    }
+
     private function handlePerwalian(Mahasiswa $mahasiswa): array
     {
         $dosen = null;
-        // Use Laravel's built-in notifications relationship from the Mahasiswa model
         $notifications = $mahasiswa->notifications()->orderBy('created_at', 'desc')->get();
         $notificationCount = $notifications->count();
         $dosenNotifications = collect();
@@ -165,7 +227,6 @@ class MahasiswaHomeController extends Controller
         if ($perwalian) {
             $dosen = Dosen::where('nip', $perwalian->ID_Dosen_Wali)->first();
 
-            // Example: If you stored 'ID_Dosen_Wali' in the notification payload, you can extract them:
             $dosenWaliIds = $notifications->map(function ($notification) {
                 return $notification->data['ID_Dosen_Wali'] ?? null;
             })->filter()->unique();
@@ -179,12 +240,5 @@ class MahasiswaHomeController extends Controller
         }
 
         return [$dosen, $notifications, $dosenNotifications, $notificationCount, $noPerwalianMessage];
-    }
-
-
-    public function show($id)
-    {
-        $pengumuman = Pengumuman::findOrFail($id);
-        return view('beranda.detailpengumuman', compact('pengumuman'));
     }
 }

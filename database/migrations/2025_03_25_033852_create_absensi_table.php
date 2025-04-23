@@ -14,6 +14,7 @@ class CreateAbsensiTable extends Migration
             $table->string('nim');
             $table->enum('status_kehadiran', ['hadir', 'alpa', 'izin']);
             $table->string('kelas');
+            $table->dateTime('tanggal');
             $table->text('keterangan')->nullable();
             $table->timestamps();
 
