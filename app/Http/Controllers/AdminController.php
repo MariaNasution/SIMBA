@@ -1,59 +1,86 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Http\Requests\StoreUserRequest;
 use App\Services\UserService;
 use App\Models\User;
 use App\Models\Pengumuman;
+use App\Models\Dosen;
+use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
-    public function index()
-    {     
-        $users = User::all();
+    protected $userService;
 
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
+
+    public function index()
+    {
         $pengumuman = Pengumuman::orderBy('created_at', 'desc')->get();
-        
-        return view('beranda.homeAdmin', compact( 'pengumuman', 'users'));
+        return view('beranda.homeAdmin', compact('pengumuman'));
     }
 
     public function indexUser()
     {
         $this->authorize('viewAny', User::class);
-        $users = User::all();
+        // Ambil semua user dengan relasi dan urutkan agar admin di atas
+        $users = User::with(['mahasiswa', 'dosen', 'konselor', 'kemahasiswaan', 'keasramaan', 'orangTua'])
+            ->orderByRaw("CASE WHEN role = 'admin' THEN 0 ELSE 1 END")
+            ->get();
         return view('admin.users.index', compact('users'));
     }
-
+    
     public function create()
     {
         $this->authorize('create', User::class);
-        return view('admin.users.create');
+        $dosen = Dosen::all(); // Untuk dropdown ID_Dosen
+        return view('admin.users.create', compact('dosen'));
     }
 
-    public function store(StoreUserRequest $request, UserService $userService)
+    public function store(StoreUserRequest $request)
     {
         $this->authorize('create', User::class);
-        $userService->createUserWithRole($request->validated());
-        return redirect()->route('admin.users.index')->with('success', 'User berhasil ditambahkan!');
+        try {
+            $this->userService->createUserWithRole($request->validated());
+            return redirect()->route('admin.users.index')->with('success', 'User berhasil ditambahkan!');
+        } catch (\Exception $e) {
+            Log::error('Error creating user: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Gagal menambahkan user. Silakan coba lagi.');
+        }
     }
 
     public function edit(User $user)
     {
         $this->authorize('update', $user);
-        return view('admin.users.edit', compact('user'));
+        $dosen = Dosen::all(); // Untuk dropdown ID_Dosen
+        return view('admin.users.edit', compact('user', 'dosen'));
     }
 
-    public function update(StoreUserRequest $request, User $user, UserService $userService)
+    public function update(StoreUserRequest $request, User $user)
     {
         $this->authorize('update', $user);
-        $userService->updateUser($user, $request->validated());
-        return redirect()->route('admin.users.index')->with('success', 'User berhasil diperbarui!');
+        try {
+            $this->userService->updateUser($user, $request->validated());
+            return redirect()->route('admin.users.index')->with('success', 'User berhasil diperbarui!');
+        } catch (\Exception $e) {
+            Log::error('Error updating user: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Gagal memperbarui user. Silakan coba lagi.');
+        }
     }
 
     public function destroy(User $user)
     {
         $this->authorize('delete', $user);
-        $user->delete();
-        return redirect()->route('admin.users.index')->with('success', 'User berhasil dihapus!');
+        try {
+            $user->delete();
+            return redirect()->route('admin.users.index')->with('success', 'User berhasil dihapus!');
+        } catch (\Exception $e) {
+            Log::error('Error deleting user: ' . $e->getMessage());
+            return back()->with('error', 'Gagal menghapus user. Silakan coba lagi.');
+        }
     }
 }
