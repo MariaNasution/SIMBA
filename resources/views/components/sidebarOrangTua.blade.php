@@ -8,7 +8,7 @@
   </div>
   <div class="profile-section">
     <div class="profile-card">
-      <a href="{{ route('profil') }}">
+      <a href="{{ route('orang_tua') }}">
         <img src="{{ asset('assets/img/profil.jpg') }}" alt="Profile Picture" class="profile-picture">
         <h4 class="profile-name">
           {{ session('student_data_ortu.nama') ?? 'Nama Tidak Ditemukan' }}

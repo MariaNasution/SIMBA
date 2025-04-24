@@ -13,8 +13,8 @@ class EnsureStudentDataOrtu
     {
         $userRole = $request->session()->get('user.role');
         
-        if (in_array($userRole, ['mahasiswa'])) {
-            if (!$request->session()->has('student_data')) {
+        if (in_array($userRole, ['mahasiswa', 'orang_tua'])) {
+            if (!$request->session()->has('student_data_ortu')) {
                 $apiToken = $request->session()->get('api_token');
                 $user = $request->session()->get('user');
 
@@ -28,7 +28,7 @@ class EnsureStudentDataOrtu
 
                         if ($response->successful()) {
                             $data = $response->json();
-                            $request->session()->put('student_data', $data['data']);
+                            $request->session()->put('student_data_ortu', $data['data']);
                         } else {
                             Log::error('API request failed:', ['status' => $response->status()]);
                             // Fallback: set default empty data

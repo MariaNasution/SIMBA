@@ -14,6 +14,7 @@ class OrangTuaController extends Controller
     {
         $pengumuman = Pengumuman::orderBy('created_at', 'desc')->get();
         return view('beranda.homeOrangTua', compact('pengumuman'));
+        
     }
 
     public function catatan_perilaku()
