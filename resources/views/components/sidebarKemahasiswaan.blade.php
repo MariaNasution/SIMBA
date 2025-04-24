@@ -23,12 +23,12 @@
         <ul class="submenu" id="konseling-submenu" style="display: none;">
             <li class="submenu-item">
                 <a href="{{ route('kemahasiswaan_daftar_pelanggaran') }}">
-                    <i class="fas fa-exclamation-triangle"></i> Daftar Pelanggaran
+                    <i class="fas fa-list"></i> Daftar Pelanggaran
                 </a>
             </li>
             <li class="submenu-item">
                 <a href="{{ route('kemahasiswaan_hasil_konseling') }}">
-                    <i class="fas fa-clipboard-check"></i> Hasil Konseling
+                    <i class="fas fa-book"></i> Hasil Konseling
                 </a>
             </li>
             <li class="submenu-item">
@@ -48,12 +48,12 @@
             </li>
             <li class="submenu-item">
                 <a href="{{ route('kemahasiswaan_daftar_request') }}">
-                    <i class="fas fa-list-alt"></i> Daftar Request
+                    <i class="fas fa-book-open"></i> Daftar Request
                 </a>
             </li>
             <li class="submenu-item">
                 <a href="{{ route('kemahasiswaan_riwayat_daftar_request') }}">
-                    <i class="fas fa-history"></i> Riwayat Daftar Request
+                    <i class="fas fa-clock"></i> Riwayat Daftar Request
                 </a>
             </li>
         </ul>
