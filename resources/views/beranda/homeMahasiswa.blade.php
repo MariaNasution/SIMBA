@@ -61,127 +61,150 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" defer></script>
 
     @if (!empty($attendanceData['dates']))
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                // Debug: Verify Chart.js is loaded
-                console.log('Chart.js loaded:', typeof Chart !== 'undefined' ? 'Yes' : 'No');
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        try {
+            const ctx = document.getElementById('frekuensiKehadiranChart').getContext('2d');
+            if (!ctx) {
+                throw new Error('Canvas element "frekuensiKehadiranChart" not found');
+            }
 
-                const attendanceData = @json($attendanceData);
-                console.log('Attendance Data:', attendanceData); // Debug data
+            const attendanceData = @json($attendanceData);
+            console.log('Raw Attendance Data:', attendanceData);
 
-                const ctx = document.getElementById('frekuensiKehadiranChart').getContext('2d');
-                const values = attendanceData.values;
-                const colors = attendanceData.colors;
-                const dates = attendanceData.dates;
+            // Validate attendance data
+            if (!attendanceData || !attendanceData.dates || !attendanceData.values || !attendanceData.colors) {
+                throw new Error('Invalid attendance data: missing required fields');
+            }
 
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: dates,
-                        datasets: [
-                            {
-                                label: 'Kehadiran',
-                                data: values,
-                                borderColor: (ctx) => {
-                                    const index = ctx.dataIndex;
-                                    if (index === undefined) {
-                                        // For segments, use the color array to determine the color between points
-                                        const p0 = ctx.p0DataIndex;
-                                        const p1 = ctx.p1DataIndex;
-                                        return values[p0] === 1 ? '#007bff' : '#dc3545';
-                                    }
-                                    return colors[index];
-                                },
-                                pointBackgroundColor: colors,
-                                pointBorderColor: colors,
-                                segment: {
-                                    borderColor: (ctx) => {
-                                        const p0 = ctx.p0DataIndex;
-                                        const p1 = ctx.p1DataIndex;
-                                        return values[p0] === 1 ? '#007bff' : '#dc3545';
-                                    },
-                                },
-                                fill: false,
-                                tension: 0.1,
-                                pointRadius: 5,
-                                pointHoverRadius: 7,
-                            },
-                        ],
+            const dates = attendanceData.dates;
+            const values = attendanceData.values;
+            const colors = attendanceData.colors;
+
+            console.log('Parsed Values:', values);
+            console.log('Colors:', colors);
+            console.log('Dates:', dates);
+
+            // Prepare data points
+            const dataPoints = dates.map((date, index) => ({
+                x: date,
+                y: values[index]
+            }));
+
+            // Create the chart with a single dataset and segment-based styling
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Attendance',
+                        data: dataPoints,
+                        borderColor: '#007bff', // Default, overridden by segment
+                        backgroundColor: colors,
+                        pointBackgroundColor: colors,
+                        pointBorderColor: colors,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        fill: false,
+                        tension: 0,
+                        segment: {
+                            borderColor: ctx => {
+                                const prevIndex = ctx.p0DataIndex;
+                                const currIndex = ctx.p1DataIndex;
+                                const prevValue = values[prevIndex];
+                                const currValue = values[currIndex];
+
+                                console.log('Segment:', {
+                                    prevIndex: prevIndex,
+                                    currIndex: currIndex,
+                                    prevValue: prevValue,
+                                    currValue: currValue,
+                                    prevDate: dates[prevIndex],
+                                    currDate: dates[currIndex]
+                                });
+
+                                // Same status: "Hadir" to "Hadir"
+                                if (prevValue === 0.5 && currValue === 0.5) {
+                                    console.log('Hadir to Hadir -> Blue');
+                                    return '#007bff';
+                                }
+                                // Same status: "Tidak Hadir" to "Tidak Hadir"
+                                if (prevValue === -0.5 && currValue === -0.5) {
+                                    console.log('Tidak Hadir to Tidak Hadir -> Red');
+                                    return '#dc3545';
+                                }
+                                // Transition: "Hadir" to "Tidak Hadir" (downward)
+                                if (prevValue === 0.5 && currValue === -0.5) {
+                                    console.log('Hadir to Tidak Hadir -> Red');
+                                    return '#dc3545';
+                                }
+                                // Transition: "Tidak Hadir" to "Hadir" (upward)
+                                if (prevValue === -0.5 && currValue === 0.5) {
+                                    console.log('Tidak Hadir to Hadir -> Blue');
+                                    return '#007bff';
+                                }
+                                // Fallback
+                                console.log('Fallback -> Blue');
+                                return '#007bff';
+                            }
+                        }
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            min: -1,
+                            max: 1,
+                            ticks: {
+                                stepSize: 1,
+                                callback: function(value) {
+                                    if (value === 0.5) return 'Hadir';
+                                    if (value === -0.5) return 'Tidak Hadir';
+                                    return '';
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        }
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            x: {
-                                title: {
-                                    display: false,
-                                },
-                                ticks: {
-                                    autoSkip: true,
-                                    maxTicksLimit: 10,
-                                },
-                            },
-                            y: {
-                                min: 0,
-                                max: 1,
-                                ticks: {
-                                    stepSize: 1,
-                                    callback: (value) => {
-                                        return value === 1 ? 'Hadir' : 'Tidak Hadir';
-                                    },
-                                },
-                            },
-                        },
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    usePointStyle: true,
-                                    pointStyle: 'line',
-                                    padding: 20,
-                                    generateLabels: (chart) => {
-                                        return [
-                                            {
-                                                text: 'Hadir',
-                                                fillStyle: '#007bff',
-                                                strokeStyle: '#007bff',
-                                                lineWidth: 2,
-                                                pointStyle: 'line',
-                                            },
-                                            {
-                                                text: 'Tidak Hadir',
-                                                fillStyle: '#dc3545',
-                                                strokeStyle: '#dc3545',
-                                                lineWidth: 2,
-                                                pointStyle: 'line',
-                                            },
-                                        ];
-                                    },
-                                },
-                            },
-                            tooltip: {
-                                enabled: true,
-                                mode: 'index',
-                                intersect: false,
-                                callbacks: {
-                                    label: (context) => {
-                                        const value = context.raw;
-                                        return value === 1 ? 'Hadir' : 'Tidak Hadir';
-                                    },
-                                },
-                            },
-                        },
-                        elements: {
-                            line: {
-                                borderWidth: 2,
-                            },
-                            point: {
-                                radius: 5,
-                            },
-                        },
-                    },
-                });
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                generateLabels: function(chart) {
+                                    return [
+                                        {
+                                            text: 'Hadir',
+                                            fillStyle: '#007bff',
+                                            strokeStyle: '#007bff',
+                                            pointStyle: 'line', // Use line style for legend
+                                            lineWidth: 2
+                                        },
+                                        {
+                                            text: 'Tidak Hadir',
+                                            fillStyle: '#dc3545',
+                                            strokeStyle: '#dc3545',
+                                            pointStyle: 'line', // Use line style for legend
+                                            lineWidth: 2
+                                        }
+                                    ];
+                                }
+                            }
+                        }
+                    }
+                }
             });
-        </script>
+        } catch (error) {
+            console.error('Error rendering attendance chart:', error);
+        }
+    });
+    </script>
     @endif
 @endsection

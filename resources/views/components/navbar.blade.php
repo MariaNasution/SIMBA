@@ -29,16 +29,13 @@
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="notificationDropdown">
                     <li><h6 class="dropdown-header">Notifikasi</h6></li>
-                    @php
-                        $userRole = auth()->user()->role ?? null;
-                    @endphp
-                    @forelse ($notifications as $notif)
+                    @forelse ($notifications as $notification)
                         @php
-                            $notifData = $notif->data;
-                            $type = $notifData['extra_data']['type'] ?? null;
-                            $label = $type ? strtoupper($type) : 'INFO';
-                            $link = $notifData['extra_data']['link'] ?? route('mahasiswa_perwalian');
-
+                            $notifData = $notification->data;
+                            $type = $notifData['extra_data']['type'] ?? 'info';
+                            $label = strtoupper($type);
+                            $link = $notifData['extra_data']['link'] ?? route('dosen.perwalian');
+                            $message = $notifData['message'] ?? 'No message';
                             $badgeClass = match($type) {
                                 'konseling' => 'bg-success',
                                 'perwalian' => 'bg-primary',
@@ -46,9 +43,9 @@
                             };
                         @endphp
                         <li>
-                            <a class="dropdown-item notification-link" href="{{ $link }}" data-notification-id="{{ $notif->id }}">
+                            <a class="dropdown-item notification-link" href="{{ $link }}" data-notification-id="{{ $notification->id }}">
                                 <span class="badge {{ $badgeClass }} me-1">[{{ $label }}]</span>
-                                {{ $notif->data['message'] ?? 'No message' }}
+                                {{ $message }}
                             </a>
                         </li>
                     @empty
@@ -70,7 +67,6 @@
         </div>
     </nav>
 
-    <!-- Styles remain unchanged -->
     <style>
         .breadcrumb-nav {
             display: flex;
@@ -182,7 +178,6 @@
                     const notificationId = this.getAttribute('data-notification-id');
                     const url = this.getAttribute('href');
 
-                    // Send AJAX request to mark notification as read
                     fetch("{{ route('notifications.markAsRead', ['id' => '__ID__']) }}".replace('__ID__', notificationId), {
                         method: 'POST',
                         headers: {
@@ -193,25 +188,23 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            // Update the badge count
                             const badge = document.getElementById('notification-count');
-                            let count = parseInt(badge.textContent) - 1;
-                            if (count <= 0) {
-                                badge.remove();
-                            } else {
-                                badge.textContent = count;
+                            if (badge) {
+                                let count = parseInt(badge.textContent) - 1;
+                                if (count <= 0) {
+                                    badge.remove();
+                                } else {
+                                    badge.textContent = count;
+                                }
                             }
-                            // Navigate to the link
                             window.location.href = url;
                         } else {
                             console.error('Failed to mark notification as read:', data.message);
-                            // Still navigate to the link even if marking fails
                             window.location.href = url;
                         }
                     })
                     .catch(error => {
                         console.error('Error marking notification as read:', error);
-                        // Navigate to the link even if the request fails
                         window.location.href = url;
                     });
                 });

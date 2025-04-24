@@ -5,7 +5,7 @@
     
         <!-- Success Popup -->
         <div id="successPopup" class="alert alert-success" style="display: none; position: fixed; top: 20px; right: 20px; z-index: 1000;">
-            Successfully made Perwalian
+            Successfully scheduled Perwalian!
         </div>
 
         <!-- Form Jadwal -->
@@ -68,36 +68,104 @@
     <script>
         document.getElementById('perwalianForm').addEventListener('submit', function(event) {
             event.preventDefault();
+
+            // Clear previous error messages
+            document.getElementById('jadwalMulaiError').textContent = '';
+            document.getElementById('jadwalSelesaiError').textContent = '';
+            document.getElementById('keteranganError').textContent = '';
+
             const formData = new FormData(this);
 
             fetch("{{ route('kemahasiswaan_perwalian.store') }}", {
                 method: 'POST',
                 body: formData,
                 headers: {
-                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                    'Accept': 'application/json'
                 }
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Show success popup
+                    // Show success popup and reset form
                     const popup = document.getElementById('successPopup');
                     popup.style.display = 'block';
                     setTimeout(() => {
                         popup.style.display = 'none';
                     }, 3000); // Fade away after 3 seconds
+                    this.reset(); // Clear form inputs
                 } else {
-                    // Display error messages
-                    document.getElementById('jadwalMulaiError').textContent = data.errors?.jadwalMulai || data.message || '';
-                    document.getElementById('jadwalSelesaiError').textContent = data.errors?.jadwalSelesai || '';
-                    document.getElementById('keteranganError').textContent = data.errors?.keterangan || '';
+                    // Display user-friendly error messages
+                    document.getElementById('jadwalMulaiError').textContent = data.errors?.jadwalMulai?.[0] 
+                        ? data.errors.jadwalMulai[0].replace('Jadwal Mulai', 'Start Date') 
+                        : '';
+                    document.getElementById('jadwalSelesaiError').textContent = data.errors?.jadwalSelesai?.[0] 
+                        ? data.errors.jadwalSelesai[0].replace('jadwalSelesai', 'End Date').replace('The End Date must be a date after jadwalMulai.', 'End Date must be after Start Date.') 
+                        : '';
+                    document.getElementById('keteranganError').textContent = data.errors?.keterangan?.[0] 
+                        ? formatKeteranganError(data.errors.keterangan[0]) 
+                        : data.message || 'An error occurred while scheduling. Please check your inputs.';
+
+                    // Handle general error messages
+                    if (data.message && !data.errors) {
+                        document.getElementById('keteranganError').textContent = formatGeneralError(data.message);
+                    }
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                document.getElementById('jadwalMulaiError').textContent = 'An unexpected error occurred.';
+                document.getElementById('keteranganError').textContent = 'An unexpected error occurred. Please try again.';
             });
         });
+
+        // Function to format keterangan error messages
+        function formatKeteranganError(error) {
+            // Check if the error is about an invalid timeframe
+            if (error.includes('not valid for the date')) {
+                // Extract date, expected keterangan, and selected keterangan
+                const dateMatch = error.match(/date (\d{4}-\d{2}-\d{2})/);
+                const expectedMatch = error.match(/Expected timeframe: (.*?)$/);
+                const selectedKeterangan = error.match(/keterangan '(.*?)'/);
+                
+                const date = dateMatch ? dateMatch[1] : 'the selected date';
+                const expected = expectedMatch ? expectedMatch[1] : 'the appropriate period';
+                const selected = selectedKeterangan ? selectedKeterangan[1] : 'the selected type';
+
+                // Provide guidance based on expected keterangan
+                let guidance = '';
+                switch (expected) {
+                    case 'Semester Baru':
+                        guidance = 'This can only be scheduled in January, August, or late May.';
+                        break;
+                    case 'Sebelum UTS':
+                        guidance = 'This can only be scheduled in February, early March, or September to mid-October.';
+                        break;
+                    case 'Sebelum UAS':
+                        guidance = 'This can only be scheduled in mid-March to early May, mid-October to early December.';
+                        break;
+                    default:
+                        guidance = 'Please select the correct period for this date.';
+                }
+
+                return `${selected} is not valid for ${date}. Please select ${expected}. ${guidance}`;
+            }
+            // Handle other keterangan errors (e.g., required field)
+            return error.replace('keterangan', 'Perwalian Type').replace('The Perwalian Type field is required.', 'Please select a Perwalian Type.');
+        }
+
+        // Function to format general error messages
+        function formatGeneralError(message) {
+            if (message.includes('already scheduled on this date')) {
+                return 'A Perwalian session is already scheduled for this date. Please choose a different date.';
+            }
+            if (message.includes('No dosen wali usernames found')) {
+                return 'No academic advisors are available to schedule a Perwalian. Please contact support.';
+            }
+            if (message.includes('You must be logged in as kemahasiswaan')) {
+                return 'You need to be logged in as a Kemahasiswaan user to schedule a Perwalian.';
+            }
+            return message;
+        }
     </script>
 
     <style>

@@ -30,6 +30,9 @@ class MahasiswaHomeController extends Controller
         $nim = $mahasiswa->nim;
         $apiToken = session('api_token');
 
+        // Debug: Log the logged-in student's NIM
+        Log::info('Logged-in Student NIM:', ['nim' => $nim]);
+
         $studentData = $this->fetchStudentData($nim, $apiToken);
 
         $performance = $this->fetchPenilaianData($nim, $apiToken);
@@ -48,6 +51,8 @@ class MahasiswaHomeController extends Controller
         ) = $this->handlePerwalian($mahasiswa);
 
         $attendanceData = $this->fetchAttendanceFrequency($nim, $mahasiswa->ID_Perwalian);
+        // Debug: Dump the final attendance data
+        // dd($attendanceData);
 
         $akademik = Calendar::where('type', 'akademik')->latest()->first();
         $bem = Calendar::where('type', 'bem')->latest()->first();
@@ -139,14 +144,22 @@ class MahasiswaHomeController extends Controller
     private function fetchAttendanceFrequency(string $nim, ?string $idPerwalian): array
     {
         try {
-            $query = Absensi::where('nim', $nim);
-            if ($idPerwalian) {
-                $query->where('ID_Perwalian', $idPerwalian);
+            // Step 1: Fetch Absensi records for the logged-in student only
+            $absensiRecords = Absensi::where('nim', $nim)->get();
+
+            // Debug: Log the retrieved records
+            Log::info('Absensi Records for Student:', ['nim' => $nim, 'records' => $absensiRecords->toArray()]);
+
+            if ($absensiRecords->isEmpty()) {
+                Log::warning('No Absensi records found for student:', ['nim' => $nim]);
+                return [
+                    'dates' => ['28/04/25', '29/04/25'],
+                    'values' => [-0.5, -0.5],
+                    'colors' => ['#dc3545', '#dc3545'],
+                ];
             }
 
-            $absensiRecords = $query->get();
-
-            // Group records by date
+            // Step 2: Group records by date
             $groupedByDate = $absensiRecords->groupBy(function ($record) {
                 return \Carbon\Carbon::parse($record->tanggal)->format('d/m/y');
             })->filter(function ($group, $date) {
@@ -157,30 +170,47 @@ class MahasiswaHomeController extends Controller
             $values = [];
             $colors = [];
 
+            // Debug: Log grouped data
+            Log::info('Grouped Absensi Records by Date for Student:', ['nim' => $nim, 'grouped' => $groupedByDate->toArray()]);
+
             foreach ($groupedByDate as $date => $records) {
                 $hadirCount = 0;
                 $alpaCount = 0;
 
                 foreach ($records as $record) {
-                    if ($record->status_kehadiran === 'hadir' || $record->status_kehadiran === 'izin') {
+                    // Normalize status_kehadiran for comparison
+                    $status = strtolower(trim($record->status_kehadiran));
+                    Log::info('Processing Record:', ['date' => $date, 'nim' => $record->nim, 'status' => $status]);
+
+                    if (in_array($status, ['hadir', 'izin'], true)) {
                         $hadirCount++;
-                    } elseif ($record->status_kehadiran === 'alpa') {
+                    } elseif ($status === 'alpa') {
                         $alpaCount++;
+                    } else {
+                        Log::warning('Unexpected status_kehadiran value:', ['status' => $record->status_kehadiran]);
                     }
                 }
 
+                // Debug: Log counts for this date
+                Log::info('Attendance Counts for Date:', [
+                    'date' => $date,
+                    'hadir_count' => $hadirCount,
+                    'alpa_count' => $alpaCount,
+                ]);
+
                 // Determine the status for this date
                 if ($hadirCount > 0) {
-                    $values[] = 0.5; // Hadir or Izin (middle position)
+                    $values[] = (float) 0.5; // Hadir or Izin (middle position)
                     $colors[] = '#007bff'; // Blue for Hadir
                 } else {
-                    $values[] = -0.5; // Tidak Hadir (Alpa, below middle)
+                    $values[] = (float) -0.5; // Tidak Hadir (Alpa, below middle)
                     $colors[] = '#dc3545'; // Red for Tidak Hadir
                 }
             }
 
             // If no data, return a default dataset with two points
             if (empty($dates)) {
+                Log::warning('No dates found after grouping Absensi records for student:', ['nim' => $nim]);
                 return [
                     'dates' => ['28/04/25', '29/04/25'],
                     'values' => [-0.5, -0.5],

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Perwalian;
 use App\Services\StudentSyncService;
 use Illuminate\Support\Facades\Cache;
+use GuzzleHttp\Promise\Utils;
 
 class DosenController extends Controller
 {
@@ -28,7 +29,7 @@ class DosenController extends Controller
         }
 
         $apiToken = session('api_token');
-        $nip = session('user')['username'];
+        $nip = session('user')['nip']; // Use nip from session
         $baseUrl = 'https://cis-dev.del.ac.id';
         
         if (!$apiToken) {
@@ -36,7 +37,6 @@ class DosenController extends Controller
         }
 
         try {
-            // 1. Fetch and update dosen details
             $dosenData = $this->fetchDosenData($apiToken, $baseUrl, $nip);
             if (!$dosenData) {
                 return back()->with('error', 'Failed to fetch lecturer data.');
@@ -47,18 +47,15 @@ class DosenController extends Controller
                 return back()->with('error', 'Dosen ID not found.');
             }
 
-            // 2. Fetch Dosen_Wali record and validate
             $dosenWali = DB::table('dosen_wali')->where('username', $nip)->first();
             if (!$dosenWali) {
                 return back()->with('error', 'Dosen Wali record not found for this lecturer.');
             }
 
-            // 3. Parse kelas and angkatan from dosen_wali
             $kelasAngkatanMap = $this->parseKelasAngkatan($dosenWali);
             $kelasList = array_keys($kelasAngkatanMap);
             
-            // 4. Process academic years in parallel
-            $academicYears = [2017, 2018, 2019, 2020];
+            $academicYears = [2020];
             $currentSem = 2;
             
             $studentsByYear = [];
@@ -67,13 +64,6 @@ class DosenController extends Controller
             $angkatanByKelasAndYear = [];
             
             foreach ($academicYears as $year) {
-                // Initialize arrays for this year
-                $studentsByYear[$year] = [];
-                $prodisByYear[$year] = [];
-                $semesterAveragesByYear[$year] = [];
-                $angkatanByKelasAndYear[$year] = [];
-                
-                // 5. Fetch students for this year
                 $yearData = $this->processYearData(
                     $dosenId, 
                     $year, 
@@ -84,23 +74,22 @@ class DosenController extends Controller
                     $baseUrl
                 );
                 
-                // Merge the results
                 $studentsByYear[$year] = $yearData['students'] ?? [];
                 $prodisByYear[$year] = $yearData['prodis'] ?? [];
                 $semesterAveragesByYear[$year] = $yearData['semesterAverages'] ?? [];
                 $angkatanByKelasAndYear[$year] = $yearData['angkatanByKelas'] ?? [];
             }
 
-            // 6. Check perwalian announcements
             $perwalianAnnouncement = $this->checkPerwalian($nip, $apiToken, $baseUrl);
+            $allAcademicYears = [2017, 2018, 2019, 2020];
             
-            // 7. Return the view with all the data
             return view('beranda.homeDosen', compact(
                 'studentsByYear', 
                 'prodisByYear', 
                 'angkatanByKelasAndYear', 
                 'perwalianAnnouncement', 
-                'semesterAveragesByYear'
+                'semesterAveragesByYear',
+                'allAcademicYears'
             ));
             
         } catch (\Exception $e) {
@@ -112,251 +101,239 @@ class DosenController extends Controller
         }
     }
 
-/**
- * Fetch and update dosen data in the session
- */
-private function fetchDosenData($apiToken, $baseUrl, $nip)
-{
-    $cacheKey = "dosen_data_{$nip}";
-    
-    // Try to get from cache first
-    if (Cache::has($cacheKey)) {
-        return Cache::get($cacheKey);
-    }
-    
-    $dosenResponse = Http::withToken($apiToken)
-        ->withOptions(['verify' => false])
-        ->timeout(15)
-        ->get("{$baseUrl}/api/library-api/dosen", ['nip' => $nip]);
-    
-    if (!$dosenResponse->successful()) {
-        Log::error('Failed to fetch dosen data', [
-            'status' => $dosenResponse->status(),
-            'response' => $dosenResponse->body(),
-        ]);
-        return null;
+    public function fetchYearData(Request $request)
+    {
+        $year = $request->input('year');
+        $apiToken = session('api_token');
+        $nip = session('user')['nip'];
+        $baseUrl = 'https://cis-dev.del.ac.id';
+        $currentSem = 2;
+
+        try {
+            $dosenData = $this->fetchDosenData($apiToken, $baseUrl, $nip);
+            $dosenId = $dosenData['pegawai_id'] ?? null;
+            if (!$dosenId) {
+                return response()->json(['error' => 'Dosen ID not found'], 400);
+            }
+
+            $dosenWali = DB::table('dosen_wali')->where('username', $nip)->first();
+            if (!$dosenWali) {
+                return response()->json(['error' => 'Dosen Wali record not found'], 400);
+            }
+
+            $kelasAngkatanMap = $this->parseKelasAngkatan($dosenWali);
+            $kelasList = array_keys($kelasAngkatanMap);
+
+            $yearData = $this->processYearData(
+                $dosenId, 
+                $year, 
+                $currentSem, 
+                $kelasList, 
+                $kelasAngkatanMap, 
+                $apiToken, 
+                $baseUrl
+            );
+
+            return response()->json($yearData);
+        } catch (\Exception $e) {
+            Log::error('Error fetching year data:', [
+                'year' => $year,
+                'message' => $e->getMessage(),
+            ]);
+            return response()->json(['error' => 'Failed to fetch year data'], 500);
+        }
     }
 
-    $dosenData = $dosenResponse->json();
-    $dosenSession = $dosenData['data']['dosen'][0];
-    
-    // Update session
-    session()->forget('user');
-    session(['user' => [
-        "username" => $nip,
-        "role" => 'dosen',
-        "pegawai_id" => $dosenSession['pegawai_id'],
-        "dosen_id" => $dosenSession['dosen_id'],
-        "nip" => $dosenSession['nip'],
-        "nama" => $dosenSession['nama'],
-        "email" => $dosenSession['email'],
-        "prodi_id" => $dosenSession['prodi_id'],
-        "prodi" => $dosenSession['prodi'],
-        "jabatan_akademik" => $dosenSession['jabatan_akademik'],
-        "jabatan_akademik_desc" => $dosenSession['jabatan_akademik_desc'],
-        "jenjang_pendidikan" => $dosenSession['jenjang_pendidikan'],
-        "nidn" => $dosenSession['nidn'],
-        "user_id" => $dosenSession['user_id'],
-    ]]);
-    
-    // Cache the result
-    Cache::put($cacheKey, $dosenSession, now()->addHour());
-    
-    return $dosenSession;
-}
+    private function fetchDosenData($apiToken, $baseUrl, $nip)
+    {
+        $cacheKey = "dosen_data_{$nip}";
+        
+        if (Cache::has($cacheKey)) {
+            return Cache::get($cacheKey);
+        }
+        
+        $dosenResponse = Http::withToken($apiToken)
+            ->withOptions(['verify' => false])
+            ->timeout(15)
+            ->get("{$baseUrl}/api/library-api/dosen", ['nip' => $nip]);
+        
+        if (!$dosenResponse->successful()) {
+            Log::error('Failed to fetch dosen data', [
+                'status' => $dosenResponse->status(),
+                'response' => $dosenResponse->body(),
+            ]);
+            return null;
+        }
 
-/**
- * Parse kelas and angkatan from dosen_wali record
- */
-private function parseKelasAngkatan($dosenWali)
-{
-    $kelasList = array_map('trim', explode(',', $dosenWali->kelas));
-    $angkatanList = array_map('trim', explode(',', $dosenWali->angkatan));
-
-    // Create a mapping of kelas to angkatan
-    $kelasAngkatanMap = [];
-    foreach ($kelasList as $index => $kelas) {
-        $angkatan = isset($angkatanList[$index]) ? $angkatanList[$index] : end($angkatanList);
-        $kelasAngkatanMap[$kelas] = $angkatan;
+        $dosenData = $dosenResponse->json();
+        $dosenSession = $dosenData['data']['dosen'][0];
+        
+        Cache::put($cacheKey, $dosenSession, now()->addHours(24));
+        
+        return $dosenSession;
     }
-    
-    return $kelasAngkatanMap;
-}
 
-/**
- * Process data for a specific academic year
- */
-private function processYearData($dosenId, $year, $currentSem, $kelasList, $kelasAngkatanMap, $apiToken, $baseUrl)
-{
-    $cacheKey = "year_data_{$dosenId}_{$year}_{$currentSem}";
-    
-    // Try to get from cache first
-    if (Cache::has($cacheKey)) {
-        return Cache::get($cacheKey);
+    private function parseKelasAngkatan($dosenWali)
+    {
+        $kelasList = array_map('trim', explode(',', $dosenWali->kelas));
+        $angkatanList = array_map('trim', explode(',', $dosenWali->angkatan));
+
+        $kelasAngkatanMap = [];
+        foreach ($kelasList as $index => $kelas) {
+            $angkatan = isset($angkatanList[$index]) ? $angkatanList[$index] : end($angkatanList);
+            $kelasAngkatanMap[$kelas] = $angkatan;
+        }
+        
+        return $kelasAngkatanMap;
     }
-    
-    $students = $this->studentSyncService->fetchStudents($dosenId, $year, $currentSem, null);
-    
-    if (empty($students)) {
-        Log::warning("No students fetched for year {$year}", [
-            'dosen_id' => $dosenId,
-            'semester' => $currentSem,
-        ]);
-        return [
+
+    private function processYearData($dosenId, $year, $currentSem, $kelasList, $kelasAngkatanMap, $apiToken, $baseUrl)
+    {
+        $cacheKey = "year_data_{$dosenId}_{$year}_{$currentSem}";
+        
+        if (Cache::has($cacheKey)) {
+            return Cache::get($cacheKey);
+        }
+        
+        $students = $this->studentSyncService->fetchStudents($dosenId, $year, $currentSem, null);
+        
+        if (empty($students)) {
+            Log::warning("No students fetched for year {$year}", [
+                'dosen_id' => $dosenId,
+                'semester' => $currentSem,
+            ]);
+            return [
+                'students' => [],
+                'prodis' => [],
+                'semzameAverages' => [],
+                'angkatanByKelas' => [],
+            ];
+        }
+
+        $studentsByKelas = [];
+        $angkatanByKelas = [];
+        
+        foreach ($students as $student) {
+            $kelas = $student['kelas'] ?? null;
+            if (is_null($kelas) || empty($kelas) || !in_array($kelas, $kelasList)) {
+                continue;
+            }
+            
+            $studentsByKelas[$kelas][] = $student;
+            $angkatanByKelas[$kelas] = $kelasAngkatanMap[$kelas] ?? $year;
+        }
+        
+        $result = [
             'students' => [],
             'prodis' => [],
             'semesterAverages' => [],
-            'angkatanByKelas' => [],
+            'angkatanByKelas' => $angkatanByKelas,
         ];
-    }
-
-    $studentsByKelas = [];
-    $angkatanByKelas = [];
-    
-    // Filter and group students by kelas
-    foreach ($students as $student) {
-        $kelas = $student['kelas'] ?? null;
-        if (is_null($kelas) || empty($kelas) || !in_array($kelas, $kelasList)) {
-            continue;
-        }
         
-        $studentsByKelas[$kelas][] = $student;
-        $angkatanByKelas[$kelas] = $kelasAngkatanMap[$kelas] ?? $year;
-    }
-    
-    // Process each class of students
-    $result = [
-        'students' => [],
-        'prodis' => [],
-        'semesterAverages' => [],
-        'angkatanByKelas' => $angkatanByKelas,
-    ];
-    
-    foreach ($studentsByKelas as $kelas => $classStudents) {
-        // Batch fetch penilaian data for all students in this class
-        $penilaianDataBatch = $this->batchFetchPenilaian($classStudents, $apiToken, $baseUrl, $year, $currentSem);
-        
-        // Process each student with their penilaian data
-        $semesterTotals = [];
-        $processedStudents = $this->processStudentsData($classStudents, $penilaianDataBatch, $kelas, $semesterTotals);
-        
-        $result['students'][$kelas] = $processedStudents;
-        $result['prodis'][$kelas] = $this->kelasToProdi($kelas) ?? null;
-        
-        // Calculate semester averages
-        $averages = [];
-        foreach ($semesterTotals as $sem => $data) {
-            if ($data['count'] > 0) {
-                $averages[$sem] = number_format($data['total'] / $data['count'], 2);
-            }
-        }
-        $result['semesterAverages'][$kelas] = $averages;
-    }
-    
-    // Cache the result
-    Cache::put($cacheKey, $result, now()->addHour());
-    
-    return $result;
-}
-
-/**
- * Process student data with penilaian information
- */
-private function processStudentsData($students, $penilaianDataBatch, $kelas, &$semesterTotals)
-{
-    $processedStudents = [];
-    
-    foreach ($students as $student) {
-        $nim = $student['nim'] ?? null;
-        if (!$nim) continue;
-
-        $penilaianData = $penilaianDataBatch[$nim] ?? [
-            'IP' => '0.00',
-            'IP Semester' => [],
-            'status_krs' => 'Approved',
-        ];
-
-        $ipk = isset($penilaianData['IP']) && is_numeric($penilaianData['IP']) 
-            ? number_format(floatval($penilaianData['IP']), 2)
-            : null;
-
-        $ipSemesterData = $penilaianData['IP Semester'] ?? [];
-        $validIps = [];
-        
-        foreach ($ipSemesterData as $entry) {
-            if (isset($entry['ip_semester']) && isset($entry['sem']) && 
-                is_numeric($entry['ip_semester']) && 
-                $entry['ip_semester'] !== "Belum di-generate") {
-                $sem = $entry['sem'];
-                $ip = floatval($entry['ip_semester']);
-                $validIps[] = $entry;
-
-                if (!isset($semesterTotals[$sem])) {
-                    $semesterTotals[$sem] = ['total' => 0, 'count' => 0];
+        foreach ($studentsByKelas as $kelas => $classStudents) {
+            $penilaianDataBatch = $this->batchFetchPenilaian($classStudents, $apiToken, $baseUrl, $year, $currentSem);
+            
+            $semesterTotals = [];
+            $processedStudents = $this->processStudentsData($classStudents, $penilaianDataBatch, $kelas, $semesterTotals);
+            
+            $result['students'][$kelas] = $processedStudents;
+            $result['prodis'][$kelas] = $this->kelasToProdi($kelas) ?? null;
+            
+            $averages = [];
+            foreach ($semesterTotals as $sem => $data) {
+                if ($data['count'] > 0) {
+                    $averages[$sem] = number_format($data['total'] / $data['count'], 2);
                 }
-                $semesterTotals[$sem]['total'] += $ip;
-                $semesterTotals[$sem]['count'] += 1;
             }
+            $result['semesterAverages'][$kelas] = $averages;
         }
-
-        $ips = null;
-        $semester = null;
         
-        if (!empty($validIps)) {
-            usort($validIps, function ($a, $b) {
-                return $b['sem'] - $a['sem'];
-            });
-            $ips = $validIps[0]['ip_semester'];
-            $semester = $validIps[0]['sem'];
-        } else {
-            $semester = 1; // Default to first semester if no valid IPs
-        }
-
-        $statusKrs = $penilaianData['status_krs'] ?? null;
+        Cache::put($cacheKey, $result, now()->addHours(24));
         
-        $student['ipk'] = $ipk;
-        $student['ips'] = $ips;
-        $student['status_krs'] = $statusKrs;
-        $student['semester'] = $semester;
-        $student['kelas'] = $kelas;
-        
-        $processedStudents[] = $student;
+        return $result;
     }
-    
-    return $processedStudents;
-}
+
+    private function processStudentsData($students, $penilaianDataBatch, $kelas, &$semesterTotals)
+    {
+        $processedStudents = [];
+        
+        foreach ($students as $student) {
+            $nim = $student['nim'] ?? null;
+            if (!$nim) continue;
+
+            $penilaianData = $penilaianDataBatch[$nim] ?? [
+                'IP' => '0.00',
+                'IP Semester' => [],
+                'status_krs' => 'Approved',
+            ];
+
+            $ipk = isset($penilaianData['IP']) && is_numeric($penilaianData['IP']) 
+                ? number_format(floatval($penilaianData['IP']), 2)
+                : null;
+
+            $ipSemesterData = $penilaianData['IP Semester'] ?? [];
+            $latestIp = null;
+            $latestSem = null;
+            
+            foreach ($ipSemesterData as $entry) {
+                if (isset($entry['ip_semester']) && isset($entry['sem']) && 
+                    is_numeric($entry['ip_semester']) && 
+                    $entry['ip_semester'] !== "Belum di-generate") {
+                    $sem = $entry['sem'];
+                    $ip = floatval($entry['ip_semester']);
+                    
+                    if ($latestSem === null || $sem > $latestSem) {
+                        $latestSem = $sem;
+                        $latestIp = $entry['ip_semester'];
+                    }
+
+                    if (!isset($semesterTotals[$sem])) {
+                        $semesterTotals[$sem] = ['total' => 0, 'count' => 0];
+                    }
+                    $semesterTotals[$sem]['total'] += $ip;
+                    $semesterTotals[$sem]['count'] += 1;
+                }
+            }
+
+            $ips = $latestIp;
+            $semester = $latestSem ?? 1;
+
+            $statusKrs = $penilaianData['status_krs'] ?? null;
+            
+            $student['ipk'] = $ipk;
+            $student['ips'] = $ips;
+            $student['status_krs'] = $statusKrs;
+            $student['semester'] = $semester;
+            $student['kelas'] = $kelas;
+            
+            $processedStudents[] = $student;
+        }
+        
+        return $processedStudents;
+    }
+
     public function showDetailedClass($year, $kelas)
     {
         ini_set('max_execution_time', 120);
 
-        if (!session('user') || session('user')['role'] !== 'dosen') {
+        if (!session('user') || seszsion('user')['role'] !== 'dosen') {
             return redirect()->route('login')->with('error', 'Unauthorized access.');
         }
 
         $apiToken = session('api_token');
-        $nip = session('user')['username'];
+        $nip = session('user')['nip'];
         $baseUrl = 'https://cis-dev.del.ac.id';
         $students = [];
         $currentSem = 2;
 
         if ($apiToken) {
             try {
-                $dosenResponse = Http::withToken($apiToken)
-                    ->withOptions(['verify' => false])
-                    ->timeout(15)
-                    ->get("{$baseUrl}/api/library-api/dosen", ['nip' => $nip]);
-
-                if (!$dosenResponse->successful()) {
-                    Log::error('Failed to fetch dosen data', [
-                        'status' => $dosenResponse->status(),
-                        'response' => $dosenResponse->body(),
-                    ]);
+                $dosenData = $this->fetchDosenData($apiToken, $baseUrl, $nip);
+                if (!$dosenData) {
                     return back()->with('error', 'Failed to fetch lecturer data.');
                 }
 
-                $dosenData = $dosenResponse->json();
-                // search by pegawai_id not dosen_id
-                $dosenId = $dosenData['data']['dosen'][0]['pegawai_id'] ?? null;
+                $dosenId = $dosenData['pegawai_id'] ?? null;
                 if (!$dosenId) {
                     return back()->with('error', 'Dosen ID not found.');
                 }                
@@ -405,7 +382,8 @@ private function processStudentsData($students, $penilaianDataBatch, $kelas, &$s
                         $ipSemesterData = [];
                     }
 
-                    $validIps = [];
+                    $latestIp = null;
+                    $latestSem = null;
                     foreach ($ipSemesterData as $entry) {
                         if (!is_array($entry)) {
                             Log::warning("IP Semester entry is not an array for student {$nim}", ['entry' => $entry]);
@@ -414,20 +392,17 @@ private function processStudentsData($students, $penilaianDataBatch, $kelas, &$s
                         if (isset($entry['ip_semester']) && isset($entry['sem']) && 
                             is_numeric($entry['ip_semester']) && 
                             $entry['ip_semester'] !== "Belum di-generate") {
-                            $validIps[] = $entry;
+                            $sem = $entry['sem'];
+                            if ($latestSem === null || $sem > $latestSem) {
+                                $latestSem = $sem;
+                                $latestIp = $entry['ip_semester'];
+                            }
                         }
                     }
 
-                    $ips = null;
-                    if (!empty($validIps)) {
-                        usort($validIps, function ($a, $b) {
-                            return $b['sem'] - $a['sem'];
-                        });
-                        $ips = $validIps[0]['ip_semester'];
-                    }
-
+                    $ips = $latestIp;
                     $statusKrs = $penilaianData['status_krs'] ?? null;
-                    $semester = !empty($validIps) ? $validIps[0]['sem'] : $currentSem;
+                    $semester = $latestSem ?? $currentSem;
 
                     $studentData = array_merge($student, [
                         'ipk' => $ipk,
@@ -464,56 +439,99 @@ private function processStudentsData($students, $penilaianDataBatch, $kelas, &$s
             return $penilaianDataBatch;
         }
 
+        $batchSize = 50;
+        $nimChunks = array_chunk($nims, $batchSize);
         $promises = [];
-        foreach ($nims as $nim) {
-            $cacheKey = "penilaian_{$nim}_" . ($year ?? 'no_year') . "_{$semester}";
-            $cachedData = Cache::get($cacheKey);
 
-            if ($cachedData) {
-                $penilaianDataBatch[$nim] = $cachedData;
+        foreach ($nimChunks as $index => $nimChunk) {
+            $chunkKey = "penilaian_chunk_" . md5(implode(',', $nimChunk)) . "_{$year}_{$semester}";
+            $cachedChunk = Cache::get($chunkKey);
+
+            if ($cachedChunk) {
+                $penilaianDataBatch = array_merge($penilaianDataBatch, $cachedChunk);
                 continue;
             }
 
-            $promises[$nim] = Http::withToken($apiToken)
+            $queryParams = [];
+            foreach ($nimChunk as $i => $nim) {
+                $queryParams["nims[{$i}]"] = $nim;
+            }
+
+            $promises[$index] = Http::withToken($apiToken)
                 ->withOptions(['verify' => false])
                 ->timeout(15)
                 ->async()
-                ->get("{$baseUrl}/api/library-api/get-penilaian", [
-                    'nim' => $nim,
-                ]);
+                ->get("{$baseUrl}/api/library-api/get-penilaian", $queryParams);
         }
-    
-        foreach ($promises as $nim => $promise) {
-            try {
-                $response = $promise->wait();
-                if ($response->successful()) {
-                    $penilaianData = $response->json();
-                    $penilaianDataBatch[$nim] = $penilaianData;
-                    Cache::put("penilaian_{$nim}_" . ($year ?? 'no_year') . "_{$semester}", $penilaianData, now()->addHour());
-                } else {
-                    Log::warning("Failed to fetch penilaian data for student {$nim}", [
-                        'status' => $response->status(),
-                        'response' => $response->body(),
-                    ]);
-                    $penilaianDataBatch[$nim] = [
+
+        $results = Utils::settle($promises)->wait();
+
+        foreach ($results as $index => $result) {
+            $nimChunk = $nimChunks[$index];
+            $chunkKey = "penilaian_chunk_" . md5(implode(',', $nimChunk)) . "_{$year}_{$semester}";
+            $chunkData = [];
+
+            if ($result['state'] === 'fulfilled' && $result['value']->successful()) {
+                $responseData = $result['value']->json();
+                
+                foreach ($nimChunk as $nim) {
+                    $penilaianData = $responseData[$nim] ?? [
                         'IP' => '0.00',
                         'IP Semester' => [],
                         'status_krs' => 'Approved',
                     ];
+                    $penilaianDataBatch[$nim] = $penilaianData;
+                    $chunkData[$nim] = $penilaianData;
                 }
-            } catch (\Exception $e) {
-                Log::error("Error fetching penilaian data for student {$nim}", [
-                    'message' => $e->getMessage(),
-                    'nim' => $nim,
-                    'sem_ta' => $semester,
+            } else {
+                Log::warning("Batch fetch failed for chunk {$index}, falling back to individual requests", [
+                    'status' => $result['value'] ? $result['value']->status() : 'N/A',
+                    'response' => $result['value'] ? $result['value']->body() : $result['reason'],
                 ]);
-                $penilaianDataBatch[$nim] = [
-                    'IP' => '0.00',
-                    'IP Semester' => [],
-                    'status_krs' => 'Approved',
-                ];
+
+                $individualPromises = [];
+                foreach ($nimChunk as $nim) {
+                    $cacheKey = "penilaian_{$nim}_{$year}_{$semester}";
+                    $cachedData = Cache::get($cacheKey);
+
+                    if ($cachedData) {
+                        $penilaianDataBatch[$nim] = $cachedData;
+                        $chunkData[$nim] = $cachedData;
+                        continue;
+                    }
+
+                    $individualPromises[$nim] = Http::withToken($apiToken)
+                        ->withOptions(['verify' => false])
+                        ->timeout(15)
+                        ->async()
+                        ->get("{$baseUrl}/api/library-api/get-penilaian", ['nim' => $nim]);
+                }
+
+                $individualResults = Utils::settle($individualPromises)->wait();
+                foreach ($individualResults as $nim => $indResult) {
+                    if ($indResult['state'] === 'fulfilled' && $indResult['value']->successful()) {
+                        $penilaianData = $indResult['value']->json();
+                        $penilaianDataBatch[$nim] = $penilaianData;
+                        $chunkData[$nim] = $penilaianData;
+                        Cache::put("penilaian_{$nim}_{$year}_{$semester}", $penilaianData, now()->addHours(24));
+                    } else {
+                        $penilaianDataBatch[$nim] = [
+                            'IP' => '0.00',
+                            'IP Semester' => [],
+                            'status_krs' => 'Approved',
+                        ];
+                        $chunkData[$nim] = $penilaianDataBatch[$nim];
+                        Log::warning("Failed to fetch penilaian data for student {$nim}", [
+                            'status' => $indResult['value'] ? $indResult['value']->status() : 'N/A',
+                            'response' => $indResult['value'] ? $indResult['value']->body() : $indResult['reason'],
+                        ]);
+                    }
+                }
             }
+
+            Cache::put($chunkKey, $chunkData, now()->addHours(24));
         }
+        
         return $penilaianDataBatch;
     }
 
@@ -521,6 +539,11 @@ private function processStudentsData($students, $penilaianDataBatch, $kelas, &$s
     {
         $user = session('user');
         try {
+            if (!isset($user['nip'])) {
+                Log::error('NIP not found in session for checkPerwalian', ['user' => $user]);
+                return null;
+            }
+
             $perwalian = Perwalian::where('ID_Dosen_Wali', $user['nip'])
                 ->where('Status', 'Scheduled')
                 ->get();

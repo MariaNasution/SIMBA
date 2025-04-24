@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Log;
 use App\Rules\ReCaptcha;
 use App\Models\User;
 use App\Models\Mahasiswa;
+use App\Models\Dosen;
+use Illuminate\Support\Facades\Http;
 
 class AuthController extends Controller
 {
@@ -85,22 +87,60 @@ class AuthController extends Controller
                 Log::error('API Error, melanjutkan dengan login lokal:', ['message' => $e->getMessage()]);
             }
 
-            $nim = null;
+            // Initialize session data
+            $sessionData = [
+                'username' => $user->username,
+                'role' => $user->role,
+            ];
+
+            // Role-specific session data
             if ($user->role === 'mahasiswa') {
                 $mahasiswa = Mahasiswa::where('username', $user->username)->first();
-                $nim = $mahasiswa ? $mahasiswa->nim : null;
-            } else if ($user->role === 'orang_tua') {
-                $nim = $user->orangTua?->nim;
+                $sessionData['nim'] = $mahasiswa ? $mahasiswa->nim : null;
+            } elseif ($user->role === 'dosen') {
+                // Fetch dosen data from the API (similar to fetchDosenData in DosenController)
+                $baseUrl = 'https://cis-dev.del.ac.id';
+                $dosenResponse = Http::withToken($apiToken)
+                    ->withOptions(['verify' => false])
+                    ->timeout(15)
+                    ->get("{$baseUrl}/api/library-api/dosen", ['nip' => $user->username]);
+
+                if (!$dosenResponse->successful()) {
+                    Log::error('Failed to fetch dosen data during login', [
+                        'status' => $dosenResponse->status(),
+                        'response' => $dosenResponse->body(),
+                    ]);
+                    return redirect()->route('login')->withErrors(['login' => 'Failed to fetch lecturer data.']);
+                }
+
+                $dosenData = $dosenResponse->json();
+                $dosenSession = $dosenData['data']['dosen'][0];
+
+                // Set the full dosen session data
+                $sessionData = [
+                    "username" => $user->username,
+                    "role" => 'dosen',
+                    "pegawai_id" => $dosenSession['pegawai_id'],
+                    "dosen_id" => $dosenSession['dosen_id'],
+                    "nip" => $dosenSession['nip'],
+                    "nama" => $dosenSession['nama'],
+                    "email" => $dosenSession['email'],
+                    "prodi_id" => $dosenSession['prodi_id'],
+                    "prodi" => $dosenSession['prodi'],
+                    "jabatan_akademik" => $dosenSession['jabatan_akademik'],
+                    "jabatan_akademik_desc" => $dosenSession['jabatan_akademik_desc'],
+                    "jenjang_pendidikan" => $dosenSession['jenjang_pendidikan'],
+                    "nidn" => $dosenSession['nidn'],
+                    "user_id" => $dosenSession['user_id'],
+                ];
+            } elseif ($user->role === 'orang_tua') {
+                $sessionData['nim'] = $user->orangTua?->nim;
             }
 
             session([
                 'api_token' => $apiToken,
                 'user_api' => $data['user'] ?? null,
-                'user' => [
-                    'username' => $user->username,
-                    'role' => $user->role,
-                    'nim' => $nim,
-                ],
+                'user' => $sessionData,
             ]);
 
             switch ($user->role) {
@@ -146,6 +186,7 @@ class AuthController extends Controller
     {
         session()->flush();
         session()->regenerate();
+   
         return redirect()->route('login');
     }
 }

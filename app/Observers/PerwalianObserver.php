@@ -33,7 +33,7 @@ class PerwalianObserver
 
     protected function sendNotification(Perwalian $perwalian, $actionText)
     {
-        // Fetch all Mahasiswa associated with this Perwalian (assuming a relationship or query)
+        // Fetch all Mahasiswa associated with this Perwalian
         $mahasiswaList = Mahasiswa::where('kelas', $perwalian->kelas)->get();
         if ($mahasiswaList->isEmpty()) {
             Log::error("No Mahasiswa found for Perwalian kelas {$perwalian->kelas}.");

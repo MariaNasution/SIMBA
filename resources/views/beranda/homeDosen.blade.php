@@ -5,7 +5,6 @@
     @if(isset($perwalianAnnouncement) && !empty($perwalianAnnouncement))
         <div class="announcement-banner">
             <div class="announcement-header">
-                <!-- Replace Font Awesome icon with custom image -->
                 <img src="{{ asset('assets/img/announcement_line.png') }}" alt="Announcement Icon" class="announcement-icon">
                 <h5>Pengumuman</h5>
             </div>
@@ -15,54 +14,52 @@
         </div>
     @endif
 
-    <div class="row">
-        @foreach ([2017, 2018, 2019, 2020] as $year)
-            @if (!empty($studentsByYear[$year]))
-                @foreach ($studentsByYear[$year] as $kelas => $classData)
-                    <div class="col-md-12 mb-4">
-                        <div class="card p-3">
-                            <h5 class="card-title">{{ $prodisByYear[$year][$kelas] }} {{ $angkatanByKelasAndYear[$year][$kelas] }} - {{ $kelas }}</h5>
-                            <div class="content-container" style="height: 300px; position: relative;">
-                                <!-- Table -->
-                                <div class="table-wrapper">
-                                    <table class="table table-bordered">
-                                        <thead>
+    <div class="row" id="class-cards">
+        @foreach ($studentsByYear as $year => $yearData)
+            @foreach ($yearData as $kelas => $classData)
+                <div class="col-md-12 mb-4" data-year="{{ $year }}" data-kelas="{{ $kelas }}">
+                    <div class="card p-3">
+                        <h5 class="card-title">{{ $prodisByYear[$year][$kelas] }} {{ $angkatanByKelasAndYear[$year][$kelas] }} - {{ $kelas }}</h5>
+                        <div class="content-container" style="height: 300px; position: relative;">
+                            <!-- Table -->
+                            <div class="table-wrapper">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>NIM</th>
+                                            <th>Nama</th>
+                                            <th>Semester</th>
+                                            <th>IPK</th>
+                                            <th>IPS</th>
+                                            <th>Status KRS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($classData as $student)
                                             <tr>
-                                                <th>NIM</th>
-                                                <th>Nama</th>
-                                                <th>Semester</th>
-                                                <th>IPK</th>
-                                                <th>IPS</th>
-                                                <th>Status KRS</th>
+                                                <td>{{ $student['nim'] ?? 'N/A' }}</td>
+                                                <td>{{ $student['nama'] ?? 'N/A' }}</td>
+                                                <td>{{ $student['semester'] ?? 'N/A' }}</td>
+                                                <td>{{ $student['ipk'] ?? 'N/A' }}</td>
+                                                <td>{{ $student['ips'] ?? 'N/A' }}</td>
+                                                <td>{{ $student['status_krs'] ?? 'N/A' }}</td>
                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($classData as $student)
-                                                <tr>
-                                                    <td>{{ $student['nim'] ?? 'N/A' }}</td>
-                                                    <td>{{ $student['nama'] ?? 'N/A' }}</td>
-                                                    <td>{{ $student['semester'] ?? 'N/A' }}</td>
-                                                    <td>{{ $student['ipk'] ?? 'N/A' }}</td>
-                                                    <td>{{ $student['ips'] ?? 'N/A' }}</td>
-                                                    <td>{{ $student['status_krs'] ?? 'N/A' }}</td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <!-- Chart -->
-                                <div class="chart-wrapper" style="display: none; height: 100%;">
-                                    <canvas class="progress-chart" style="max-height: 100%; max-width: 100%;"></canvas>
-                                </div>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
-                            <div class="text-end mt-2">
-                                <a href="#" class="btn btn-primary toggle-chart" data-year="{{ $year }}" data-kelas="{{ $kelas }}">Kemajuan Studi</a>
-                                <a href="{{ route('dosen.detailedClass', ['year' => $year, 'kelas' => $kelas]) }}" class="btn btn-secondary">Selengkapnya</a>
+                            <!-- Chart -->
+                            <div class="chart-wrapper" style="display: none; height: 100%;">
+                                <canvas class="progress-chart" style="max-height: 100%; max-width: 100%;"></canvas>
                             </div>
                         </div>
+                        <div class="text-end mt-2">
+                            <a href="#" class="btn btn-primary toggle-chart" data-year="{{ $year }}" data-kelas="{{ $kelas }}">Kemajuan Studi</a>
+                            <a href="{{ route('dosen.detailedClass', ['year' => $year, 'kelas' => $kelas]) }}" class="btn btn-secondary">Selengkapnya</a>
+                        </div>
                     </div>
-                @endforeach
-            @endif
+                </div>
+            @endforeach
         @endforeach
     </div>
 </div>
@@ -186,7 +183,7 @@
     }
 
     .table tbody tr:first-child td {
-        background-color: #F2DEDE;
+        background-color:#DFF0D8;
     }
 
     .table thead th {
@@ -197,98 +194,190 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const prodisByYear = @json($prodisByYear);
-    const semesterAveragesByYear = @json($semesterAveragesByYear);
-    const angkatanByKelasAndYear = @json($angkatanByKelasAndYear);
+    let prodisByYear = @json($prodisByYear);
+    let semesterAveragesByYear = @json($semesterAveragesByYear);
+    let angkatanByKelasAndYear = @json($angkatanByKelasAndYear);
 
     document.addEventListener('DOMContentLoaded', function() {
-        const toggleButtons = document.querySelectorAll('.toggle-chart');
-        
-        toggleButtons.forEach(button => {
-            let chartInitialized = false;
-            let chartInstance = null;
-            
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                const card = this.closest('.card');
-                const tableWrapper = card.querySelector('.table-wrapper');
-                const chartWrapper = card.querySelector('.chart-wrapper');
-                const canvas = chartWrapper.querySelector('.progress-chart');
-                const year = this.getAttribute('data-year');
-                const kelas = this.getAttribute('data-kelas');
-                const angkatan = angkatanByKelasAndYear[year][kelas] || year;
-                
-                if (tableWrapper.classList.contains('slide-out')) {
-                    tableWrapper.classList.remove('slide-out');
-                    chartWrapper.classList.remove('slide-in');
-                    setTimeout(() => {
-                        chartWrapper.style.display = 'none';
-                    }, 500);
-                    this.textContent = 'Kemajuan Studi';
-                } else {
-                    tableWrapper.classList.add('slide-out');
-                    chartWrapper.style.display = 'block';
-                    setTimeout(() => {
-                        chartWrapper.classList.add('slide-in');
-                    }, 10);
-                    this.textContent = 'Kembali ke Tabel';
-                    
-                    if (!chartInitialized) {
-                        const semesterAverages = semesterAveragesByYear[year][kelas] || {};
-                        const maxSemester = Math.max(...Object.keys(semesterAverages).map(Number), 5);
+        // Lazy load other academic years
+        const years = @json($allAcademicYears);
+        const loadedYears = @json(array_keys($studentsByYear));
+        const classCardsContainer = document.getElementById('class-cards');
 
-                        const labels = [];
-                        const data = [];
-                        for (let sem = 1; sem <= maxSemester; sem++) {
-                            labels.push(`Semester ${sem}`);
-                            data.push(semesterAverages[sem] || 0);
-                        }
-
-                        chartInstance = new Chart(canvas, {
-                            type: 'line',
-                            data: {
-                                labels: labels,
-                                datasets: [{
-                                    label: 'NR Rata-rata Kelas',
-                                    data: data,
-                                    borderColor: 'rgba(200, 0, 0, 1)',
-                                    backgroundColor: 'rgba(200, 0, 0, 0.2)',
-                                    fill: false,
-                                    tension: 0.1,
-                                    pointRadius: 5,
-                                    pointBackgroundColor: 'rgba(200, 0, 0, 1)',
-                                    pointBorderColor: 'rgba(200, 0, 0, 1)'
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: {
-                                    title: {
-                                        display: true,
-                                        text: `Progress Pencapaian ${prodisByYear[year][kelas]} ${angkatan} - ${kelas}`,
-                                        font: { size: 16 },
-                                        color: 'black'
-                                    },
-                                    legend: { position: 'bottom' }
-                                },
-                                scales: {
-                                    y: {
-                                        beginAtZero: false,
-                                        min: 2.0,
-                                        max: 4.0,
-                                        ticks: { stepSize: 0.5 },
-                                        title: { display: true, text: 'Index Prestasi' }
-                                    },
-                                    x: { title: { display: true, text: 'Semester' } }
-                                }
-                            }
-                        });
-                        chartInitialized = true;
+        years.forEach(year => {
+            if (!loadedYears.includes(Number(year))) {
+                fetch(`/dosen/fetch-year-data?year=${year}`, {
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error('Error loading year data:', data.error);
+                        return;
                     }
-                }
-            });
+
+                    // Update global variables
+                    prodisByYear[year] = data.prodis;
+                    semesterAveragesByYear[year] = data.semesterAverages;
+                    angkatanByKelasAndYear[year] = data.angkatanByKelas;
+
+                    // Append new cards to the DOM
+                    Object.keys(data.students).forEach(kelas => {
+                        const classData = data.students[kelas];
+                        const cardHtml = `
+                            <div class="col-md-12 mb-4" data-year="${year}" data-kelas="${kelas}">
+                                <div class="card p-3">
+                                    <h5 class="card-title">${data.prodis[kelas]} ${data.angkatanByKelas[kelas]} - ${kelas}</h5>
+                                    <div class="content-container" style="height: 300px; position: relative;">
+                                        <!-- Table -->
+                                        <div class="table-wrapper">
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>NIM</th>
+                                                        <th>Nama</th>
+                                                        <th>Semester</th>
+                                                        <th>IPK</th>
+                                                        <th>IPS</th>
+                                                        <th>Status KRS</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    ${classData.map(student => `
+                                                        <tr>
+                                                            <td>${student.nim || 'N/A'}</td>
+                                                            <td>${student.nama || 'N/A'}</td>
+                                                            <td>${student.semester || 'N/A'}</td>
+                                                            <td>${student.ipk || 'N/A'}</td>
+                                                            <td>${student.ips || 'N/A'}</td>
+                                                            <td>${student.status_krs || 'N/A'}</td>
+                                                        </tr>
+                                                    `).join('')}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <!-- Chart -->
+                                        <div class="chart-wrapper" style="display: none; height: 100%;">
+                                            <canvas class="progress-chart" style="max-height: 100%; max-width: 100%;"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="text-end mt-2">
+                                        <a href="#" class="btn btn-primary toggle-chart" data-year="${year}" data-kelas="${kelas}">Kemajuan Studi</a>
+                                        <a href="/dosen/class/${year}/${kelas}" class="btn btn-secondary">Selengkapnya</a>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        classCardsContainer.insertAdjacentHTML('beforeend', cardHtml);
+                    });
+
+                    // Re-attach event listeners for new toggle buttons
+                    attachToggleListeners();
+                })
+                .catch(error => console.error('Error fetching year data:', error));
+            }
         });
+
+        // Function to attach toggle listeners to chart buttons
+        function attachToggleListeners() {
+            const toggleButtons = document.querySelectorAll('.toggle-chart');
+            
+            toggleButtons.forEach(button => {
+                // Remove existing listeners to prevent duplicates
+                const newButton = button.cloneNode(true);
+                button.parentNode.replaceChild(newButton, button);
+
+                let chartInitialized = false;
+                let chartInstance = null;
+
+                newButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const card = this.closest('.card');
+                    const tableWrapper = card.querySelector('.table-wrapper');
+                    const chartWrapper = card.querySelector('.chart-wrapper');
+                    const canvas = chartWrapper.querySelector('.progress-chart');
+                    const year = this.getAttribute('data-year');
+                    const kelas = this.getAttribute('data-kelas');
+                    const angkatan = angkatanByKelasAndYear[year][kelas] || year;
+                    
+                    if (tableWrapper.classList.contains('slide-out')) {
+                        tableWrapper.classList.remove('slide-out');
+                        chartWrapper.classList.remove('slide-in');
+                        setTimeout(() => {
+                            chartWrapper.style.display = 'none';
+                        }, 500);
+                        this.textContent = 'Kemajuan Studi';
+                    } else {
+                        tableWrapper.classList.add('slide-out');
+                        chartWrapper.style.display = 'block';
+                        setTimeout(() => {
+                            chartWrapper.classList.add('slide-in');
+                        }, 10);
+                        this.textContent = 'Kembali ke Tabel';
+                        
+                        if (!chartInitialized) {
+                            const semesterAverages = semesterAveragesByYear[year][kelas] || {};
+                            const maxSemester = Math.max(...Object.keys(semesterAverages).map(Number), 5);
+
+                            const labels = [];
+                            const data = [];
+                            for (let sem = 1; sem <= maxSemester; sem++) {
+                                labels.push(`Semester ${sem}`);
+                                data.push(semesterAverages[sem] || 0);
+                            }
+
+                            chartInstance = new Chart(canvas, {
+                                type: 'line',
+                                data: {
+                                    labels: labels,
+                                    datasets: [{
+                                        label: 'NR Rata-rata Kelas',
+                                        data: data,
+                                        borderColor: 'rgba(200, 0, 0, 1)',
+                                        backgroundColor: 'rgba(200, 0, 0, 0.2)',
+                                        fill: false,
+                                        tension: 0.1,
+                                        pointRadius: 5,
+                                        pointBackgroundColor: 'rgba(200, 0, 0, 1)',
+                                        pointBorderColor: 'rgba(200, 0, 0, 1)'
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        title: {
+                                            display: true,
+                                            text: `Progress Pencapaian ${prodisByYear[year][kelas]} ${angkatan} - ${kelas}`,
+                                            font: { size: 16 },
+                                            color: 'black'
+                                        },
+                                        legend: { position: 'bottom' }
+                                    },
+                                    scales: {
+                                        y: {
+                                            beginAtZero: false,
+                                            min: 2.0,
+                                            max: 4.0,
+                                            ticks: { stepSize: 0.5 },
+                                            title: { display: true, text: 'Index Prestasi' }
+                                        },
+                                        x: { title: { display: true, text: 'Semester' } }
+                                    }
+                                }
+                            });
+                            chartInitialized = true;
+                        }
+                    }
+                });
+            });
+        }
+
+        // Initial attachment of toggle listeners
+        attachToggleListeners();
     });
 </script>
 @endsection

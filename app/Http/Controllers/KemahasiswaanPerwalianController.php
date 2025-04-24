@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Perwalian;
-use App\Models\Notifikasi;
 use App\Models\Dosen;
 use App\Models\Dosen_Wali;
 use App\Models\BeritaAcara;
 use App\Models\Absensi;
+use App\Services\NotificationService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -16,6 +16,13 @@ use Illuminate\Support\Facades\Validator;
 
 class KemahasiswaanPerwalianController extends Controller
 {
+    protected $notificationService;
+
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
     public function jadwalPerwalian()
     {
         Log::info('jadwalPerwalian method called');
@@ -56,6 +63,33 @@ class KemahasiswaanPerwalianController extends Controller
             ], 422);
         }
 
+        // Validate keterangan against the date
+        $startDate = Carbon::parse($request->jadwalMulai);
+        $month = (int) $startDate->month;
+        $day = (int) $startDate->day;
+        $category = $this->determineCategory($month, $day);
+        $categoryMap = [
+            'Semester Baru' => 'semester_baru',
+            'Sebelum UTS' => 'sebelum_uts',
+            'Sebelum UAS' => 'sebelum_uas',
+        ];
+        $selectedCategory = $categoryMap[$request->keterangan] ?? null;
+
+        if ($selectedCategory !== $category) {
+            Log::error('Keterangan does not match the expected timeframe', [
+                'keterangan' => $request->keterangan,
+                'expected_category' => $category,
+                'selected_category' => $selectedCategory,
+                'date' => $startDate->toDateString(),
+            ]);
+            return response()->json([
+                'success' => false,
+                'errors' => [
+                    'keterangan' => "The selected keterangan '{$request->keterangan}' is not valid for the date {$startDate->toDateString()}. Expected timeframe: " . array_search($category, $categoryMap, true),
+                ],
+            ], 422);
+        }
+
         try {
             $user = session('user');
             Log::info('Session user data in store method', ['user' => $user]);
@@ -78,7 +112,7 @@ class KemahasiswaanPerwalianController extends Controller
                 ], 404);
             }
 
-            $dosenList = Dosen::whereIn('nip', $usernames)->get();
+            $dosenList = Dosen::whereIn('username', $usernames)->get();
             Log::info('Fetched dosen records', [
                 'count' => $dosenList->count(),
                 'records' => $dosenList->toArray(),
@@ -91,10 +125,10 @@ class KemahasiswaanPerwalianController extends Controller
                 ], 404);
             }
 
-            $startDate = Carbon::parse($request->jadwalMulai)->startOfDay();
+            $startDate = Carbon::parse($request->jadwalMulai);
             $existingPerwalian = Perwalian::where('role', 'dosen')
                 ->where('Status', 'Scheduled')
-                ->whereDate('Tanggal', $startDate)
+                ->whereDate('Tanggal', $startDate->toDateString())
                 ->first();
 
             if ($existingPerwalian) {
@@ -131,16 +165,17 @@ class KemahasiswaanPerwalianController extends Controller
                 $formattedDateTime = "$dayName, $formattedDate at $startTime - $endTime";
 
                 foreach ($dosenList as $dosen) {
-                    $notificationMessage = "Perwalian scheduled for {$dosen->nama} (Keterangan: {$perwalian->keterangan}) - {$formattedDateTime}";
-                    $notificationData = [
-                        'Pesan' => $notificationMessage,
-                        'NIM' => null,
-                        'Id_Perwalian' => $perwalian->ID_Perwalian,
-                        'nama' => $dosen->nama,
-                        'role' => 'dosen',
-                    ];
-                    Log::info('Creating notification for dosen', ['data' => $notificationData]);
-                    Notifikasi::create($notificationData);
+                    $notificationMessage = "Perwalian scheduled for {$dosen->nama} - {$formattedDateTime}";
+                    $this->notificationService->sendNotification(
+                        $dosen,
+                        $notificationMessage,
+                        [
+                            'type' => 'perwalian',
+                            'id_perwalian' => $perwalian->ID_Perwalian,
+                            'link' => '#',
+                        ]
+                    );
+                    Log::info("Notification sent to Dosen {$dosen->username}: {$notificationMessage}");
                 }
 
                 return $perwalian;
@@ -149,7 +184,7 @@ class KemahasiswaanPerwalianController extends Controller
             Log::info('Transaction committed successfully');
             return response()->json([
                 'success' => true,
-                'message' => 'Perwalian scheduled successfully on ' . $startDate->toDateString(),
+                'message' => 'Perwalian scheduled successfully on ' . $startDate->toDateTimeString(),
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to schedule Perwalian', [
