@@ -11,6 +11,7 @@
         "guzzlehttp/promises": "^2.2",
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9",
+        "maatwebsite/excel": "^3.1",
         "mews/captcha": "^3.4",
         "twilio/sdk": "^8.4"
     },

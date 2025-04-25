@@ -49,9 +49,45 @@
         </div>
     </div>
 
+    <!-- Column Selection Checkboxes -->
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <h5>Pilih Kolom untuk Ekspor</h5>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="nim" value="nim" checked>
+                <label class="form-check-label" for="nim">NIM</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="nama" value="nama" checked>
+                <label class="form-check-label" for="nama">Nama</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="status_kehadiran" value="status_kehadiran" checked>
+                <label class="form-check-label" for="status_kehadiran">Status Kehadiran</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="keterangan_absensi" value="keterangan_absensi">
+                <label class="form-check-label" for="keterangan_absensi">Keterangan</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="kelas" value="kelas" checked>
+                <label class="form-check-label" for="kelas">Kelas</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="dosen_wali" value="dosen_wali">
+                <label class="form-check-label" for="dosen_wali">Dosen Wali</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="prodi" value="prodi">
+                <label class="form-check-label" for="prodi">Prodi</label>
+            </div>
+        </div>
+    </div>
+
     <!-- Search Results -->
     <div id="searchResults" class="mt-5 d-none">
         <h2>Hasil Pencarian</h2>
+        <button class="btn btn-success mb-3" onclick="exportBeritaAcara(event)">Ekspor ke Excel</button>
         <div id="resultsContainer"></div>
     </div>
 </div>
@@ -187,6 +223,7 @@
 
 <script>
     const searchRoute = "{{ route('kemahasiswaan_perwalian.berita_acara.search') }}";
+    const exportRoute = "{{ route('kemahasiswaan_perwalian.berita_acara.export') }}";
 
     function formatDate(dateString) {
         if (!dateString) return 'N/A';
@@ -368,6 +405,79 @@
             resultsContainer.innerHTML = `<p>Gagal melakukan pencarian: ${error.message}. Silakan coba lagi.</p>`;
             searchResults.classList.remove('d-none');
         });
+    }
+
+    function exportBeritaAcara(event) {
+        event.preventDefault();
+
+        const prodi = document.getElementById('pilihProdi').value;
+        const keterangan = document.getElementById('keterangan').value;
+        const angkatan = document.getElementById('angkatan').value;
+
+        if (!prodi || !keterangan || !angkatan) {
+            alert('Silakan pilih semua filter (Prodi, Keterangan, Angkatan).');
+            return;
+        }
+
+        // Get selected columns
+        const columns = [];
+        document.querySelectorAll('.form-check-input:checked').forEach(checkbox => {
+            columns.push(checkbox.value);
+        });
+
+        if (columns.length === 0) {
+            alert('Silakan pilih setidaknya satu kolom untuk diekspor.');
+            return;
+        }
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+        if (!csrfToken) {
+            alert('Gagal: CSRF token tidak ditemukan.');
+            return;
+        }
+
+        // Create a form to submit the request
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = exportRoute;
+        form.style.display = 'none';
+
+        // Add CSRF token
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = csrfToken;
+        form.appendChild(csrfInput);
+
+        // Add filter values
+        const prodiInput = document.createElement('input');
+        prodiInput.type = 'hidden';
+        prodiInput.name = 'prodi';
+        prodiInput.value = prodi;
+        form.appendChild(prodiInput);
+
+        const keteranganInput = document.createElement('input');
+        keteranganInput.type = 'hidden';
+        keteranganInput.name = 'keterangan';
+        keteranganInput.value = keterangan;
+        form.appendChild(keteranganInput);
+
+        const angkatanInput = document.createElement('input');
+        angkatanInput.type = 'hidden';
+        angkatanInput.name = 'angkatan';
+        angkatanInput.value = angkatan;
+        form.appendChild(angkatanInput);
+
+        // Add selected columns
+        const columnsInput = document.createElement('input');
+        columnsInput.type = 'hidden';
+        columnsInput.name = 'columns';
+        columnsInput.value = JSON.stringify(columns);
+        form.appendChild(columnsInput);
+
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
     }
 </script>
 @endsection

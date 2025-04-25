@@ -8,11 +8,13 @@ use App\Models\Dosen;
 use App\Models\Dosen_Wali;
 use App\Models\BeritaAcara;
 use App\Models\Absensi;
+use App\Exports\BeritaAcaraExport;
 use App\Services\NotificationService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 
 class KemahasiswaanPerwalianController extends Controller
 {
@@ -343,10 +345,12 @@ class KemahasiswaanPerwalianController extends Controller
                 'records' => $mahasiswaRecords->toArray(),
             ]);
 
-            $absensiWithNames = $absensiRecords->map(function ($absensi) use ($mahasiswaRecords) {
+            $absensiWithNames = $absensiRecords->map(function ($absensi) use ($mahasiswaRecords, $beritaAcaras) {
                 $absensiData = $absensi->toArray();
                 $absensiData['nama'] = $mahasiswaRecords->get($absensi->nim)?->nama ?? 'Unknown';
-                return $absensiData;
+                $berita = $beritaAcaras->firstWhere('kelas', $absensi->kelas);
+                $absensiData['dosen_wali'] = $berita->dosen_wali ?? 'N/A';
+                return (object) $absensiData;
             });
 
             Log::info('Absensi with names prepared', [
@@ -380,6 +384,145 @@ class KemahasiswaanPerwalianController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to search Berita Acara: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function exportBeritaAcara(Request $request)
+    {
+        try {
+            Log::info('exportBeritaAcara request received', ['request' => $request->all()]);
+
+            $prodiMap = [
+                'S1Informatika' => 'IF',
+                'S1TeknikRekayasaPerangkatLunak' => 'TRPL',
+                'S1TeknikKomputer' => 'TK',
+                'S1TeknikInformasi' => 'TI',
+                'S1TeknikBioproses' => 'TB',
+                'S1TeknikMetalurgi' => 'TM',
+                'S1SistemInformasi' => 'SI',
+                'S1TeknikElektro' => 'TE',
+                'S1ManajemenRekayasa' => 'MR',
+            ];
+
+            $categoryMap = [
+                'Semester Baru' => 'semester_baru',
+                'Sebelum UTS' => 'sebelum_uts',
+                'Sebelum UAS' => 'sebelum_uas',
+            ];
+
+            $validator = Validator::make($request->all(), [
+                'prodi' => 'required|string|in:' . implode(',', array_keys($prodiMap)),
+                'keterangan' => 'required|string|in:' . implode(',', array_keys($categoryMap)),
+                'angkatan' => 'required|integer|min:2000|max:' . date('Y'),
+                'columns' => 'required|json',
+            ]);
+
+            if ($validator->fails()) {
+                Log::error('Validation failed in exportBeritaAcara', ['errors' => $validator->errors()]);
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+
+            $prodi = $request->input('prodi');
+            $keterangan = $request->input('keterangan');
+            $angkatan = $request->input('angkatan');
+            $columns = json_decode($request->input('columns'), true);
+
+            if (empty($columns)) {
+                Log::error('No columns selected for export', ['columns' => $columns]);
+                return response()->json(['success' => false, 'message' => 'At least one column must be selected.'], 400);
+            }
+
+            $validColumns = ['nim', 'nama', 'status_kehadiran', 'keterangan_absensi', 'kelas', 'dosen_wali', 'prodi'];
+            if (array_diff($columns, $validColumns)) {
+                Log::error('Invalid columns selected', ['columns' => $columns]);
+                return response()->json(['success' => false, 'message' => 'Invalid column selection.'], 400);
+            }
+
+            $kelasPrefix = $prodiMap[$prodi] ?? null;
+            if (!$kelasPrefix) {
+                Log::error('Invalid prodi mapping', ['prodi' => $prodi]);
+                return response()->json(['success' => false, 'message' => 'Invalid Prodi value.'], 400);
+            }
+
+            $kelasPatterns = ["%{$kelasPrefix}1", "%{$kelasPrefix}2"];
+            $targetCategory = $categoryMap[$keterangan] ?? null;
+
+            if (!$targetCategory) {
+                Log::error('Invalid keterangan for category mapping', ['keterangan' => $keterangan]);
+                return response()->json(['success' => false, 'message' => 'Invalid Keterangan value.'], 400);
+            }
+
+            // Fetch BeritaAcara to get dosen_wali
+            $beritaAcaras = BeritaAcara::where('angkatan', $angkatan)
+                ->where(function ($query) use ($kelasPatterns) {
+                    $query->where('kelas', 'LIKE', $kelasPatterns[0])
+                          ->orWhere('kelas', 'LIKE', $kelasPatterns[1]);
+                })
+                ->get()
+                ->filter(function ($beritaAcara) use ($targetCategory) {
+                    $month = (int) Carbon::parse($beritaAcara->tanggal_perwalian)->month;
+                    $day = (int) Carbon::parse($beritaAcara->tanggal_perwalian)->day;
+                    return $this->determineCategory($month, $day) === $targetCategory;
+                })
+                ->take(2);
+
+            // Fetch Perwal potwier�
+
+            // Fetch related Perwalian records
+            $perwalian = Perwalian::where('angkatan', $angkatan)
+                ->where(function ($query) use ($kelasPatterns) {
+                    $query->where('kelas', 'LIKE', $kelasPatterns[0])
+                          ->orWhere('kelas', 'LIKE', $kelasPatterns[1]);
+                })
+                ->where('role', 'mahasiswa')
+                ->where('status', 'Completed')
+                ->where('keterangan', $keterangan)
+                ->get();
+
+            $perwalianIds = $perwalian->pluck('ID_Perwalian')->all();
+            $absensiRecords = Absensi::whereIn('ID_Perwalian', $perwalianIds)
+                ->where(function ($query) use ($kelasPatterns) {
+                    $query->where('kelas', 'LIKE', $kelasPatterns[0])
+                          ->orWhere('kelas', 'LIKE', $kelasPatterns[1]);
+                })
+                ->get();
+
+            $mahasiswaRecords = DB::table('mahasiswa')
+                ->whereIn('ID_Perwalian', $perwalianIds)
+                ->orderBy('nama')
+                ->get()
+                ->keyBy('nim');
+
+            $absensiWithNames = $absensiRecords->map(function ($absensi) use ($mahasiswaRecords, $beritaAcaras) {
+                $absensiData = $absensi->toArray();
+                $absensiData['nama'] = $mahasiswaRecords->get($absensi->nim)?->nama ?? 'Unknown';
+                $berita = $beritaAcaras->firstWhere('kelas', $absensi->kelas);
+                $absensiData['dosen_wali'] = $berita->dosen_wali ?? 'N/A';
+                return (object) $absensiData;
+            });
+
+            if ($absensiWithNames->isEmpty()) {
+                Log::info('No data available for export', ['filters' => $request->all()]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No data available for export.'
+                ], 404);
+            }
+
+            $filename = 'Berita_Acara_' . $prodi . '_' . $angkatan . '_' . str_replace(' ', '_', $keterangan) . '.xlsx';
+            return Excel::download(new BeritaAcaraExport($absensiWithNames, $columns), $filename);
+        } catch (\Exception $e) {
+            Log::error('Error in exportBeritaAcara', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to export Berita Acara: ' . $e->getMessage(),
             ], 500);
         }
     }

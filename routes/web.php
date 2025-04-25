@@ -32,7 +32,6 @@ use App\Http\Controllers\SmsController;
 use App\Http\Controllers\NotificationController;
 
 
-
 Route::post('/notifications/mark-read', [NotificationController::class, 'markAllRead'])->name('notifications.markRead');
 
 Route::post('/notifications/mark-as-read/{id}', [NotificationController::class, 'markAsRead'])
@@ -96,6 +95,7 @@ Route::middleware(['auth.session', 'role:kemahasiswaan'])
         Route::get('/perwalian/kelas', [KemahasiswaanPerwalianController::class, 'kelasPerwalian'])->name('perwalian.kelas');
         Route::get('/perwalian/berita-acara', [KemahasiswaanPerwalianController::class, 'beritaAcaraPerwalian'])->name('perwalian.berita_acara');
         Route::post('/perwalian/berita-acara/search', [KemahasiswaanPerwalianController::class, 'searchBeritaAcara'])->name('perwalian.berita_acara.search');
+        Route::post('/perwalian/berita-acara/export', [KemahasiswaanPerwalianController::class, 'exportBeritaAcara'])->name('perwalian.berita_acara.export');
 
         // Konseling
         Route::prefix('konseling')->group(function () {
@@ -123,7 +123,7 @@ Route::middleware(['auth.session', 'role:kemahasiswaan'])
             Route::get('/ajukan', [AjukanKonselingController::class, 'index'])->name('konseling.ajukan');
             Route::get('/cari', [AjukanKonselingController::class, 'cariMahasiswa'])->name('konseling.cari');
             Route::post('/ajukan', [AjukanKonselingController::class, 'ajukanKonseling'])->name('konseling.ajukan');
-            Route::get('/caririwayat', [RiwayatkonselingController::class, 'CariRiwayatMahasiswa'])->name('konseling.caririwayat');
+            Route::get('/caririwayat', [RiwayatKonselingController::class, 'CariRiwayatMahasiswa'])->name('konseling.caririwayat');
             Route::get('/konseling', [AjukanKonselingController::class, 'index'])->name('konseling.index');
             Route::get('/konseling/pilih', [AjukanKonselingController::class, 'pilihMahasiswa'])->name('konseling.pilih');
 

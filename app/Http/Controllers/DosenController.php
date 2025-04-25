@@ -316,7 +316,7 @@ class DosenController extends Controller
     {
         ini_set('max_execution_time', 120);
 
-        if (!session('user') || seszsion('user')['role'] !== 'dosen') {
+        if (!session('user') || session('user')['role'] !== 'dosen') {
             return redirect()->route('login')->with('error', 'Unauthorized access.');
         }
 

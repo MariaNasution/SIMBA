@@ -751,13 +751,19 @@ public function destroy(Request $request)
         }
     
         // Get Berita Acara record for catatan (from dosen wali)
+        // $beritaAcara = DB::table('berita_acaras')
+        //     ->where('kelas', $perwalian->kelas)
+        //     ->where('tanggal_perwalian', $perwalian->Tanggal)
+        //     ->where('user_id', $user->user_id)
+        //     ->first();
+
         $beritaAcara = DB::table('berita_acaras')
-            ->where('kelas', $perwalian->kelas)
-            ->where('tanggal_perwalian', $perwalian->Tanggal)
-            ->where('user_id', $user->user_id)
-            ->first();
+        ->where('kelas', $perwalian->kelas)
+        ->where('tanggal_perwalian', $perwalian->Tanggal)
+        ->first();
+            
+
         $catatan = $beritaAcara->catatan_feedback ?? null;
-    
         return view('dosen.detailed_histori', [
             'perwalian' => $perwalian,
             'students'  => $students,
