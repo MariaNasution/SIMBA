@@ -50,7 +50,6 @@
 @section('content')
 <!-- Header -->
 
-
 <div class="container mt-4">
   <div class="position-relative mb-4">
     <div class="text-center">

@@ -95,38 +95,39 @@
               </table>
             </div>
 
-            <!-- Tabel Perbuatan Baik -->
-            <div id="perbuatanBaikTable{{ $key }}" style="display: none;">
-              <table class="table table-bordered table-striped" style="margin-top: 0; border-top: none;">
-                <thead>
-                  <tr>
-                    <th style="width: 0.7%">#</th>
-                    <th>Perbuatan Baik</th>
-                    <th>Keterangan</th>
-                    <th>Kredit Kebaikan Poin</th>
-                    <th>Unit</th>
-                    <th>Tanggal</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @php $perbuatanBaikIndex = 1; @endphp
-                  @forelse ($perilaku['perbuatan_baik'] ?? [] as $perbuatan)
-                  <tr>
-                    <td style="width: 5%">{{ $perbuatanBaikIndex++ }}</td>
-                    <td>{{ $perbuatan['perbuatan_baik'] ?? '-' }}</td>
-                    <td>{{ $perbuatan['keterangan'] ?? '-' }}</td>
-                    <td style="width: 15%">{{ $perbuatan['kredit_poin'] ?? 0 }}</td>
-                    <td>{{ $perbuatan['unit'] ?? '-' }}</td>
-                    <td>{{ $perbuatan['tanggal'] ?? '-' }}</td>
-                  </tr>
-                  @empty
-                  <tr>
-                    <td colspan="6" class="no-results">No results found.</td>
-                  </tr>
-                  @endforelse
-                </tbody>
-              </table>
-            </div>
+            <!-- … -->
+<!-- Tabel Perbuatan Baik -->
+<div id="perbuatanBaikTable{{ $key }}" style="display: none;">
+  <table class="table table-bordered table-striped" style="margin-top: 0; border-top: none;">
+    <thead>
+      <tr>
+        <th style="width: 0.7%">#</th>
+        <th>Perbuatan Baik</th>
+        <th>Keterangan</th>
+        <th>Kredit Poin</th>
+        <th>Unit</th>
+        <th>Tanggal</th>
+      </tr>
+    </thead>
+    <tbody>
+      @php $i = 1; @endphp
+      @forelse ($perilaku['perbuatan_baik'] as $item)
+      <tr>
+        <td>{{ $i++ }}</td>
+        <!-- jika API pakai key 'nama_kebaikan' ganti di bawah -->
+        <td>{{ $item['perbuatan_baik'] ?? $item['nama_kebaikan'] ?? '-' }}</td>
+        <td>{{ $item['keterangan']    ?? $item['deskripsi']     ?? '-' }}</td>
+        <!-- titik kredit poin dari DB = 'kredit_poin', dari API = 'poin' -->
+        <td>{{ $item['kredit_poin'] ?? $item['poin'] ?? 0 }}</td>
+        <td>{{ $item['unit']         ?? '-' }}</td>
+        <td>{{ $item['tanggal']      ?? '-' }}</td>
+      </tr>
+      @empty
+      <tr><td colspan="6" class="no-results">Tidak ada perbuatan baik.</td></tr>
+      @endforelse
+    </tbody>
+  </table>
+</div>
 
             <script>
             document.addEventListener('DOMContentLoaded', function() {

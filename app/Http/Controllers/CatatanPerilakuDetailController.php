@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\OrangTua;
 use App\Services\TwilioService;
 use App\Models\StudentBehavior;
-use App\Models\Mahasiswa;
 use Illuminate\Support\Facades\Log;
 
 class CatatanPerilakuDetailController extends Controller

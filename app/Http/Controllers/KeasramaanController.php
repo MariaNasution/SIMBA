@@ -23,163 +23,160 @@ class KeasramaanController extends Controller
     public function detail($studentNim)
     {
         $apiToken = session('api_token');
-        $user = session('user');
+        $user     = session('user');
 
-        if (!$apiToken || !$user || !($user['role'] === 'keasramaan' || isset($user['nim']))) {
+        if (!$apiToken || ! $user || !($user['role'] === 'keasramaan' || isset($user['nim']))) {
             return redirect()->back()->withErrors(['error' => 'Session data tidak lengkap.']);
         }
 
         try {
-            // Get behavior score data from API
-            $response = Http::withToken($apiToken)
-                ->withOptions(['verify' => false])
+            //
+            // 1) Ambil Nilai Perilaku
+            //
+            $respNilai = Http::withToken($apiToken)
+                ->withOptions(['verify'=>false])
                 ->get('https://cis-dev.del.ac.id/api/library-api/get-penilaian', [
                     'nim' => $studentNim,
                 ]);
 
-            if (!$response->successful()) {
-                if ($response->status() == 500) {
-                    $nilaiPerilaku = [];
-                } else {
-                    return redirect()->back()->withErrors(['error' => 'Gagal mengambil data penilaian dari API.']);
+            if (! $respNilai->successful()) {
+                if ($respNilai->status() != 500) {
+                    return redirect()->back()
+                        ->withErrors(['error'=>'Gagal mengambil data penilaian dari API.']);
                 }
+                $nilaiPerilaku = [];
             } else {
-                $data = $response->json();
-                $nilaiPerilaku = $data['Nilai Perilaku'] ?? [];
-                $nilaiPerilaku = array_values($nilaiPerilaku);
+                $arr = $respNilai->json()['Nilai Perilaku'] ?? [];
+                $nilaiPerilaku = array_values($arr);
             }
 
-            // Get violation data (pelanggaran API)
-            $pelanggaranResponse = Http::withToken($apiToken)
-                ->withOptions(['verify' => false])
+            //
+            // 2) Ambil Pelanggaran API
+            //
+            $respPel = Http::withToken($apiToken)
+                ->withOptions(['verify'=>false])
                 ->get('https://cis-dev.del.ac.id/api/aktivitas-mhs-api/get-pelanggaran-mhs', [
                     'nim'    => $studentNim,
                     'ta'     => '',
                     'sem_ta' => '',
                 ]);
 
-            if (!$pelanggaranResponse->successful()) {
-                if ($pelanggaranResponse->status() == 500) {
-                    $pelanggaranData = ['data' => []];
-                } else {
-                    return redirect()->back()->withErrors(['error' => 'Gagal mengambil data pelanggaran dari API.']);
-                }
-            } else {
-                $pelanggaranData = $pelanggaranResponse->json();
+            $pelanggaranList = [];
+            if ($respPel->successful()) {
+                // normalisasi: pastikan setiap record punya 'id' => null
+                $raw = $respPel->json()['data'] ?? [];
+                $pelanggaranList = array_map(fn($r)=>
+                    is_array($r)
+                        ? array_merge(['id'=>null], $r)
+                        : ['id'=>null]
+                , $raw);
             }
 
-            // Preprocess API pelanggaran data: normalize each record so it always has an 'id' key.
-            $pelanggaranList = array_map(function ($record) {
-                if (is_array($record)) {
-                    return array_merge(['id' => null], $record);
-                }
-                return ['id' => null];
-            }, $pelanggaranData['data'] ?? []);
+            //
+            // 3) Ambil Kebaikan API
+            //
+            $respKeb = Http::withToken($apiToken)
+                ->withOptions(['verify'=>false])
+                ->get('https://cis-dev.del.ac.id/api/aktivitas-mhs-api/get-kebaikan-mhs', [
+                    'nim'    => $studentNim,
+                    'ta'     => '',
+                    'sem_ta' => '',
+                ]);
 
-            // Fetch local behavior records for the student and group by "TA-semester"
-            $localBehaviors = StudentBehavior::where('student_nim', $studentNim)->get()
-                ->groupBy(function ($item) {
-                    return $item->ta . '-' . $item->semester;
-                });
-
-            // Process API pelanggaran data and merge with local records
-            foreach ($nilaiPerilaku as &$perilaku) {
-                // Convert numeric semester to text if needed.
-                $perilaku['semester'] = $this->convertSemester($perilaku['sem_ta'] ?? 0);
-
-                // Filter API pelanggaran data for this TA and semester.
-                $filteredPelanggaran = array_filter($pelanggaranList, function ($pelanggaran) use ($perilaku) {
-                    return (int)$pelanggaran['ta'] === (int)$perilaku['ta']
-                        && (int)$pelanggaran['sem_ta'] === (int)$perilaku['sem_ta'];
-                });
-
-                // Build a key to match local records grouping.
-                $semKey = $perilaku['ta'] . '-' . ($perilaku['sem_ta'] ?? 0);
-
-                // Merge local pelanggaran records if available
-                if (isset($localBehaviors[$semKey])) {
-                    $dbPelanggaran = $localBehaviors[$semKey]
-                        ->where('type', 'pelanggaran')
-                        ->map(function ($item) {
-                            return [
-                                // Use the local record's actual ID
-                                'id'           => $item->id,
-                                'pelanggaran'  => $item->description,
-                                'unit'         => $item->unit,
-                                'tanggal'      => $item->tanggal,
-                                'poin'         => $item->poin,
-                                'tindakan'     => $item->tindakan,
-                            ];
-                        })->toArray();
-                    // Merge normalized API items with local records.
-                    $filteredPelanggaran = array_merge(array_values($filteredPelanggaran), $dbPelanggaran);
-                }
-                $perilaku['pelanggaran'] = array_values($filteredPelanggaran);
-
-                // Merge local perbuatan_baik records (API does not provide these)
-                if (isset($localBehaviors[$semKey])) {
-                    $dbPerbuatanBaik = $localBehaviors[$semKey]
-                        ->where('type', 'perbuatan_baik')
-                        ->map(function ($item) {
-                            return [
-                                'id'             => $item->id,
-                                'perbuatan_baik' => $item->description,
-                                'unit'           => $item->unit,
-                                'tanggal'        => $item->tanggal,
-                                'poin'           => $item->poin,
-                                'tindakan'       => $item->tindakan,
-                            ];
-                        })->toArray();
-                    $perilaku['perbuatan_baik'] = array_values($dbPerbuatanBaik);
-                } else {
-                    $perilaku['perbuatan_baik'] = [];
-                }
-
-                // === Hitung Akumulasi Skor ===
-                // Misal, skor awal default adalah 0
-                $skorAwal = 0;
-
-                // Total poin pelanggaran
-                $totalPoinPelanggaran = 0;
-                if (!empty($perilaku['pelanggaran'])) {
-                    foreach ($perilaku['pelanggaran'] as $pelanggaran) {
-                        $totalPoinPelanggaran += isset($pelanggaran['poin']) ? (int)$pelanggaran['poin'] : 0;
-                    }
-                }
-
-                // Total kredit perbuatan baik
-                $totalKreditPerbuatanBaik = 0;
-                if (!empty($perilaku['perbuatan_baik'])) {
-                    foreach ($perilaku['perbuatan_baik'] as $baik) {
-                        $totalKreditPerbuatanBaik += isset($baik['poin']) ? (int)$baik['poin'] : 0;
-                    }
-                }
-
-                // Hitung akumulasi skor menggunakan formula: skor awal + total poin pelanggaran - total kredit perbuatan baik.
-                $perilaku['akumulasi_skor'] = $skorAwal + $totalPoinPelanggaran - $totalKreditPerbuatanBaik;
+            $kebaikanList = [];
+            if ($respKeb->successful()) {
+                $rawK = $respKeb->json()['data'] ?? [];
+                $kebaikanList = array_map(fn($r)=>
+                    is_array($r)
+                        ? array_merge(['id'=>null], $r)
+                        : ['id'=>null]
+                , $rawK);
             }
 
+            //
+            // 4) Ambil local DB behaviors, group by "TA-semester"
+            //
+            $localBehaviors = StudentBehavior::where('student_nim', $studentNim)
+                ->get()
+                ->groupBy(fn($item)=> $item->ta.'-'.$item->semester);
+
+            //
+            // 5) Proses tiap semester
+            //
+            foreach ($nilaiPerilaku as &$per) {
+                // convert sem_ta → teks
+                $per['semester'] = $this->convertSemester($per['sem_ta'] ?? 0);
+                $key = $per['ta'].'-'.($per['sem_ta'] ?? 0);
+
+                // — Pelanggaran API filter →
+                $filPel = array_filter($pelanggaranList, fn($r)=>
+                    (int)$r['ta']===(int)$per['ta'] &&
+                    (int)$r['sem_ta']===(int)$per['sem_ta']
+                );
+                // — + local DB pelanggaran
+                if (isset($localBehaviors[$key])) {
+                    $dbPel = $localBehaviors[$key]
+                        ->where('type','pelanggaran')
+                        ->map(fn($i)=>[
+                            'id'          => $i->id,
+                            'pelanggaran' => $i->description,
+                            'unit'        => $i->unit,
+                            'tanggal'     => $i->tanggal,
+                            'poin'        => $i->poin,
+                            'tindakan'    => $i->tindakan,
+                        ])->toArray();
+                    $filPel = array_merge(array_values($filPel), $dbPel);
+                }
+                $per['pelanggaran'] = array_values($filPel);
+
+                // — Kebaikan API filter →
+                $filKeb = array_filter($kebaikanList, fn($r)=>
+                    (int)$r['ta']===(int)$per['ta'] &&
+                    (int)$r['sem_ta']===(int)$per['sem_ta']
+                );
+                // — + local DB perbuatan_baik
+                $dbKeb = [];
+                if (isset($localBehaviors[$key])) {
+                    $dbKeb = $localBehaviors[$key]
+                        ->where('type','perbuatan_baik')
+                        ->map(fn($i)=>[
+                            'id'             => $i->id,
+                            'perbuatan_baik' => $i->description,
+                            'unit'           => $i->unit,
+                            'tanggal'        => $i->tanggal,
+                            'poin'           => $i->poin,
+                            'tindakan'       => $i->tindakan,
+                        ])->toArray();
+                }
+                $per['perbuatan_baik'] = array_values(array_merge(array_values($filKeb), $dbKeb));
+
+                // — Hitung akumulasi skor —
+                $skAwal = 0;
+                $totPel = array_sum(array_map(fn($x)=>(int)($x['poin']??0), $per['pelanggaran']));
+                $totKeb = array_sum(array_map(fn($x)=>(int)($x['poin']??0), $per['perbuatan_baik']));
+                $per['akumulasi_skor'] = $skAwal + $totPel - $totKeb;
+            }
+            unset($per);
+
+            // 6) Kirim ke Blade
             return view('catatanPerilaku.catatan_perilaku_detail', [
                 'nilaiPerilaku' => $nilaiPerilaku,
                 'studentNim'    => $studentNim,
             ]);
         } catch (\Exception $e) {
-            Log::error('Exception occurred in detail:', ['message' => $e->getMessage()]);
-            return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            Log::error('detail() exception: '.$e->getMessage());
+            return redirect()->back()
+                ->withErrors(['error'=>'Terjadi kesalahan: '.$e->getMessage()]);
         }
     }
 
     private function convertSemester($sem_ta)
     {
-        switch ($sem_ta) {
-            case 1:
-                return 'Gasal';
-            case 2:
-                return 'Genap';
-            case 3:
-                return 'Pendek';
-            default:
-                return 'Tidak Diketahui';
-        }
+        return match ($sem_ta) {
+            1 => 'Gasal',
+            2 => 'Genap',
+            3 => 'Pendek',
+            default => 'Tidak Diketahui',
+        };
     }
 }
