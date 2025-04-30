@@ -201,9 +201,12 @@
         .page-break { page-break-before: always; margin-top: 100px; }
         .signature-box { margin-top: 40px; text-align: left; }
         .signature-box p { margin: 5px 0; font-size: 1rem; font-weight: bold; }
-        .submit-container { display: flex; justify-content: flex-end; padding-right: 50px; margin-top: 50px; }
+        .submit-container { display: flex; justify-content: flex-end; padding-right: 0px; margin-top: 50px;}
+
         .editable-input, .editable-textarea { border: none; background: transparent; outline: none; width: 100%; font-size: inherit; font-family: inherit; }
         .editable-textarea { min-height: 50px; resize: none; }
+        
+    
         table {
             width: 100%;
             border-collapse: collapse;

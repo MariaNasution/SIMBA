@@ -10,9 +10,10 @@
   <!-- Add SweetAlert2 JS -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <!-- Load reCAPTCHA v2 -->
-  @if (config('services.recaptcha.site_key'))
+  @if (config('services.recaptcha.enabled') && config('services.recaptcha.site_key'))
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   @else
+  @if (!config('services.recaptcha.site_key'))
   <script>
     console.error('reCAPTCHA site key is missing. Check .env RECAPTCHA_SITE_KEY and config/services.php.');
     document.addEventListener('DOMContentLoaded', function() {
@@ -23,6 +24,7 @@
       });
     });
   </script>
+  @endif
   @endif
 </head>
 
@@ -76,11 +78,13 @@
           @endif
 
           <!-- reCAPTCHA v2 Widget -->
+          @if (config('services.recaptcha.enabled') && config('services.recaptcha.site_key'))
           <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
           @if ($errors->has('g-recaptcha-response'))
           <div style="font-size: 12px; color: red; margin: 0 !important; padding: 0 !important; line-height: 1;">
             {{ $errors->first('g-recaptcha-response') }}
           </div>
+          @endif
           @endif
 
           <p>Belum Punya Akun? <a href="#" class="register-link"
@@ -165,6 +169,7 @@
     });
 
     // Handle reCAPTCHA v2 form submission
+    @if (config('services.recaptcha.enabled') && config('services.recaptcha.site_key'))
     loginForm.addEventListener("submit", function(e) {
       const recaptchaResponse = document.getElementById('g-recaptcha-response')?.value;
       if (!recaptchaResponse) {
@@ -176,6 +181,7 @@
         });
       }
     });
+    @endif
   });
   </script>
 
@@ -210,7 +216,7 @@
               title: 'Sukses',
               text: data.message
             }).then(() => {
-              // Arahkan ke form login
+              // Arahkan ke form PMID
               document.querySelector('.login-btn').click();
               registerForm.reset();
             });

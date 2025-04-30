@@ -342,9 +342,39 @@ class SetPerwalianController extends Controller
                 'ID_Perwalian' => $perwalian->ID_Perwalian,
             ]);
 
+            // Define NIM prefix to username prefix mapping
+            $prefixMap = [
+                '11S' => 'ifs',
+                '21S' => 'mrs',
+                '31S' => 'bps',
+                '12S' => 'iss',
+                '14S' => 'els',
+                '113' => 'if3',
+                '114' => 'if4',
+                '133' => 'ce3',
+                '22S' => 'tms',
+            ];
+
             foreach ($students as $student) {
                 $nim = $student['nim'];
-                $username = 'ifs' . substr($nim, 3);
+
+                // Ensure NIM is a string and at least 3 characters long
+                if (!is_string($nim) || strlen($nim) < 3) {
+                    Log::warning('Invalid NIM for username generation', ['nim' => $nim]);
+                    $username = 'std' . $nim; // Fallback username
+                } else {
+                    // Get the first 3 characters of the NIM
+                    $nimPrefix = substr($nim, 0, 3);
+                    // Check if the prefix exists in the map
+                    $usernamePrefix = isset($prefixMap[$nimPrefix]) ? $prefixMap[$nimPrefix] : 'std';
+                    // Generate username: prefix + rest of NIM
+                    $username = $usernamePrefix . substr($nim, 3);
+                    // Ensure username isn't empty
+                    if (empty($username) || $username === $usernamePrefix) {
+                        Log::warning('Generated username is empty or invalid', ['nim' => $nim, 'username' => $username]);
+                        $username = $usernamePrefix . $nim; // Fallback to prefix + full NIM
+                    }
+                }
 
                 Log::info('Processing student for Perwalian', [
                     'nim' => $nim,
@@ -742,7 +772,7 @@ public function destroy(Request $request)
         $students = [];
         foreach ($mahasiswaRecords as $m) {
             $absRecord = $absensiRecords->get($m->nim);
-            $status = $absRecord ? $absRecord->status_kehadiran : 'Belum';
+            $status = $absRecord ? $absRecord->status_kehadiran : 'Tidak Hadir';
             $students[] = [
                 'nim'   => $m->nim,
                 'nama'  => $m->nama,
@@ -760,6 +790,7 @@ public function destroy(Request $request)
         $beritaAcara = DB::table('berita_acaras')
         ->where('kelas', $perwalian->kelas)
         ->where('tanggal_perwalian', $perwalian->Tanggal)
+        ->where('dosen_wali', $user->nip)
         ->first();
             
 
@@ -792,14 +823,14 @@ public function destroy(Request $request)
         if (!$perwalian) {
             return redirect()->route('dosen.histori')->with('error', 'Perwalian not found.');
         }
-        Log::Info('Gote her1');
+        // Log::Info('Gote her1');
 
         // Ensure the Perwalian is in "Completed" status
         if ($perwalian->Status !== 'Completed') {
             return redirect()->route('dosen.histori')->with('error', 'Berita Acara can only be printed for completed Perwalian sessions.');
         }
 
-        Log::Info('Gote her2');
+        // Log::Info('Gote her2');
 
         // Get Mahasiswa records for this Perwalian
         $mahasiswaRecords = DB::table('mahasiswa')
@@ -807,7 +838,7 @@ public function destroy(Request $request)
             ->orderBy('nama')
             ->get();
 
-            Log::Info('Gote her3');
+            // Log::Info('Gote her3');
 
         $students = [];
         foreach ($mahasiswaRecords as $m) {
@@ -817,13 +848,13 @@ public function destroy(Request $request)
             ];
         }
 
-        Log::Info('Gote her4');
+        // Log::Info('Gote her4');
 
         // Get BeritaAcara record (dosen wali's report)
         $beritaAcara = DB::table('berita_acaras')
             ->where('kelas', $perwalian->kelas)
             ->where('tanggal_perwalian', $perwalian->Tanggal)
-            ->where('dosen_wali', $user->username)
+            ->where('dosen_wali', $user->nip)
             ->first();
 
             
@@ -832,7 +863,7 @@ public function destroy(Request $request)
             return redirect()->route('dosen.histori')->with('error', 'Berita Acara not found for this Perwalian session.');
         }
 
-        Log::Info('Gote her6');
+        // Log::Info('Gote her6');
 
 
         // Get Absensi records for mahasiswa (for the attendance table)
@@ -841,7 +872,7 @@ public function destroy(Request $request)
             ->get()
             ->keyBy('nim');
 
-            Log::Info('Gote her7');
+            // Log::Info('Gote her7');
 
         // Prepare data for the PDF view
         $pdfData = [
@@ -852,7 +883,7 @@ public function destroy(Request $request)
         ];
 
         
-        Log::Info('Gote her8');
+        // Log::Info('Gote her8');
 
         // Load the PDF view
         $pdf = PDF::loadView('dosen.berita_acara_pdf', $pdfData)

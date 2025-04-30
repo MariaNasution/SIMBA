@@ -18,8 +18,10 @@ class AuthController extends Controller
         Log::info('Environment debug:', [
             'RECAPTCHA_SITE_KEY' => env('RECAPTCHA_SITE_KEY'),
             'RECAPTCHA_SECRET_KEY' => env('RECAPTCHA_SECRET_KEY'),
+            'RECAPTCHA_ENABLED' => env('RECAPTCHA_ENABLED', true),
             'config_recaptcha_site_key' => config('services.recaptcha.site_key'),
             'config_recaptcha_secret_key' => config('services.recaptcha.secret_key'),
+            'config_recaptcha_enabled' => config('services.recaptcha.enabled'),
             'APP_ENV' => env('APP_ENV'),
         ]);
         return view('auth.login');
@@ -29,11 +31,17 @@ class AuthController extends Controller
     {
         Log::info('Login request received:', ['request' => $request->all()]);
 
-        $request->validate([
+        $rules = [
             'username' => 'required|string',
             'password' => 'required|string',
-            'g-recaptcha-response' => ['required', new ReCaptcha],
-        ], [
+        ];
+
+        // Add reCAPTCHA validation only if enabled
+        if (config('services.recaptcha.enabled') && config('services.recaptcha.site_key')) {
+            $rules['g-recaptcha-response'] = ['required', new ReCaptcha];
+        }
+
+        $request->validate($rules, [
             'g-recaptcha-response.required' => 'Please complete the reCAPTCHA checkbox.',
             'g-recaptcha-response' => 'reCAPTCHA verification failed. Please try again.',
         ]);
@@ -167,7 +175,7 @@ class AuthController extends Controller
                 case 'konselor':
                     Log::info('Redirecting to konselor route...');
                     return redirect()->route('konselor_beranda')->with('success', 'Login sebagai konselor berhasil!');
-                
+
                 case 'admin':
                     Log::info('Redirecting to admin route...');
                     return redirect()->route('admin.beranda')->with('success', 'Login sebagai admin berhasil!');
@@ -186,7 +194,7 @@ class AuthController extends Controller
     {
         session()->flush();
         session()->regenerate();
-   
+
         return redirect()->route('login');
     }
 }

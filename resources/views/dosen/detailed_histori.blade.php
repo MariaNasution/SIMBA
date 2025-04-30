@@ -59,7 +59,7 @@
                                         @elseif($status === 'izin')
                                             <span class="badge bg-info">Izin</span>
                                         @else
-                                            <span class="badge bg-danger">Belum</span>
+                                            <span class="badge bg-danger">Tidak Hadir</span>
                                         @endif
                                     </td>
                                 </tr>
