@@ -309,7 +309,7 @@ class SetPerwalianController extends Controller
             if (empty($students)) {
                 Log::warning('No students fetched for class in SetPerwalianController@store', [
                     'class' => $validatedData['selectedClass'],
-                    'dosen_id' => $user['pegawai_id'],
+                    'pegawai_id' => $user['pegawai_id'],
                     'sync_year' => $syncYear,
                     'semester' => $currentSem,
                 ]);

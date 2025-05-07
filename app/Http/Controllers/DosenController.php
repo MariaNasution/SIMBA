@@ -199,7 +199,7 @@ class DosenController extends Controller
         
         if (empty($students)) {
             Log::warning("No students fetched for year {$year}", [
-                'dosen_id' => $dosenId,
+                'pegawai_id' => $dosenId,
                 'semester' => $currentSem,
             ]);
             return [
@@ -342,7 +342,7 @@ class DosenController extends Controller
 
                 if (empty($studentsInClass)) {
                     Log::warning("No students found for year {$year} and kelas {$kelas}", [
-                        'dosen_id' => $dosenId,
+                        'pegawai_id' => $dosenId,
                     ]);
                     return back()->with('error', 'No students found for this class.');
                 }

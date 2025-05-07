@@ -60,7 +60,7 @@ class AbsensiController extends Controller
             // Sync students for each class
             foreach ($kelasList as $kelas) {
                 Log::info('Calling syncStudents for class', [
-                    'dosen_id' => $dosen['pegawai_id'],
+                    'pegawai_id' => $dosen['pegawai_id'],
                     'year' => $syncYear,
                     'semester' => $semester,
                     'kelas' => $kelas,
@@ -71,7 +71,7 @@ class AbsensiController extends Controller
             // Log the synced students
             $syncedStudents = Mahasiswa::where('ID_Dosen', $dosen['pegawai_id'])->get();
             Log::info('Students in mahasiswa table after sync', [
-                'dosen_id' => $dosen['pegawai_id'],
+                'pegawai_id' => $dosen['pegawai_id'],
                 'student_count' => $syncedStudents->count(),
                 'students' => $syncedStudents->toArray(),
             ]);

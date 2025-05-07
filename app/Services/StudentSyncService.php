@@ -37,7 +37,7 @@ class StudentSyncService
     {
         $apiToken = session('api_token');
         $query = [
-            'dosen_id' => $dosenId,
+            'pegawai_id' => $dosenId,
             'ta' => $year,
             'sem_ta' => $semester,
         ];
