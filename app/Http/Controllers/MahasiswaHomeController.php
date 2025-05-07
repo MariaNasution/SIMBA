@@ -40,7 +40,6 @@ class MahasiswaHomeController extends Controller
             return redirect()->route('beranda')->withErrors(['error' => 'Gagal mengambil data kemajuan studi.']);
         }
         list($labels, $values) = $performance;
-
         // Handle perwalian and notifications
         list(
             $dosen,

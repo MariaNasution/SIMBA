@@ -102,6 +102,7 @@ class DosenController extends Controller
                     $semesterAveragesByYear[$year] = [];
                     $angkatanByKelasAndYear[$year] = [];
 
+                    // dd($dosenId, $year, $currentSem, $kelas);
                     $students = $this->studentSyncService->fetchStudents($dosenId, $year, $currentSem, null);
 
                     if (empty($students)) {
@@ -243,7 +244,6 @@ class DosenController extends Controller
                 if (!$dosenId) {
                     return back()->with('error', 'Dosen ID not found.');
                 }                
-
 
                 $studentsInClass = $this->studentSyncService->fetchStudents($dosenId, $year, $currentSem, $kelas);
 

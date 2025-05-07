@@ -168,7 +168,7 @@
         @media (max-width: 768px) {
             .breadcrumb-nav {
                 flex-direction: row;
-                align-items: center;
+                align-items: centewebr;
                 padding: 10px 20px;
                 overflow-x: auto;
             }

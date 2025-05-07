@@ -33,6 +33,8 @@ use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\PerwalianController;
 
 Route::post('/notifications/mark-read', [NotifikasiController::class, 'markAllRead'])->name('notifications.markRead');
+// Route::post('/notifications/mark-read', [NotifikasiController::class, 'markAllRead'])->name('notifications.markRead');
+
 use App\Http\Controllers\KonselingLanjutanController;
 use App\Http\Controllers\BeritaAcaraController;
 

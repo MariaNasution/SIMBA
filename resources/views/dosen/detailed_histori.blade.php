@@ -4,11 +4,7 @@
 <div class="container my-4">
     <!-- Header with Back and Print Buttons -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <a href="{{ route('dosen.histori') }}" class="back-btn">
-                <span class="arrow"><</span> Back
-            </a>
-        </div>
+       
         <div>
             <a href="{{ route('berita_acara.print', $perwalian->ID_Perwalian) }}" class="btn btn-primary">
                 <i class="fas fa-print"></i> Print Perwalian PDF
