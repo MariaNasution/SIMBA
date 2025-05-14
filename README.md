@@ -1,4 +1,4 @@
-# Proyek Bersama Informatika
+# Proyek Kelompok 1 Informatika 2022 SIMBA
 
 # Cara Penggunaan :
 
