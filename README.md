@@ -6,7 +6,7 @@
 2. Lalu jalankan composer require maatwebsite/excel untuk keperluan export excel
 3. Setelah itu jalankan composer require twilio/sdk untuk keperluan api sms.
 4. Untuk sementara pengiriman sms tidak bisa dikarenakan regulasi yang panjang dari pihak ketiganya tetapi sistemasinya dalam aplikasi sudah ada.
-5. Download tambahkan path cacert.pem pada bagian berikut pada file php.ini:
+5. Download tambahkan path cacert.pem pada bagian berikut pada file php.ini untuk keperluan recaptcha:  
    ![image](https://github.com/user-attachments/assets/6dc63a1d-81e8-40cf-acb8-064461a3ae1f)
 
 6. Buat file .env dengan rinci berikut :
