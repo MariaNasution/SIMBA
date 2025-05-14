@@ -17,7 +17,18 @@
     DB_DATABASE=kel1  
     DB_USERNAME=root  
     DB_PASSWORD=  
-
+      
+ -   recaptcha :  
+    RECAPTCHA_SITE_KEY=6LcEfxsrAAAAAAW4KQIGiHvaScj2GItOMuj9xLDw
+    RECAPTCHA_SECRET_KEY=6LcEfxsrAAAAAIoHStYwqgPnaSfrr0bbOY4rh4dL
+    # RECAPTCHA_SITE=https://www.google.com/recaptcha/admin/
+    RECAPTCHA_ENABLED=false  
+  
+   -   twilio (isi dengan credential sendiri):  
+    TWILIO_SID=  
+    TWILIO_AUTH_TOKEN=  
+    TWILIO_NUMBER=  
+  
 7. jalankan perintah berikut pada terminal : php artisan migrate --seed
 8. jalankan perintah berikut untuk menjalankan aplikasi: php artisan serve
 9. untuk user manual dapat dilihat pada docs berikut : https://docs.google.com/document/d/1E-acvYaZ3bXgycn88gx5RrXVqX2sboHZl-Q11Sa_DtE/edit?tab=t.0
