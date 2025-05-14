@@ -10,13 +10,13 @@
    ![image](https://github.com/user-attachments/assets/6dc63a1d-81e8-40cf-acb8-064461a3ae1f)
 
 6. Buat file .env dengan rinci berikut :
--   database :
-    DB_CONNECTION=mysql
-    DB_HOST=127.0.0.1
-    DB_PORT=3306
-    DB_DATABASE=kel1
-    DB_USERNAME=root
-    DB_PASSWORD=
+-   database :  
+    DB_CONNECTION=mysql  
+    DB_HOST=127.0.0.1  
+    DB_PORT=3306  
+    DB_DATABASE=kel1  
+    DB_USERNAME=root  
+    DB_PASSWORD=  
 
 7. jalankan perintah berikut pada terminal : php artisan migrate --seed
 8. jalankan perintah berikut untuk menjalankan aplikasi: php artisan serve
