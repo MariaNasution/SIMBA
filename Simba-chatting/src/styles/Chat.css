@@ -1,0 +1,155 @@
+.comments-container {
+  background: #2c2c3f;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.comments-container h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  margin-bottom: 20px;
+}
+
+.comments-list {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  padding-right: 10px;
+}
+
+.comment {
+  display: flex;
+  align-items: flex-start;
+  padding: 15px 0;
+  border-bottom: 1px solid #40405a;
+  gap: 10px; /* Consistent spacing between username and text */
+}
+
+.own-comment {
+  justify-content: flex-start; /* Logged-in user's messages on the left */
+}
+
+.other-comment {
+  justify-content: flex-end; /* Other users' messages on the right */
+}
+
+.comment-user {
+  font-weight: 700;
+  color: #a0a0ff;
+  font-size: 16px;
+  min-width: 100px; /* Prevent username from shrinking too much */
+  max-width: 150px; /* Prevent long usernames from pushing text too far */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.comment-text {
+  font-size: 16px;
+  color: #e0e0e0;
+  line-height: 1.5;
+  background: #33334d;
+  padding: 10px;
+  border-radius: 8px;
+  max-width: 70%; /* Prevent text from stretching too wide */
+  word-wrap: break-word; /* Ensure long words wrap */
+}
+
+.own-comment .comment-text {
+  background: #6b6bff; /* Different background for own messages */
+  color: #ffffff;
+}
+
+.comment-form {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.comment-input {
+  flex: 1;
+  padding: 14px;
+  background: #33334d;
+  border: 1px solid #40405a;
+  border-radius: 10px;
+  color: #e0e0e0;
+  font-size: 16px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.comment-input:focus {
+  outline: none;
+  border-color: #6b6bff;
+  box-shadow: 0 0 8px rgba(107, 107, 255, 0.5);
+}
+
+.comment-input::placeholder {
+  color: #88889f;
+}
+
+.submit-button {
+  padding: 10px 20px;
+  background: linear-gradient(45deg, #6b6bff, #a0a0ff);
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.submit-button:hover {
+  background: linear-gradient(45deg, #5050cc, #8080ff);
+  transform: scale(1.05);
+}
+
+/* Custom Scrollbar */
+.comments-list::-webkit-scrollbar {
+  width: 10px;
+}
+
+.comments-list::-webkit-scrollbar-track {
+  background: #2c2c3f;
+  border-radius: 8px;
+}
+
+.comments-list::-webkit-scrollbar-thumb {
+  background: #6b6bff;
+  border-radius: 8px;
+}
+
+.comments-list::-webkit-scrollbar-thumb:hover {
+  background: #5050cc;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 480px) {
+  .comments-container {
+    padding: 15px;
+  }
+  .comments-container h2 {
+    font-size: 20px;
+  }
+  .comment-form {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .comment-input {
+    width: 100%;
+  }
+  .submit-button {
+    font-size: 14px;
+    padding: 10px;
+  }
+  .comment-user {
+    min-width: 80px;
+    max-width: 120px;
+  }
+  .comment-text {
+    max-width: 100%; /* Allow more width on smaller screens */
+  }
+}
