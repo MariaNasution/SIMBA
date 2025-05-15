@@ -60,6 +60,12 @@
                         @if ($adError || empty($advertisements))
                             <div class="no-posts-container">
                                 <p class="no-posts">Couldn’t load posts</p>
+                                <button onclick="refreshAds()" class="refresh-button rounded-full" aria-label="Refresh posts">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+                                        <path d="M21 3v5h-5" />
+                                    </svg>
+                                </button>
                             </div>
                         @else
                             <div class="ad-posts" id="ad-posts">
@@ -230,80 +236,151 @@
     @endif
 
     <script>
-        // Seamless looping for ad posts
-        document.addEventListener('DOMContentLoaded', function () {
-            const adPosts = document.querySelector('#ad-posts');
-            const section = document.querySelector('.ad-section');
-            const noPostsContainer = section.querySelector('.no-posts-container');
+        function refreshAds() {
+            console.log('refreshAds: Attempting to fetch advertisements');
+            fetch('/api/advertisements', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch advertisements: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('refreshAds: Fetched advertisements:', data);
+                    const section = document.querySelector('.ad-section');
+                    const noPostsContainer = section.querySelector('.no-posts-container');
+                    const adPosts = section.querySelector('#ad-posts');
 
-            // Render server-side posts and prepare for scrolling
-            if (!($adError || empty($advertisements))) {
-                const posts = @json(array_slice($advertisements, 0, 10));
-                if (posts.length > 0 && adPosts) {
-                    localStorage.setItem('advertisements', JSON.stringify(posts));
-                    // Triple posts for smoother looping
-                    adPosts.innerHTML = adPosts.innerHTML + adPosts.innerHTML + adPosts.innerHTML;
-                    adPosts.style.display = 'flex';
+                    if (data.length === 0) {
+                        console.log('refreshAds: No posts available');
+                        if (noPostsContainer) {
+                            noPostsContainer.style.display = 'flex';
+                        }
+                        if (adPosts) {
+                            adPosts.style.display = 'none';
+                        }
+                        return;
+                    }
+
+                    // Limit to first 10 posts
+                    const limitedData = data.slice(0, 10);
+                    localStorage.setItem('advertisements', JSON.stringify(limitedData));
+
+                    // Update posts and duplicate for scrolling
+                    if (adPosts) {
+                        const postHTML = limitedData.map(ad => `
+                            <a href="http://localhost:3000" target="_blank" class="ad-card">
+                                ${ad.image_data ? `<img src="data:${ad.image_mime_type};base64,${ad.image_data}" alt="${ad.title}" class="ad-image">` : '<p class="text-gray-400">Image unavailable</p>'}
+                                <div class="ad-overlay">
+                                    <h3>${ad.title}</h3>
+                                    <p>${ad.description.length > 30 ? ad.description.substring(0, 30) + '...' : ad.description}</p>
+                                </div>
+                            </a>
+                        `).join('');
+                        adPosts.innerHTML = postHTML + postHTML + postHTML; // Triple for smoother loop
+                        adPosts.style.display = 'flex';
+                    }
                     if (noPostsContainer) {
                         noPostsContainer.style.display = 'none';
                     }
-
-                    // Continuous scroll loop
-                    let scrollPos = 0;
-                    const scrollSpeed = 0.5; // Constant speed (pixels per frame)
-                    const cardWidth = window.innerWidth <= 768 ? 106 : 128; // 100px + 6px mobile, 120px + 8px desktop
-                    const resetPoint = cardWidth * 10; // After 10 cards
-                    let animationFrameId = null;
-
-                    function scrollAds() {
-                        scrollPos += scrollSpeed;
-                        adPosts.scrollLeft = scrollPos;
-
-                        // Reset scroll when 10 cards have passed
-                        if (scrollPos >= resetPoint) {
-                            scrollPos = 0; // Reset to start
-                            adPosts.scrollLeft = 0;
-                        }
-
-                        animationFrameId = requestAnimationFrame(scrollAds);
-                    }
-
-                    // Start scrolling
-                    scrollAds();
-
-                    // Pause on hover
-                    adPosts.addEventListener('mouseenter', () => {
-                        if (animationFrameId) {
-                            cancelAnimationFrame(animationFrameId); // Cancel existing animation
-                            animationFrameId = null;
-                        }
-                        scrollPos = adPosts.scrollLeft; // Save current position
-                    });
-
-                    // Resume on mouse leave
-                    adPosts.addEventListener('mouseleave', () => {
-                        if (!animationFrameId) {
-                            scrollAds(); // Restart scrolling
-                        }
-                    });
-                } else {
-                    localStorage.removeItem('advertisements');
-                    if (adPosts) {
-                        adPosts.style.display = 'none';
-                    }
+                })
+                .catch(error => {
+                    console.error('refreshAds: Error fetching advertisements:', error);
+                    const section = document.querySelector('.ad-section');
+                    const noPostsContainer = section.querySelector('.no-posts-container');
+                    const adPosts = section.querySelector('#ad-posts');
                     if (noPostsContainer) {
                         noPostsContainer.style.display = 'flex';
                     }
+                    if (adPosts) {
+                        adPosts.style.display = 'none';
+                    }
+                });
+        }
+
+        // Seamless looping for ad posts
+        document.addEventListener('DOMContentLoaded', function () {
+            const adPosts = document.querySelector('#ad-posts');
+            if (adPosts && adPosts.children.length > 0) {
+                const posts = @json(array_slice($advertisements, 0, 10));
+                localStorage.setItem('advertisements', JSON.stringify(posts));
+                // Triple posts for smoother looping
+                adPosts.innerHTML = adPosts.innerHTML + adPosts.innerHTML + adPosts.innerHTML;
+            }
+
+            // Load cached posts if API failed
+            if (!adPosts || adPosts.children.length === 0) {
+                const cachedPosts = localStorage.getItem('advertisements');
+                if (cachedPosts) {
+                    const posts = JSON.parse(cachedPosts).slice(0, 10);
+                    const section = document.querySelector('.ad-section');
+                    const noPostsContainer = section.querySelector('.no-posts-container');
+                    const adPosts = section.querySelector('#ad-posts');
+
+                    if (adPosts) {
+                        const postHTML = posts.map(ad => `
+                            <a href="http://localhost:3000" target="_blank" class="ad-card">
+                                ${ad.image_data ? `<img src="data:${ad.image_mime_type};base64,${ad.image_data}" alt="${ad.title}" class="ad-image">` : '<p class="text-gray-400">Image unavailable</p>'}
+                                <div class="ad-overlay">
+                                    <h3>${ad.title}</h3>
+                                    <p>${ad.description.length > 30 ? ad.description.substring(0, 30) + '...' : ad.description}</p>
+                                </div>
+                            </a>
+                        `).join('');
+                        adPosts.innerHTML = postHTML + postHTML + postHTML; // Triple posts
+                        adPosts.style.display = 'flex';
+                    }
+                    if (noPostsContainer) {
+                        noPostsContainer.style.display = 'none';
+                    }
                 }
-            } else {
-                // Do not load cached posts if server-side indicates error
-                localStorage.removeItem('advertisements'); // Clear cache on initial error
-                if (adPosts) {
-                    adPosts.style.display = 'none';
+            }
+
+            // Continuous scroll loop
+            if (adPosts && adPosts.children.length > 0) {
+                let scrollPos = 0;
+                const scrollSpeed = 0.5; // Constant speed (pixels per frame)
+                const cardWidth = window.innerWidth <= 768 ? 106 : 128; // 100px + 6px mobile, 120px + 8px desktop
+                const resetPoint = cardWidth * 10; // After 10 cards
+                let animationFrameId = null;
+
+                function scrollAds() {
+                    scrollPos += scrollSpeed;
+                    adPosts.scrollLeft = scrollPos;
+
+                    // Reset scroll when 10 cards have passed
+                    if (scrollPos >= resetPoint) {
+                        scrollPos = 0; // Reset to start
+                        adPosts.scrollLeft = 0;
+                    }
+
+                    animationFrameId = requestAnimationFrame(scrollAds);
                 }
-                if (noPostsContainer) {
-                    noPostsContainer.style.display = 'flex';
-                }
+
+                // Start scrolling
+                scrollAds();
+
+                // Pause on hover
+                adPosts.addEventListener('mouseenter', () => {
+                    if (animationFrameId) {
+                        cancelAnimationFrame(animationFrameId); // Cancel existing animation
+                        animationFrameId = null;
+                    }
+                    scrollPos = adPosts.scrollLeft; // Save current position
+                });
+
+                // Resume on mouse leave
+                adPosts.addEventListener('mouseleave', () => {
+                    if (!animationFrameId) {
+                        scrollAds(); // Restart scrolling
+                    }
+                });
             }
         });
     </script>
