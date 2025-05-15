@@ -81,7 +81,7 @@
 
         <!-- Footer -->
         <footer class="text-center py-3">
-            <p>© {{ date('Y') }}Kelompok 1 IF 1 ©Goormet</p>
+            <p>© {{ date('Y') }}Kelompok 1 IF 1 ©SIMBA</p>
         </footer>
     </div>
 
