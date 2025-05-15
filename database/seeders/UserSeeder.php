@@ -255,7 +255,7 @@ class UserSeeder extends Seeder
                     DB::table('orang_tua')->insert([
                         'username' => $user['username'],
                         'nim' => '11S20001', // Matches one of the new students
-                        'no_hp' => '+6281377385300',
+                        'no_hp' => '',
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
