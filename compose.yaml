@@ -12,7 +12,7 @@ services:
     depends_on:
       - mysql
     expose:
-      - "9000"
+      - "8102"
 
   nginx:
     image: nginx:alpine
