@@ -1,0 +1,109 @@
+# Version control
+.git/
+.gitignore
+.svn/
+.hg/
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Go
+/vendor/
+*.test
+*.exe
+*.out
+*.a
+*.o
+*.so
+*.cgo*
+*.cover
+*.prof
+*.pb.go
+*.pb.gw.go
+*.sum
+*.mod
+
+# PHP Composer
+/vendor/
+
+# IDE/editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime*
+*.DS_Store
+Thumbs.db
+
+# Build outputs
+build/
+dist/
+out/
+
+# Test files and coverage
+coverage/
+.coverage
+.pytest_cache/
+test/
+tests/
+*_test.go
+
+# Debug and log files
+*.log
+debug/
+logs/
+
+# Environment and secrets
+.env
+.env.*
+*.env
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Local and temp files
+.local/
+tmp/
+temp/
+*.tmp
+
+# Documentation
+README*
+*.md
+docs/
+
+# Docker files
+Dockerfile*
+docker-compose*
+
+# Project-specific
+*.stub
+
+# Miscellaneous
+*.bak
+*.old
+*.orig
+
+# Exclude lock files from ignore (they should be included)
+!composer.lock
+!package-lock.json
+!go.sum
+
+# Exclude Dockerignore itself
+.dockerignore
+
+# Exclude important config files
+!composer.json
+!package.json
+!go.mod
+
+# Exclude public assets (if needed for build)
+!public/
+
+# Exclude resources (if needed for build)
+!resources/
