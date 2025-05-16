@@ -25,8 +25,9 @@
 # Menjalankan dengan Docker
 
 ## Persyaratan Khusus Proyek
-- PHP 8.2 (FPM Alpine)
-- Node.js 20 (untuk build asset Laravel) dan Node.js 22 (untuk React frontend Simba-chatting)
+- PHP 8.3 (FPM Alpine, untuk Laravel)
+- Node.js 20 (untuk build asset Laravel)
+- Node.js 22 (untuk React frontend Simba-chatting)
 - Go 1.24 (untuk backend Simba-chatting)
 - MySQL (default: database `kel1`, user `root`, tanpa password)
 
@@ -56,6 +57,7 @@
 - Jika ingin menggunakan file `.env` pada service tertentu, hapus tanda komentar pada bagian `env_file` di `docker-compose.yml`.
 - Data MySQL akan disimpan secara persisten di volume `mysql-data`.
 - Untuk build asset Laravel, proses otomatis dijalankan di Dockerfile, tidak perlu build manual.
+- Untuk backend Go Simba-chatting, file `service-account.json` dapat di-mount dari host jika diperlukan (lihat komentar pada compose file).
 
 ## Catatan
 - Pastikan port 8000, 8080, dan 3000 tidak digunakan aplikasi lain.

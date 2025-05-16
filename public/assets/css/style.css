@@ -19,6 +19,27 @@ ps-32 {
     padding-left: 50px;
 }
 
+
+.chart-card {
+    min-width: 280px; /* Match .card for responsiveness */
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    padding: 20px; /* Consistent padding */
+    min-height: 500px; /* Fixed height for uniformity */
+    max-height: 500px; /* Prevent overflow */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.chart-card canvas {
+    width: 100% !important;
+    height: 400px !important; /* Match canvas height */
+    max-height: 400px !important;
+}
+
 .card {
     flex-grow: 1; /* Memastikan kartu menggunakan ruang yang tersedia */
     min-width: 280px; /* Lebar minimal agar responsif */
@@ -26,7 +47,6 @@ ps-32 {
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     background-color: #fff;
-
 }
 
 .cards {
@@ -398,6 +418,176 @@ body {
 
 .va-text {
     color: rgb(48, 181, 234); /* Warna biru */
+}
+
+/* Advertisement Section */
+.ad-section {
+    background: #2c2c3f;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    color: #e0e0e0;
+    font-family: 'Arial', sans-serif;
+    margin-bottom: 20px;
+}
+
+.ad-section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.ad-posts {
+    display: flex;
+    flex-direction: row;
+    overflow: hidden; /* Hide overflow for clean loop */
+    max-width: 1000px; /* Wider container */
+    margin: 0 auto;
+    will-change: transform;
+}
+
+.ad-posts:hover .ad-card {
+    animation-play-state: paused;
+}
+
+.ad-section .ad-card {
+    position: relative;
+    flex: 0 0 120px; /* Smaller card */
+    height: 80px; /* Smaller card */
+    margin-right: 8px; /* Reduced margin */
+    overflow: hidden;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    background: #33334d;
+    text-decoration: none;
+    color: inherit;
+    flex-grow: 0 !important;
+    min-width: 120px !important;
+    max-width: 120px !important;
+}
+
+.ad-section .ad-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+.ad-section .ad-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 12px;
+}
+
+.ad-section .text-gray-400 {
+    color: #9ca3af;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+}
+
+.ad-section .ad-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.8));
+    opacity: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 4px; /* Reduced for smaller cards */
+    transition: opacity 0.4s ease;
+    z-index: 1;
+}
+
+.ad-section .ad-card:hover .ad-overlay {
+    opacity: 1;
+}
+
+.ad-section .ad-overlay h3 {
+    margin: 0;
+    font-size: 10px; /* Smaller font */
+    font-weight: 700;
+    text-align: center;
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.ad-section .ad-overlay p {
+    margin: 0;
+    font-size: 8px; /* Smaller font */
+    color: #d0d0ff;
+    text-align: center;
+}
+
+.ad-section .no-posts-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.ad-section .no-posts {
+    color: #88889f;
+    font-size: 16px;
+    text-align: center;
+}
+
+.ad-section .no-posts-container .refresh-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px; /* Smaller, rounded button */
+    height: 40px;
+    background: #4B5563; /* Matches chatList.js style */
+    border: none;
+    border-radius: 50%; /* Rounded-full */
+    color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    z-index: 10; /* Ensure button is clickable */
+}
+
+.ad-section .no-posts-container .refresh-button:hover {
+    background-color: #374151; /* Darker on hover */
+}
+
+.ad-section .no-posts-container .refresh-button svg {
+    width: 20px; /* Smaller icon */
+    height: 20px;
+}
+
+@media (max-width: 768px) {
+    .ad-section .ad-card {
+        flex: 0 0 100px; /* Smaller on mobile */
+        height: 60px; /* Smaller on mobile */
+        min-width: 100px !important;
+        max-width: 100px !important;
+        margin-right: 6px; /* Reduced margin */
+    }
+
+    .ad-section .ad-overlay h3 {
+        font-size: 8px; /* Smaller font */
+    }
+
+    .ad-section .ad-overlay p {
+        font-size: 6px; /* Smaller font */
+    }
+
+    .ad-posts {
+        max-width: 600px; /* Wider on mobile */
+    }
 }
 
 #kemajuanStudiChart {
