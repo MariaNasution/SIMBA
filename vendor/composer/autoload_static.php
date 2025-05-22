@@ -636,6 +636,7 @@ class ComposerStaticInita48c00f6b237690e854b34f9c472cf96
         'App\\Http\\Controllers\\KemajuanStudiController' => __DIR__ . '/../..' . '/app/Http/Controllers/KemajuanStudiController.php',
         'App\\Http\\Controllers\\KonselingLanjutanController' => __DIR__ . '/../..' . '/app/Http/Controllers/KonselingLanjutanController.php',
         'App\\Http\\Controllers\\KonselorController' => __DIR__ . '/../..' . '/app/Http/Controllers/KonselorController.php',
+        'App\\Http\\Controllers\\MahasiswaHomeController' => __DIR__ . '/../..' . '/app/Http/Controllers/MahasiswaHomeController.php',
         'App\\Http\\Controllers\\MahasiswaKonselingController' => __DIR__ . '/../..' . '/app/Http/Controllers/MahasiswaKonselingController.php',
         'App\\Http\\Controllers\\MahasiswaPerwalianController' => __DIR__ . '/../..' . '/app/Http/Controllers/MahasiswaPerwalianController.php',
         'App\\Http\\Controllers\\MahasiswaRequestKonselingController' => __DIR__ . '/../..' . '/app/Http/Controllers/MahasiswaRequestKonselingController.php',

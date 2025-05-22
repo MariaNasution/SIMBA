@@ -26,6 +26,7 @@ return array(
     'App\\Http\\Controllers\\KemajuanStudiController' => $baseDir . '/app/Http/Controllers/KemajuanStudiController.php',
     'App\\Http\\Controllers\\KonselingLanjutanController' => $baseDir . '/app/Http/Controllers/KonselingLanjutanController.php',
     'App\\Http\\Controllers\\KonselorController' => $baseDir . '/app/Http/Controllers/KonselorController.php',
+    'App\\Http\\Controllers\\MahasiswaHomeController' => $baseDir . '/app/Http/Controllers/MahasiswaHomeController.php',
     'App\\Http\\Controllers\\MahasiswaKonselingController' => $baseDir . '/app/Http/Controllers/MahasiswaKonselingController.php',
     'App\\Http\\Controllers\\MahasiswaPerwalianController' => $baseDir . '/app/Http/Controllers/MahasiswaPerwalianController.php',
     'App\\Http\\Controllers\\MahasiswaRequestKonselingController' => $baseDir . '/app/Http/Controllers/MahasiswaRequestKonselingController.php',
