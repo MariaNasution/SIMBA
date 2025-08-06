@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php artisan:*)",
+      "Bash(php:*)",
+      "Bash(find:*)",
+      "Bash(composer install:*)",
+      "Bash(composer update:*)",
+      "Bash(taskkill:*)"
+    ],
+    "deny": []
+  }
+}

@@ -30,7 +30,7 @@ This project is set up for multi-service development using Docker and Docker Com
 
 ## Ports Exposed
 
-- **PHP App**: Exposes port `9000` (internal, for PHP-FPM; not mapped to host by default)
+- **PHP App**: Exposes port `8102` (internal, for PHP-FPM; not mapped to host by default)
 - **Go Simba Chatting Backend**: Exposes port `8080` (internal; not mapped to host by default)
 - **React Simba Chatting Frontend**: Exposes port `3000` (mapped to host, access via [http://localhost:3000](http://localhost:3000))
 

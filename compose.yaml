@@ -1,73 +1,31 @@
-version: '3.8'
-
 services:
-  php-app:
+  simba-app:
     build:
       context: .
       dockerfile: ./Dockerfile
-    container_name: php-app
+    container_name: simba-app
     restart: unless-stopped
     networks:
       - appnet
     depends_on:
       - mysql
-    expose:
-      - "8102"
-
-  nginx:
-    image: nginx:alpine
-    container_name: nginx
-    restart: unless-stopped
     ports:
-      - "8000:80"
-    volumes:
-      - .:/var/www/html
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
-      - php-app
-    networks:
-      - appnet
+      - "80:80"
 
   mysql:
-    image: mysql:8.0
+    image: mysql:8.4
     container_name: simba-mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_HOST: '%'
       MYSQL_DATABASE: kel1
-      MYSQL_USER: kel1_user
-      MYSQL_PASSWORD: kel1_password
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
     volumes:
       - mysql-data:/var/lib/mysql
     networks:
       - appnet
-
-  go-simba-chat-backend:
-    build:
-      context: ./Simba-chatting/backend
-      dockerfile: backendDockerfile
-    container_name: go-simba-chat-backend
-    restart: unless-stopped
-    networks:
-      - appnet
     ports:
-      - "8080:8080"
-    expose:
-      - "8080"
-
-  js-simba-chatting:
-    build:
-      context: ./Simba-chatting
-      dockerfile: ../Simba-chattingDockerfile
-    container_name: js-simba-chatting
-    restart: unless-stopped
-    init: true
-    networks:
-      - appnet
-    ports:
-      - "3000:3000"
-    depends_on:
-      - go-simba-chat-backend
+      - "3307:3306"  # Avoids conflict with local MySQL/MariaDB if any
 
 volumes:
   mysql-data:

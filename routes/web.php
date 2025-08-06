@@ -69,10 +69,11 @@ Route::middleware(['auth.session', 'ensure.student.data', 'role:mahasiswa'])->gr
     Route::get('/detailnilai/{kode_mk}', [DetailNilaiController::class, 'show'])->name('detailnilai');
     Route::get('/mahasiswa_konseling', [MahasiswaKonselingController::class, 'index'])->name('mahasiswa_konseling');
     Route::get('/mahasiswa_perwalian', [MahasiswaPerwalianController::class, 'index'])->name('mahasiswa_perwalian');
+    Route::get('/catatan_perilaku', [CatatanPerilakuController::class, 'index'])->name('catatan_perilaku_mahasiswa');
+    
+    // Konseling request routes
     Route::get('/mahasiswa/konseling/request', [MahasiswaRequestKonselingController::class, 'create'])->name('mhs_konseling_request');
-    Route::redirect('/mahasiswa/konseling/request', '/mahasiswa/request-konseling');
     Route::post('/mahasiswa/request-konseling', [MahasiswaRequestKonselingController::class, 'store'])->name('mhs_konseling_request.store');
-    Route::get('/mahasiswa/konseling/request', [MahasiswaRequestKonselingController::class, 'create'])->name('mhs_konseling_request');
     Route::post('/mahasiswa/konseling/store', [MahasiswaRequestKonselingController::class, 'store'])->name('mhs_konseling_store');
 
 });
@@ -121,7 +122,7 @@ Route::middleware(['auth.session', 'role:kemahasiswaan'])
             // Kemahasiswaan request konseling
             Route::get('/ajukan', [AjukanKonselingController::class, 'index'])->name('konseling.ajukan');
             Route::get('/cari', [AjukanKonselingController::class, 'cariMahasiswa'])->name('konseling.cari');
-            Route::post('/ajukan', [AjukanKonselingController::class, 'ajukanKonseling'])->name('konseling.ajukan');
+            Route::post('/ajukan', [AjukanKonselingController::class, 'ajukanKonseling'])->name('konseling.store');
             Route::get('/caririwayat', [RiwayatKonselingController::class, 'CariRiwayatMahasiswa'])->name('konseling.caririwayat');
             Route::get('/konseling', [AjukanKonselingController::class, 'index'])->name('konseling.index');
             Route::get('/konseling/pilih', [AjukanKonselingController::class, 'pilihMahasiswa'])->name('konseling.pilih');
@@ -171,9 +172,9 @@ Route::middleware(['auth.session', 'role:konselor'])
             // Konselor request konseling
             Route::get('/ajukan', [AjukanKonselingController::class, 'index'])->name('konseling.form');
             Route::get('/cari', [AjukanKonselingController::class, 'cariMahasiswa'])->name('konseling.cari');
-            Route::post('/ajukan', [AjukanKonselingController::class, 'ajukanKonseling'])->name('konseling.ajukan');
+            Route::post('/ajukan', [AjukanKonselingController::class, 'ajukanKonseling'])->name('konseling.submit');
 
-            Route::get('/caririwayat', [RiwayatkonselingController::class, 'CariRiwayatMahasiswa'])->name('konseling.caririwayat');
+            Route::get('/caririwayat', [RiwayatKonselingController::class, 'CariRiwayatMahasiswa'])->name('konseling.caririwayat');
             Route::get('/konseling', [AjukanKonselingController::class, 'index'])->name('konseling.index');
             Route::get('/konseling/pilih', [AjukanKonselingController::class, 'pilihMahasiswa'])->name('konseling.pilih');
 
@@ -187,32 +188,8 @@ Route::middleware(['auth.session', 'role:konselor'])
         });
     });
 
-// Middleware untuk mahasiswa
-Route::middleware(['auth.session', 'ensure.student.data', 'role:mahasiswa'])->group(function () {
-    Route::get('/mahasiswa/beranda', [MahasiswaHomeController::class, 'index'])->name('beranda');
-    Route::get('/mahasiswa/pengumuman/{id}', [MahasiswaHomeController::class, 'show'])->name('pengumuman.detail');
-    Route::get('/mahasiswa/profil', [ProfilController::class, 'index'])->name('profil');
-    Route::get('perkuliahan/kemajuan_studi', [KemajuanStudiController::class, 'index'])->name('kemajuan_studi');
-    Route::get('/detailnilai/{kode_mk}', [DetailNilaiController::class, 'show'])->name('detailnilai');
-    Route::get('/catatan_perilaku', [CatatanPerilakuController::class, 'index'])->name('catatan_perilaku_mahasiswa');
-
-    Route::get('/mahasiswa_konseling', [MahasiswaKonselingController::class, 'index'])->name('mahasiswa_konseling');
-    Route::get('/mahasiswa_perwalian', [MahasiswaPerwalianController::class, 'index'])->name('mahasiswa_perwalian');
-
-    Route::prefix('konseling')->group(function () {
-        Route::get('/mahasiswa/konseling/request', [MahasiswaRequestKonselingController::class, 'create'])->name('mhs_konseling_request');
-
-
-        Route::get('/mahasiswa/request-konseling', [MahasiswaRequestKonselingController::class, 'create'])->name('mhs_konseling_request');
-        Route::post('/mahasiswa/request-konseling', [MahasiswaRequestKonselingController::class, 'store'])->name('mhs_konseling_request.store');
-        Route::get('/mahasiswa/request-konseling', [MahasiswaRequestKonselingController::class, 'create'])->name('mhs_konseling_request');
-
-
-        Route::get('/mahasiswa/konseling/request', [MahasiswaRequestKonselingController::class, 'create'])->name('mhs_konseling_request');
-        Route::post('/mahasiswa/konseling/store', [MahasiswaRequestKonselingController::class, 'store'])->name('mhs_konseling_store');
-    });
-
-});
+// Additional mahasiswa routes (merged with existing group above)
+// Route group removed to avoid duplicates
 
 Route::middleware(['auth.session', 'role:dosen'])->group(function () {
     // DosenController Routes (unchanged)
