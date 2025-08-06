@@ -3,22 +3,39 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Mahasiswa;
+use App\Models\OrangTua;
+use App\Models\Dosen;
+use App\Models\Konselor;
+use App\Models\Kemahasiswaan;
+use App\Models\Keasramaan;
 
 class StoreUserRequest extends FormRequest
 {
     public function authorize()
     {
-        return $this->user()->hasRole('admin'); // Hanya admin yang bisa akses
+        return $this->user()->hasRole('admin');
     }
 
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
             $role = $this->input('role');
-            if ($role === 'mahasiswa' && !$this->input('kelas')) {
-                $validator->errors()->add('kelas', 'Kelas wajib diisi untuk mahasiswa.');
+            if ($role === 'mahasiswa') {
+                if (!$this->filled('nama')) {
+                    $validator->errors()->add('nama', 'Nama wajib diisi untuk mahasiswa.');
+                }
+                if (!$this->filled('nim')) {
+                    $validator->errors()->add('nim', 'NIM wajib diisi untuk mahasiswa.');
+                }
+                if (!$this->filled('kelas')) {
+                    $validator->errors()->add('kelas', 'Kelas wajib diisi untuk mahasiswa.');
+                }
+                if (!$this->filled('anak_wali')) {
+                    $validator->errors()->add('anak_wali', 'Dosen wali wajib dipilih untuk mahasiswa.');
+                }
             }
-            if ($role === 'orang_tua' && !$this->input('no_hp')) {
+            if ($role === 'orang_tua' && !$this->filled('no_hp')) {
                 $validator->errors()->add('no_hp', 'Nomor HP wajib diisi untuk orang tua.');
             }
         });
@@ -27,34 +44,68 @@ class StoreUserRequest extends FormRequest
     public function rules()
     {
         $userId = $this->user ? $this->user->id : null;
+        $isUpdate = $this->route()->getName() === 'admin.users.update';
 
-        return [
+        $rules = [
             'username' => 'required|string|max:255|unique:users,username,' . $userId,
-            'password' => 'required|string|min:6|confirmed', // Konfirmasi password
             'role' => 'required|string|in:mahasiswa,konselor,kemahasiswaan,dosen,keasramaan,orang_tua',
-            'nama' => 'required_if:role,mahasiswa,dosen|string|max:255|nullable',
+            'nama' => 'nullable|string|max:255',
             'nim' => [
-                'required_if:role,mahasiswa,orang_tua',
+                'nullable',
                 'string',
-                'max:20',
-                'unique:mahasiswa,nim,' . ($this->user ? $this->user->mahasiswa?->nim : null),
-                // Validasi nim untuk orang_tua harus ada di tabel mahasiswa
-                'exists:mahasiswa,nim' => $this->input('role') === 'orang_tua',
+                'max:8',
+                function ($attribute, $value, $fail) use ($userId) {
+                    if ($this->input('role') === 'mahasiswa') {
+                        if (Mahasiswa::where('nim', $value)->where('username', '!=', $this->user?->username)->exists()) {
+                            $fail('NIM sudah terdaftar untuk mahasiswa.');
+                        }
+                    } elseif ($this->input('role') === 'orang_tua') {
+                        if ($value && !Mahasiswa::where('nim', $value)->exists()) {
+                            $fail('NIM mahasiswa tidak ditemukan.');
+                        }
+                        if (OrangTua::where('nim', $value)->where('username', '!=', $this->user?->username)->exists()) {
+                            $fail('NIM sudah terdaftar untuk orang tua.');
+                        }
+                    }
+                },
             ],
             'nip' => [
-                'required_if:role,dosen,konselor,kemahasiswaan,keasramaan',
+                'nullable',
                 'string',
                 'max:20',
-                'unique:dosen,nip,' . ($this->user ? $this->user->dosen?->nip : null),
-                'unique:konselor,nip,' . ($this->user ? $this->user->konselor?->nip : null),
-                'unique:kemahasiswaan,nip,' . ($this->user ? $this->user->kemahasiswaan?->nip : null),
-                'unique:keasramaan,nip,' . ($this->user ? $this->user->keasramaan?->nip : null),
+                function ($attribute, $value, $fail) use ($userId) {
+                    if ($this->input('role') === 'dosen' && Dosen::where('nip', $value)->where('username', '!=', $this->user?->username)->exists()) {
+                        $fail('NIP sudah terdaftar untuk dosen.');
+                    } elseif ($this->input('role') === 'konselor' && Konselor::where('nip', $value)->where('username', '!=', $this->user?->username)->exists()) {
+                        $fail('NIP sudah terdaftar untuk konselor.');
+                    } elseif ($this->input('role') === 'kemahasiswaan' && Kemahasiswaan::where('nip', $value)->where('username', '!=', $this->user?->username)->exists()) {
+                        $fail('NIP sudah terdaftar untuk kemahasiswaan.');
+                    } elseif ($this->input('role') === 'keasramaan' && Keasramaan::where('nip', $value)->where('username', '!=', $this->user?->username)->exists()) {
+                        $fail('NIP sudah terdaftar untuk keasramaan.');
+                    }
+                },
             ],
-            'kelas' => 'required_if:role,mahasiswa|string|max:10|nullable',
-            'ID_Dosen' => 'required_if:role,mahasiswa|exists:dosen,username|nullable',
+            'kelas' => 'nullable|string|max:10',
+            'anak_wali' => [
+                'nullable',
+                'string',
+                function ($attribute, $value, $fail) {
+                    if ($this->input('role') === 'mahasiswa' && $value && !Dosen::where('nip', $value)->exists()) {
+                        $fail('NIP dosen wali tidak ditemukan.');
+                    }
+                },
+            ],
             'ID_Perwalian' => 'nullable|exists:perwalian,ID_Perwalian',
-            'no_hp' => 'required_if:role,orang_tua|string|max:15|nullable',
+            'no_hp' => 'nullable|string|max:15',
         ];
+
+        if ($isUpdate) {
+            $rules['password'] = 'nullable|string|min:6|confirmed';
+        } else {
+            $rules['password'] = 'required|string|min:6|confirmed';
+        }
+
+        return $rules;
     }
 
     public function messages()
@@ -62,10 +113,8 @@ class StoreUserRequest extends FormRequest
         return [
             'username.unique' => 'Username sudah digunakan.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
-            'nim.unique' => 'NIM sudah terdaftar.',
-            'nim.exists' => 'NIM mahasiswa tidak ditemukan.',
-            'nip.unique' => 'NIP sudah terdaftar.',
-            'ID_Dosen.exists' => 'Dosen wali tidak valid.',
+            'nim.max' => 'NIM tidak boleh lebih dari 8 karakter.',
+            'nip.max' => 'NIP tidak boleh lebih dari 20 karakter.',
         ];
     }
 }

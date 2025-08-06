@@ -27,7 +27,6 @@ class AdminController extends Controller
     public function indexUser()
     {
         $this->authorize('viewAny', User::class);
-        // Ambil semua user dengan relasi dan urutkan agar admin di atas
         $users = User::with(['mahasiswa', 'dosen', 'konselor', 'kemahasiswaan', 'keasramaan', 'orangTua'])
             ->orderByRaw("CASE WHEN role = 'admin' THEN 0 ELSE 1 END")
             ->get();
@@ -37,7 +36,7 @@ class AdminController extends Controller
     public function create()
     {
         $this->authorize('create', User::class);
-        $dosen = Dosen::all(); // Untuk dropdown ID_Dosen
+        $dosen = Dosen::select('username', 'nama', 'nip')->get();
         return view('admin.users.create', compact('dosen'));
     }
 
@@ -45,18 +44,19 @@ class AdminController extends Controller
     {
         $this->authorize('create', User::class);
         try {
+            Log::info('Attempting to create user with data: ', $request->validated());
             $this->userService->createUserWithRole($request->validated());
             return redirect()->route('admin.users.index')->with('success', 'User berhasil ditambahkan!');
         } catch (\Exception $e) {
-            Log::error('Error creating user: ' . $e->getMessage());
-            return back()->withInput()->with('error', 'Gagal menambahkan user. Silakan coba lagi.');
+            Log::error('Error creating user: ' . $e->getMessage(), ['data' => $request->validated()]);
+            return back()->withInput()->with('error', 'Gagal menambahkan user: ' . $e->getMessage());
         }
     }
 
     public function edit(User $user)
     {
         $this->authorize('update', $user);
-        $dosen = Dosen::all(); // Untuk dropdown ID_Dosen
+        $dosen = Dosen::select('username', 'nama', 'nip')->get();
         return view('admin.users.edit', compact('user', 'dosen'));
     }
 
